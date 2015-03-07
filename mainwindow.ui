@@ -364,6 +364,9 @@
             </item>
             <item>
              <widget class="QSpinBox" name="spNumOfSamples">
+              <property name="keyboardTracking">
+               <bool>false</bool>
+              </property>
               <property name="minimum">
                <number>2</number>
               </property>
