@@ -164,8 +164,11 @@ void MainWindow::onPortToggled(bool open)
 
 void MainWindow::onDataReady()
 {
-    QByteArray data = serialPort.readAll();
-    addData((unsigned char)(data[0]));
+    if (ui->actionStart->isChecked())
+    {
+        QByteArray data = serialPort.readAll();
+        addData((unsigned char)(data[0]));
+    }
 }
 
 void MainWindow::onPortError(QSerialPort::SerialPortError error)
