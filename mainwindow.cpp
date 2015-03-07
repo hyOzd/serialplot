@@ -178,6 +178,7 @@ void MainWindow::onPortError(QSerialPort::SerialPortError error)
                 qDebug() << "Closing port on resource error: " << serialPort.portName();
                 togglePort();
             }
+            loadPortList();
             break;
         default:
             qDebug() << "Unhandled port error: " << error;
