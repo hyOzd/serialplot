@@ -35,6 +35,17 @@ MainWindow::MainWindow(QWidget *parent) :
     loadPortList();
     loadBaudRateList();
     ui->cbBaudRate->setCurrentIndex(ui->cbBaudRate->findText("9600"));
+
+	// init plot
+	numOfSamples = 100;
+	dataArray.resize(numOfSamples);
+	dataX.resize(numOfSamples);
+	for (int i = 0; i < dataX.size(); i++)
+	{
+		dataX[i] = i;
+	}
+	curve.setSamples(dataX, dataArray);
+	curve.attach(ui->plot);
 }
 
 MainWindow::~MainWindow()
@@ -146,5 +157,20 @@ void MainWindow::onPortToggled(bool open)
 
 void MainWindow::onDataReady()
 {
-    qDebug() << "Data: " << serialPort.readAll().toHex();
+	QByteArray data = serialPort.readAll();
+	addData((unsigned char)(data[0]));
+}
+
+void MainWindow::addData(double data)
+{
+	// shift data array and place new data at the end
+	for (int i = 0; i < dataArray.size()-1; i++)
+	{
+		dataArray[i] = dataArray[i+1];
+	}
+	dataArray.last() = data;
+
+	// update plot
+	curve.setSamples(dataX, dataArray);
+	ui->plot->replot();
 }
