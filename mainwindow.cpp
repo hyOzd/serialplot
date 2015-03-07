@@ -167,7 +167,23 @@ void MainWindow::onDataReady()
 
 void MainWindow::onPortError(QSerialPort::SerialPortError error)
 {
-    qDebug() << "Port error happened: " << serialPort.error();
+    switch(error)
+    {
+        case QSerialPort::NoError :
+            break;
+        case QSerialPort::ResourceError :
+            qDebug() << "Port error: resource unavaliable; most likely device removed.";
+            if (serialPort.isOpen())
+            {
+                qDebug() << "Closing port on resource error: " << serialPort.portName();
+                togglePort();
+            }
+            break;
+        default:
+            qDebug() << "Unhandled port error: " << error;
+            break;
+    }
+
 }
 
 void MainWindow::addData(double data)
