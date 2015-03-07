@@ -40,6 +40,8 @@ private slots:
     void onDataReady();
     void onPortError(QSerialPort::SerialPortError error);
 
+    void onNumOfSamplesChanged(int value);
+
 signals:
     void portToggled(bool open);
 };

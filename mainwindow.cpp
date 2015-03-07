@@ -32,6 +32,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&(this->serialPort), &QSerialPort::readyRead,
                      this, &MainWindow::onDataReady);
 
+    QObject::connect(ui->spNumOfSamples, SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
+                     this, &MainWindow::onNumOfSamplesChanged);
+
     // init port signals
     QObject::connect(&(this->serialPort), SIGNAL(error(QSerialPort::SerialPortError)),
                      this, SLOT(onPortError(QSerialPort::SerialPortError)));
@@ -41,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->cbBaudRate->setCurrentIndex(ui->cbBaudRate->findText("9600"));
 
     // init plot
-    numOfSamples = 100;
+    numOfSamples = ui->spNumOfSamples->value();
     dataArray.resize(numOfSamples);
     dataX.resize(numOfSamples);
     for (int i = 0; i < dataX.size(); i++)
@@ -199,4 +202,26 @@ void MainWindow::addData(double data)
     // update plot
     curve.setSamples(dataX, dataArray);
     ui->plot->replot();
+}
+
+void MainWindow::onNumOfSamplesChanged(int value)
+{
+    int oldNum = this->numOfSamples;
+    numOfSamples = value;
+
+    // resize data arrays
+    if (numOfSamples < oldNum)
+    {
+        dataX.resize(numOfSamples);
+        dataArray.remove(0, oldNum - numOfSamples);
+    }
+    else if(numOfSamples > oldNum)
+    {
+        dataX.resize(numOfSamples);
+        for (int i = oldNum; i < numOfSamples; i++)
+        {
+            dataX[i] = i;
+            dataArray.prepend(0);
+        }
+    }
 }
