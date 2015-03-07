@@ -32,6 +32,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&(this->serialPort), &QSerialPort::readyRead,
                      this, &MainWindow::onDataReady);
 
+	// init port signals
+	QObject::connect(&(this->serialPort), SIGNAL(error(QSerialPort::SerialPortError)),
+                     this, SLOT(onPortError(QSerialPort::SerialPortError)));
+
     loadPortList();
     loadBaudRateList();
     ui->cbBaudRate->setCurrentIndex(ui->cbBaudRate->findText("9600"));
@@ -159,6 +163,11 @@ void MainWindow::onDataReady()
 {
 	QByteArray data = serialPort.readAll();
 	addData((unsigned char)(data[0]));
+}
+
+void MainWindow::onPortError(QSerialPort::SerialPortError error)
+{
+	qDebug() << "Port error happened: " << serialPort.error();
 }
 
 void MainWindow::addData(double data)

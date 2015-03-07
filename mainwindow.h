@@ -38,6 +38,7 @@ private slots:
     void selectBaudRate(QString baudRate);
 
     void onDataReady();
+    void onPortError(QSerialPort::SerialPortError error);
 
 signals:
     void portToggled(bool open);
