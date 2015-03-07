@@ -57,6 +57,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    if (serialPort.isOpen())
+    {
+        serialPort.close();
+    }
     delete ui;
 }
 
