@@ -41,6 +41,8 @@ private slots:
     void onPortError(QSerialPort::SerialPortError error);
 
     void onNumOfSamplesChanged(int value);
+    void onAutoScaleChecked(bool checked);
+    void onYScaleChanged();
 
 signals:
     void portToggled(bool open);

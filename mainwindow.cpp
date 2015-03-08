@@ -2,7 +2,8 @@
 #include "ui_mainwindow.h"
 #include <QSerialPortInfo>
 #include <QtDebug>
-
+#include <qwt_plot.h>
+#include <limits.h>
 #include "utils.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -35,6 +36,15 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->spNumOfSamples, SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
                      this, &MainWindow::onNumOfSamplesChanged);
 
+    QObject::connect(ui->cbAutoScale, &QCheckBox::toggled,
+                     this, &MainWindow::onAutoScaleChecked);
+
+    QObject::connect(ui->spYmin, SIGNAL(valueChanged(double)),
+                     this, SLOT(onYScaleChanged()));
+
+    QObject::connect(ui->spYmax, SIGNAL(valueChanged(double)),
+                     this, SLOT(onYScaleChanged()));
+
     // init port signals
     QObject::connect(&(this->serialPort), SIGNAL(error(QSerialPort::SerialPortError)),
                      this, SLOT(onPortError(QSerialPort::SerialPortError)));
@@ -42,6 +52,13 @@ MainWindow::MainWindow(QWidget *parent) :
     loadPortList();
     loadBaudRateList();
     ui->cbBaudRate->setCurrentIndex(ui->cbBaudRate->findText("9600"));
+
+    // set limits for axis limit boxes
+    ui->spYmin->setRange(std::numeric_limits<double>::min(),
+                         std::numeric_limits<double>::max());
+
+    ui->spYmax->setRange(std::numeric_limits<double>::min(),
+                         std::numeric_limits<double>::max());
 
     // init plot
     numOfSamples = ui->spNumOfSamples->value();
@@ -231,4 +248,32 @@ void MainWindow::onNumOfSamplesChanged(int value)
             dataArray.prepend(0);
         }
     }
+}
+
+void MainWindow::onAutoScaleChecked(bool checked)
+{
+    if (checked)
+    {
+        ui->plot->setAxisAutoScale(QwtPlot::yLeft);
+        ui->lYmin->setEnabled(false);
+        ui->lYmax->setEnabled(false);
+        ui->spYmin->setEnabled(false);
+        ui->spYmax->setEnabled(false);
+    }
+    else
+    {
+        ui->lYmin->setEnabled(true);
+        ui->lYmax->setEnabled(true);
+        ui->spYmin->setEnabled(true);
+        ui->spYmax->setEnabled(true);
+
+        ui->plot->setAxisScale(QwtPlot::yLeft, ui->spYmin->value(),
+                               ui->spYmax->value());
+    }
+}
+
+void MainWindow::onYScaleChanged()
+{
+    ui->plot->setAxisScale(QwtPlot::yLeft, ui->spYmin->value(),
+                           ui->spYmax->value());
 }
