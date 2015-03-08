@@ -30,9 +30,6 @@ MainWindow::MainWindow(QWidget *parent) :
                      SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
                      this, &MainWindow::selectBaudRate);
 
-    QObject::connect(&(this->serialPort), &QSerialPort::readyRead,
-                     this, &MainWindow::onDataReady);
-
     QObject::connect(ui->spNumOfSamples, SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
                      this, &MainWindow::onNumOfSamplesChanged);
 
@@ -48,6 +45,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // init port signals
     QObject::connect(&(this->serialPort), SIGNAL(error(QSerialPort::SerialPortError)),
                      this, SLOT(onPortError(QSerialPort::SerialPortError)));
+
+    QObject::connect(&(this->serialPort), &QSerialPort::readyRead,
+                     this, &MainWindow::onDataReady);
 
     loadPortList();
     loadBaudRateList();
