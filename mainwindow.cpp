@@ -168,7 +168,7 @@ void MainWindow::onPortToggled(bool open)
 
 void MainWindow::onDataReady()
 {
-    if (ui->actionStart->isChecked())
+    if (!ui->actionPause->isChecked())
     {
         QByteArray data = serialPort.readAll();
         addData((unsigned char)(data[0]));
