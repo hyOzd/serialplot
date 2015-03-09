@@ -230,7 +230,7 @@ void MainWindow::addData(double data)
 
 void MainWindow::onNumOfSamplesChanged(int value)
 {
-    int oldNum = this->numOfSamples;
+    unsigned int oldNum = this->numOfSamples;
     numOfSamples = value;
 
     // resize data arrays
@@ -242,7 +242,7 @@ void MainWindow::onNumOfSamplesChanged(int value)
     else if(numOfSamples > oldNum)
     {
         dataX.resize(numOfSamples);
-        for (int i = oldNum; i < numOfSamples; i++)
+        for (unsigned int i = oldNum; i < numOfSamples; i++)
         {
             dataX[i] = i;
             dataArray.prepend(0);
