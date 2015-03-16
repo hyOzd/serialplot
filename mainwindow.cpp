@@ -68,10 +68,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->cbBaudRate->setCurrentIndex(ui->cbBaudRate->findText("9600"));
 
     // set limits for axis limit boxes
-    ui->spYmin->setRange(std::numeric_limits<double>::min(),
+    ui->spYmin->setRange((-1) * std::numeric_limits<double>::max(),
                          std::numeric_limits<double>::max());
 
-    ui->spYmax->setRange(std::numeric_limits<double>::min(),
+    ui->spYmax->setRange((-1) * std::numeric_limits<double>::max(),
                          std::numeric_limits<double>::max());
 
     // init plot
