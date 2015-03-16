@@ -230,6 +230,10 @@ void MainWindow::onDataReady()
             addData(samples);
         }
     }
+    else
+    {
+        serialPort.clear(QSerialPort::Input);
+    }
 }
 
 void MainWindow::onPortError(QSerialPort::SerialPortError error)
