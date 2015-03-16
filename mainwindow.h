@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QButtonGroup>
 #include <QString>
 #include <QVector>
 #include <QSerialPort>
@@ -20,7 +21,19 @@ public:
     ~MainWindow();
 
 private:
+    enum NumberFormat
+    {
+        NumberFormat_uint8,
+        NumberFormat_uint16,
+        NumberFormat_uint32,
+        NumberFormat_int8,
+        NumberFormat_int16,
+        NumberFormat_int32
+    };
+
     Ui::MainWindow *ui;
+    QButtonGroup numberFormatButtons;
+
     QSerialPort serialPort;
 
     unsigned int numOfSamples;
@@ -28,6 +41,13 @@ private:
     QVector<double> dataArray;
     QVector<double> dataX;
     void addData(double data);
+
+    NumberFormat numberFormat;
+    unsigned int sampleSize; // number of bytes in the selected number format
+    double (MainWindow::*readSample)();
+
+    // note that serialPort should already have enough bytes present
+    template<typename T> double readSampleAs();
 
 private slots:
     void loadPortList();
@@ -43,6 +63,9 @@ private slots:
     void onNumOfSamplesChanged(int value);
     void onAutoScaleChecked(bool checked);
     void onYScaleChanged();
+
+    void onNumberFormatButtonToggled(int numberFormatId, bool checked);
+    void selectNumberFormat(NumberFormat numberFormatId);
 
 signals:
     void portToggled(bool open);

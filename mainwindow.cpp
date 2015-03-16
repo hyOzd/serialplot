@@ -42,6 +42,17 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->spYmax, SIGNAL(valueChanged(double)),
                      this, SLOT(onYScaleChanged()));
 
+    // setup number format buttons
+    numberFormatButtons.addButton(ui->rbUint8,  NumberFormat_uint8);
+    numberFormatButtons.addButton(ui->rbUint16, NumberFormat_uint16);
+    numberFormatButtons.addButton(ui->rbUint32, NumberFormat_uint32);
+    numberFormatButtons.addButton(ui->rbInt8,   NumberFormat_int8);
+    numberFormatButtons.addButton(ui->rbInt16,  NumberFormat_int16);
+    numberFormatButtons.addButton(ui->rbInt32,  NumberFormat_int32);
+
+    QObject::connect(&numberFormatButtons, SIGNAL(buttonToggled(int, bool)),
+                     this, SLOT(onNumberFormatButtonToggled(int, bool)));
+
     // init port signals
     QObject::connect(&(this->serialPort), SIGNAL(error(QSerialPort::SerialPortError)),
                      this, SLOT(onPortError(QSerialPort::SerialPortError)));
@@ -70,6 +81,16 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     curve.setSamples(dataX, dataArray);
     curve.attach(ui->plot);
+
+    // init number format
+    if (numberFormatButtons.checkedId() >= 0)
+    {
+        selectNumberFormat((NumberFormat) numberFormatButtons.checkedId());
+    }
+    else
+    {
+        selectNumberFormat(NumberFormat_uint8);
+    }
 }
 
 MainWindow::~MainWindow()
@@ -187,8 +208,24 @@ void MainWindow::onDataReady()
 {
     if (!ui->actionPause->isChecked())
     {
-        QByteArray data = serialPort.readAll();
-        addData((unsigned char)(data[0]));
+        int bytesAvailable = serialPort.bytesAvailable();
+        if (bytesAvailable < sampleSize)
+        {
+            return;
+        }
+        else
+        {
+            int numOfSamplesToRead =
+                (bytesAvailable - (bytesAvailable % sampleSize)) / sampleSize;
+            QVector<double> samples(numOfSamplesToRead);
+            int i = 0;
+            while(i < numOfSamplesToRead)
+            {
+                samples.replace(i, (this->*readSample)());
+                i++;
+            }
+            addData(samples[0]);
+        }
     }
 }
 
@@ -276,4 +313,49 @@ void MainWindow::onYScaleChanged()
 {
     ui->plot->setAxisScale(QwtPlot::yLeft, ui->spYmin->value(),
                            ui->spYmax->value());
+}
+
+void MainWindow::onNumberFormatButtonToggled(int numberFormatId, bool checked)
+{
+    if (checked) selectNumberFormat((NumberFormat) numberFormatId);
+}
+
+void MainWindow::selectNumberFormat(NumberFormat numberFormatId)
+{
+    numberFormat = numberFormatId;
+
+    switch(numberFormat)
+    {
+        case NumberFormat_uint8:
+            sampleSize = 1;
+            readSample = &MainWindow::readSampleAs<quint8>;
+            break;
+        case NumberFormat_int8:
+            sampleSize = 1;
+            readSample = &MainWindow::readSampleAs<qint8>;
+            break;
+        case NumberFormat_uint16:
+            sampleSize = 2;
+            readSample = &MainWindow::readSampleAs<quint16>;
+            break;
+        case NumberFormat_int16:
+            sampleSize = 2;
+            readSample = &MainWindow::readSampleAs<qint16>;
+            break;
+        case NumberFormat_uint32:
+            sampleSize = 4;
+            readSample = &MainWindow::readSampleAs<quint32>;
+            break;
+        case NumberFormat_int32:
+            sampleSize = 4;
+            readSample = &MainWindow::readSampleAs<qint32>;
+            break;
+    }
+}
+
+template<typename T> double MainWindow::readSampleAs()
+{
+    T data;
+    this->serialPort.read((char*) &data, sizeof(data));
+    return double(data);
 }

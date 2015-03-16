@@ -342,6 +342,9 @@
              <property name="text">
               <string>uint8</string>
              </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item row="2" column="0">
@@ -536,7 +539,7 @@
      <x>0</x>
      <y>0</y>
      <width>653</width>
-     <height>23</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
