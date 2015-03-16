@@ -42,6 +42,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->spYmax, SIGNAL(valueChanged(double)),
                      this, SLOT(onYScaleChanged()));
 
+    QObject::connect(ui->actionClear, SIGNAL(triggered(bool)),
+                     this, SLOT(clearPlot()));
+
     // setup number format buttons
     numberFormatButtons.addButton(ui->rbUint8,  NumberFormat_uint8);
     numberFormatButtons.addButton(ui->rbUint16, NumberFormat_uint16);
@@ -259,6 +262,15 @@ void MainWindow::addData(double data)
         dataArray[i] = dataArray[i+1];
     }
     dataArray.last() = data;
+
+    // update plot
+    curve.setSamples(dataX, dataArray);
+    ui->plot->replot();
+}
+
+void MainWindow::clearPlot()
+{
+    dataArray.fill(0.0);
 
     // update plot
     curve.setSamples(dataX, dataArray);

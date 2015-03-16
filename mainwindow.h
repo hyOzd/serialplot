@@ -67,6 +67,8 @@ private slots:
     void onNumberFormatButtonToggled(int numberFormatId, bool checked);
     void selectNumberFormat(NumberFormat numberFormatId);
 
+    void clearPlot();
+
 signals:
     void portToggled(bool open);
 };
