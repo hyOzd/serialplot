@@ -227,7 +227,7 @@ void MainWindow::onDataReady()
                 samples.replace(i, (this->*readSample)());
                 i++;
             }
-            addData(samples[0]);
+            addData(samples);
         }
     }
 }
@@ -254,14 +254,35 @@ void MainWindow::onPortError(QSerialPort::SerialPortError error)
 
 }
 
-void MainWindow::addData(double data)
+void MainWindow::addData(QVector<double> data)
 {
-    // shift data array and place new data at the end
-    for (int i = 0; i < dataArray.size()-1; i++)
+    int offset = numOfSamples - data.size();
+
+    if (offset < 0)
     {
-        dataArray[i] = dataArray[i+1];
+        for (int i = 0; i < numOfSamples; i++)
+        {
+            dataArray[i] = data[i - offset];
+        }
     }
-    dataArray.last() = data;
+    else if (offset == 0)
+    {
+        dataArray = data;
+    }
+    else
+    {
+        // shift old samples
+        int shift = data.size();
+        for (int i = 0; i < offset; i++)
+        {
+            dataArray[i] = dataArray[i + shift];
+        }
+        // place new samples
+        for (int i = 0; i < data.size(); i++)
+        {
+            dataArray[offset + i] = data[i];
+        }
+    }
 
     // update plot
     curve.setSamples(dataX, dataArray);

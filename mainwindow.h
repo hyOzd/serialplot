@@ -40,7 +40,7 @@ private:
     QwtPlotCurve curve;
     QVector<double> dataArray;
     QVector<double> dataX;
-    void addData(double data);
+    void addData(QVector<double> data);
 
     NumberFormat numberFormat;
     unsigned int sampleSize; // number of bytes in the selected number format
