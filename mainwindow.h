@@ -35,6 +35,7 @@ private:
     Ui::MainWindow *ui;
     QButtonGroup numberFormatButtons;
     QButtonGroup parityButtons;
+    QButtonGroup dataBitsButtons;
 
     QSerialPort serialPort;
 
@@ -59,6 +60,7 @@ private slots:
     void onPortToggled(bool open);
     void selectBaudRate(QString baudRate);
     void selectParity(int parity); // parity must be one of QSerialPort::Parity
+    void selectDataBits(int dataBits); // bits must be one of QSerialPort::DataBits
 
     void onDataReady();
     void onPortError(QSerialPort::SerialPortError error);

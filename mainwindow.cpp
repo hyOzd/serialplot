@@ -65,6 +65,16 @@ MainWindow::MainWindow(QWidget *parent) :
                      SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
                      this, &MainWindow::selectParity);
 
+    // setup data bits selection buttons
+    dataBitsButtons.addButton(ui->rb8Bits, (int) QSerialPort::Data8);
+    dataBitsButtons.addButton(ui->rb7Bits, (int) QSerialPort::Data7);
+    dataBitsButtons.addButton(ui->rb6Bits, (int) QSerialPort::Data6);
+    dataBitsButtons.addButton(ui->rb5Bits, (int) QSerialPort::Data5);
+
+    QObject::connect(&dataBitsButtons,
+                     SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
+                     this, &MainWindow::selectDataBits);
+
     // init port signals
     QObject::connect(&(this->serialPort), SIGNAL(error(QSerialPort::SerialPortError)),
                      this, SLOT(onPortError(QSerialPort::SerialPortError)));
@@ -218,6 +228,18 @@ void MainWindow::selectParity(int parity)
         if(!serialPort.setParity((QSerialPort::Parity) parity))
         {
             qDebug() << "Set parity failed: " << serialPort.error();
+        }
+    }
+}
+
+void MainWindow::selectDataBits(int dataBits)
+{
+    qDebug() << dataBits;
+    if (serialPort.isOpen())
+    {
+        if(!serialPort.setDataBits((QSerialPort::DataBits) dataBits))
+        {
+            qDebug() << "Set data bits failed: " << serialPort.error();
         }
     }
 }
