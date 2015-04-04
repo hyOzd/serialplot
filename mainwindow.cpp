@@ -234,7 +234,6 @@ void MainWindow::selectParity(int parity)
 
 void MainWindow::selectDataBits(int dataBits)
 {
-    qDebug() << dataBits;
     if (serialPort.isOpen())
     {
         if(!serialPort.setDataBits((QSerialPort::DataBits) dataBits))
