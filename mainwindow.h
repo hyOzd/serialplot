@@ -36,6 +36,8 @@ private:
     QButtonGroup numberFormatButtons;
     QButtonGroup parityButtons;
     QButtonGroup dataBitsButtons;
+    QButtonGroup stopBitsButtons;
+    QButtonGroup flowControlButtons;
 
     QSerialPort serialPort;
 
@@ -61,6 +63,8 @@ private slots:
     void selectBaudRate(QString baudRate);
     void selectParity(int parity); // parity must be one of QSerialPort::Parity
     void selectDataBits(int dataBits); // bits must be one of QSerialPort::DataBits
+    void selectStopBits(int stopBits); // stopBits must be one of QSerialPort::StopBits
+    void selectFlowControl(int flowControl); // flowControl must be one of QSerialPort::FlowControl
 
     void onDataReady();
     void onPortError(QSerialPort::SerialPortError error);

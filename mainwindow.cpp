@@ -75,6 +75,26 @@ MainWindow::MainWindow(QWidget *parent) :
                      SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
                      this, &MainWindow::selectDataBits);
 
+    // setup stop bits selection buttons
+    stopBitsButtons.addButton(ui->rb1StopBit, (int) QSerialPort::OneStop);
+    stopBitsButtons.addButton(ui->rb2StopBit, (int) QSerialPort::TwoStop);
+
+    QObject::connect(&stopBitsButtons,
+                     SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
+                     this, &MainWindow::selectStopBits);
+
+    // setup flow control selection buttons
+    flowControlButtons.addButton(ui->rbNoFlowControl,
+                                 (int) QSerialPort::NoFlowControl);
+    flowControlButtons.addButton(ui->rbHardwareControl,
+                                 (int) QSerialPort::HardwareControl);
+    flowControlButtons.addButton(ui->rbSoftwareControl,
+                                 (int) QSerialPort::SoftwareControl);
+
+    QObject::connect(&flowControlButtons,
+                     SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
+                     this, &MainWindow::selectFlowControl);
+
     // init port signals
     QObject::connect(&(this->serialPort), SIGNAL(error(QSerialPort::SerialPortError)),
                      this, SLOT(onPortError(QSerialPort::SerialPortError)));
@@ -239,6 +259,28 @@ void MainWindow::selectDataBits(int dataBits)
         if(!serialPort.setDataBits((QSerialPort::DataBits) dataBits))
         {
             qDebug() << "Set data bits failed: " << serialPort.error();
+        }
+    }
+}
+
+void MainWindow::selectStopBits(int stopBits)
+{
+    if (serialPort.isOpen())
+    {
+        if(!serialPort.setStopBits((QSerialPort::StopBits) stopBits))
+        {
+            qDebug() << "Set stop bits failed: " << serialPort.error();
+        }
+    }
+}
+
+void MainWindow::selectFlowControl(int flowControl)
+{
+    if (serialPort.isOpen())
+    {
+        if(!serialPort.setFlowControl((QSerialPort::FlowControl) flowControl))
+        {
+            qDebug() << "Set flow control failed: " << serialPort.error();
         }
     }
 }
