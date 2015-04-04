@@ -34,6 +34,7 @@ private:
 
     Ui::MainWindow *ui;
     QButtonGroup numberFormatButtons;
+    QButtonGroup parityButtons;
 
     QSerialPort serialPort;
 
@@ -49,8 +50,6 @@ private:
 
     // note that serialPort should already have enough bytes present
     template<typename T> double readSampleAs();
-
-    QSignalMapper selectParityMapper;
 
 private slots:
     void loadPortList();

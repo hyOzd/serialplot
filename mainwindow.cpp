@@ -57,22 +57,12 @@ MainWindow::MainWindow(QWidget *parent) :
                      this, SLOT(onNumberFormatButtonToggled(int, bool)));
 
     // setup parity selection buttons
-    selectParityMapper.setMapping(ui->rbNoParity, (int) QSerialPort::NoParity);
-    selectParityMapper.setMapping(ui->rbEvenParity, (int) QSerialPort::EvenParity);
-    selectParityMapper.setMapping(ui->rbOddParity, (int) QSerialPort::OddParity);
+    parityButtons.addButton(ui->rbNoParity, (int) QSerialPort::NoParity);
+    parityButtons.addButton(ui->rbEvenParity, (int) QSerialPort::EvenParity);
+    parityButtons.addButton(ui->rbOddParity, (int) QSerialPort::OddParity);
 
-    QObject::connect(ui->rbNoParity, &QPushButton::clicked,
-                     &selectParityMapper,
-                     SELECT<>::OVERLOAD_OF(&QSignalMapper::map));
-    QObject::connect(ui->rbEvenParity, &QPushButton::clicked,
-                     &selectParityMapper,
-                     SELECT<>::OVERLOAD_OF(&QSignalMapper::map));
-    QObject::connect(ui->rbOddParity, &QPushButton::clicked,
-                     &selectParityMapper,
-                     SELECT<>::OVERLOAD_OF(&QSignalMapper::map));
-
-    QObject::connect(&selectParityMapper,
-                     SELECT<int>::OVERLOAD_OF(&QSignalMapper::mapped),
+    QObject::connect(&parityButtons,
+                     SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
                      this, &MainWindow::selectParity);
 
     // init port signals
