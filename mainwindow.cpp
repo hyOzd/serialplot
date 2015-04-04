@@ -56,6 +56,25 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&numberFormatButtons, SIGNAL(buttonToggled(int, bool)),
                      this, SLOT(onNumberFormatButtonToggled(int, bool)));
 
+    // setup parity selection buttons
+    selectParityMapper.setMapping(ui->rbNoParity, (int) QSerialPort::NoParity);
+    selectParityMapper.setMapping(ui->rbEvenParity, (int) QSerialPort::EvenParity);
+    selectParityMapper.setMapping(ui->rbOddParity, (int) QSerialPort::OddParity);
+
+    QObject::connect(ui->rbNoParity, &QPushButton::clicked,
+                     &selectParityMapper,
+                     SELECT<>::OVERLOAD_OF(&QSignalMapper::map));
+    QObject::connect(ui->rbEvenParity, &QPushButton::clicked,
+                     &selectParityMapper,
+                     SELECT<>::OVERLOAD_OF(&QSignalMapper::map));
+    QObject::connect(ui->rbOddParity, &QPushButton::clicked,
+                     &selectParityMapper,
+                     SELECT<>::OVERLOAD_OF(&QSignalMapper::map));
+
+    QObject::connect(&selectParityMapper,
+                     SELECT<int>::OVERLOAD_OF(&QSignalMapper::mapped),
+                     this, &MainWindow::selectParity);
+
     // init port signals
     QObject::connect(&(this->serialPort), SIGNAL(error(QSerialPort::SerialPortError)),
                      this, SLOT(onPortError(QSerialPort::SerialPortError)));
@@ -198,6 +217,17 @@ void MainWindow::selectBaudRate(QString baudRate)
         else
         {
             qDebug() << "Baud rate changed: " << serialPort.baudRate();
+        }
+    }
+}
+
+void MainWindow::selectParity(int parity)
+{
+    if (serialPort.isOpen())
+    {
+        if(!serialPort.setParity((QSerialPort::Parity) parity))
+        {
+            qDebug() << "Set parity failed: " << serialPort.error();
         }
     }
 }

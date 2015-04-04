@@ -6,6 +6,7 @@
 #include <QString>
 #include <QVector>
 #include <QSerialPort>
+#include <QSignalMapper>
 #include <qwt_plot_curve.h>
 
 namespace Ui {
@@ -49,6 +50,8 @@ private:
     // note that serialPort should already have enough bytes present
     template<typename T> double readSampleAs();
 
+    QSignalMapper selectParityMapper;
+
 private slots:
     void loadPortList();
     void loadBaudRateList();
@@ -56,6 +59,7 @@ private slots:
     void selectPort(QString portName);
     void onPortToggled(bool open);
     void selectBaudRate(QString baudRate);
+    void selectParity(int parity); // parity must be one of QSerialPort::Parity
 
     void onDataReady();
     void onPortError(QSerialPort::SerialPortError error);
