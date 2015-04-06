@@ -15,6 +15,7 @@
 
 #=============================================================================
 # Copyright 2010-2013, Julien Schueller
+# Copyright 2015 Hasan Yavuz Özderya
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without

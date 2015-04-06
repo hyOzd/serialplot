@@ -9,3 +9,6 @@ Small and simple software for plotting data from serial port.
 # Known Issues
 - Port error 13 happens when closing. This is a Qt issue. It's known
   to not happen Qt 5.4.1 .
+
+# License
+This software is licensed under GPLv3. See file COPYING for details.
