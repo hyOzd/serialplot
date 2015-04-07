@@ -121,6 +121,11 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&(this->serialPort), &QSerialPort::readyRead,
                      this, &MainWindow::onDataReady);
 
+    // init skip byte button
+    skipByteRequested = false;
+    QObject::connect(ui->pbSkipByte, &QPushButton::clicked,
+                     this, &MainWindow::skipByte);
+
     loadPortList();
     loadBaudRateList();
     ui->cbBaudRate->setCurrentIndex(ui->cbBaudRate->findText("9600"));
@@ -314,6 +319,14 @@ void MainWindow::onDataReady()
     if (!ui->actionPause->isChecked())
     {
         int bytesAvailable = serialPort.bytesAvailable();
+
+        if (bytesAvailable > 0 && skipByteRequested)
+        {
+            serialPort.read(1);
+            skipByteRequested = false;
+            bytesAvailable--;
+        }
+
         if (bytesAvailable < sampleSize)
         {
             return;
@@ -358,6 +371,11 @@ void MainWindow::onPortError(QSerialPort::SerialPortError error)
             break;
     }
 
+}
+
+void MainWindow::skipByte()
+{
+    skipByteRequested = true;
 }
 
 void MainWindow::addData(QVector<double> data)

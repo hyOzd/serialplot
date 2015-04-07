@@ -73,6 +73,8 @@ private:
     // note that serialPort should already have enough bytes present
     template<typename T> double readSampleAs();
 
+    bool skipByteRequested;
+
 private slots:
     void loadPortList();
     void loadBaudRateList();
@@ -87,6 +89,8 @@ private slots:
 
     void onDataReady();
     void onPortError(QSerialPort::SerialPortError error);
+
+    void skipByte();
 
     void onNumOfSamplesChanged(int value);
     void onAutoScaleChecked(bool checked);
