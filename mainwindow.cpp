@@ -20,6 +20,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QSerialPortInfo>
+#include <QApplication>
 #include <QtDebug>
 #include <qwt_plot.h>
 #include <limits.h>
@@ -30,8 +31,15 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    setupAboutDialog();
 
     // init UI signals
+
+    // menu signals
+    QObject::connect(ui->actionHelpAbout, &QAction::triggered,
+              &aboutDialog, &QWidget::show);
+
+    // port tab signals
     QObject::connect(ui->pbReloadPorts, &QPushButton::clicked,
                      this, &MainWindow::loadPortList);
 
@@ -166,6 +174,15 @@ MainWindow::~MainWindow()
         serialPort.close();
     }
     delete ui;
+}
+
+void MainWindow::setupAboutDialog()
+{
+    Ui_AboutDialog uiAboutDialog;
+    uiAboutDialog.setupUi(&aboutDialog);
+
+    QObject::connect(uiAboutDialog.pbAboutQt, &QPushButton::clicked,
+                     [](){ QApplication::aboutQt();});
 }
 
 void MainWindow::loadPortList()

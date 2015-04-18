@@ -38,7 +38,7 @@ find_package(Qwt 6.1 REQUIRED)
 include_directories(${QWT_INCLUDE_DIR})
 
 # wrap UI files
-qt5_wrap_ui(UI_FILES mainwindow.ui)
+qt5_wrap_ui(UI_FILES mainwindow.ui about_dialog.ui)
 
 # Tell CMake to create the helloworld executable
 add_executable(serialplot main.cpp mainwindow.cpp customcheckablebutton.cpp ${UI_FILES})

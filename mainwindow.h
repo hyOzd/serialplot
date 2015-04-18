@@ -28,6 +28,8 @@
 #include <QSignalMapper>
 #include <qwt_plot_curve.h>
 
+#include "ui_about_dialog.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -57,6 +59,9 @@ private:
     QButtonGroup dataBitsButtons;
     QButtonGroup stopBitsButtons;
     QButtonGroup flowControlButtons;
+
+    QDialog aboutDialog;
+    void setupAboutDialog();
 
     QSerialPort serialPort;
 

@@ -41,6 +41,7 @@ HEADERS  += mainwindow.h \
     utils.h \
     customcheckablebutton.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    about_dialog.ui
 
 CONFIG += c++11
