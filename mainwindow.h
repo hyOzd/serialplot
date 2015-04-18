@@ -24,6 +24,7 @@
 #include <QButtonGroup>
 #include <QString>
 #include <QVector>
+#include <QList>
 #include <QSerialPort>
 #include <QSignalMapper>
 #include <qwt_plot_curve.h>
@@ -66,10 +67,15 @@ private:
     QSerialPort serialPort;
 
     unsigned int numOfSamples;
-    QwtPlotCurve curve;
-    QVector<double> dataArray;
-    QVector<double> dataX;
-    void addData(QVector<double> data);
+    unsigned int numOfChannels;
+
+    QList<QwtPlotCurve*> curves;
+    typedef QVector<double> DataArray;
+    DataArray dataX;   // array that simply contains numbers 0..numberOfSamples
+    QList<DataArray> channelsData;
+
+    // `data` contains channel specific data
+    void addChannelData(unsigned int channel, DataArray data);
 
     NumberFormat numberFormat;
     unsigned int sampleSize; // number of bytes in the selected number format

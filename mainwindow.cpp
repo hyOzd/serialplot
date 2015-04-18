@@ -145,16 +145,25 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->spYmax->setRange((-1) * std::numeric_limits<double>::max(),
                          std::numeric_limits<double>::max());
 
-    // init plot
+    // init data arrays and plot
+
     numOfSamples = ui->spNumOfSamples->value();
-    dataArray.resize(numOfSamples);
+    numOfChannels = 1;
+
     dataX.resize(numOfSamples);
     for (int i = 0; i < dataX.size(); i++)
     {
         dataX[i] = i;
     }
-    curve.setSamples(dataX, dataArray);
-    curve.attach(ui->plot);
+
+    // init channel data and curve list
+    for (int i = 0; i < numOfChannels; i++)
+    {
+        channelsData.append(DataArray(numOfSamples, 0.0));
+        curves.append(new QwtPlotCurve());
+        curves[i]->setSamples(dataX, channelsData[i]);
+        curves[i]->attach(ui->plot);
+    }
 
     // init number format
     if (numberFormatButtons.checkedId() >= 0)
@@ -169,6 +178,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    for (auto curve : curves)
+    {
+        delete curve;
+    }
+
     if (serialPort.isOpen())
     {
         serialPort.close();
@@ -335,6 +349,8 @@ void MainWindow::onDataReady()
 {
     if (!ui->actionPause->isChecked())
     {
+        // a package is a set of channel data like {CHAN0_SAMPLE, CHAN1_SAMPLE...}
+        int packageSize = sampleSize * numOfChannels;
         int bytesAvailable = serialPort.bytesAvailable();
 
         if (bytesAvailable > 0 && skipByteRequested)
@@ -344,22 +360,34 @@ void MainWindow::onDataReady()
             bytesAvailable--;
         }
 
-        if (bytesAvailable < sampleSize)
+        if (bytesAvailable < packageSize)
         {
             return;
         }
         else
         {
-            int numOfSamplesToRead =
-                (bytesAvailable - (bytesAvailable % sampleSize)) / sampleSize;
-            QVector<double> samples(numOfSamplesToRead);
-            int i = 0;
-            while(i < numOfSamplesToRead)
+            int numOfPackagesToRead =
+                (bytesAvailable - (bytesAvailable % packageSize)) / packageSize;
+            QVector<DataArray> channelSamples(numOfChannels);
+            for (int ci = 0; ci < numOfChannels; ci++)
             {
-                samples.replace(i, (this->*readSample)());
+                channelSamples[ci].resize(numOfPackagesToRead);
+            }
+
+            int i = 0;
+            while(i < numOfPackagesToRead)
+            {
+                for (int ci = 0; ci < numOfChannels; ci++)
+                {
+                    channelSamples[ci].replace(i, (this->*readSample)());
+                }
                 i++;
             }
-            addData(samples);
+
+            for (int ci = 0; ci < numOfChannels; ci++)
+            {
+                addChannelData(ci, channelSamples[ci]);
+            }
         }
     }
     else
@@ -395,20 +423,21 @@ void MainWindow::skipByte()
     skipByteRequested = true;
 }
 
-void MainWindow::addData(QVector<double> data)
+void MainWindow::addChannelData(unsigned int channel, DataArray data)
 {
+    DataArray* channelDataArray = &(channelsData[channel]);
     int offset = numOfSamples - data.size();
 
     if (offset < 0)
     {
         for (int i = 0; i < numOfSamples; i++)
         {
-            dataArray[i] = data[i - offset];
+            (*channelDataArray)[i] = data[i - offset];
         }
     }
     else if (offset == 0)
     {
-        dataArray = data;
+        (*channelDataArray) = data;
     }
     else
     {
@@ -416,26 +445,29 @@ void MainWindow::addData(QVector<double> data)
         int shift = data.size();
         for (int i = 0; i < offset; i++)
         {
-            dataArray[i] = dataArray[i + shift];
+            (*channelDataArray)[i] = (*channelDataArray)[i + shift];
         }
         // place new samples
         for (int i = 0; i < data.size(); i++)
         {
-            dataArray[offset + i] = data[i];
+            (*channelDataArray)[offset + i] = data[i];
         }
     }
 
     // update plot
-    curve.setSamples(dataX, dataArray);
-    ui->plot->replot();
+    curves[channel]->setSamples(dataX, (*channelDataArray));
+    ui->plot->replot(); // TODO: replot after all channel data updated
 }
 
 void MainWindow::clearPlot()
 {
-    dataArray.fill(0.0);
+    for (int ci = 0; ci < numOfChannels; ci++)
+    {
+        channelsData[ci].fill(0.0);
+        curves[ci]->setSamples(dataX, channelsData[ci]);
+    }
 
     // update plot
-    curve.setSamples(dataX, dataArray);
     ui->plot->replot();
 }
 
@@ -448,7 +480,10 @@ void MainWindow::onNumOfSamplesChanged(int value)
     if (numOfSamples < oldNum)
     {
         dataX.resize(numOfSamples);
-        dataArray.remove(0, oldNum - numOfSamples);
+        for (int ci = 0; ci < numOfChannels; ci++)
+        {
+            channelsData[ci].remove(0, oldNum - numOfSamples);
+        }
     }
     else if(numOfSamples > oldNum)
     {
@@ -456,7 +491,10 @@ void MainWindow::onNumOfSamplesChanged(int value)
         for (unsigned int i = oldNum; i < numOfSamples; i++)
         {
             dataX[i] = i;
-            dataArray.prepend(0);
+            for (int ci = 0; ci < numOfChannels; ci++)
+            {
+                channelsData[ci].prepend(0);
+            }
         }
     }
 }
