@@ -72,6 +72,11 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionClear, SIGNAL(triggered(bool)),
                      this, SLOT(clearPlot()));
 
+    // setup number of channels spinbox
+    QObject::connect(ui->spNumOfChannels,
+                     SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
+                     this, &MainWindow::onNumOfChannelsChanged);
+
     // setup number format buttons
     numberFormatButtons.addButton(ui->rbUint8,  NumberFormat_uint8);
     numberFormatButtons.addButton(ui->rbUint16, NumberFormat_uint16);
@@ -495,6 +500,35 @@ void MainWindow::onNumOfSamplesChanged(int value)
             {
                 channelsData[ci].prepend(0);
             }
+        }
+    }
+}
+
+void MainWindow::onNumOfChannelsChanged(int value)
+{
+    unsigned int oldNum = this->numOfChannels;
+    this->numOfChannels = value;
+
+    if (numOfChannels > oldNum)
+    {
+        // add new channels
+        for (int i = 0; i < numOfChannels - oldNum; i++)
+        {
+            channelsData.append(DataArray(numOfSamples, 0.0));
+            curves.append(new QwtPlotCurve());
+            curves.last()->setSamples(dataX, channelsData.last());
+            curves.last()->attach(ui->plot);
+        }
+    }
+    else if(numOfChannels < oldNum)
+    {
+        // remove channels
+        for (int i = 0; i < oldNum - numOfChannels; i++)
+        {
+            channelsData.removeLast();
+            auto curve = curves.takeLast();
+            curve->detach();
+            delete curve;
         }
     }
 }

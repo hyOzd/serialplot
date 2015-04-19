@@ -107,6 +107,7 @@ private slots:
     void onAutoScaleChecked(bool checked);
     void onYScaleChanged();
 
+    void onNumOfChannelsChanged(int value);
     void onNumberFormatButtonToggled(int numberFormatId, bool checked);
     void selectNumberFormat(NumberFormat numberFormatId);
 
