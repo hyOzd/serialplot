@@ -2,6 +2,13 @@
 
 Small and simple software for plotting data from serial port.
 
+![SerialPlot v0.1 Screenshot](http://i.imgur.com/xPtXTx2.png)
+
+## Features
+* Reading data from serial port
+* Binary data formats (u)int8, (u)int16, (u)int32
+* Synchronized multi channel plotting
+
 ## Dependencies
 - Qt 5, including SerialPort module
 - Qwt 6.1
