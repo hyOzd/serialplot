@@ -597,21 +597,12 @@
      <height>23</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="actionFileLoadProfile"/>
-    <addaction name="actionFileSaveProfile"/>
-   </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionHelpDataFormats"/>
     <addaction name="actionHelpAbout"/>
    </widget>
-   <addaction name="menuFile"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -644,24 +635,9 @@
     <string>Clear</string>
    </property>
   </action>
-  <action name="actionHelpDataFormats">
-   <property name="text">
-    <string>Data Formats</string>
-   </property>
-  </action>
   <action name="actionHelpAbout">
    <property name="text">
     <string>About</string>
-   </property>
-  </action>
-  <action name="actionFileLoadProfile">
-   <property name="text">
-    <string>Load Profile</string>
-   </property>
-  </action>
-  <action name="actionFileSaveProfile">
-   <property name="text">
-    <string>Save Profile</string>
    </property>
   </action>
  </widget>
