@@ -601,6 +601,7 @@
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actionDemoMode"/>
     <addaction name="actionHelpAbout"/>
    </widget>
    <addaction name="menuHelp"/>
@@ -638,6 +639,17 @@
   <action name="actionHelpAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionDemoMode">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Demo Mode</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle Demo Mode</string>
    </property>
   </action>
  </widget>

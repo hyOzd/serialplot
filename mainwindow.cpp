@@ -179,6 +179,14 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         selectNumberFormat(NumberFormat_uint8);
     }
+
+    // Init demo mode
+    demoCount = 0;
+    demoTimer.setInterval(100);
+    QObject::connect(&demoTimer, &QTimer::timeout,
+                     this, &MainWindow::demoTimerTimeout);
+    QObject::connect(ui->actionDemoMode, &QAction::toggled,
+                     this, &MainWindow::enableDemo);
 }
 
 MainWindow::~MainWindow()
@@ -348,6 +356,9 @@ void MainWindow::selectFlowControl(int flowControl)
 void MainWindow::onPortToggled(bool open)
 {
     ui->pbOpenPort->setChecked(open);
+    // make sure demo mode is disabled
+    if (open && isDemoRunning()) enableDemo(false);
+    ui->actionDemoMode->setEnabled(!open);
 }
 
 void MainWindow::onDataReady()
@@ -604,4 +615,43 @@ template<typename T> double MainWindow::readSampleAs()
     T data;
     this->serialPort.read((char*) &data, sizeof(data));
     return double(data);
+}
+
+bool MainWindow::isDemoRunning()
+{
+    return ui->actionDemoMode->isChecked();
+}
+
+void MainWindow::demoTimerTimeout()
+{
+    demoCount++;
+    if (demoCount > 100) demoCount = 0;
+
+    for (int ci = 0; ci < numOfChannels; ci++)
+    {
+        DataArray data(1);
+        data.replace(0, (ci + 1)*demoCount);
+        addChannelData(ci, data);
+    }
+}
+
+void MainWindow::enableDemo(bool enabled)
+{
+    if (enabled)
+    {
+        if (!serialPort.isOpen())
+        {
+            demoTimer.start();
+            ui->actionDemoMode->setChecked(true);
+        }
+        else
+        {
+            ui->actionDemoMode->setChecked(false);
+        }
+    }
+    else
+    {
+        demoTimer.stop();
+        ui->actionDemoMode->setChecked(false);
+    }
 }

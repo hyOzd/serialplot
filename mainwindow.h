@@ -27,6 +27,7 @@
 #include <QList>
 #include <QSerialPort>
 #include <QSignalMapper>
+#include <QTimer>
 #include <qwt_plot_curve.h>
 
 #include "ui_about_dialog.h"
@@ -86,6 +87,11 @@ private:
 
     bool skipByteRequested;
 
+    // demo
+    QTimer demoTimer;
+    int demoCount;
+    bool isDemoRunning();
+
 private slots:
     void loadPortList();
     void loadBaudRateList();
@@ -112,6 +118,9 @@ private slots:
     void selectNumberFormat(NumberFormat numberFormatId);
 
     void clearPlot();
+
+    void demoTimerTimeout();
+    void enableDemo(bool enabled);
 
 signals:
     void portToggled(bool open);
