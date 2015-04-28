@@ -24,6 +24,7 @@
 #include <QtDebug>
 #include <qwt_plot.h>
 #include <limits.h>
+#include <cmath>
 #include "utils.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -167,6 +168,7 @@ MainWindow::MainWindow(QWidget *parent) :
         channelsData.append(DataArray(numOfSamples, 0.0));
         curves.append(new QwtPlotCurve());
         curves[i]->setSamples(dataX, channelsData[i]);
+        curves[i]->setPen(makeColor(i));
         curves[i]->attach(ui->plot);
     }
 
@@ -528,6 +530,7 @@ void MainWindow::onNumOfChannelsChanged(int value)
             channelsData.append(DataArray(numOfSamples, 0.0));
             curves.append(new QwtPlotCurve());
             curves.last()->setSamples(dataX, channelsData.last());
+            curves.last()->setPen(makeColor(curves.length()-1));
             curves.last()->attach(ui->plot);
         }
     }
@@ -653,5 +656,36 @@ void MainWindow::enableDemo(bool enabled)
     {
         demoTimer.stop();
         ui->actionDemoMode->setChecked(false);
+    }
+}
+
+/*
+  Below crude drawing demostrates how color selection occurs for
+  given channel index
+
+  0°                     <--Hue Value-->                           360°
+  |* . o . + . o . * . o . + . o . * . o . + . o . * . o . + . o . |
+
+  * -> 0-3
+  + -> 4-7
+  o -> 8-15
+  . -> 16-31
+
+ */
+
+QColor MainWindow::makeColor(unsigned int channelIndex)
+{
+    auto i = channelIndex;
+
+    if (i < 4)
+    {
+        return QColor::fromHsv(360*i/4, 255, 255);
+    }
+    else
+    {
+        double p = floor(log2(i));
+        double n = pow(2, p);
+        i = i - n;
+        return QColor::fromHsv(360*i/n + 360/pow(2,p+1), 255, 255);
     }
 }

@@ -28,6 +28,7 @@
 #include <QSerialPort>
 #include <QSignalMapper>
 #include <QTimer>
+#include <QColor>
 #include <qwt_plot_curve.h>
 
 #include "ui_about_dialog.h"
@@ -91,6 +92,8 @@ private:
     QTimer demoTimer;
     int demoCount;
     bool isDemoRunning();
+
+    QColor makeColor(unsigned int channelIndex);
 
 private slots:
     void loadPortList();
