@@ -32,7 +32,18 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 # Find the QtWidgets library
 find_package(Qt5Widgets)
-find_package(Qwt 6.1 REQUIRED)
+
+# Find QWT or use static
+set(QWT_USE_STATIC false CACHE BOOL "Use a static version of Qwt provided by user.")
+set(QWT_STATIC_LIBRARY "" CACHE FILEPATH "Path to the static Qwt library, libqwt.a.")
+set(QWT_STATIC_INCLUDE "" CACHE PATH "Path to the Qwt include directory when building Qwt static.")
+
+if (QWT_USE_STATIC)
+  set(QWT_LIBRARY ${QWT_STATIC_LIBRARY})
+  set(QWT_INCLUDE_DIR ${QWT_STATIC_INCLUDE})
+else (QWT_USE_STATIC)
+  find_package(Qwt 6.1 REQUIRED)
+endif (QWT_USE_STATIC)
 
 # includes
 include_directories(${QWT_INCLUDE_DIR})
@@ -44,8 +55,8 @@ qt5_wrap_ui(UI_FILES mainwindow.ui about_dialog.ui)
 add_executable(serialplot main.cpp mainwindow.cpp customcheckablebutton.cpp ${UI_FILES})
 
 # Use the Widgets module from Qt 5.
-qt5_use_modules(serialplot Widgets SerialPort)
 target_link_libraries(serialplot ${QWT_LIBRARY})
+qt5_use_modules(serialplot Widgets SerialPort Svg)
 
 # Enable C++11 support, fail if not supported
 include(CheckCXXCompilerFlag)
