@@ -76,3 +76,21 @@ add_custom_target(run
     DEPENDS serialplot
     WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
 )
+
+# installing
+install(TARGETS serialplot DESTINATION bin)
+
+# install menu item and icon
+find_program(XDG-DESKTOP-MENU xdg-desktop-menu)
+find_program(XDG-ICON-RESOURCE xdg-icon-resource)
+
+# first copy files to share/serialplot/
+install(FILES
+  ${CMAKE_SOURCE_DIR}/misc/serialplot.desktop
+  ${CMAKE_SOURCE_DIR}/misc/serialplot.png
+  DESTINATION share/serialplot)
+
+install(CODE "
+  execute_process(COMMAND ${XDG-DESKTOP-MENU} install --novendor ${CMAKE_INSTALL_PREFIX}/share/serialplot/serialplot.desktop)
+  execute_process(COMMAND ${XDG-ICON-RESOURCE} install --novendor --size 256 ${CMAKE_INSTALL_PREFIX}/share/serialplot/serialplot.png)
+")

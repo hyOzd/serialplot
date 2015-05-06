@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=SerialPlot
+Comment=Small and simple software for plotting data from serial port
+Icon=serialplot
+Exec=serialplot
+Terminal=false
+Type=Application
+Categories=Utility Electronics
