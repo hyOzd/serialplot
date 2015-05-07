@@ -1,0 +1,3 @@
+#!/bin/bash
+xdg-desktop-menu uninstall --novendor serialplot.desktop
+xdg-icon-resource uninstall --novendor --size 256 serialplot
