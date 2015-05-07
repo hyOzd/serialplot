@@ -26,6 +26,7 @@
 #include <limits.h>
 #include <cmath>
 #include "utils.h"
+#include "version.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -212,6 +213,10 @@ void MainWindow::setupAboutDialog()
 
     QObject::connect(uiAboutDialog.pbAboutQt, &QPushButton::clicked,
                      [](){ QApplication::aboutQt();});
+
+    QString aboutText = uiAboutDialog.lbAbout->text();
+    aboutText.replace("$VERSION_STRING$", VERSION_STRING);
+    uiAboutDialog.lbAbout->setText(aboutText);
 }
 
 void MainWindow::loadPortList()
