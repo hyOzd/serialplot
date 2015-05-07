@@ -95,6 +95,17 @@ install(CODE "
   execute_process(COMMAND ${XDG-ICON-RESOURCE} install --novendor --size 256 ${CMAKE_INSTALL_PREFIX}/share/serialplot/serialplot.png)
 ")
 
+# uninstalling
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+  IMMEDIATE @ONLY)
+
+add_custom_target(uninstall
+  COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
+  COMMAND ${XDG-DESKTOP-MENU} uninstall --novendor serialplot.desktop
+  COMMAND ${XDG-ICON-RESOURCE} uninstall --novendor --size 256 serialplot)
+
 # packaging
 set(CPACK_GENERATOR "DEB")
 
