@@ -98,6 +98,11 @@ install(FILES
   ${CMAKE_SOURCE_DIR}/misc/serialplot.png
   DESTINATION share/serialplot)
 
+# install copyright file (in debian format)
+install(FILES
+  ${CMAKE_SOURCE_DIR}/debian/copyright
+  DESTINATION share/doc/serialplot/)
+
 install(CODE "
   execute_process(COMMAND ${XDG-DESKTOP-MENU} install --novendor ${CMAKE_INSTALL_PREFIX}/share/serialplot/serialplot.desktop)
   execute_process(COMMAND ${XDG-ICON-RESOURCE} install --novendor --size 256 ${CMAKE_INSTALL_PREFIX}/share/serialplot/serialplot.png)
