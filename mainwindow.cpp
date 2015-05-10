@@ -20,6 +20,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QSerialPortInfo>
+#include <QByteArray>
 #include <QApplication>
 #include <QtDebug>
 #include <qwt_plot.h>
@@ -86,6 +87,7 @@ MainWindow::MainWindow(QWidget *parent) :
     numberFormatButtons.addButton(ui->rbInt8,   NumberFormat_int8);
     numberFormatButtons.addButton(ui->rbInt16,  NumberFormat_int16);
     numberFormatButtons.addButton(ui->rbInt32,  NumberFormat_int32);
+    numberFormatButtons.addButton(ui->rbASCII,  NumberFormat_ASCII);
 
     QObject::connect(&numberFormatButtons, SIGNAL(buttonToggled(int, bool)),
                      this, SLOT(onNumberFormatButtonToggled(int, bool)));
@@ -419,6 +421,34 @@ void MainWindow::onDataReady()
     }
 }
 
+void MainWindow::onDataReadyASCII()
+{
+    while(serialPort.canReadLine())
+    {
+        QByteArray line = serialPort.readLine();
+        line = line.trimmed();
+        auto separatedValues = line.split(',');
+
+        if (separatedValues.length() >= numOfChannels)
+        {
+            for (int ci = 0; ci < numOfChannels; ci++)
+            {
+                double channelSample = separatedValues[ci].toDouble();
+                addChannelData(ci, DataArray({channelSample}));
+            }
+        }
+        else // there is missing channel data
+        {
+            qDebug() << "Incoming data is missing data for some channels!";
+            for (int ci = 0; ci < separatedValues.length(); ci++)
+            {
+                double channelSample = separatedValues[ci].toDouble();
+                addChannelData(ci, DataArray({channelSample}));
+            }
+        }
+    }
+}
+
 void MainWindow::onPortError(QSerialPort::SerialPortError error)
 {
     switch(error)
@@ -615,6 +645,24 @@ void MainWindow::selectNumberFormat(NumberFormat numberFormatId)
             sampleSize = 4;
             readSample = &MainWindow::readSampleAs<qint32>;
             break;
+        case NumberFormat_ASCII:
+            sampleSize = 0;    // these two members should not be used
+            readSample = NULL; // in this mode
+            break;
+    }
+
+    if (numberFormat == NumberFormat_ASCII)
+    {
+        QObject::disconnect(&(this->serialPort), &QSerialPort::readyRead, 0, 0);
+        QObject::connect(&(this->serialPort), &QSerialPort::readyRead,
+                         this, &MainWindow::onDataReadyASCII);
+
+    }
+    else
+    {
+        QObject::disconnect(&(this->serialPort), &QSerialPort::readyRead, 0, 0);
+        QObject::connect(&(this->serialPort), &QSerialPort::readyRead,
+                         this, &MainWindow::onDataReady);
     }
 }
 

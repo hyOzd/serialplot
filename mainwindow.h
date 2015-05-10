@@ -53,7 +53,8 @@ private:
         NumberFormat_uint32,
         NumberFormat_int8,
         NumberFormat_int16,
-        NumberFormat_int32
+        NumberFormat_int32,
+        NumberFormat_ASCII
     };
 
     Ui::MainWindow *ui;
@@ -107,7 +108,8 @@ private slots:
     void selectStopBits(int stopBits); // stopBits must be one of QSerialPort::StopBits
     void selectFlowControl(int flowControl); // flowControl must be one of QSerialPort::FlowControl
 
-    void onDataReady();
+    void onDataReady();      // used with binary number formats
+    void onDataReadyASCII(); // used with ASCII number format
     void onPortError(QSerialPort::SerialPortError error);
 
     void skipByte();
