@@ -135,9 +135,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&(this->serialPort), SIGNAL(error(QSerialPort::SerialPortError)),
                      this, SLOT(onPortError(QSerialPort::SerialPortError)));
 
-    QObject::connect(&(this->serialPort), &QSerialPort::readyRead,
-                     this, &MainWindow::onDataReady);
-
     // init skip byte button
     skipByteRequested = false;
     QObject::connect(ui->pbSkipByte, &QPushButton::clicked,
