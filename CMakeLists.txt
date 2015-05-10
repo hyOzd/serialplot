@@ -21,11 +21,6 @@ cmake_minimum_required(VERSION 2.8.11)
 
 project(serialplot)
 
-set(MAJOR_VERSION 0)
-set(MINOR_VERSION 1)
-set(PATCH_VERSION 0)
-set(VERSION_STRING "${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}")
-
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -74,6 +69,32 @@ elseif(COMPILER_SUPPORTS_CXX0X)
 else()
   message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
+
+# version number
+set(MAJOR_VERSION 0)
+set(MINOR_VERSION 1)
+set(PATCH_VERSION 0)
+set(VERSION_STRING "${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}")
+
+# get revision number from mercurial
+find_program(MERCURIAL hg)
+
+if (MERCURIAL)
+  execute_process(COMMAND ${MERCURIAL} id -i
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    RESULT_VARIABLE MERCURIAL_RESULT
+    OUTPUT_VARIABLE VERSION_REVISION
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+  if(NOT MERCURIAL_RESULT EQUAL 0)
+    set(VERSION_SCM_REVISION false)
+  endif(NOT MERCURIAL_RESULT EQUAL 0)
+endif (MERCURIAL)
+
+if (NOT VERSION_REVISION)
+  set(VERSION_REVISION "0")
+endif (NOT VERSION_REVISION)
+
+message("SCM revision: ${VERSION_REVISION}")
 
 # configure version file
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/version.h.in" "${CMAKE_CURRENT_BINARY_DIR}/version.h")

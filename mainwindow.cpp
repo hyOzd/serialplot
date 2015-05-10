@@ -215,6 +215,7 @@ void MainWindow::setupAboutDialog()
 
     QString aboutText = uiAboutDialog.lbAbout->text();
     aboutText.replace("$VERSION_STRING$", VERSION_STRING);
+    aboutText.replace("$VERSION_REVISION$", VERSION_REVISION);
     uiAboutDialog.lbAbout->setText(aboutText);
 }
 
