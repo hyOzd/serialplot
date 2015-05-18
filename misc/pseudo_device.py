@@ -24,7 +24,7 @@
 # along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import os, pty, time
+import os, pty, time, struct
 
 def ascii_test(port):
     """Put ASCII test data through pseudo terminal."""
@@ -39,6 +39,15 @@ def ascii_test(port):
         os.write(port, bytes(data + "\r\n", 'ASCII'))
         time.sleep(0.1)
 
+def float_test(port):
+    """Put 32-bit float test data through pseudo terminal"""
+    for i in range(0, 1000):
+        f = float(i)/3.0
+        data = struct.pack('f', f)
+        os.write(port, data)
+        import binascii
+        time.sleep(0.1)
+
 def run():
     # create the pseudo terminal
     master, slave = pty.openpty()
@@ -48,7 +57,7 @@ def run():
     print("Master terminal: {}\nSlave terminal: {}".format(master_name, slave_name))
 
     try:
-        ascii_test(master)
+        float_test(master)
     finally:
         # close the pseudo terminal files
         os.close(master)
