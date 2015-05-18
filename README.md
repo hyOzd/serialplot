@@ -6,7 +6,8 @@ Small and simple software for plotting data from serial port.
 
 ## Features
 * Reading data from serial port
-* Binary data formats (u)int8, (u)int16, (u)int32
+* Binary data formats (u)int8, (u)int16, (u)int32, float
+* ASCII input (Comma Separated Values)
 * Synchronized multi channel plotting
 
 ## Dependencies
