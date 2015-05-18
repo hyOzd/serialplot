@@ -654,13 +654,14 @@ void MainWindow::selectNumberFormat(NumberFormat numberFormatId)
         QObject::disconnect(&(this->serialPort), &QSerialPort::readyRead, 0, 0);
         QObject::connect(&(this->serialPort), &QSerialPort::readyRead,
                          this, &MainWindow::onDataReadyASCII);
-
+        ui->pbSkipByte->setDisabled(true);
     }
     else
     {
         QObject::disconnect(&(this->serialPort), &QSerialPort::readyRead, 0, 0);
         QObject::connect(&(this->serialPort), &QSerialPort::readyRead,
                          this, &MainWindow::onDataReady);
+        ui->pbSkipByte->setEnabled(true);
     }
 }
 
