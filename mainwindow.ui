@@ -447,13 +447,20 @@
              </property>
             </spacer>
            </item>
-           <item row="3" column="0">
+           <item row="3" column="1">
             <widget class="QRadioButton" name="rbASCII">
              <property name="toolTip">
               <string>Comma Separated Values</string>
              </property>
              <property name="text">
               <string>ASCII(CSV)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QRadioButton" name="rbFloat">
+             <property name="text">
+              <string>float</string>
              </property>
             </widget>
            </item>

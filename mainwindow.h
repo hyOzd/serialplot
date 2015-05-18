@@ -54,6 +54,7 @@ private:
         NumberFormat_int8,
         NumberFormat_int16,
         NumberFormat_int32,
+        NumberFormat_float,
         NumberFormat_ASCII
     };
 

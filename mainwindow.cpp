@@ -87,6 +87,7 @@ MainWindow::MainWindow(QWidget *parent) :
     numberFormatButtons.addButton(ui->rbInt8,   NumberFormat_int8);
     numberFormatButtons.addButton(ui->rbInt16,  NumberFormat_int16);
     numberFormatButtons.addButton(ui->rbInt32,  NumberFormat_int32);
+    numberFormatButtons.addButton(ui->rbFloat,  NumberFormat_float);
     numberFormatButtons.addButton(ui->rbASCII,  NumberFormat_ASCII);
 
     QObject::connect(&numberFormatButtons, SIGNAL(buttonToggled(int, bool)),
@@ -642,6 +643,10 @@ void MainWindow::selectNumberFormat(NumberFormat numberFormatId)
         case NumberFormat_int32:
             sampleSize = 4;
             readSample = &MainWindow::readSampleAs<qint32>;
+            break;
+        case NumberFormat_float:
+            sampleSize = 4;
+            readSample = &MainWindow::readSampleAs<float>;
             break;
         case NumberFormat_ASCII:
             sampleSize = 0;    // these two members should not be used
