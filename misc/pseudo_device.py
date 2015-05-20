@@ -24,7 +24,7 @@
 # along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import os, pty, time, struct
+import os, pty, time, struct, math
 
 def ascii_test(port):
     """Put ASCII test data through pseudo terminal."""
@@ -48,6 +48,19 @@ def float_test(port):
         import binascii
         time.sleep(0.1)
 
+def float_sine(port):
+    """Puts 2 channel sine and cosine wafeform through pseudo terminal
+    continuously."""
+    i = 0
+    period = 200
+    while True:
+        sin = math.sin(2 * math.pi * i / period)
+        # cos = math.sin(2 * math.pi * (i / period + 1 / 4))
+        data = struct.pack('ff', sin, -sin)
+        os.write(port, data)
+        i = (i + 1) % period
+        time.sleep(0.1)
+
 def run():
     # create the pseudo terminal
     master, slave = pty.openpty()
@@ -57,7 +70,7 @@ def run():
     print("Master terminal: {}\nSlave terminal: {}".format(master_name, slave_name))
 
     try:
-        float_test(master)
+        float_sine(master)
     finally:
         # close the pseudo terminal files
         os.close(master)
