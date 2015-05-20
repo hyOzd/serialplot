@@ -736,13 +736,13 @@ QColor MainWindow::makeColor(unsigned int channelIndex)
 
     if (i < 4)
     {
-        return QColor::fromHsv(360*i/4, 255, 255);
+        return QColor::fromHsv(360*i/4, 255, 230);
     }
     else
     {
         double p = floor(log2(i));
         double n = pow(2, p);
         i = i - n;
-        return QColor::fromHsv(360*i/n + 360/pow(2,p+1), 255, 255);
+        return QColor::fromHsv(360*i/n + 360/pow(2,p+1), 255, 230);
     }
 }
