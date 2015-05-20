@@ -44,4 +44,6 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui \
     about_dialog.ui
 
+INCLUDEPATH += qmake/
+
 CONFIG += c++11
