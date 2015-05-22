@@ -2,7 +2,7 @@
 
 Small and simple software for plotting data from serial port.
 
-![SerialPlot v0.1 Screenshot](http://i.imgur.com/xPtXTx2.png)
+![SerialPlot v0.2 Screenshot](http://i.imgur.com/l7mNWfB.png)
 
 ## Features
 * Reading data from serial port
