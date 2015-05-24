@@ -31,6 +31,7 @@
 #include <QColor>
 #include <qwt_plot_curve.h>
 
+#include "portcontrol.h"
 #include "ui_about_dialog.h"
 
 namespace Ui {
@@ -60,13 +61,10 @@ private:
 
     Ui::MainWindow *ui;
     QButtonGroup numberFormatButtons;
-    QButtonGroup parityButtons;
-    QButtonGroup dataBitsButtons;
-    QButtonGroup stopBitsButtons;
-    QButtonGroup flowControlButtons;
 
     QDialog aboutDialog;
     void setupAboutDialog();
+    PortControl portControl;
 
     QSerialPort serialPort;
 
@@ -98,17 +96,7 @@ private:
     QColor makeColor(unsigned int channelIndex);
 
 private slots:
-    void loadPortList();
-    void loadBaudRateList();
-    void togglePort();
-    void selectPort(QString portName);
     void onPortToggled(bool open);
-    void selectBaudRate(QString baudRate);
-    void selectParity(int parity); // parity must be one of QSerialPort::Parity
-    void selectDataBits(int dataBits); // bits must be one of QSerialPort::DataBits
-    void selectStopBits(int stopBits); // stopBits must be one of QSerialPort::StopBits
-    void selectFlowControl(int flowControl); // flowControl must be one of QSerialPort::FlowControl
-
     void onDataReady();      // used with binary number formats
     void onDataReadyASCII(); // used with ASCII number format
     void onPortError(QSerialPort::SerialPortError error);
@@ -127,9 +115,6 @@ private slots:
 
     void demoTimerTimeout();
     void enableDemo(bool enabled);
-
-signals:
-    void portToggled(bool open);
 };
 
 #endif // MAINWINDOW_H

@@ -35,14 +35,17 @@ CONFIG += qwt
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    customcheckablebutton.cpp
+    customcheckablebutton.cpp \
+    portcontrol.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
-    customcheckablebutton.h
+    customcheckablebutton.h \
+    portcontrol.h
 
 FORMS    += mainwindow.ui \
-    about_dialog.ui
+    about_dialog.ui \
+    portcontrol.ui
 
 INCLUDEPATH += qmake/
 

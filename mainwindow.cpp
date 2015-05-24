@@ -19,7 +19,6 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QSerialPortInfo>
 #include <QByteArray>
 #include <QApplication>
 #include <QtDebug>
@@ -31,9 +30,13 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    portControl(&serialPort)
 {
     ui->setupUi(this);
+    ui->tabWidget->insertTab(0, &portControl, "Port");
+    ui->tabWidget->setCurrentIndex(0);
+
     setupAboutDialog();
 
     // init UI signals
@@ -42,23 +45,11 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionHelpAbout, &QAction::triggered,
               &aboutDialog, &QWidget::show);
 
-    // port tab signals
-    QObject::connect(ui->pbReloadPorts, &QPushButton::clicked,
-                     this, &MainWindow::loadPortList);
-
-    QObject::connect(ui->pbOpenPort, &QPushButton::clicked,
-                     this, &MainWindow::togglePort);
-
-    QObject::connect(this, &MainWindow::portToggled,
+    QObject::connect(&portControl, &PortControl::portToggled,
                      this, &MainWindow::onPortToggled);
 
-    QObject::connect(ui->cbPortList,
-                     SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
-                     this, &MainWindow::selectPort);
-
-    QObject::connect(ui->cbBaudRate,
-                     SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
-                     this, &MainWindow::selectBaudRate);
+    QObject::connect(&portControl, &PortControl::skipByteRequested,
+                     this, &MainWindow::skipByte);
 
     QObject::connect(ui->spNumOfSamples, SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
                      this, &MainWindow::onNumOfSamplesChanged);
@@ -93,57 +84,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&numberFormatButtons, SIGNAL(buttonToggled(int, bool)),
                      this, SLOT(onNumberFormatButtonToggled(int, bool)));
 
-    // setup parity selection buttons
-    parityButtons.addButton(ui->rbNoParity, (int) QSerialPort::NoParity);
-    parityButtons.addButton(ui->rbEvenParity, (int) QSerialPort::EvenParity);
-    parityButtons.addButton(ui->rbOddParity, (int) QSerialPort::OddParity);
-
-    QObject::connect(&parityButtons,
-                     SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
-                     this, &MainWindow::selectParity);
-
-    // setup data bits selection buttons
-    dataBitsButtons.addButton(ui->rb8Bits, (int) QSerialPort::Data8);
-    dataBitsButtons.addButton(ui->rb7Bits, (int) QSerialPort::Data7);
-    dataBitsButtons.addButton(ui->rb6Bits, (int) QSerialPort::Data6);
-    dataBitsButtons.addButton(ui->rb5Bits, (int) QSerialPort::Data5);
-
-    QObject::connect(&dataBitsButtons,
-                     SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
-                     this, &MainWindow::selectDataBits);
-
-    // setup stop bits selection buttons
-    stopBitsButtons.addButton(ui->rb1StopBit, (int) QSerialPort::OneStop);
-    stopBitsButtons.addButton(ui->rb2StopBit, (int) QSerialPort::TwoStop);
-
-    QObject::connect(&stopBitsButtons,
-                     SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
-                     this, &MainWindow::selectStopBits);
-
-    // setup flow control selection buttons
-    flowControlButtons.addButton(ui->rbNoFlowControl,
-                                 (int) QSerialPort::NoFlowControl);
-    flowControlButtons.addButton(ui->rbHardwareControl,
-                                 (int) QSerialPort::HardwareControl);
-    flowControlButtons.addButton(ui->rbSoftwareControl,
-                                 (int) QSerialPort::SoftwareControl);
-
-    QObject::connect(&flowControlButtons,
-                     SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
-                     this, &MainWindow::selectFlowControl);
-
     // init port signals
     QObject::connect(&(this->serialPort), SIGNAL(error(QSerialPort::SerialPortError)),
                      this, SLOT(onPortError(QSerialPort::SerialPortError)));
-
-    // init skip byte button
-    skipByteRequested = false;
-    QObject::connect(ui->pbSkipByte, &QPushButton::clicked,
-                     this, &MainWindow::skipByte);
-
-    loadPortList();
-    loadBaudRateList();
-    ui->cbBaudRate->setCurrentIndex(ui->cbBaudRate->findText("9600"));
 
     // set limits for axis limit boxes
     ui->spYmin->setRange((-1) * std::numeric_limits<double>::max(),
@@ -220,150 +163,8 @@ void MainWindow::setupAboutDialog()
     uiAboutDialog.lbAbout->setText(aboutText);
 }
 
-void MainWindow::loadPortList()
-{
-    QString currentSelection = ui->cbPortList->currentText();
-
-    ui->cbPortList->clear();
-
-    for (auto port : QSerialPortInfo::availablePorts())
-    {
-        ui->cbPortList->addItem(port.portName());
-    }
-
-    // find current selection in the new list, maybe it doesn't exist anymore?
-    int currentSelectionIndex = ui->cbPortList->findText(currentSelection);
-    if (currentSelectionIndex >= 0)
-    {
-        ui->cbPortList->setCurrentIndex(currentSelectionIndex);
-    }
-    else // our port doesn't exist anymore, close port if it's open
-    {
-        if (serialPort.isOpen()) togglePort();
-    }
-}
-
-void MainWindow::loadBaudRateList()
-{
-    ui->cbBaudRate->clear();
-
-    for (auto baudRate : QSerialPortInfo::standardBaudRates())
-    {
-        ui->cbBaudRate->addItem(QString::number(baudRate));
-    }
-}
-
-void MainWindow::togglePort()
-{
-    if (serialPort.isOpen())
-    {
-        serialPort.close();
-        qDebug() << "Port closed, " << serialPort.portName();
-        emit portToggled(false);
-    }
-    else
-    {
-        serialPort.setPortName(ui->cbPortList->currentText());
-
-        // open port
-        if (serialPort.open(QIODevice::ReadWrite))
-        {
-            qDebug() << "Port opened, " << serialPort.portName();
-            emit portToggled(true);
-
-            // set baud rate
-            if (!serialPort.setBaudRate(ui->cbBaudRate->currentText().toInt()))
-            {
-                qDebug() << "Set baud rate failed during port opening: "
-                         << serialPort.error();
-            }
-        }
-        else
-        {
-            qDebug() << "Port open error: " << serialPort.error();
-        }
-    }
-}
-
-void MainWindow::selectPort(QString portName)
-{
-    // has selection actually changed
-    if (portName != serialPort.portName())
-    {
-        // if another port is already open, close it by toggling
-        if (serialPort.isOpen())
-        {
-            togglePort();
-
-            // open new selection by toggling
-            togglePort();
-        }
-    }
-}
-
-void MainWindow::selectBaudRate(QString baudRate)
-{
-    if (serialPort.isOpen())
-    {
-        if (!serialPort.setBaudRate(baudRate.toInt()))
-        {
-            qDebug() << "Set baud rate failed during select: "
-                     << serialPort.error();
-        }
-        else
-        {
-            qDebug() << "Baud rate changed: " << serialPort.baudRate();
-        }
-    }
-}
-
-void MainWindow::selectParity(int parity)
-{
-    if (serialPort.isOpen())
-    {
-        if(!serialPort.setParity((QSerialPort::Parity) parity))
-        {
-            qDebug() << "Set parity failed: " << serialPort.error();
-        }
-    }
-}
-
-void MainWindow::selectDataBits(int dataBits)
-{
-    if (serialPort.isOpen())
-    {
-        if(!serialPort.setDataBits((QSerialPort::DataBits) dataBits))
-        {
-            qDebug() << "Set data bits failed: " << serialPort.error();
-        }
-    }
-}
-
-void MainWindow::selectStopBits(int stopBits)
-{
-    if (serialPort.isOpen())
-    {
-        if(!serialPort.setStopBits((QSerialPort::StopBits) stopBits))
-        {
-            qDebug() << "Set stop bits failed: " << serialPort.error();
-        }
-    }
-}
-
-void MainWindow::selectFlowControl(int flowControl)
-{
-    if (serialPort.isOpen())
-    {
-        if(!serialPort.setFlowControl((QSerialPort::FlowControl) flowControl))
-        {
-            qDebug() << "Set flow control failed: " << serialPort.error();
-        }
-    }
-}
-
 void MainWindow::onPortToggled(bool open)
 {
-    ui->pbOpenPort->setChecked(open);
     // make sure demo mode is disabled
     if (open && isDemoRunning()) enableDemo(false);
     ui->actionDemoMode->setEnabled(!open);
@@ -459,9 +260,9 @@ void MainWindow::onPortError(QSerialPort::SerialPortError error)
             if (serialPort.isOpen())
             {
                 qDebug() << "Closing port on resource error: " << serialPort.portName();
-                togglePort();
+                portControl.togglePort();
             }
-            loadPortList();
+            portControl.loadPortList();
             break;
         default:
             qDebug() << "Unhandled port error: " << error;
@@ -659,14 +460,14 @@ void MainWindow::selectNumberFormat(NumberFormat numberFormatId)
         QObject::disconnect(&(this->serialPort), &QSerialPort::readyRead, 0, 0);
         QObject::connect(&(this->serialPort), &QSerialPort::readyRead,
                          this, &MainWindow::onDataReadyASCII);
-        ui->pbSkipByte->setDisabled(true);
+        portControl.enableSkipByte();
     }
     else
     {
         QObject::disconnect(&(this->serialPort), &QSerialPort::readyRead, 0, 0);
         QObject::connect(&(this->serialPort), &QSerialPort::readyRead,
                          this, &MainWindow::onDataReady);
-        ui->pbSkipByte->setEnabled(true);
+        portControl.enableSkipByte(false);
     }
 }
 

@@ -49,10 +49,11 @@ endif (QWT_USE_STATIC)
 include_directories(${QWT_INCLUDE_DIR})
 
 # wrap UI files
-qt5_wrap_ui(UI_FILES mainwindow.ui about_dialog.ui)
+qt5_wrap_ui(UI_FILES mainwindow.ui portcontrol.ui about_dialog.ui)
 
 # Tell CMake to create the helloworld executable
-add_executable(serialplot main.cpp mainwindow.cpp customcheckablebutton.cpp ${UI_FILES})
+add_executable(serialplot main.cpp mainwindow.cpp portcontrol.cpp
+  customcheckablebutton.cpp ${UI_FILES})
 
 # Use the Widgets module from Qt 5.
 target_link_libraries(serialplot ${QWT_LIBRARY})
