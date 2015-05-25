@@ -64,9 +64,9 @@ private:
 
     QDialog aboutDialog;
     void setupAboutDialog();
-    PortControl portControl;
 
     QSerialPort serialPort;
+    PortControl portControl;
 
     unsigned int numOfSamples;
     unsigned int numOfChannels;
