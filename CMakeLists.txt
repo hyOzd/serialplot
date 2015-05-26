@@ -59,6 +59,9 @@ add_executable(serialplot main.cpp mainwindow.cpp portcontrol.cpp
 target_link_libraries(serialplot ${QWT_LIBRARY})
 qt5_use_modules(serialplot Widgets SerialPort Svg)
 
+# set compiler flags
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+
 # Enable C++11 support, fail if not supported
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
