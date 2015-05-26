@@ -215,15 +215,15 @@ void PortControl::togglePort()
         // open port
         if (serialPort->open(QIODevice::ReadWrite))
         {
+            // set port settings
+            selectBaudRate(ui->cbBaudRate->currentText());
+            selectParity((QSerialPort::Parity) parityButtons.checkedId());
+            selectDataBits((QSerialPort::DataBits) dataBitsButtons.checkedId());
+            selectStopBits((QSerialPort::StopBits) stopBitsButtons.checkedId());
+            selectFlowControl((QSerialPort::FlowControl) flowControlButtons.checkedId());
+
             qDebug() << "Port opened, " << serialPort->portName();
             emit portToggled(true);
-
-            // set baud rate
-            if (!serialPort->setBaudRate(ui->cbBaudRate->currentText().toInt()))
-            {
-                qDebug() << "Set baud rate failed during port opening: "
-                         << serialPort->error();
-            }
         }
         else
         {
