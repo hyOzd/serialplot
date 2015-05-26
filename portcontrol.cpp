@@ -42,6 +42,10 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
                      SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
                      this, &PortControl::selectPort);
 
+    QObject::connect(ui->cbPortList,
+                     SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
+                     this, &PortControl::onPortNameChanged);
+
     QObject::connect(ui->cbBaudRate,
                      SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
                      this, &PortControl::selectBaudRate);
@@ -105,10 +109,14 @@ void PortControl::loadPortList()
 
     ui->cbPortList->clear();
 
+    discoveredPorts.clear();
     for (auto port : QSerialPortInfo::availablePorts())
     {
         ui->cbPortList->addItem(port.portName());
+        discoveredPorts << port.portName();
     }
+
+    ui->cbPortList->addItems(userEnteredPorts);
 
     // find current selection in the new list, maybe it doesn't exist anymore?
     int currentSelectionIndex = ui->cbPortList->findText(currentSelection);
@@ -244,4 +252,14 @@ void PortControl::selectPort(QString portName)
 void PortControl::enableSkipByte(bool enabled)
 {
     ui->pbSkipByte->setDisabled(enabled);
+}
+
+void PortControl::onPortNameChanged(QString portName)
+{
+    // was this a user entered name?
+    if(!discoveredPorts.contains(portName) &&
+       !userEnteredPorts.contains(portName))
+    {
+        userEnteredPorts << portName;
+    }
 }

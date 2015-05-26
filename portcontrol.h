@@ -23,6 +23,7 @@
 #include <QWidget>
 #include <QButtonGroup>
 #include <QSerialPort>
+#include <QStringList>
 
 namespace Ui {
 class PortControl;
@@ -46,6 +47,9 @@ private:
     QButtonGroup stopBitsButtons;
     QButtonGroup flowControlButtons;
 
+    QStringList discoveredPorts; // list of port names returned by availablePorts
+    QStringList userEnteredPorts; // list of port names entered by user
+
 public slots:
     void loadPortList();
     void loadBaudRateList();
@@ -58,6 +62,9 @@ public slots:
     void selectDataBits(int dataBits); // bits must be one of QSerialPort::DataBits
     void selectStopBits(int stopBits); // stopBits must be one of QSerialPort::StopBits
     void selectFlowControl(int flowControl); // flowControl must be one of QSerialPort::FlowControl
+
+private slots:
+    void onPortNameChanged(QString portName);
 
 signals:
     void skipByteRequested();
