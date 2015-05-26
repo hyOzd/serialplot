@@ -137,25 +137,19 @@
              </property>
             </widget>
            </item>
+           <item row="3" column="0">
+            <widget class="QRadioButton" name="rbFloat">
+             <property name="text">
+              <string>float</string>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="1">
             <widget class="QRadioButton" name="rbInt8">
              <property name="text">
               <string>int8</string>
              </property>
             </widget>
-           </item>
-           <item row="4" column="0">
-            <spacer name="verticalSpacer_6">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
            </item>
            <item row="3" column="1">
             <widget class="QRadioButton" name="rbASCII">
@@ -164,13 +158,6 @@
              </property>
              <property name="text">
               <string>ASCII(CSV)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QRadioButton" name="rbFloat">
-             <property name="text">
-              <string>float</string>
              </property>
             </widget>
            </item>
@@ -327,7 +314,7 @@
      <x>0</x>
      <y>0</y>
      <width>653</width>
-     <height>23</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp">
