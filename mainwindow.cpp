@@ -488,11 +488,14 @@ void MainWindow::demoTimerTimeout()
     demoCount++;
     if (demoCount > 100) demoCount = 0;
 
-    for (unsigned int ci = 0; ci < numOfChannels; ci++)
+    if (!ui->actionPause->isChecked())
     {
-        DataArray data(1);
-        data.replace(0, (ci + 1)*demoCount);
-        addChannelData(ci, data);
+        for (unsigned int ci = 0; ci < numOfChannels; ci++)
+        {
+            DataArray data(1);
+            data.replace(0, (ci + 1)*demoCount);
+            addChannelData(ci, data);
+        }
     }
 }
 
