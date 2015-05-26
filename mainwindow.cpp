@@ -107,7 +107,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     // init channel data and curve list
-    for (int i = 0; i < numOfChannels; i++)
+    for (unsigned int i = 0; i < numOfChannels; i++)
     {
         channelsData.append(DataArray(numOfSamples, 0.0));
         curves.append(new QwtPlotCurve());
@@ -194,7 +194,7 @@ void MainWindow::onDataReady()
             int numOfPackagesToRead =
                 (bytesAvailable - (bytesAvailable % packageSize)) / packageSize;
             QVector<DataArray> channelSamples(numOfChannels);
-            for (int ci = 0; ci < numOfChannels; ci++)
+            for (unsigned int ci = 0; ci < numOfChannels; ci++)
             {
                 channelSamples[ci].resize(numOfPackagesToRead);
             }
@@ -202,14 +202,14 @@ void MainWindow::onDataReady()
             int i = 0;
             while(i < numOfPackagesToRead)
             {
-                for (int ci = 0; ci < numOfChannels; ci++)
+                for (unsigned int ci = 0; ci < numOfChannels; ci++)
                 {
                     channelSamples[ci].replace(i, (this->*readSample)());
                 }
                 i++;
             }
 
-            for (int ci = 0; ci < numOfChannels; ci++)
+            for (unsigned int ci = 0; ci < numOfChannels; ci++)
             {
                 addChannelData(ci, channelSamples[ci]);
             }
@@ -229,9 +229,9 @@ void MainWindow::onDataReadyASCII()
         line = line.trimmed();
         auto separatedValues = line.split(',');
 
-        if (separatedValues.length() >= numOfChannels)
+        if (separatedValues.length() >= int(numOfChannels))
         {
-            for (int ci = 0; ci < numOfChannels; ci++)
+            for (unsigned int ci = 0; ci < numOfChannels; ci++)
             {
                 double channelSample = separatedValues[ci].toDouble();
                 addChannelData(ci, DataArray({channelSample}));
@@ -283,7 +283,7 @@ void MainWindow::addChannelData(unsigned int channel, DataArray data)
 
     if (offset < 0)
     {
-        for (int i = 0; i < numOfSamples; i++)
+        for (unsigned int i = 0; i < numOfSamples; i++)
         {
             (*channelDataArray)[i] = data[i - offset];
         }
@@ -314,7 +314,7 @@ void MainWindow::addChannelData(unsigned int channel, DataArray data)
 
 void MainWindow::clearPlot()
 {
-    for (int ci = 0; ci < numOfChannels; ci++)
+    for (unsigned int ci = 0; ci < numOfChannels; ci++)
     {
         channelsData[ci].fill(0.0);
         curves[ci]->setSamples(dataX, channelsData[ci]);
@@ -333,7 +333,7 @@ void MainWindow::onNumOfSamplesChanged(int value)
     if (numOfSamples < oldNum)
     {
         dataX.resize(numOfSamples);
-        for (int ci = 0; ci < numOfChannels; ci++)
+        for (unsigned int ci = 0; ci < numOfChannels; ci++)
         {
             channelsData[ci].remove(0, oldNum - numOfSamples);
         }
@@ -344,7 +344,7 @@ void MainWindow::onNumOfSamplesChanged(int value)
         for (unsigned int i = oldNum; i < numOfSamples; i++)
         {
             dataX[i] = i;
-            for (int ci = 0; ci < numOfChannels; ci++)
+            for (unsigned int ci = 0; ci < numOfChannels; ci++)
             {
                 channelsData[ci].prepend(0);
             }
@@ -360,7 +360,7 @@ void MainWindow::onNumOfChannelsChanged(int value)
     if (numOfChannels > oldNum)
     {
         // add new channels
-        for (int i = 0; i < numOfChannels - oldNum; i++)
+        for (unsigned int i = 0; i < numOfChannels - oldNum; i++)
         {
             channelsData.append(DataArray(numOfSamples, 0.0));
             curves.append(new QwtPlotCurve());
@@ -372,7 +372,7 @@ void MainWindow::onNumOfChannelsChanged(int value)
     else if(numOfChannels < oldNum)
     {
         // remove channels
-        for (int i = 0; i < oldNum - numOfChannels; i++)
+        for (unsigned int i = 0; i < oldNum - numOfChannels; i++)
         {
             channelsData.removeLast();
             auto curve = curves.takeLast();
@@ -488,7 +488,7 @@ void MainWindow::demoTimerTimeout()
     demoCount++;
     if (demoCount > 100) demoCount = 0;
 
-    for (int ci = 0; ci < numOfChannels; ci++)
+    for (unsigned int ci = 0; ci < numOfChannels; ci++)
     {
         DataArray data(1);
         data.replace(0, (ci + 1)*demoCount);
