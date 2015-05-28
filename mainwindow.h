@@ -115,6 +115,8 @@ private slots:
 
     void demoTimerTimeout();
     void enableDemo(bool enabled);
+
+    void onExportCsv();
 };
 
 #endif // MAINWINDOW_H

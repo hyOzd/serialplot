@@ -324,6 +324,13 @@
     <addaction name="actionDemoMode"/>
     <addaction name="actionHelpAbout"/>
    </widget>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionExportCsv"/>
+   </widget>
+   <addaction name="menuFile"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -370,6 +377,14 @@
    </property>
    <property name="toolTip">
     <string>Toggle Demo Mode</string>
+   </property>
+  </action>
+  <action name="actionExportCsv">
+   <property name="text">
+    <string>Export CSV</string>
+   </property>
+   <property name="toolTip">
+    <string>Export plot data to CSV</string>
    </property>
   </action>
  </widget>

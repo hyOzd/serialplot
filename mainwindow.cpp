@@ -21,6 +21,9 @@
 #include "ui_mainwindow.h"
 #include <QByteArray>
 #include <QApplication>
+#include <QFileDialog>
+#include <QFile>
+#include <QTextStream>
 #include <QtDebug>
 #include <qwt_plot.h>
 #include <limits.h>
@@ -44,6 +47,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // menu signals
     QObject::connect(ui->actionHelpAbout, &QAction::triggered,
               &aboutDialog, &QWidget::show);
+
+    QObject::connect(ui->actionExportCsv, &QAction::triggered,
+                     this, &MainWindow::onExportCsv);
 
     QObject::connect(&portControl, &PortControl::portToggled,
                      this, &MainWindow::onPortToggled);
@@ -548,5 +554,47 @@ QColor MainWindow::makeColor(unsigned int channelIndex)
         double n = pow(2, p);
         i = i - n;
         return QColor::fromHsv(360*i/n + 360/pow(2,p+1), 255, 230);
+    }
+}
+
+void MainWindow::onExportCsv()
+{
+    bool wasPaused = ui->actionPause->isChecked();
+    ui->actionPause->setChecked(true); // pause plotting
+
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export CSV File"));
+
+    if (fileName.isNull())  // user canceled export
+    {
+        ui->actionPause->setChecked(wasPaused);
+    }
+    else
+    {
+        QFile file(fileName);
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+        {
+            QTextStream fileStream(&file);
+
+            for (unsigned int ci = 0; ci < numOfChannels; ci++)
+            {
+                fileStream << "Channel " << ci;
+                if (ci != numOfChannels-1) fileStream << ",";
+            }
+            fileStream << '\n';
+
+            for (unsigned int i = 0; i < numOfSamples; i++)
+            {
+                for (unsigned int ci = 0; ci < numOfChannels; ci++)
+                {
+                    fileStream << channelsData[ci][i];
+                    if (ci != numOfChannels-1) fileStream << ",";
+                }
+                fileStream << '\n';
+            }
+        }
+        else
+        {
+            qDebug() << "File open error during export: " << file.error();
+        }
     }
 }
