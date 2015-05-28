@@ -28,6 +28,8 @@
 #include <qwt_plot.h>
 #include <limits.h>
 #include <cmath>
+#include <iostream>
+
 #include "utils.h"
 #include "version.h"
 
@@ -597,4 +599,12 @@ void MainWindow::onExportCsv()
             qDebug() << "File open error during export: " << file.error();
         }
     }
+}
+
+void MainWindow::messageHandler(QtMsgType type,
+                                const QMessageLogContext &context,
+                                const QString &msg)
+{
+    ui->ptLog->appendPlainText(msg);
+    std::cerr << msg.toStdString() << std::endl;
 }

@@ -29,6 +29,7 @@
 #include <QSignalMapper>
 #include <QTimer>
 #include <QColor>
+#include <QtGlobal>
 #include <qwt_plot_curve.h>
 
 #include "portcontrol.h"
@@ -45,6 +46,9 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+    void messageHandler(QtMsgType type, const QMessageLogContext &context,
+                        const QString &msg);
 
 private:
     enum NumberFormat

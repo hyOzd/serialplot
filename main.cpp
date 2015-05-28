@@ -19,12 +19,24 @@
 
 #include "mainwindow.h"
 #include <QApplication>
+#include <QtGlobal>
+
+MainWindow* pMainWindow;
+
+void messageHandler(QtMsgType type, const QMessageLogContext &context,
+                    const QString &msg)
+{
+    pMainWindow->messageHandler(type, context, msg);
+}
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
-    w.show();
+    pMainWindow = &w;
 
+    qInstallMessageHandler(messageHandler);
+
+    w.show();
     return a.exec();
 }
