@@ -225,10 +225,6 @@ void PortControl::togglePort()
             qDebug() << "Port opened, " << serialPort->portName();
             emit portToggled(true);
         }
-        else
-        {
-            qDebug() << "Port open error: " << serialPort->error();
-        }
     }
     ui->pbOpenPort->setChecked(serialPort->isOpen());
 }
