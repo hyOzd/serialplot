@@ -606,5 +606,6 @@ void MainWindow::messageHandler(QtMsgType type,
                                 const QString &msg)
 {
     ui->ptLog->appendPlainText(msg);
+    ui->statusBar->showMessage(msg, 5000);
     std::cerr << msg.toStdString() << std::endl;
 }
