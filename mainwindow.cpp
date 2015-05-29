@@ -605,7 +605,29 @@ void MainWindow::messageHandler(QtMsgType type,
                                 const QMessageLogContext &context,
                                 const QString &msg)
 {
-    ui->ptLog->appendPlainText(msg);
-    ui->statusBar->showMessage(msg, 5000);
-    std::cerr << msg.toStdString() << std::endl;
+    QString logString;
+
+    switch (type)
+    {
+        case QtDebugMsg:
+            logString = "[Debug] " + msg;
+            break;
+        case QtWarningMsg:
+            logString = "[Warning] " + msg;
+            break;
+        case QtCriticalMsg:
+            logString = "[Error] " + msg;
+            break;
+        case QtFatalMsg:
+            logString = "[Fatal] " + msg;
+            break;
+    }
+
+    ui->ptLog->appendPlainText(logString);
+    std::cerr << logString.toStdString() << std::endl;
+
+    if (type != QtDebugMsg)
+    {
+        ui->statusBar->showMessage(msg, 5000);
+    }
 }
