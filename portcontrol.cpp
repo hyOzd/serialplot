@@ -146,12 +146,11 @@ void PortControl::selectBaudRate(QString baudRate)
     {
         if (!serialPort->setBaudRate(baudRate.toInt()))
         {
-            qDebug() << "Set baud rate failed during select: "
-                     << serialPort->error();
+            qCritical() << "Can't set baud rate!";
         }
         else
         {
-            qDebug() << "Baud rate changed: " << serialPort->baudRate();
+            qDebug() << "Baud rate changed to" << serialPort->baudRate();
         }
     }
 }
@@ -162,7 +161,7 @@ void PortControl::selectParity(int parity)
     {
         if(!serialPort->setParity((QSerialPort::Parity) parity))
         {
-            qDebug() << "Set parity failed: " << serialPort->error();
+            qCritical() << "Can't set parity option!";
         }
     }
 }
@@ -173,7 +172,7 @@ void PortControl::selectDataBits(int dataBits)
     {
         if(!serialPort->setDataBits((QSerialPort::DataBits) dataBits))
         {
-            qDebug() << "Set data bits failed: " << serialPort->error();
+            qCritical() << "Can't set numer of data bits!";
         }
     }
 }
@@ -184,7 +183,7 @@ void PortControl::selectStopBits(int stopBits)
     {
         if(!serialPort->setStopBits((QSerialPort::StopBits) stopBits))
         {
-            qDebug() << "Set stop bits failed: " << serialPort->error();
+            qCritical() << "Can't set number of stop bits!";
         }
     }
 }
@@ -195,7 +194,7 @@ void PortControl::selectFlowControl(int flowControl)
     {
         if(!serialPort->setFlowControl((QSerialPort::FlowControl) flowControl))
         {
-            qDebug() << "Set flow control failed: " << serialPort->error();
+            qCritical() << "Can't set flow control option!";
         }
     }
 }
@@ -205,7 +204,7 @@ void PortControl::togglePort()
     if (serialPort->isOpen())
     {
         serialPort->close();
-        qDebug() << "Port closed, " << serialPort->portName();
+        qDebug() << "Closed port:" << serialPort->portName();
         emit portToggled(false);
     }
     else
@@ -222,7 +221,7 @@ void PortControl::togglePort()
             selectStopBits((QSerialPort::StopBits) stopBitsButtons.checkedId());
             selectFlowControl((QSerialPort::FlowControl) flowControlButtons.checkedId());
 
-            qDebug() << "Port opened, " << serialPort->portName();
+            qDebug() << "Opened port:" << serialPort->portName();
             emit portToggled(true);
         }
     }

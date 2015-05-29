@@ -247,7 +247,7 @@ void MainWindow::onDataReadyASCII()
         }
         else // there is missing channel data
         {
-            qDebug() << "Incoming data is missing data for some channels!";
+            qWarning() << "Incoming data is missing data for some channels!";
             for (int ci = 0; ci < separatedValues.length(); ci++)
             {
                 double channelSample = separatedValues[ci].toDouble();
@@ -632,7 +632,7 @@ void MainWindow::onExportCsv()
         }
         else
         {
-            qDebug() << "File open error during export: " << file.error();
+            qCritical() << "File open error during export: " << file.error();
         }
     }
 }
