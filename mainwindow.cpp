@@ -264,19 +264,55 @@ void MainWindow::onPortError(QSerialPort::SerialPortError error)
         case QSerialPort::NoError :
             break;
         case QSerialPort::ResourceError :
-            qDebug() << "Port error: resource unavaliable; most likely device removed.";
+            qWarning() << "Port error: resource unavaliable; most likely device removed.";
             if (serialPort.isOpen())
             {
-                qDebug() << "Closing port on resource error: " << serialPort.portName();
+                qWarning() << "Closing port on resource error: " << serialPort.portName();
                 portControl.togglePort();
             }
             portControl.loadPortList();
             break;
+        case QSerialPort::DeviceNotFoundError:
+            qCritical() << "Device doesn't exists: " << serialPort.portName();
+            break;
+        case QSerialPort::PermissionError:
+            qCritical() << "Permission denied. Either you don't have \
+required privileges or device is already opened by another process.";
+            break;
+        case QSerialPort::OpenError:
+            qWarning() << "Device is already opened!";
+            break;
+        case QSerialPort::NotOpenError:
+            qCritical() << "Device is not open!";
+            break;
+        case QSerialPort::ParityError:
+            qCritical() << "Parity error detected.";
+            break;
+        case QSerialPort::FramingError:
+            qCritical() << "Framing error detected.";
+            break;
+        case QSerialPort::BreakConditionError:
+            qCritical() << "Break condition is detected.";
+            break;
+        case QSerialPort::WriteError:
+            qCritical() << "An error occurred while writing data.";
+            break;
+        case QSerialPort::ReadError:
+            qCritical() << "An error occurred while reading data.";
+            break;
+        case QSerialPort::UnsupportedOperationError:
+            qCritical() << "Operation is not supported.";
+            break;
+        case QSerialPort::TimeoutError:
+            qCritical() << "A timeout error occurred.";
+            break;
+        case QSerialPort::UnknownError:
+            qCritical() << "Unknown error!";
+            break;
         default:
-            qDebug() << "Unhandled port error: " << error;
+            qCritical() << "Unhandled port error: " << error;
             break;
     }
-
 }
 
 void MainWindow::skipByte()
