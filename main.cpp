@@ -21,6 +21,8 @@
 #include <QApplication>
 #include <QtGlobal>
 
+#include "version.h"
+
 MainWindow* pMainWindow;
 
 void messageHandler(QtMsgType type, const QMessageLogContext &context,
@@ -36,6 +38,10 @@ int main(int argc, char *argv[])
     pMainWindow = &w;
 
     qInstallMessageHandler(messageHandler);
+
+    // log application information
+    qDebug() << "SerialPlot" << VERSION_STRING;
+    qDebug() << "Revision" << VERSION_REVISION;
 
     w.show();
     return a.exec();
