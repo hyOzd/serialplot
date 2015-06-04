@@ -41,7 +41,8 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     utils.h \
     customcheckablebutton.h \
-    portcontrol.h
+    portcontrol.h \
+    floatswap.h
 
 FORMS    += mainwindow.ui \
     about_dialog.ui \

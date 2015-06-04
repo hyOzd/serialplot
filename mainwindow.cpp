@@ -25,6 +25,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QtDebug>
+#include <QtEndian>
 #include <qwt_plot.h>
 #include <limits.h>
 #include <cmath>
@@ -32,6 +33,7 @@
 
 #include "utils.h"
 #include "version.h"
+#include "floatswap.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -519,6 +521,16 @@ template<typename T> double MainWindow::readSampleAs()
 {
     T data;
     this->serialPort.read((char*) &data, sizeof(data));
+
+    if (ui->rbLittleE->isChecked())
+    {
+        data = qFromLittleEndian(data);
+    }
+    else
+    {
+        data = qFromBigEndian(data);
+    }
+
     return double(data);
 }
 
