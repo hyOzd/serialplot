@@ -61,6 +61,16 @@ def float_sine(port):
         i = (i + 1) % period
         time.sleep(0.1)
 
+def uint32_test(port, little):
+    """Puts 32 bit unsigned integer data through pseudo terminal"""
+    i = 0
+    maxi = 200
+    while True:
+        data = struct.pack('>I', i)
+        os.write(port, data)
+        time.sleep(0.05)
+        i = i+1 if i <= maxi else 0
+
 def run():
     # create the pseudo terminal
     master, slave = pty.openpty()
