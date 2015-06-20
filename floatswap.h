@@ -1,4 +1,3 @@
-#include <byteswap.h>
 #include <QtGlobal>
 
 template <> inline float qbswap<float>(float source)
