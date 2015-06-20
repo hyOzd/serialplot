@@ -22,7 +22,7 @@
 # /usr/local/qwt-VERSION directories.
 #
 
-file(GLOB qwt_glob_dir "/usr/local/qwt*/")
+file(GLOB qwt_glob_dir "/usr/local/qwt*/" "c:/Qwt*")
 
 if(qwt_glob_dir)
   foreach(qwt_path ${qwt_glob_dir})
