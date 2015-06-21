@@ -158,7 +158,7 @@ endif (UNIX)
 # packaging
 if (UNIX)
   set(CPACK_GENERATOR "DEB")
-elsif (WIN32)
+elseif (WIN32)
   set(CPACK_GENERATOR "NSIS")
 endif (UNIX)
 
