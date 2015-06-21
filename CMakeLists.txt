@@ -183,6 +183,8 @@ elseif (WIN32)
   set(CPACK_PACKAGE_EXECUTABLES "serialplot;SerialPlot")
   set(CPACK_CREATE_DESKTOP_LINKS "serialplot")
   set(CPACK_NSIS_MODIFY_PATH "ON")
+  set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/misc/serialplot.bmp")
+  string(REPLACE "/" "\\\\" CPACK_PACKAGE_ICON ${CPACK_PACKAGE_ICON})
 endif (UNIX)
 
 if (UNIX)
