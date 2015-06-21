@@ -181,6 +181,8 @@ if (UNIX)
   set(CPACK_PACKAGE_EXECUTABLES "serialplot")
 elseif (WIN32)
   set(CPACK_PACKAGE_EXECUTABLES "serialplot;SerialPlot")
+  set(CPACK_CREATE_DESKTOP_LINKS "serialplot")
+  set(CPACK_NSIS_MODIFY_PATH "ON")
 endif (UNIX)
 
 if (UNIX)
