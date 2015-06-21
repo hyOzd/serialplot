@@ -117,21 +117,23 @@ install(TARGETS serialplot DESTINATION bin)
 find_program(XDG-DESKTOP-MENU xdg-desktop-menu)
 find_program(XDG-ICON-RESOURCE xdg-icon-resource)
 
-# first copy files to share/serialplot/
-install(FILES
-  ${CMAKE_SOURCE_DIR}/misc/serialplot.desktop
-  ${CMAKE_SOURCE_DIR}/misc/serialplot.png
-  DESTINATION share/serialplot)
+if (UNIX)
+  # first copy files to share/serialplot/
+  install(FILES
+    ${CMAKE_SOURCE_DIR}/misc/serialplot.desktop
+    ${CMAKE_SOURCE_DIR}/misc/serialplot.png
+    DESTINATION share/serialplot)
 
-# install copyright file (in debian format)
-install(FILES
-  ${CMAKE_SOURCE_DIR}/debian/copyright
-  DESTINATION share/doc/serialplot/)
+  # install copyright file (in debian format)
+  install(FILES
+    ${CMAKE_SOURCE_DIR}/debian/copyright
+    DESTINATION share/doc/serialplot/)
 
-install(CODE "
+  install(CODE "
   execute_process(COMMAND ${XDG-DESKTOP-MENU} install --novendor ${CMAKE_INSTALL_PREFIX}/share/serialplot/serialplot.desktop)
   execute_process(COMMAND ${XDG-ICON-RESOURCE} install --novendor --size 256 ${CMAKE_INSTALL_PREFIX}/share/serialplot/serialplot.png)
 ")
+endif (UNIX)
 
 # uninstalling
 configure_file(
@@ -139,13 +141,19 @@ configure_file(
   "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
   IMMEDIATE @ONLY)
 
-add_custom_target(uninstall
-  COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
-  COMMAND ${XDG-DESKTOP-MENU} uninstall --novendor serialplot.desktop
-  COMMAND ${XDG-ICON-RESOURCE} uninstall --novendor --size 256 serialplot)
+if (UNIX)
+  add_custom_target(uninstall
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
+    COMMAND ${XDG-DESKTOP-MENU} uninstall --novendor serialplot.desktop
+    COMMAND ${XDG-ICON-RESOURCE} uninstall --novendor --size 256 serialplot)
+endif (UNIX)
 
 # packaging
-set(CPACK_GENERATOR "DEB")
+if (UNIX)
+  set(CPACK_GENERATOR "DEB")
+elsif (WIN32)
+  set(CPACK_GENERATOR "NSIS")
+endif (UNIX)
 
 include(InstallRequiredSystemLibraries)
 
@@ -156,26 +164,33 @@ set(CPACK_PACKAGE_VERSION_MAJOR ${MAJOR_VERSION})
 set(CPACK_PACKAGE_VERSION_MINOR ${MINOR_VERSION})
 set(CPACK_PACKAGE_VERSION_PATCH ${PATCH_VERSION})
 set(CPACK_STRIP_FILES TRUE)
-set(CPACK_PACKAGE_EXECUTABLES "serialplot")
 set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5widgets5 (>= 5.2.1), libqt5serialport5 (>= 5.2.1), libc6 (>= 2.19)")
 if (NOT QWT_USE_STATIC)
   set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libqwt6-qt5 (>= 6.1.1)")
 endif (NOT QWT_USE_STATIC)
 set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/debian/postinst" "${CMAKE_SOURCE_DIR}/debian/postrm")
 
-# set debian package name
-string(TOLOWER "${CPACK_PACKAGE_NAME}" CPACK_PACKAGE_NAME_LOWERCASE)
-find_program(DPKG_PROGRAM dpkg DOC "dpkg program of Debian-based systems")
-if(DPKG_PROGRAM)
-  execute_process(
-    COMMAND ${DPKG_PROGRAM} --print-architecture
-    OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_ARCHITECTURE
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
-  set(CPACK_PACKAGE_FILE_NAME
-	"${CPACK_PACKAGE_NAME_LOWERCASE}_${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
-else(DPKG_PROGRAM)
-  set(CPACK_PACKAGE_FILE_NAME
-	"${CPACK_PACKAGE_NAME_LOWERCASE}_${PROJECT_VERSION}-${PROJECT_VERSION_REVISION}_${CMAKE_SYSTEM_NAME}")
-endif(DPKG_PROGRAM)
+if (UNIX)
+  set(CPACK_PACKAGE_EXECUTABLES "serialplot")
+elsif (WIN32)
+  set(CPACK_PACKAGE_EXECUTABLES "serialplot;misc/serialplot.png")
+endif (UNIX)
+
+if (UNIX)
+  # set debian package name
+  string(TOLOWER "${CPACK_PACKAGE_NAME}" CPACK_PACKAGE_NAME_LOWERCASE)
+  find_program(DPKG_PROGRAM dpkg DOC "dpkg program of Debian-based systems")
+  if(DPKG_PROGRAM)
+    execute_process(
+      COMMAND ${DPKG_PROGRAM} --print-architecture
+      OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_ARCHITECTURE
+      OUTPUT_STRIP_TRAILING_WHITESPACE)
+    set(CPACK_PACKAGE_FILE_NAME
+      "${CPACK_PACKAGE_NAME_LOWERCASE}_${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
+  else(DPKG_PROGRAM)
+    set(CPACK_PACKAGE_FILE_NAME
+      "${CPACK_PACKAGE_NAME_LOWERCASE}_${PROJECT_VERSION}-${PROJECT_VERSION_REVISION}_${CMAKE_SYSTEM_NAME}")
+  endif(DPKG_PROGRAM)
+endif (UNIX)
 
 include(CPack)
