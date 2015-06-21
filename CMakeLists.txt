@@ -179,8 +179,8 @@ set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/debian/postinst" "${
 
 if (UNIX)
   set(CPACK_PACKAGE_EXECUTABLES "serialplot")
-elsif (WIN32)
-  set(CPACK_PACKAGE_EXECUTABLES "serialplot;misc/serialplot.png")
+elseif (WIN32)
+  set(CPACK_PACKAGE_EXECUTABLES "serialplot;SerialPlot")
 endif (UNIX)
 
 if (UNIX)
