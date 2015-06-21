@@ -52,7 +52,7 @@ include_directories(${QWT_INCLUDE_DIR})
 qt5_wrap_ui(UI_FILES mainwindow.ui portcontrol.ui about_dialog.ui)
 
 # Tell CMake to create the helloworld executable
-add_executable(serialplot main.cpp mainwindow.cpp portcontrol.cpp
+add_executable(serialplot WIN32 main.cpp mainwindow.cpp portcontrol.cpp
   customcheckablebutton.cpp ${UI_FILES} misc/windows_icon.rc)
 
 # Use the Widgets module from Qt 5.
