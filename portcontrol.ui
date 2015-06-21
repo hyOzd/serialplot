@@ -69,6 +69,9 @@
            <height>16777215</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>Reload port list</string>
+         </property>
          <property name="text">
           <string>↺</string>
          </property>
@@ -280,6 +283,9 @@
          <height>50</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>Toggle port status</string>
+       </property>
        <property name="text">
         <string>Open</string>
        </property>
@@ -290,6 +296,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="pbSkipByte">
+       <property name="toolTip">
+        <string>Skip reading 1 byte to correct the alignment</string>
+       </property>
        <property name="text">
         <string>Skip Byte</string>
        </property>
