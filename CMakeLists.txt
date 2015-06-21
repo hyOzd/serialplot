@@ -113,6 +113,13 @@ add_custom_target(run
 # installing
 install(TARGETS serialplot DESTINATION bin)
 
+# for windows put libraries to install directory
+if (WIN32)
+  file(GLOB WINDOWS_INSTALL_LIBRARIES
+    "${CMAKE_BINARY_DIR}/windows_install_libraries/*.*")
+  install(FILES ${WINDOWS_INSTALL_LIBRARIES} DESTINATION bin)
+endif (WIN32)
+
 # install menu item and icon
 find_program(XDG-DESKTOP-MENU xdg-desktop-menu)
 find_program(XDG-ICON-RESOURCE xdg-icon-resource)
