@@ -106,6 +106,9 @@
             <layout class="QGridLayout" name="gridLayout_2">
              <item row="2" column="0">
               <widget class="QRadioButton" name="rbUint32">
+               <property name="toolTip">
+                <string>unsigned 4 bytes integer</string>
+               </property>
                <property name="text">
                 <string>uint32</string>
                </property>
@@ -113,6 +116,9 @@
              </item>
              <item row="0" column="1">
               <widget class="QRadioButton" name="rbInt8">
+               <property name="toolTip">
+                <string>signed 1 byte integer</string>
+               </property>
                <property name="text">
                 <string>int8</string>
                </property>
@@ -120,6 +126,9 @@
              </item>
              <item row="0" column="0">
               <widget class="QRadioButton" name="rbUint8">
+               <property name="toolTip">
+                <string>unsigned 1 byte integer</string>
+               </property>
                <property name="text">
                 <string>uint8</string>
                </property>
@@ -140,6 +149,9 @@
              </item>
              <item row="1" column="1">
               <widget class="QRadioButton" name="rbInt16">
+               <property name="toolTip">
+                <string>signed 2 bytes integer</string>
+               </property>
                <property name="text">
                 <string>int16</string>
                </property>
@@ -147,6 +159,9 @@
              </item>
              <item row="2" column="1">
               <widget class="QRadioButton" name="rbInt32">
+               <property name="toolTip">
+                <string>signed 4 bytes integer</string>
+               </property>
                <property name="text">
                 <string>int32</string>
                </property>
@@ -154,6 +169,9 @@
              </item>
              <item row="3" column="0">
               <widget class="QRadioButton" name="rbFloat">
+               <property name="toolTip">
+                <string>4 bytes floating point number</string>
+               </property>
                <property name="text">
                 <string>float</string>
                </property>
@@ -161,6 +179,9 @@
              </item>
              <item row="1" column="0">
               <widget class="QRadioButton" name="rbUint16">
+               <property name="toolTip">
+                <string>unsigned 2 bytes integer</string>
+               </property>
                <property name="text">
                 <string>uint16</string>
                </property>
@@ -203,6 +224,9 @@
             <layout class="QVBoxLayout" name="verticalLayout">
              <item>
               <widget class="QRadioButton" name="rbLittleE">
+               <property name="toolTip">
+                <string>least significant byte first</string>
+               </property>
                <property name="text">
                 <string>Little Endian</string>
                </property>
@@ -213,6 +237,9 @@
              </item>
              <item>
               <widget class="QRadioButton" name="rbBigE">
+               <property name="toolTip">
+                <string>most significant byte first</string>
+               </property>
                <property name="text">
                 <string>Big Endian</string>
                </property>
