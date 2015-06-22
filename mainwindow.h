@@ -31,6 +31,7 @@
 #include <QColor>
 #include <QtGlobal>
 #include <qwt_plot_curve.h>
+#include <qwt_plot_textlabel.h>
 
 #include "portcontrol.h"
 #include "ui_about_dialog.h"
@@ -96,6 +97,7 @@ private:
     QTimer demoTimer;
     int demoCount;
     bool isDemoRunning();
+    QwtPlotTextLabel demoIndicator;
 
     QColor makeColor(unsigned int channelIndex);
 

@@ -143,6 +143,15 @@ MainWindow::MainWindow(QWidget *parent) :
                      this, &MainWindow::demoTimerTimeout);
     QObject::connect(ui->actionDemoMode, &QAction::toggled,
                      this, &MainWindow::enableDemo);
+
+    {   // init demo indicator
+        QwtText demoText("DEMO RUNNING");
+        demoText.setColor(QColor("red"));
+        demoText.setRenderFlags(Qt::AlignLeft | Qt::AlignTop);
+        demoIndicator.setText(demoText);
+        demoIndicator.hide();
+        demoIndicator.attach(ui->plot);
+    }
 }
 
 MainWindow::~MainWindow()
@@ -570,6 +579,8 @@ void MainWindow::enableDemo(bool enabled)
         {
             demoTimer.start();
             ui->actionDemoMode->setChecked(true);
+            demoIndicator.show();
+            ui->plot->replot();
         }
         else
         {
@@ -580,6 +591,8 @@ void MainWindow::enableDemo(bool enabled)
     {
         demoTimer.stop();
         ui->actionDemoMode->setChecked(false);
+        demoIndicator.hide();
+        ui->plot->replot();
     }
 }
 
