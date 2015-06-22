@@ -236,6 +236,13 @@ void MainWindow::onDataReadyASCII()
     while(serialPort.canReadLine())
     {
         QByteArray line = serialPort.readLine();
+
+        // discard data if paused
+        if (ui->actionPause->isChecked())
+        {
+            return;
+        }
+
         line = line.trimmed();
         auto separatedValues = line.split(',');
 
