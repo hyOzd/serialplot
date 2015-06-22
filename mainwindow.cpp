@@ -145,8 +145,10 @@ MainWindow::MainWindow(QWidget *parent) :
                      this, &MainWindow::enableDemo);
 
     {   // init demo indicator
-        QwtText demoText("DEMO RUNNING");
-        demoText.setColor(QColor("red"));
+        QwtText demoText(" DEMO RUNNING ");  // looks better with spaces
+        demoText.setColor(QColor("white"));
+        demoText.setBackgroundBrush(Qt::darkRed);
+        demoText.setBorderRadius(4);
         demoText.setRenderFlags(Qt::AlignLeft | Qt::AlignTop);
         demoIndicator.setText(demoText);
         demoIndicator.hide();
