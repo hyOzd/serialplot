@@ -466,6 +466,8 @@
      <string>File</string>
     </property>
     <addaction name="actionExportCsv"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuHelp"/>
@@ -522,6 +524,14 @@
    </property>
    <property name="toolTip">
     <string>Export plot data to CSV</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
  </widget>

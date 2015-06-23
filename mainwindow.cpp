@@ -55,6 +55,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionExportCsv, &QAction::triggered,
                      this, &MainWindow::onExportCsv);
 
+    QObject::connect(ui->actionQuit, &QAction::triggered,
+                     this, &MainWindow::close);
+
     QObject::connect(&portControl, &PortControl::portToggled,
                      this, &MainWindow::onPortToggled);
 
