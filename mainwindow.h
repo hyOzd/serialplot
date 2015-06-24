@@ -82,7 +82,7 @@ private:
     DataArray dataX;   // array that simply contains numbers 0..numberOfSamples
     QList<DataArray> channelsData;
 
-    // `data` contains channel specific data
+    // `data` contains i th channels data
     void addChannelData(unsigned int channel, DataArray data);
 
     NumberFormat numberFormat;
