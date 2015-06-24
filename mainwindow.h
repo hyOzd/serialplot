@@ -22,6 +22,7 @@
 
 #include <QMainWindow>
 #include <QButtonGroup>
+#include <QLabel>
 #include <QString>
 #include <QVector>
 #include <QList>
@@ -93,6 +94,11 @@ private:
 
     bool skipByteRequested;
 
+    const int SPS_UPDATE_TIMEOUT = 1;  // second
+    QLabel spsLabel;
+    unsigned int sampleCount;
+    QTimer spsTimer;
+
     // demo
     QTimer demoTimer;
     int demoCount;
@@ -118,6 +124,8 @@ private slots:
     void selectNumberFormat(NumberFormat numberFormatId);
 
     void clearPlot();
+
+    void spsTimerTimeout();
 
     void demoTimerTimeout();
     void enableDemo(bool enabled);

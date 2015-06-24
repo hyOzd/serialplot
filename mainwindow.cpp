@@ -139,6 +139,14 @@ MainWindow::MainWindow(QWidget *parent) :
         selectNumberFormat(NumberFormat_uint8);
     }
 
+    // Init sps (sample per second) counter
+    sampleCount = 0;
+    spsLabel.setText("0sps");
+    ui->statusBar->addPermanentWidget(&spsLabel);
+    spsTimer.start(SPS_UPDATE_TIMEOUT * 1000);
+    QObject::connect(&spsTimer, &QTimer::timeout,
+                     this, &MainWindow::spsTimerTimeout);
+
     // Init demo mode
     demoCount = 0;
     demoTimer.setInterval(100);
@@ -157,6 +165,7 @@ MainWindow::MainWindow(QWidget *parent) :
         demoIndicator.hide();
         demoIndicator.attach(ui->plot);
     }
+
 }
 
 MainWindow::~MainWindow()
@@ -377,6 +386,8 @@ void MainWindow::addChannelData(unsigned int channel, DataArray data)
     // update plot
     curves[channel]->setSamples(dataX, (*channelDataArray));
     ui->plot->replot(); // TODO: replot after all channel data updated
+
+    sampleCount += data.size();
 }
 
 void MainWindow::clearPlot()
@@ -558,6 +569,12 @@ template<typename T> double MainWindow::readSampleAs()
 bool MainWindow::isDemoRunning()
 {
     return ui->actionDemoMode->isChecked();
+}
+
+void MainWindow::spsTimerTimeout()
+{
+    spsLabel.setText(QString::number(sampleCount/SPS_UPDATE_TIMEOUT) + "sps");
+    sampleCount = 0;
 }
 
 void MainWindow::demoTimerTimeout()
