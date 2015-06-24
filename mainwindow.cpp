@@ -35,6 +35,11 @@
 #include "version.h"
 #include "floatswap.h"
 
+#if defined(Q_OS_WIN) && defined(QT_STATIC)
+#include <QtPlugin>
+Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
+#endif
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
