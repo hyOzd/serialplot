@@ -10,6 +10,12 @@ Small and simple software for plotting data from serial port.
 * ASCII input (Comma Separated Values)
 * Synchronized multi channel plotting
 
+## Installation
+
+You can obtain installation packages from
+[downloads](https://bitbucket.org/hyOzd/serialplot/downloads). As of
+moment there is only Debian and Windows 64 bits packages.
+
 ## Dependencies
 - Qt 5, including SerialPort module
 - Qwt 6.1
