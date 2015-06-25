@@ -185,7 +185,9 @@ elseif (WIN32)
   set(CPACK_NSIS_MODIFY_PATH "ON")
   set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/misc/serialplot.bmp")
   string(REPLACE "/" "\\\\" CPACK_PACKAGE_ICON ${CPACK_PACKAGE_ICON})
-  SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/COPYING")
+  set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/COPYING")
+  set(CPACK_NSIS_MENU_LINKS
+    "https://bitbucket.org/hyOzd/serialplot" "SerialPlot source code on bitbucket.org")
 endif (UNIX)
 
 if (UNIX)
