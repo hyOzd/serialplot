@@ -147,6 +147,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Init sps (sample per second) counter
     sampleCount = 0;
     spsLabel.setText("0sps");
+    spsLabel.setToolTip("samples per second (total of all channels)");
     ui->statusBar->addPermanentWidget(&spsLabel);
     spsTimer.start(SPS_UPDATE_TIMEOUT * 1000);
     QObject::connect(&spsTimer, &QTimer::timeout,
