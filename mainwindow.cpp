@@ -134,6 +134,10 @@ MainWindow::MainWindow(QWidget *parent) :
         curves[i]->attach(ui->plot);
     }
 
+    // init zoomer
+    zoomer = new Zoomer(ui->plot->canvas(), false);
+    zoomer->setZoomBase();
+
     // init number format
     if (numberFormatButtons.checkedId() >= 0)
     {
