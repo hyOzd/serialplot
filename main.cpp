@@ -28,6 +28,7 @@ MainWindow* pMainWindow;
 void messageHandler(QtMsgType type, const QMessageLogContext &context,
                     const QString &msg)
 {
+    // TODO: don't call MainWindow::messageHandler if window is destroyed
     pMainWindow->messageHandler(type, context, msg);
 }
 

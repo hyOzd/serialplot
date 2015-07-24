@@ -192,6 +192,7 @@ MainWindow::~MainWindow()
         serialPort.close();
     }
     delete ui;
+    ui = NULL; // we check if ui is deleted in messageHandler
 }
 
 void MainWindow::setupAboutDialog()
@@ -728,10 +729,10 @@ void MainWindow::messageHandler(QtMsgType type,
             break;
     }
 
-    ui->ptLog->appendPlainText(logString);
+    if (ui != NULL) ui->ptLog->appendPlainText(logString);
     std::cerr << logString.toStdString() << std::endl;
 
-    if (type != QtDebugMsg)
+    if (type != QtDebugMsg && ui != NULL)
     {
         ui->statusBar->showMessage(msg, 5000);
     }
