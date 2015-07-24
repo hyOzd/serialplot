@@ -134,11 +134,9 @@ MainWindow::MainWindow(QWidget *parent) :
         curves[i]->attach(ui->plot);
     }
 
-    // init zoomer
-    zoomer = new Zoomer(ui->plot->canvas(), false);
-    zoomer->setZoomBase();
-    QObject::connect(zoomer, &Zoomer::unzoomed,
-                     this, &MainWindow::unzoomed);
+    // init auto scale
+    ui->plot->setAxis(ui->cbAutoScale->isChecked(),
+                      ui->spYmin->value(), ui->spYmax->value());
 
     // init number format
     if (numberFormatButtons.checkedId() >= 0)
@@ -477,7 +475,7 @@ void MainWindow::onAutoScaleChecked(bool checked)
 {
     if (checked)
     {
-        ui->plot->setAxisAutoScale(QwtPlot::yLeft);
+        ui->plot->setAxis(true);
         ui->lYmin->setEnabled(false);
         ui->lYmax->setEnabled(false);
         ui->spYmin->setEnabled(false);
@@ -490,18 +488,13 @@ void MainWindow::onAutoScaleChecked(bool checked)
         ui->spYmin->setEnabled(true);
         ui->spYmax->setEnabled(true);
 
-        zoomer->zoom(0); // unzoom first, since zoomer plays with scales
-
-        ui->plot->setAxisScale(QwtPlot::yLeft, ui->spYmin->value(),
-                               ui->spYmax->value());
+        ui->plot->setAxis(false,  ui->spYmin->value(), ui->spYmax->value());
     }
 }
 
 void MainWindow::onYScaleChanged()
 {
-    ui->plot->setAxisScale(QwtPlot::yLeft, ui->spYmin->value(),
-                           ui->spYmax->value());
-    zoomer->zoom(0); // unzoom first, since zoomer plays with scales
+    ui->plot->setAxis(false,  ui->spYmin->value(), ui->spYmax->value());
 }
 
 void MainWindow::onNumberFormatButtonToggled(int numberFormatId, bool checked)
@@ -736,19 +729,4 @@ void MainWindow::messageHandler(QtMsgType type,
     {
         ui->statusBar->showMessage(msg, 5000);
     }
-}
-
-void MainWindow::unzoomed()
-{
-    if (ui->cbAutoScale->isChecked())
-    {
-        ui->plot->setAxisAutoScale(QwtPlot::yLeft);
-    }
-    else
-    {
-        ui->plot->setAxisScale(QwtPlot::yLeft, ui->spYmin->value(),
-                               ui->spYmax->value());
-    }
-    ui->plot->setAxisAutoScale(QwtPlot::xBottom);
-    ui->plot->replot();
 }

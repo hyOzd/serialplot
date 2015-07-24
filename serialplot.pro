@@ -37,6 +37,7 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     customcheckablebutton.cpp \
     portcontrol.cpp \
+    plot.cpp \
     zoomer.cpp
 
 HEADERS  += mainwindow.h \
@@ -44,6 +45,7 @@ HEADERS  += mainwindow.h \
     customcheckablebutton.h \
     portcontrol.h \
     floatswap.h \
+    plot.h \
     zoomer.h
 
 FORMS    += mainwindow.ui \

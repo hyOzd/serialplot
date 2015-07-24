@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <widget class="QwtPlot" name="plot">
+     <widget class="Plot" name="plot">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
         <horstretch>0</horstretch>
@@ -451,7 +451,7 @@
      <x>0</x>
      <y>0</y>
      <width>653</width>
-     <height>20</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp">
@@ -538,9 +538,9 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QwtPlot</class>
+   <class>Plot</class>
    <extends>QFrame</extends>
-   <header>qwt_plot.h</header>
+   <header>plot.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

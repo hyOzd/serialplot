@@ -33,7 +33,6 @@
 #include <QtGlobal>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_textlabel.h>
-#include "zoomer.h"
 
 #include "portcontrol.h"
 #include "ui_about_dialog.h"
@@ -86,8 +85,6 @@ private:
     // `data` contains i th channels data
     void addChannelData(unsigned int channel, DataArray data);
 
-    Zoomer* zoomer;
-
     NumberFormat numberFormat;
     unsigned int sampleSize; // number of bytes in the selected number format
     double (MainWindow::*readSample)();
@@ -127,7 +124,6 @@ private slots:
     void selectNumberFormat(NumberFormat numberFormatId);
 
     void clearPlot();
-    void unzoomed();
 
     void spsTimerTimeout();
 
