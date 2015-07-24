@@ -87,7 +87,6 @@ private:
     void addChannelData(unsigned int channel, DataArray data);
 
     Zoomer* zoomer;
-    void unzoomed();
 
     NumberFormat numberFormat;
     unsigned int sampleSize; // number of bytes in the selected number format
@@ -128,6 +127,7 @@ private slots:
     void selectNumberFormat(NumberFormat numberFormatId);
 
     void clearPlot();
+    void unzoomed();
 
     void spsTimerTimeout();
 
