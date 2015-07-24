@@ -36,13 +36,15 @@ CONFIG += qwt
 SOURCES += main.cpp\
         mainwindow.cpp \
     customcheckablebutton.cpp \
-    portcontrol.cpp
+    portcontrol.cpp \
+    zoomer.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
     customcheckablebutton.h \
     portcontrol.h \
-    floatswap.h
+    floatswap.h \
+    zoomer.h
 
 FORMS    += mainwindow.ui \
     about_dialog.ui \
