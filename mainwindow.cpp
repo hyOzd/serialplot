@@ -489,6 +489,8 @@ void MainWindow::onAutoScaleChecked(bool checked)
         ui->spYmin->setEnabled(true);
         ui->spYmax->setEnabled(true);
 
+        zoomer->zoom(0); // unzoom first, since zoomer plays with scales
+
         ui->plot->setAxisScale(QwtPlot::yLeft, ui->spYmin->value(),
                                ui->spYmax->value());
     }
@@ -498,6 +500,7 @@ void MainWindow::onYScaleChanged()
 {
     ui->plot->setAxisScale(QwtPlot::yLeft, ui->spYmin->value(),
                            ui->spYmax->value());
+    zoomer->zoom(0); // unzoom first, since zoomer plays with scales
 }
 
 void MainWindow::onNumberFormatButtonToggled(int numberFormatId, bool checked)
