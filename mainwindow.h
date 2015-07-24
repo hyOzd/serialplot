@@ -87,6 +87,7 @@ private:
     void addChannelData(unsigned int channel, DataArray data);
 
     Zoomer* zoomer;
+    void unzoomed();
 
     NumberFormat numberFormat;
     unsigned int sampleSize; // number of bytes in the selected number format

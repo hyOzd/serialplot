@@ -38,7 +38,6 @@ void Zoomer::zoom(int up)
 
     if (up == 0)
     {
-        this->plot()->setAxisAutoScale(QwtPlot::yLeft);
-        this->plot()->replot();
+        emit unzoomed();
     }
 }

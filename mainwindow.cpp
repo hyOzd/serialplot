@@ -137,6 +137,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // init zoomer
     zoomer = new Zoomer(ui->plot->canvas(), false);
     zoomer->setZoomBase();
+    QObject::connect(zoomer, &Zoomer::unzoomed,
+                     this, &MainWindow::unzoomed);
 
     // init number format
     if (numberFormatButtons.checkedId() >= 0)
@@ -730,4 +732,19 @@ void MainWindow::messageHandler(QtMsgType type,
     {
         ui->statusBar->showMessage(msg, 5000);
     }
+}
+
+void MainWindow::unzoomed()
+{
+    if (ui->cbAutoScale->isChecked())
+    {
+        ui->plot->setAxisAutoScale(QwtPlot::yLeft);
+    }
+    else
+    {
+        ui->plot->setAxisScale(QwtPlot::yLeft, ui->spYmin->value(),
+                               ui->spYmax->value());
+    }
+    ui->plot->setAxisAutoScale(QwtPlot::xBottom);
+    ui->plot->replot();
 }

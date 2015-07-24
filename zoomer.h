@@ -29,6 +29,9 @@ class Zoomer : public QwtPlotZoomer
 public:
     Zoomer(QWidget *, bool doReplot=true);
     void zoom(int up);
+
+signals:
+    void unzoomed();
 };
 
 #endif // ZOOMER_H
