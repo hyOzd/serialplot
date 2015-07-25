@@ -65,3 +65,22 @@ void Plot::unzoomed()
     setAxisAutoScale(QwtPlot::xBottom);
     resetAxes();
 }
+
+void Plot::showGrid(bool show)
+{
+    grid.enableX(show);
+    grid.enableY(show);
+    replot();
+}
+
+void Plot::showMinorGrid(bool show)
+{
+    grid.enableXMin(show);
+    grid.enableYMin(show);
+    replot();
+}
+
+void Plot::unzoom()
+{
+    zoomer.zoom(0);
+}

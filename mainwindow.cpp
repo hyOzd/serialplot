@@ -63,6 +63,20 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionQuit, &QAction::triggered,
                      this, &MainWindow::close);
 
+    QObject::connect(ui->actionGrid, &QAction::toggled, [this](bool show)
+                     {
+                         ui->plot->showGrid(show);
+                         ui->actionMinorGrid->setEnabled(show);
+                     });
+
+    ui->actionMinorGrid->setEnabled(ui->actionGrid->isChecked());
+    QObject::connect(ui->actionMinorGrid, &QAction::toggled,
+                     ui->plot, &Plot::showMinorGrid);
+
+    QObject::connect(ui->actionUnzoom, &QAction::triggered,
+                     ui->plot, &Plot::unzoom);
+
+    // port control signals
     QObject::connect(&portControl, &PortControl::portToggled,
                      this, &MainWindow::onPortToggled);
 
@@ -137,6 +151,10 @@ MainWindow::MainWindow(QWidget *parent) :
     // init auto scale
     ui->plot->setAxis(ui->cbAutoScale->isChecked(),
                       ui->spYmin->value(), ui->spYmax->value());
+
+    // init grid
+    ui->plot->showGrid(ui->actionGrid->isChecked());
+    ui->plot->showMinorGrid(ui->actionMinorGrid->isChecked());
 
     // init number format
     if (numberFormatButtons.checkedId() >= 0)

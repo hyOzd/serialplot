@@ -37,6 +37,11 @@ private:
 
     void resetAxes();
 
+public slots:
+    void showGrid(bool show = true);
+    void showMinorGrid(bool show = true);
+    void unzoom();
+
 private slots:
     void unzoomed();
 };
