@@ -36,7 +36,7 @@ void Zoomer::zoom(int up)
 
     QwtPlotZoomer::zoom(up);
 
-    if (up == 0)
+    if(zoomRectIndex() == 0)
     {
         emit unzoomed();
     }
