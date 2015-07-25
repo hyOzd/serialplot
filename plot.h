@@ -18,6 +18,7 @@
 */
 
 #include <qwt_plot.h>
+#include <qwt_plot_grid.h>
 #include "zoomer.h"
 
 class Plot : public QwtPlot
@@ -32,6 +33,7 @@ private:
     bool isAutoScaled;
     double yMin, yMax;
     Zoomer zoomer;
+    QwtPlotGrid grid;
 
     void resetAxes();
 

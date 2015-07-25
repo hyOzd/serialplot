@@ -28,6 +28,8 @@ Plot::Plot(QWidget* parent) :
     QObject::connect(&zoomer, &Zoomer::unzoomed, this, &Plot::unzoomed);
 
     zoomer.setZoomBase();
+    grid.setPen(Qt::lightGray);
+    grid.attach(this);
 }
 
 void Plot::setAxis(bool autoScaled, double yAxisMin, double yAxisMax)
