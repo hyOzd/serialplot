@@ -180,8 +180,8 @@ endif (UNIX)
 include(InstallRequiredSystemLibraries)
 
 # configure debian scripts
-configure_file(${CMAKE_SOURCE_DIR}/debian/postinst ${CMAKE_BINARY_DIR}/debian/postinst)
-configure_file(${CMAKE_SOURCE_DIR}/debian/postrm ${CMAKE_BINARY_DIR}/debian/postrm)
+configure_file(${CMAKE_SOURCE_DIR}/debian/postinst.in ${CMAKE_BINARY_DIR}/debian/postinst)
+configure_file(${CMAKE_SOURCE_DIR}/debian/postrm.in ${CMAKE_BINARY_DIR}/debian/postrm)
 
 set(CPACK_PACKAGE_NAME "${PROGRAM_NAME}")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Small and simple software for plotting data from serial port")
