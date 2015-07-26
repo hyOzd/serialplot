@@ -38,6 +38,8 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     QObject::connect(ui->pbOpenPort, &QPushButton::clicked,
                      this, &PortControl::togglePort);
 
+    // TODO: port name coming from combobox is dirty, create a separate layer of signals
+    //       that will sanitize this information
     QObject::connect(ui->cbPortList,
                      SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
                      this, &PortControl::selectPort);
@@ -112,7 +114,15 @@ void PortControl::loadPortList()
     discoveredPorts.clear();
     for (auto port : QSerialPortInfo::availablePorts())
     {
-        ui->cbPortList->addItem(port.portName());
+        QString pName = port.portName();
+        if (!port.description().isEmpty()) pName += QString(" ") + port.description();
+        if (port.hasProductIdentifier())
+        {
+            QString vID = QString("%1").arg(port.vendorIdentifier(), 4, 16, QChar('0'));
+            QString pID = QString("%1").arg(port.productIdentifier(), 4, 16, QChar('0'));
+            pName = pName + " [" + vID + ":" + pID + "]";
+        }
+        ui->cbPortList->addItem(pName);
         discoveredPorts << port.portName();
     }
 
@@ -209,7 +219,9 @@ void PortControl::togglePort()
     }
     else
     {
-        serialPort->setPortName(ui->cbPortList->currentText());
+        // port name may contain description
+        QString portName = ui->cbPortList->currentText().split(" ")[0];
+        serialPort->setPortName(portName);
 
         // open port
         if (serialPort->open(QIODevice::ReadWrite))
@@ -230,6 +242,8 @@ void PortControl::togglePort()
 
 void PortControl::selectPort(QString portName)
 {
+    // portName may be coming from combobox
+    portName = portName.split(" ")[0];
     // has selection actually changed
     if (portName != serialPort->portName())
     {
