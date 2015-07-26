@@ -21,6 +21,9 @@ cmake_minimum_required(VERSION 2.8.11)
 
 project(serialplot)
 
+set(PROGRAM_NAME ${CMAKE_PROJECT_NAME} CACHE STRING "Output program name")
+set(PROGRAM_DISPLAY_NAME "SerialPlot" CACHE STRING "Display name (menus etc) of the program")
+
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -51,16 +54,20 @@ include_directories(${QWT_INCLUDE_DIR})
 # wrap UI files
 qt5_wrap_ui(UI_FILES mainwindow.ui portcontrol.ui about_dialog.ui)
 
-# Tell CMake to create the helloworld executable
-add_executable(serialplot WIN32 main.cpp mainwindow.cpp portcontrol.cpp
+add_executable(${PROGRAM_NAME} WIN32
+  main.cpp
+  mainwindow.cpp
+  portcontrol.cpp
   customcheckablebutton.cpp
   plot.cpp
   zoomer.cpp
-  ${UI_FILES} misc/windows_icon.rc)
+  ${UI_FILES}
+  misc/windows_icon.rc
+  )
 
 # Use the Widgets module from Qt 5.
-target_link_libraries(serialplot ${QWT_LIBRARY})
-qt5_use_modules(serialplot Widgets SerialPort Svg)
+target_link_libraries(${PROGRAM_NAME} ${QWT_LIBRARY})
+qt5_use_modules(${PROGRAM_NAME} Widgets SerialPort Svg)
 
 # set compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
@@ -108,13 +115,13 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/version.h.in" "${CMAKE_CURRENT_BINAR
 
 # add make run target
 add_custom_target(run
-    COMMAND serialplot
-    DEPENDS serialplot
+    COMMAND ${PROGRAM_NAME}
+    DEPENDS ${PROGRAM_NAME}
     WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
 )
 
 # installing
-install(TARGETS serialplot DESTINATION bin)
+install(TARGETS ${PROGRAM_NAME} DESTINATION bin)
 
 # for windows put libraries to install directory
 if (WIN32)
@@ -124,24 +131,29 @@ if (WIN32)
 endif (WIN32)
 
 # install menu item and icon
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/misc/program_name.desktop.in"
+  "${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.desktop")
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/misc/program_name.png"
+  "${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.png" COPYONLY)
+
 find_program(XDG-DESKTOP-MENU xdg-desktop-menu)
 find_program(XDG-ICON-RESOURCE xdg-icon-resource)
 
 if (UNIX)
   # first copy files to share/serialplot/
   install(FILES
-    ${CMAKE_SOURCE_DIR}/misc/serialplot.desktop
-    ${CMAKE_SOURCE_DIR}/misc/serialplot.png
-    DESTINATION share/serialplot)
+    ${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.desktop
+    ${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.png
+    DESTINATION share/${PROGRAM_NAME})
 
   # install copyright file (in debian format)
   install(FILES
     ${CMAKE_SOURCE_DIR}/debian/copyright
-    DESTINATION share/doc/serialplot/)
+    DESTINATION share/doc/${PROGRAM_NAME}/)
 
   install(CODE "
-  execute_process(COMMAND ${XDG-DESKTOP-MENU} install --novendor ${CMAKE_INSTALL_PREFIX}/share/serialplot/serialplot.desktop)
-  execute_process(COMMAND ${XDG-ICON-RESOURCE} install --novendor --size 256 ${CMAKE_INSTALL_PREFIX}/share/serialplot/serialplot.png)
+  execute_process(COMMAND ${XDG-DESKTOP-MENU} install --novendor ${CMAKE_INSTALL_PREFIX}/share/${PROGRAM_NAME}/${PROGRAM_NAME}.desktop)
+  execute_process(COMMAND ${XDG-ICON-RESOURCE} install --novendor --size 256 ${CMAKE_INSTALL_PREFIX}/share/${PROGRAM_NAME}/${PROGRAM_NAME}.png)
 ")
 endif (UNIX)
 
@@ -154,8 +166,8 @@ configure_file(
 if (UNIX)
   add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
-    COMMAND ${XDG-DESKTOP-MENU} uninstall --novendor serialplot.desktop
-    COMMAND ${XDG-ICON-RESOURCE} uninstall --novendor --size 256 serialplot)
+    COMMAND ${XDG-DESKTOP-MENU} uninstall --novendor ${PROGRAM_NAME}.desktop
+    COMMAND ${XDG-ICON-RESOURCE} uninstall --novendor --size 256 ${PROGRAM_NAME})
 endif (UNIX)
 
 # packaging
@@ -167,7 +179,11 @@ endif (UNIX)
 
 include(InstallRequiredSystemLibraries)
 
-set(CPACK_PACKAGE_NAME "serialplot")
+# configure debian scripts
+configure_file(${CMAKE_SOURCE_DIR}/debian/postinst ${CMAKE_BINARY_DIR}/debian/postinst)
+configure_file(${CMAKE_SOURCE_DIR}/debian/postrm ${CMAKE_BINARY_DIR}/debian/postrm)
+
+set(CPACK_PACKAGE_NAME "${PROGRAM_NAME}")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Small and simple software for plotting data from serial port")
 set(CPACK_PACKAGE_CONTACT "Hasan Yavuz Özderya <hy@ozderya.net>")
 set(CPACK_PACKAGE_VERSION_MAJOR ${MAJOR_VERSION})
@@ -178,13 +194,15 @@ set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5widgets5 (>= 5.2.1), libqt5serialport5 (
 if (NOT QWT_USE_STATIC)
   set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libqwt6-qt5 (>= 6.1.1)")
 endif (NOT QWT_USE_STATIC)
-set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/debian/postinst" "${CMAKE_SOURCE_DIR}/debian/postrm")
+set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA
+  "${CMAKE_BINARY_DIR}/debian/postinst"
+  "${CMAKE_BINARY_DIR}/debian/postrm")
 
 if (UNIX)
-  set(CPACK_PACKAGE_EXECUTABLES "serialplot")
+  set(CPACK_PACKAGE_EXECUTABLES "${PROGRAM_NAME}")
 elseif (WIN32)
-  set(CPACK_PACKAGE_EXECUTABLES "serialplot;SerialPlot")
-  set(CPACK_CREATE_DESKTOP_LINKS "serialplot")
+  set(CPACK_PACKAGE_EXECUTABLES "${PROGRAM_NAME};${PROGRAM_DISPLAY_NAME}")
+  set(CPACK_CREATE_DESKTOP_LINKS "${PROGRAM_NAME}")
   set(CPACK_NSIS_MODIFY_PATH "ON")
   set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/misc/serialplot.bmp")
   string(REPLACE "/" "\\\\" CPACK_PACKAGE_ICON ${CPACK_PACKAGE_ICON})
