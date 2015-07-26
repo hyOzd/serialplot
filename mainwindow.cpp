@@ -76,6 +76,11 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionUnzoom, &QAction::triggered,
                      ui->plot, &Plot::unzoom);
 
+    QObject::connect(ui->actionDarkBackground, &QAction::toggled,
+                     ui->plot, &Plot::darkBackground);
+
+    ui->plot->darkBackground(ui->actionDarkBackground->isChecked());
+
     // port control signals
     QObject::connect(&portControl, &PortControl::portToggled,
                      this, &MainWindow::onPortToggled);

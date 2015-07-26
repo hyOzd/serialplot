@@ -476,6 +476,7 @@
     <addaction name="actionGrid"/>
     <addaction name="actionMinorGrid"/>
     <addaction name="actionUnzoom"/>
+    <addaction name="actionDarkBackground"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -568,6 +569,17 @@
    </property>
    <property name="toolTip">
     <string>Show/hide minor grid</string>
+   </property>
+  </action>
+  <action name="actionDarkBackground">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Dark Background</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle Dark Background</string>
    </property>
   </action>
  </widget>

@@ -28,8 +28,9 @@ Plot::Plot(QWidget* parent) :
     QObject::connect(&zoomer, &Zoomer::unzoomed, this, &Plot::unzoomed);
 
     zoomer.setZoomBase();
-    grid.setPen(Qt::lightGray);
     grid.attach(this);
+
+    darkBackground(false);
 }
 
 void Plot::setAxis(bool autoScaled, double yAxisMin, double yAxisMax)
@@ -83,4 +84,23 @@ void Plot::showMinorGrid(bool show)
 void Plot::unzoom()
 {
     zoomer.zoom(0);
+}
+
+void Plot::darkBackground(bool enabled)
+{
+    if (enabled)
+    {
+        setCanvasBackground(QBrush(Qt::black));
+        grid.setPen(Qt::darkGray);
+        zoomer.setRubberBandPen(QPen(Qt::white));
+        zoomer.setTrackerPen(QPen(Qt::white));
+    }
+    else
+    {
+        setCanvasBackground(QBrush(Qt::white));
+        grid.setPen(Qt::lightGray);
+        zoomer.setRubberBandPen(QPen(Qt::black));
+        zoomer.setTrackerPen(QPen(Qt::black));
+    }
+    replot();
 }

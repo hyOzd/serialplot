@@ -41,6 +41,7 @@ public slots:
     void showGrid(bool show = true);
     void showMinorGrid(bool show = true);
     void unzoom();
+    void darkBackground(bool enabled = true);
 
 private slots:
     void unzoomed();
