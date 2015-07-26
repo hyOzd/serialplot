@@ -506,10 +506,16 @@
    <property name="toolTip">
     <string>Pause Plotting</string>
    </property>
+   <property name="shortcut">
+    <string>P</string>
+   </property>
   </action>
   <action name="actionClear">
    <property name="text">
     <string>Clear</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+K</string>
    </property>
   </action>
   <action name="actionHelpAbout">
@@ -554,6 +560,9 @@
    <property name="toolTip">
     <string>Show/hide grid</string>
    </property>
+   <property name="shortcut">
+    <string>G</string>
+   </property>
   </action>
   <action name="actionUnzoom">
    <property name="text">
@@ -569,6 +578,9 @@
    </property>
    <property name="toolTip">
     <string>Show/hide minor grid</string>
+   </property>
+   <property name="shortcut">
+    <string>M</string>
    </property>
   </action>
   <action name="actionDarkBackground">
