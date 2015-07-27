@@ -456,19 +456,30 @@ void MainWindow::onNumOfSamplesChanged(int value)
         for (unsigned int ci = 0; ci < numOfChannels; ci++)
         {
             channelsData[ci].remove(0, oldNum - numOfSamples);
+            curves[ci]->setSamples(dataX, channelsData[ci]);
         }
+        ui->plot->replot();
     }
     else if(numOfSamples > oldNum)
     {
+        // update data arrays
         dataX.resize(numOfSamples);
         for (unsigned int i = oldNum; i < numOfSamples; i++)
         {
             dataX[i] = i;
             for (unsigned int ci = 0; ci < numOfChannels; ci++)
             {
+                // TODO: opportunity of major optimization here
+                //       let's hope nobody sees this
                 channelsData[ci].prepend(0);
             }
         }
+        // update curves
+        for (unsigned int ci = 0; ci < numOfChannels; ci++)
+        {
+            curves[ci]->setSamples(dataX, channelsData[ci]);
+        }
+        ui->plot->replot();
     }
 }
 
