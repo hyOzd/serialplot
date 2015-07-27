@@ -307,8 +307,16 @@ void MainWindow::onDataReadyASCII()
         {
             for (unsigned int ci = 0; ci < numOfChannels; ci++)
             {
-                double channelSample = separatedValues[ci].toDouble();
-                addChannelData(ci, DataArray({channelSample}));
+                bool ok;
+                double channelSample = separatedValues[ci].toDouble(&ok);
+                if (ok)
+                {
+                    addChannelData(ci, DataArray({channelSample}));
+                }
+                else
+                {
+                    qWarning() << "Data parsing error for channel: " << ci;
+                }
             }
         }
         else // there is missing channel data
@@ -316,8 +324,16 @@ void MainWindow::onDataReadyASCII()
             qWarning() << "Incoming data is missing data for some channels!";
             for (int ci = 0; ci < separatedValues.length(); ci++)
             {
-                double channelSample = separatedValues[ci].toDouble();
-                addChannelData(ci, DataArray({channelSample}));
+                bool ok;
+                double channelSample = separatedValues[ci].toDouble(&ok);
+                if (ok)
+                {
+                    addChannelData(ci, DataArray({channelSample}));
+                }
+                else
+                {
+                    qWarning() << "Data parsing error for channel: " << ci;
+                }
             }
         }
     }
