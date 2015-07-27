@@ -303,37 +303,29 @@ void MainWindow::onDataReadyASCII()
         line = line.trimmed();
         auto separatedValues = line.split(',');
 
+        int numReadChannels; // effective number of channels to read
         if (separatedValues.length() >= int(numOfChannels))
         {
-            for (unsigned int ci = 0; ci < numOfChannels; ci++)
-            {
-                bool ok;
-                double channelSample = separatedValues[ci].toDouble(&ok);
-                if (ok)
-                {
-                    addChannelData(ci, DataArray({channelSample}));
-                }
-                else
-                {
-                    qWarning() << "Data parsing error for channel: " << ci;
-                }
-            }
+            numReadChannels = numOfChannels;
         }
         else // there is missing channel data
         {
+            numReadChannels = separatedValues.length();
             qWarning() << "Incoming data is missing data for some channels!";
-            for (int ci = 0; ci < separatedValues.length(); ci++)
+        }
+
+        // parse read line
+        for (int ci = 0; ci < numReadChannels; ci++)
+        {
+            bool ok;
+            double channelSample = separatedValues[ci].toDouble(&ok);
+            if (ok)
             {
-                bool ok;
-                double channelSample = separatedValues[ci].toDouble(&ok);
-                if (ok)
-                {
-                    addChannelData(ci, DataArray({channelSample}));
-                }
-                else
-                {
-                    qWarning() << "Data parsing error for channel: " << ci;
-                }
+                addChannelData(ci, DataArray({channelSample}));
+            }
+            else
+            {
+                qWarning() << "Data parsing error for channel: " << ci;
             }
         }
     }
