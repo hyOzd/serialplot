@@ -26,7 +26,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QTabWidget" name="tabWidget">
+     <widget class="HidableTabWidget" name="tabWidget">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
         <horstretch>0</horstretch>
@@ -601,6 +601,12 @@
    <class>Plot</class>
    <extends>QFrame</extends>
    <header>plot.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>HidableTabWidget</class>
+   <extends>QTabWidget</extends>
+   <header>hidabletabwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

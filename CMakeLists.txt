@@ -61,6 +61,7 @@ add_executable(${PROGRAM_NAME} WIN32
   customcheckablebutton.cpp
   plot.cpp
   zoomer.cpp
+  hidabletabwidget.cpp
   ${UI_FILES}
   misc/windows_icon.rc
   )
