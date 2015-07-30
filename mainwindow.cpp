@@ -630,6 +630,7 @@ void MainWindow::spsTimerTimeout()
 
 void MainWindow::demoTimerTimeout()
 {
+    const double period = 100;
     demoCount++;
     if (demoCount > 100) demoCount = 0;
 
@@ -638,7 +639,9 @@ void MainWindow::demoTimerTimeout()
         for (unsigned int ci = 0; ci < numOfChannels; ci++)
         {
             DataArray data(1);
-            data.replace(0, (ci + 1)*demoCount);
+            // we are calculating the fourier components of square wave
+            double value = 4*sin(2*M_PI*double((ci+1)*demoCount)/period)/((2*(ci+1))*M_PI);
+            data.replace(0, value);
             addChannelData(ci, data);
         }
     }
