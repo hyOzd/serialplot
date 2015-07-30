@@ -38,7 +38,8 @@ SOURCES += main.cpp\
     customcheckablebutton.cpp \
     portcontrol.cpp \
     plot.cpp \
-    zoomer.cpp
+    zoomer.cpp \
+    hidabletabwidget.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
@@ -46,7 +47,8 @@ HEADERS  += mainwindow.h \
     portcontrol.h \
     floatswap.h \
     plot.h \
-    zoomer.h
+    zoomer.h \
+    hidabletabwidget.h
 
 FORMS    += mainwindow.ui \
     about_dialog.ui \
