@@ -1,6 +1,7 @@
 #include "hidabletabwidget.h"
 #include <QTabBar>
 #include <QToolButton>
+#include <QSizePolicy>
 
 HidableTabWidget::HidableTabWidget(QWidget *parent) :
     QTabWidget(parent),
@@ -22,12 +23,10 @@ void HidableTabWidget::onHideAction(bool checked)
     if (checked)
     {
         this->setMaximumHeight(this->tabBar()->height());
-        this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
     }
     else
     {
         this->setMaximumHeight(100000); // just a very big number
-        this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     }
 }
 
