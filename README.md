@@ -61,6 +61,9 @@ https://bitbucket.org/hyOzd/serialplot/downloads
 You can also build with QtCreator IDE using `serialplot.pro` file.
 
 ## Known Issues
+- If user enters a port name by hand and doesn't press enter (which
+  is not necessary) port is closed and name is forgotten when clicked
+  "Refresh Port List".
 - Port error 13 happens when closing. This is a Qt issue. It's known
   to not happen with Qt 5.4.1 . Not fatal.
 
