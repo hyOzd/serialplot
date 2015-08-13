@@ -17,6 +17,9 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef UTILS_H
+#define UTILS_H
+
 // credits: peppe@stackoverflow [http://stackoverflow.com/a/16795664/432492]
 template<typename... Args> struct SELECT {
     template<typename C, typename R>
@@ -24,3 +27,5 @@ template<typename... Args> struct SELECT {
         return pmf;
     }
 };
+
+#endif // UTILS_H

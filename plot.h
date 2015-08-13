@@ -17,6 +17,9 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef PLOT_H
+#define PLOT_H
+
 #include <qwt_plot.h>
 #include <qwt_plot_grid.h>
 #include "zoomer.h"
@@ -46,3 +49,5 @@ public slots:
 private slots:
     void unzoomed();
 };
+
+#endif // PLOT_H

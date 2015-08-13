@@ -17,8 +17,13 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef VERSION_H
+#define VERSION_H
+
 #define MAJOR_VERSION    @MAJOR_VERSION@
 #define MINOR_VERSION    @MINOR_VERSION@
 #define PATCH_VERSION    @PATCH_VERSION@
 #define VERSION_STRING   "@VERSION_STRING@"
 #define VERSION_REVISION "@VERSION_REVISION@"
+
+#endif // VERSION_H
