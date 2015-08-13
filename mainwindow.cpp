@@ -135,7 +135,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // init data arrays and plot
 
     numOfSamples = ui->spNumOfSamples->value();
-    numOfChannels = 1;
+    numOfChannels = ui->spNumOfChannels->value();
 
     // init channel data and curve list
     for (unsigned int i = 0; i < numOfChannels; i++)
