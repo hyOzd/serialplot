@@ -36,6 +36,7 @@
 
 #include "portcontrol.h"
 #include "ui_about_dialog.h"
+#include "framebuffer.h"
 
 namespace Ui {
 class MainWindow;
@@ -79,8 +80,8 @@ private:
 
     QList<QwtPlotCurve*> curves;
     typedef QVector<double> DataArray;
-    DataArray dataX;   // array that simply contains numbers 0..numberOfSamples
-    QList<DataArray> channelsData;
+    // Note: FrameBuffer s are owned by their respective QwtPlotCurve s.
+    QList<FrameBuffer*> channelBuffers;
 
     // `data` contains i th channels data
     void addChannelData(unsigned int channel, DataArray data);

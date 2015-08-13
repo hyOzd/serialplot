@@ -39,7 +39,8 @@ SOURCES += main.cpp\
     portcontrol.cpp \
     plot.cpp \
     zoomer.cpp \
-    hidabletabwidget.cpp
+    hidabletabwidget.cpp \
+    framebuffer.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
@@ -48,7 +49,8 @@ HEADERS  += mainwindow.h \
     floatswap.h \
     plot.h \
     zoomer.h \
-    hidabletabwidget.h
+    hidabletabwidget.h \
+    framebuffer.h
 
 FORMS    += mainwindow.ui \
     about_dialog.ui \

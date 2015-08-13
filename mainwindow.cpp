@@ -137,18 +137,12 @@ MainWindow::MainWindow(QWidget *parent) :
     numOfSamples = ui->spNumOfSamples->value();
     numOfChannels = 1;
 
-    dataX.resize(numOfSamples);
-    for (int i = 0; i < dataX.size(); i++)
-    {
-        dataX[i] = i;
-    }
-
     // init channel data and curve list
     for (unsigned int i = 0; i < numOfChannels; i++)
     {
-        channelsData.append(DataArray(numOfSamples, 0.0));
+        channelBuffers.append(new FrameBuffer(numOfSamples));
         curves.append(new QwtPlotCurve());
-        curves[i]->setSamples(dataX, channelsData[i]);
+        curves[i]->setSamples(channelBuffers[i]);
         curves[i]->setPen(makeColor(i));
         curves[i]->attach(ui->plot);
     }
@@ -205,6 +199,7 @@ MainWindow::~MainWindow()
 {
     for (auto curve : curves)
     {
+        // also deletes respective FrameBuffer
         delete curve;
     }
 
@@ -396,39 +391,8 @@ void MainWindow::skipByte()
 
 void MainWindow::addChannelData(unsigned int channel, DataArray data)
 {
-    DataArray* channelDataArray = &(channelsData[channel]);
-    int offset = numOfSamples - data.size();
-
-    if (offset < 0)
-    {
-        for (unsigned int i = 0; i < numOfSamples; i++)
-        {
-            (*channelDataArray)[i] = data[i - offset];
-        }
-    }
-    else if (offset == 0)
-    {
-        (*channelDataArray) = data;
-    }
-    else
-    {
-        // shift old samples
-        int shift = data.size();
-        for (int i = 0; i < offset; i++)
-        {
-            (*channelDataArray)[i] = (*channelDataArray)[i + shift];
-        }
-        // place new samples
-        for (int i = 0; i < data.size(); i++)
-        {
-            (*channelDataArray)[offset + i] = data[i];
-        }
-    }
-
-    // update plot
-    curves[channel]->setSamples(dataX, (*channelDataArray));
+    channelBuffers[channel]->addSamples(data);
     ui->plot->replot(); // TODO: replot after all channel data updated
-
     sampleCount += data.size();
 }
 
@@ -436,51 +400,21 @@ void MainWindow::clearPlot()
 {
     for (unsigned int ci = 0; ci < numOfChannels; ci++)
     {
-        channelsData[ci].fill(0.0);
-        curves[ci]->setSamples(dataX, channelsData[ci]);
+        channelBuffers[ci]->clear();
     }
-
-    // update plot
     ui->plot->replot();
 }
 
 void MainWindow::onNumOfSamplesChanged(int value)
 {
-    unsigned int oldNum = this->numOfSamples;
     numOfSamples = value;
 
-    // resize data arrays
-    if (numOfSamples < oldNum)
+    for (unsigned int ci = 0; ci < numOfChannels; ci++)
     {
-        dataX.resize(numOfSamples);
-        for (unsigned int ci = 0; ci < numOfChannels; ci++)
-        {
-            channelsData[ci].remove(0, oldNum - numOfSamples);
-            curves[ci]->setSamples(dataX, channelsData[ci]);
-        }
-        ui->plot->replot();
+        channelBuffers[ci]->resize(numOfSamples);
     }
-    else if(numOfSamples > oldNum)
-    {
-        // update data arrays
-        dataX.resize(numOfSamples);
-        for (unsigned int i = oldNum; i < numOfSamples; i++)
-        {
-            dataX[i] = i;
-            for (unsigned int ci = 0; ci < numOfChannels; ci++)
-            {
-                // TODO: opportunity of major optimization here
-                //       let's hope nobody sees this
-                channelsData[ci].prepend(0);
-            }
-        }
-        // update curves
-        for (unsigned int ci = 0; ci < numOfChannels; ci++)
-        {
-            curves[ci]->setSamples(dataX, channelsData[ci]);
-        }
-        ui->plot->replot();
-    }
+
+    ui->plot->replot();
 }
 
 void MainWindow::onNumOfChannelsChanged(int value)
@@ -493,9 +427,9 @@ void MainWindow::onNumOfChannelsChanged(int value)
         // add new channels
         for (unsigned int i = 0; i < numOfChannels - oldNum; i++)
         {
-            channelsData.append(DataArray(numOfSamples, 0.0));
+            channelBuffers.append(new FrameBuffer(numOfSamples));
             curves.append(new QwtPlotCurve());
-            curves.last()->setSamples(dataX, channelsData.last());
+            curves.last()->setSamples(channelBuffers.last());
             curves.last()->setPen(makeColor(curves.length()-1));
             curves.last()->attach(ui->plot);
         }
@@ -505,10 +439,9 @@ void MainWindow::onNumOfChannelsChanged(int value)
         // remove channels
         for (unsigned int i = 0; i < oldNum - numOfChannels; i++)
         {
-            channelsData.removeLast();
-            auto curve = curves.takeLast();
-            curve->detach();
-            delete curve;
+            // also deletes owned FrameBuffer
+            delete curves.takeLast();
+            channelBuffers.removeLast();
         }
     }
 }
@@ -732,7 +665,7 @@ void MainWindow::onExportCsv()
             {
                 for (unsigned int ci = 0; ci < numOfChannels; ci++)
                 {
-                    fileStream << channelsData[ci][i];
+                    fileStream << channelBuffers[ci]->sample(i).y();
                     if (ci != numOfChannels-1) fileStream << ",";
                 }
                 fileStream << '\n';

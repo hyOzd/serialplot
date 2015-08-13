@@ -23,6 +23,12 @@
 
 #include "version.h"
 
+// TEST CODE
+#include "framebuffer.h"
+// #include <QtDebug>
+#include <qwt_plot.h>
+#include <qwt_plot_curve.h>
+
 MainWindow* pMainWindow;
 
 void messageHandler(QtMsgType type, const QMessageLogContext &context,
@@ -45,5 +51,33 @@ int main(int argc, char *argv[])
     qDebug() << "Revision" << VERSION_REVISION;
 
     w.show();
+
+    // test framebuffer
+    FrameBuffer buffer(10);
+    QVector<double> s(3,15.);
+    s.append(1.0);
+    s.append(2.0);
+    s.append(3.0);
+    buffer.addSamples(s);
+    // buffer.addSamples(s);
+    // buffer.resize(5);
+    QwtPlot plot;
+    QwtPlotCurve curve;
+    curve.setSamples(&buffer);
+    curve.attach(&plot);
+    plot.show();
+    qDebug() << buffer.sample(0);
+    qDebug() << buffer.sample(1);
+    qDebug() << "size:" << buffer.size();
+    buffer.addSamples(s);
+    // curve.setSamples(&buffer);
+    plot.replot();
+    // qDebug() << buffer.sample(5);
+    // qDebug() << buffer.sample(7);
+    // qDebug() << buffer.sample(8);
+    // qDebug() << buffer.sample(9);
+    // qDebug() << buffer.sample(15);
+    // qDebug() << buffer.sample(19);
+
     return a.exec();
 }
