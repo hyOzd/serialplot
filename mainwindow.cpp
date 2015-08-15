@@ -274,6 +274,7 @@ void MainWindow::onDataReady()
                        channelSamples + ci*numOfPackagesToRead,
                        numOfPackagesToRead);
     }
+    ui->plot->replot();
 
     delete channelSamples;
 }
@@ -318,6 +319,7 @@ void MainWindow::onDataReadyASCII()
                 qWarning() << "Data parsing error for channel: " << ci;
             }
         }
+        ui->plot->replot();
     }
 }
 
@@ -387,7 +389,6 @@ void MainWindow::skipByte()
 void MainWindow::addChannelData(unsigned int channel, double* data, unsigned size)
 {
     channelBuffers[channel]->addSamples(data, size);
-    ui->plot->replot(); // TODO: replot after all channel data updated
     sampleCount += size;
 }
 
@@ -570,6 +571,7 @@ void MainWindow::demoTimerTimeout()
             double value = 4*sin(2*M_PI*double((ci+1)*demoCount)/period)/((2*(ci+1))*M_PI);
             addChannelData(ci, &value, 1);
         }
+        ui->plot->replot();
     }
 }
 
