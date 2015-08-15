@@ -255,26 +255,27 @@ void MainWindow::onDataReady()
 
     int numOfPackagesToRead =
         (bytesAvailable - (bytesAvailable % packageSize)) / packageSize;
-    QVector<DataArray> channelSamples(numOfChannels);
-    for (unsigned int ci = 0; ci < numOfChannels; ci++)
-    {
-        channelSamples[ci].resize(numOfPackagesToRead);
-    }
+    double* channelSamples = new double[numOfPackagesToRead*numOfChannels];
 
     int i = 0;
     while(i < numOfPackagesToRead)
     {
         for (unsigned int ci = 0; ci < numOfChannels; ci++)
         {
-            channelSamples[ci].replace(i, (this->*readSample)());
+            // channelSamples[ci].replace(i, (this->*readSample)());
+            channelSamples[ci*numOfPackagesToRead+i] = (this->*readSample)();
         }
         i++;
     }
 
     for (unsigned int ci = 0; ci < numOfChannels; ci++)
     {
-        addChannelData(ci, channelSamples[ci]);
+        addChannelData(ci,
+                       channelSamples + ci*numOfPackagesToRead,
+                       numOfPackagesToRead);
     }
+
+    delete channelSamples;
 }
 
 void MainWindow::onDataReadyASCII()
@@ -310,7 +311,7 @@ void MainWindow::onDataReadyASCII()
             double channelSample = separatedValues[ci].toDouble(&ok);
             if (ok)
             {
-                addChannelData(ci, DataArray({channelSample}));
+                addChannelData(ci, &channelSample, 1);
             }
             else
             {
@@ -383,11 +384,11 @@ void MainWindow::skipByte()
     skipByteRequested = true;
 }
 
-void MainWindow::addChannelData(unsigned int channel, DataArray data)
+void MainWindow::addChannelData(unsigned int channel, double* data, unsigned size)
 {
-    channelBuffers[channel]->addSamples(data);
+    channelBuffers[channel]->addSamples(data, size);
     ui->plot->replot(); // TODO: replot after all channel data updated
-    sampleCount += data.size();
+    sampleCount += size;
 }
 
 void MainWindow::clearPlot()
@@ -565,11 +566,9 @@ void MainWindow::demoTimerTimeout()
     {
         for (unsigned int ci = 0; ci < numOfChannels; ci++)
         {
-            DataArray data(1);
             // we are calculating the fourier components of square wave
             double value = 4*sin(2*M_PI*double((ci+1)*demoCount)/period)/((2*(ci+1))*M_PI);
-            data.replace(0, value);
-            addChannelData(ci, data);
+            addChannelData(ci, &value, 1);
         }
     }
 }

@@ -62,9 +62,9 @@ void FrameBuffer::resize(size_t size)
     _size = size;
 }
 
-void FrameBuffer::addSamples(QVector<double> samples)
+void FrameBuffer::addSamples(double* samples, size_t size)
 {
-    unsigned shift = samples.size();
+    unsigned shift = size;
     if (shift < _size)
     {
         unsigned x = _size - headIndex; // distance of `head` to end

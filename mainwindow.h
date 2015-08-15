@@ -84,7 +84,7 @@ private:
     QList<FrameBuffer*> channelBuffers;
 
     // `data` contains i th channels data
-    void addChannelData(unsigned int channel, DataArray data);
+    void addChannelData(unsigned int channel, double* data, unsigned size);
 
     NumberFormat numberFormat;
     unsigned int sampleSize; // number of bytes in the selected number format

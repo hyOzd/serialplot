@@ -31,7 +31,7 @@ public:
     ~FrameBuffer();
 
     void resize(size_t size);
-    void addSamples(QVector<double> samples);
+    void addSamples(double* samples, size_t size);
     void clear(); // fill 0
 
     // QwtSeriesData implementations
