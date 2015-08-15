@@ -24,6 +24,8 @@ FrameBuffer::FrameBuffer(size_t size)
     _size = size;
     data = new double[_size]();
     headIndex = 0;
+
+    _boundingRect.setCoords(0, 0, size, 0);
 }
 
 FrameBuffer::~FrameBuffer()
@@ -60,6 +62,9 @@ void FrameBuffer::resize(size_t size)
     data = newData;
     headIndex = 0;
     _size = size;
+
+    // update the bounding rectangle
+    _boundingRect.setRight(_size);
 }
 
 void FrameBuffer::addSamples(double* samples, size_t size)
@@ -107,6 +112,23 @@ void FrameBuffer::addSamples(double* samples, size_t size)
         }
         headIndex = 0;
     }
+
+    // update bounding rectangle
+    double minValue = 0;
+    double maxValue = 0;
+    for (size_t i = 0; i < _size; i++)
+    {
+        if (data[i] > maxValue)
+        {
+            maxValue = data[i];
+        }
+        else if (data[i] < minValue)
+        {
+            minValue = data[i];
+        }
+    }
+    _boundingRect.setTop(minValue);
+    _boundingRect.setBottom(maxValue);
 }
 
 void FrameBuffer::clear()
@@ -126,7 +148,7 @@ QPointF FrameBuffer::sample(size_t i) const
 
 QRectF FrameBuffer::boundingRect() const
 {
-    return qwtBoundingRect(*this);
+    return _boundingRect;
 }
 
 double FrameBuffer::_sample(size_t i) const

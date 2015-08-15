@@ -44,6 +44,8 @@ private:
     double* data;
     size_t headIndex; // indicates the actual `0` index of the ring buffer
 
+    QRectF _boundingRect;
+
     double _sample(size_t i) const;
 };
 
