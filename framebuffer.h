@@ -28,6 +28,7 @@ class FrameBuffer : public QwtSeriesData<QPointF>
 {
 public:
     FrameBuffer(size_t size);
+    ~FrameBuffer();
 
     void resize(size_t size);
     void addSamples(QVector<double> samples);
@@ -39,7 +40,11 @@ public:
     QRectF boundingRect() const;
 
 private:
-    QVector<double> data;
+    size_t _size; // size of `data`
+    double* data;
+    size_t headIndex; // indicates the actual `0` index of the ring buffer
+
+    double _sample(size_t i) const;
 };
 
 #endif // FRAMEBUFFER_H

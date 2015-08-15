@@ -19,80 +19,119 @@
 
 #include "framebuffer.h"
 
-FrameBuffer::FrameBuffer(size_t size) :
-    data(size, 0.)
+FrameBuffer::FrameBuffer(size_t size)
 {
+    _size = size;
+    data = new double[_size]();
+    headIndex = 0;
+}
 
+FrameBuffer::~FrameBuffer()
+{
+    delete data;
 }
 
 void FrameBuffer::resize(size_t size)
 {
-    size_t old_size = this->size();
-    size_t new_size = size;
+    int offset = size - _size;
+    if (offset == 0) return;
 
-    if (new_size < old_size)
+    double* newData = new double[size];
+
+    // move data to new array
+    int fill_start = offset > 0 ? offset : 0;
+
+    for (int i = fill_start; i < int(size); i++)
     {
-        data.remove(0, old_size - new_size);
+        newData[i] = _sample(i - offset);
     }
-    else if (new_size > old_size)
+
+    // fill the beginning of the new data
+    if (fill_start > 0)
     {
-        // This is seriously inefficient!
-        for (size_t i = old_size; i < new_size; i++)
+        for (int i = 0; i < fill_start; i++)
         {
-            data.prepend(0);
+            newData[i] = 0;
         }
     }
+
+    // data is ready, clean and re-point
+    delete data;
+    data = newData;
+    headIndex = 0;
+    _size = size;
 }
 
 void FrameBuffer::addSamples(QVector<double> samples)
 {
-    int offset = size() - samples.size();
+    unsigned shift = samples.size();
+    if (shift < _size)
+    {
+        unsigned x = _size - headIndex; // distance of `head` to end
 
-    if (offset < 0)
-    {
-        // new samples exceed the size of frame buffer
-        // excess part (from beginning) of the input will be ignored
-        for (unsigned int i = 0; i < size(); i++)
+        if (shift <= x) // there is enough room at the end of array
         {
-            data[i] = samples[i - offset];
+            for (size_t i = 0; i < shift; i++)
+            {
+                data[i+headIndex] = samples[i];
+            }
+
+            if (shift == x) // we used all the room at the end
+            {
+                headIndex = 0;
+            }
+            else
+            {
+                headIndex += shift;
+            }
+        }
+        else // there isn't enough room
+        {
+            for (size_t i = 0; i < x; i++) // fill the end part
+            {
+                data[i+headIndex] = samples[i];
+            }
+            for (size_t i = 0; i < (shift-x); i++) // continue from the beginning
+            {
+                data[i] = samples[i+x];
+            }
+            headIndex = shift-x;
         }
     }
-    else if (offset == 0) // input is the same size as the framebuffer
+    else // number of new samples equal or bigger than current size
     {
-        data = samples;
-    }
-    else // regular case; input is smaller than framebuffer
-    {
-        // shift old samples
-        int shift = samples.size();
-        for (int i = 0; i < offset; i++)
+        int x = shift - _size;
+        for (size_t i = 0; i < _size; i++)
         {
-            data[i] = data[i + shift];
+            data[i] = samples[i+x];
         }
-        // place new samples
-        for (int i = 0; i < samples.size(); i++)
-        {
-            data[offset + i] = samples[i];
-        }
+        headIndex = 0;
     }
 }
 
 void FrameBuffer::clear()
 {
-    data.fill(0);
+    for (size_t i=0; i < _size; i++) data[i] = 0.;
 }
 
 size_t FrameBuffer::size() const
 {
-    return (size_t) data.size();
+    return _size;
 }
 
 QPointF FrameBuffer::sample(size_t i) const
 {
-    return QPointF(i, data[i]);
+    return QPointF(i, _sample(i));
 }
 
 QRectF FrameBuffer::boundingRect() const
 {
     return qwtBoundingRect(*this);
+}
+
+double FrameBuffer::_sample(size_t i) const
+{
+    size_t index = headIndex + i;
+    if (index >= _size) index -= _size;
+    return data[index];
 }
