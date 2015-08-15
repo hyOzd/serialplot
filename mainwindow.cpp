@@ -234,52 +234,46 @@ void MainWindow::onPortToggled(bool open)
 
 void MainWindow::onDataReady()
 {
-    if (!ui->actionPause->isChecked())
-    {
-        // a package is a set of channel data like {CHAN0_SAMPLE, CHAN1_SAMPLE...}
-        int packageSize = sampleSize * numOfChannels;
-        int bytesAvailable = serialPort.bytesAvailable();
-
-        if (bytesAvailable > 0 && skipByteRequested)
-        {
-            serialPort.read(1);
-            skipByteRequested = false;
-            bytesAvailable--;
-        }
-
-        if (bytesAvailable < packageSize)
-        {
-            return;
-        }
-        else
-        {
-            int numOfPackagesToRead =
-                (bytesAvailable - (bytesAvailable % packageSize)) / packageSize;
-            QVector<DataArray> channelSamples(numOfChannels);
-            for (unsigned int ci = 0; ci < numOfChannels; ci++)
-            {
-                channelSamples[ci].resize(numOfPackagesToRead);
-            }
-
-            int i = 0;
-            while(i < numOfPackagesToRead)
-            {
-                for (unsigned int ci = 0; ci < numOfChannels; ci++)
-                {
-                    channelSamples[ci].replace(i, (this->*readSample)());
-                }
-                i++;
-            }
-
-            for (unsigned int ci = 0; ci < numOfChannels; ci++)
-            {
-                addChannelData(ci, channelSamples[ci]);
-            }
-        }
-    }
-    else
+    if (ui->actionPause->isChecked())
     {
         serialPort.clear(QSerialPort::Input);
+        return;
+    }
+
+    // a package is a set of channel data like {CHAN0_SAMPLE, CHAN1_SAMPLE...}
+    int packageSize = sampleSize * numOfChannels;
+    int bytesAvailable = serialPort.bytesAvailable();
+
+    if (bytesAvailable > 0 && skipByteRequested)
+    {
+        serialPort.read(1);
+        skipByteRequested = false;
+        bytesAvailable--;
+    }
+
+    if (bytesAvailable < packageSize) return;
+
+    int numOfPackagesToRead =
+        (bytesAvailable - (bytesAvailable % packageSize)) / packageSize;
+    QVector<DataArray> channelSamples(numOfChannels);
+    for (unsigned int ci = 0; ci < numOfChannels; ci++)
+    {
+        channelSamples[ci].resize(numOfPackagesToRead);
+    }
+
+    int i = 0;
+    while(i < numOfPackagesToRead)
+    {
+        for (unsigned int ci = 0; ci < numOfChannels; ci++)
+        {
+            channelSamples[ci].replace(i, (this->*readSample)());
+        }
+        i++;
+    }
+
+    for (unsigned int ci = 0; ci < numOfChannels; ci++)
+    {
+        addChannelData(ci, channelSamples[ci]);
     }
 }
 
