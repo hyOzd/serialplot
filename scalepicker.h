@@ -17,39 +17,31 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PLOT_H
-#define PLOT_H
+#ifndef SCALEPICKER_H
+#define SCALEPICKER_H
 
-#include <qwt_plot.h>
-#include <qwt_plot_grid.h>
-#include "zoomer.h"
-#include "scalepicker.h"
+#include <QObject>
+#include <QMouseEvent>
+#include <qwt_scale_widget.h>
 
-class Plot : public QwtPlot
+class ScalePicker : public QObject
 {
     Q_OBJECT
-
 public:
-    Plot(QWidget* parent = 0);
-    void setAxis(bool autoScaled, double yMin = 0, double yMax = 1);
+    ScalePicker(QwtScaleWidget* scaleWidget);
+    virtual bool eventFilter(QObject*, QEvent*);
+
+signals:
+    void pickStarted(double pos);
+    void picking(double firstPos, double lastPos);
+    void picked(double firstPos, double lastPos);
 
 private:
-    bool isAutoScaled;
-    double yMin, yMax;
-    Zoomer zoomer;
-    QwtPlotGrid grid;
-    ScalePicker scalePicker;
+    QwtScaleWidget* _scaleWidget;
+    double position(QMouseEvent*); // returns the mouse position relative to plot coordinates
 
-    void resetAxes();
-
-public slots:
-    void showGrid(bool show = true);
-    void showMinorGrid(bool show = true);
-    void unzoom();
-    void darkBackground(bool enabled = true);
-
-private slots:
-    void unzoomed();
+    bool started;
+    double firstPos;
 };
 
-#endif // PLOT_H
+#endif // SCALEPICKER_H

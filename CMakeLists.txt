@@ -63,6 +63,7 @@ add_executable(${PROGRAM_NAME} WIN32
   zoomer.cpp
   hidabletabwidget.cpp
   framebuffer.cpp
+  scalepicker.cpp
   ${UI_FILES}
   misc/windows_icon.rc
   )

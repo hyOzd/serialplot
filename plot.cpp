@@ -21,7 +21,8 @@
 
 Plot::Plot(QWidget* parent) :
     QwtPlot(parent),
-    zoomer(this->canvas(), false)
+    zoomer(this->canvas(), false),
+    scalePicker(this->axisWidget(QwtPlot::xBottom))
 {
     isAutoScaled = false;
 
