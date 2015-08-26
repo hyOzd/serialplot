@@ -53,5 +53,19 @@ void ScaleZoomer::bottomPicked(double firstPos, double lastPos)
 
 void ScaleZoomer::leftPicked(double firstPos, double lastPos)
 {
+    QRectF zRect;
+    if (lastPos > firstPos)
+    {
+        zRect.setBottom(firstPos);
+        zRect.setTop(lastPos);
+    }
+    else
+    {
+        zRect.setBottom(lastPos);
+        zRect.setTop(firstPos);
+    }
 
+    zRect.setLeft(_plot->axisScaleDiv(QwtPlot::xBottom).lowerBound());
+    zRect.setRight(_plot->axisScaleDiv(QwtPlot::xBottom).upperBound());
+    _zoomer->zoom(zRect);
 }
