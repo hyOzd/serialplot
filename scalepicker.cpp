@@ -22,8 +22,12 @@
 #include <qwt_scale_widget.h>
 #include <qwt_scale_map.h>
 #include <QtDebug>
+#include <math.h>
 
 #include "scalepicker.h"
+
+// minimum size for pick (in pixels)
+#define MIN_PICK_SIZE (2)
 
 ScalePicker::ScalePicker(QwtScaleWidget* scaleWidget) :
     QObject(scaleWidget)
@@ -31,6 +35,7 @@ ScalePicker::ScalePicker(QwtScaleWidget* scaleWidget) :
     scaleWidget->installEventFilter(this);
     _scaleWidget = scaleWidget;
     started = false;
+    pressed = false;
 }
 
 bool ScalePicker::eventFilter(QObject* object, QEvent* event)
@@ -41,17 +46,26 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
     {
         QMouseEvent* mouseEvent = (QMouseEvent*) event;
         double pos = this->position(mouseEvent);
+        double posPx = this->positionPx(mouseEvent);
 
-        if (event->type() == QEvent::MouseButtonPress)
+        if (event->type() == QEvent::MouseButtonPress &&
+            mouseEvent->button() == Qt::LeftButton)
         {
-            started = true;
+            pressed = true; // not yet started
             firstPos = pos;
-            qDebug() << "Pick started:" << firstPos;
-            emit pickStarted(pos);
+            firstPosPx = posPx;
         }
         else if (event->type() == QEvent::MouseMove)
         {
-            if (started)
+            // make sure pick size is big enough, so that just
+            // clicking won't trigger pick
+            if (!started && pressed && (fabs(posPx-firstPosPx) > MIN_PICK_SIZE))
+            {
+                started = true;
+                qDebug() << "Pick started:" << firstPos;
+                emit pickStarted(pos);
+            }
+            else if (started)
             {
                 emit picking(firstPos, pos);
             }
@@ -60,7 +74,9 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
         {
             if (started)
             {
+                // finalize
                 started = false;
+                pressed = false;
                 qDebug() << "Picked:" << firstPos << pos;
                 emit picked(firstPos, pos);
             }
@@ -75,7 +91,15 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
 
 double ScalePicker::position(QMouseEvent* mouseEvent)
 {
-    // capture and convert the position of the click to the plot coordinates
+    double pos;
+    pos = positionPx(mouseEvent);
+    // convert the position of the click to the plot coordinates
+    pos = _scaleWidget->scaleDraw()->scaleMap().invTransform(pos);
+    return pos;
+}
+
+double ScalePicker::positionPx(QMouseEvent* mouseEvent)
+{
     double pos;
     if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale ||
         _scaleWidget->alignment() == QwtScaleDraw::TopScale)
@@ -86,6 +110,5 @@ double ScalePicker::position(QMouseEvent* mouseEvent)
     {
         pos = mouseEvent->pos().y();
     }
-    pos = _scaleWidget->scaleDraw()->scaleMap().invTransform(pos);
     return pos;
 }

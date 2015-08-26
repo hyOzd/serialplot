@@ -22,11 +22,13 @@
 
 #include <QObject>
 #include <QMouseEvent>
+#include <QPointF>
 #include <qwt_scale_widget.h>
 
 class ScalePicker : public QObject
 {
     Q_OBJECT
+
 public:
     ScalePicker(QwtScaleWidget* scaleWidget);
     virtual bool eventFilter(QObject*, QEvent*);
@@ -38,10 +40,13 @@ signals:
 
 private:
     QwtScaleWidget* _scaleWidget;
-    double position(QMouseEvent*); // returns the mouse position relative to plot coordinates
+    double position(QMouseEvent*); // returns the axis mouse position relative to plot coordinates
+    double positionPx(QMouseEvent*); // returns the axis mouse position in pixels
 
+    bool pressed;
     bool started;
-    double firstPos;
+    double firstPos; // converted to plot coordinates
+    double firstPosPx; // pixel coordinates
 };
 
 #endif // SCALEPICKER_H
