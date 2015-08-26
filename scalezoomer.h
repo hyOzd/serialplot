@@ -23,6 +23,7 @@
 #include <QObject>
 #include <qwt_plot.h>
 #include <qwt_plot_zoomer.h>
+#include <qwt_plot_shapeitem.h>
 
 #include "scalepicker.h"
 
@@ -39,9 +40,12 @@ private:
     ScalePicker bottomPicker;
     ScalePicker leftPicker;
 
+    QwtPlotShapeItem rectShape;
 
 private slots:
+    void bottomPickStarted(double firstPos);
     void bottomPicked(double firstPos, double lastPos);
+    void bottomPicking(double firstPos, double lastPos);
     void leftPicked(double firstPos, double lastPos);
 };
 

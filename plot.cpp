@@ -17,8 +17,8 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QRectF>
 #include "plot.h"
-
 Plot::Plot(QWidget* parent) :
     QwtPlot(parent),
     zoomer(this->canvas(), false),
@@ -30,6 +30,9 @@ Plot::Plot(QWidget* parent) :
 
     zoomer.setZoomBase();
     grid.attach(this);
+
+    rectItem.setRect(QRectF(0,0,100,1));
+    // rectItem.attach(this);
 
     darkBackground(false);
 }

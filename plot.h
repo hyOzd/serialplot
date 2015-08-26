@@ -22,6 +22,7 @@
 
 #include <qwt_plot.h>
 #include <qwt_plot_grid.h>
+#include <qwt_plot_shapeitem.h>
 #include "zoomer.h"
 #include "scalezoomer.h"
 
@@ -39,6 +40,7 @@ private:
     Zoomer zoomer;
     ScaleZoomer sZoomer;
     QwtPlotGrid grid;
+    QwtPlotShapeItem rectItem;
 
     void resetAxes();
 
