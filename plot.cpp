@@ -22,7 +22,7 @@
 Plot::Plot(QWidget* parent) :
     QwtPlot(parent),
     zoomer(this->canvas(), false),
-    scalePicker(this->axisWidget(QwtPlot::xBottom))
+    sZoomer(this, &zoomer)
 {
     isAutoScaled = false;
 

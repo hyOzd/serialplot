@@ -53,7 +53,6 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
         {
             if (started)
             {
-                qDebug() << "Picking:" << firstPos << pos;
                 emit picking(firstPos, pos);
             }
         }
