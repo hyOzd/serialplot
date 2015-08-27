@@ -19,9 +19,9 @@
 
 #include <QEvent>
 #include <QMouseEvent>
+#include <QPainter>
 #include <qwt_scale_widget.h>
 #include <qwt_scale_map.h>
-#include <QtDebug>
 #include <math.h>
 
 #include "scalepicker.h"
@@ -29,11 +29,35 @@
 // minimum size for pick (in pixels)
 #define MIN_PICK_SIZE (2)
 
-ScalePicker::ScalePicker(QwtScaleWidget* scaleWidget) :
+class ScalePickerOverlay : public QwtWidgetOverlay
+{
+public:
+    ScalePickerOverlay(QWidget* widget, ScalePicker* picker);
+
+protected:
+    virtual void drawOverlay(QPainter*) const;
+
+private:
+    ScalePicker* _picker;
+};
+
+ScalePickerOverlay::ScalePickerOverlay(QWidget* widget, ScalePicker* picker) :
+    QwtWidgetOverlay(widget)
+{
+    _picker = picker;
+}
+
+void ScalePickerOverlay::drawOverlay(QPainter* painter) const
+{
+    _picker->drawOverlay(painter);
+}
+
+ScalePicker::ScalePicker(QwtScaleWidget* scaleWidget, QWidget* canvas) :
     QObject(scaleWidget)
 {
     scaleWidget->installEventFilter(this);
     _scaleWidget = scaleWidget;
+    pickerOverlay = new ScalePickerOverlay(canvas, this);
     started = false;
     pressed = false;
 }
@@ -47,6 +71,7 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
         QMouseEvent* mouseEvent = (QMouseEvent*) event;
         double pos = this->position(mouseEvent);
         double posPx = this->positionPx(mouseEvent);
+        currentPosPx = posPx;
 
         if (event->type() == QEvent::MouseButtonPress &&
             mouseEvent->button() == Qt::LeftButton)
@@ -62,11 +87,12 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
             if (!started && pressed && (fabs(posPx-firstPosPx) > MIN_PICK_SIZE))
             {
                 started = true;
-                qDebug() << "Pick started:" << firstPos;
+                // pickerOverlay->updateOverlay();
                 emit pickStarted(pos);
             }
             else if (started)
             {
+                pickerOverlay->updateOverlay();
                 emit picking(firstPos, pos);
             }
         }
@@ -77,7 +103,6 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
                 // finalize
                 started = false;
                 pressed = false;
-                qDebug() << "Picked:" << firstPos << pos;
                 emit picked(firstPos, pos);
             }
         }
@@ -86,6 +111,26 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
     else
     {
         return QObject::eventFilter(object, event);
+    }
+}
+
+void ScalePicker::drawOverlay(QPainter* painter)
+{
+    if (started)
+    {
+        QRect rect;
+        if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale ||
+            _scaleWidget->alignment() == QwtScaleDraw::TopScale)
+        {
+            int height = painter->device()->height();
+            rect = QRect(firstPosPx, 0, (currentPosPx-firstPosPx), height);
+        }
+        else // vertical
+        {
+            int width = painter->device()->width();
+            rect = QRect(0, firstPosPx, width, (currentPosPx-firstPosPx));
+        }
+        painter->drawRect(rect);
     }
 }
 

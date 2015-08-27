@@ -18,43 +18,18 @@
 */
 
 #include <QRectF>
-#include <QtDebug>
+
 #include "scalezoomer.h"
 
 ScaleZoomer::ScaleZoomer(QwtPlot* plot, QwtPlotZoomer* zoomer) :
     QObject(plot),
-    bottomPicker(plot->axisWidget(QwtPlot::xBottom)),
-    leftPicker(plot->axisWidget(QwtPlot::yLeft))
+    bottomPicker(plot->axisWidget(QwtPlot::xBottom), plot->canvas()),
+    leftPicker(plot->axisWidget(QwtPlot::yLeft), plot->canvas())
 {
     _plot = plot;
     _zoomer = zoomer;
-    connect(&bottomPicker, &ScalePicker::pickStarted, this, &ScaleZoomer::bottomPickStarted);
-    connect(&bottomPicker, &ScalePicker::picking, this, &ScaleZoomer::bottomPicking);
     connect(&bottomPicker, &ScalePicker::picked, this, &ScaleZoomer::bottomPicked);
     connect(&leftPicker, &ScalePicker::picked, this, &ScaleZoomer::leftPicked);
-}
-
-void ScaleZoomer::bottomPickStarted(double firstPos)
-{
-    double yMin = _plot->axisScaleDiv(QwtPlot::yLeft).lowerBound();
-    double yMax = _plot->axisScaleDiv(QwtPlot::yLeft).upperBound();
-    rectShape.setRect(QRectF(firstPos, yMin, 2, yMax-yMin));
-    rectShape.attach(_plot);
-    _plot->replot();
-}
-
-void ScaleZoomer::bottomPicking(double firstPos, double lastPos)
-{
-    double yMin = _plot->axisScaleDiv(QwtPlot::yLeft).lowerBound();
-    double yMax = _plot->axisScaleDiv(QwtPlot::yLeft).upperBound();
-    if (lastPos > firstPos) {
-        rectShape.setRect(QRectF(firstPos, yMin, lastPos-firstPos, yMax-yMin));
-    }
-    else
-    {
-        rectShape.setRect(QRectF(lastPos, yMin, firstPos-lastPos, yMax-yMin));
-    }
-    _plot->replot();
 }
 
 void ScaleZoomer::bottomPicked(double firstPos, double lastPos)
@@ -74,8 +49,6 @@ void ScaleZoomer::bottomPicked(double firstPos, double lastPos)
     zRect.setBottom(_plot->axisScaleDiv(QwtPlot::yLeft).lowerBound());
     zRect.setTop(_plot->axisScaleDiv(QwtPlot::yLeft).upperBound());
     _zoomer->zoom(zRect);
-    rectShape.detach();
-    _plot->replot();
 }
 
 void ScaleZoomer::leftPicked(double firstPos, double lastPos)
