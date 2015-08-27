@@ -32,6 +32,12 @@ ScaleZoomer::ScaleZoomer(QwtPlot* plot, QwtPlotZoomer* zoomer) :
     connect(&leftPicker, &ScalePicker::picked, this, &ScaleZoomer::leftPicked);
 }
 
+void ScaleZoomer::setPickerPen(QPen pen)
+{
+    bottomPicker.setPen(pen);
+    leftPicker.setPen(pen);
+}
+
 void ScaleZoomer::bottomPicked(double firstPos, double lastPos)
 {
     QRectF zRect;

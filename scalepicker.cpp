@@ -130,8 +130,15 @@ void ScalePicker::drawOverlay(QPainter* painter)
             int width = painter->device()->width();
             rect = QRect(0, firstPosPx, width, (currentPosPx-firstPosPx));
         }
+
+        painter->setPen(_pen);
         painter->drawRect(rect);
     }
+}
+
+void ScalePicker::setPen(QPen pen)
+{
+    _pen = pen;
 }
 
 double ScalePicker::position(QMouseEvent* mouseEvent)

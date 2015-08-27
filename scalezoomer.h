@@ -21,6 +21,7 @@
 #define SCALEZOOMER_H
 
 #include <QObject>
+#include <QPen>
 #include <qwt_plot.h>
 #include <qwt_plot_zoomer.h>
 
@@ -32,6 +33,7 @@ class ScaleZoomer : public QObject
 
 public:
     ScaleZoomer(QwtPlot*, QwtPlotZoomer*);
+    void setPickerPen(QPen pen);
 
 private:
     QwtPlot* _plot;

@@ -98,6 +98,7 @@ void Plot::darkBackground(bool enabled)
         grid.setPen(Qt::darkGray);
         zoomer.setRubberBandPen(QPen(Qt::white));
         zoomer.setTrackerPen(QPen(Qt::white));
+        sZoomer.setPickerPen(QPen(Qt::white));
     }
     else
     {
@@ -105,6 +106,7 @@ void Plot::darkBackground(bool enabled)
         grid.setPen(Qt::lightGray);
         zoomer.setRubberBandPen(QPen(Qt::black));
         zoomer.setTrackerPen(QPen(Qt::black));
+        sZoomer.setPickerPen(QPen(Qt::black));
     }
     replot();
 }

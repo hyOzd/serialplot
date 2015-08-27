@@ -22,6 +22,7 @@
 
 #include <QObject>
 #include <QMouseEvent>
+#include <QPen>
 #include <qwt_scale_widget.h>
 #include <qwt_widget_overlay.h>
 
@@ -34,6 +35,7 @@ public:
     virtual bool eventFilter(QObject*, QEvent*);
 
     void drawOverlay(QPainter*); // called from ScalePickerOverlay
+    void setPen(QPen pen);
 
 signals:
     void pickStarted(double pos);
@@ -43,14 +45,16 @@ signals:
 private:
     QwtScaleWidget* _scaleWidget;
     QwtWidgetOverlay* pickerOverlay; // ScalePickerOverlay
-    double position(QMouseEvent*); // returns the axis mouse position relative to plot coordinates
-    double positionPx(QMouseEvent*); // returns the axis mouse position in pixels
+    QPen _pen;
 
     bool pressed;
     bool started;
     double firstPos; // converted to plot coordinates
     double firstPosPx; // pixel coordinates
     double currentPosPx; // current position in pixel coordinates
+
+    double position(QMouseEvent*); // returns the axis mouse position relative to plot coordinates
+    double positionPx(QMouseEvent*); // returns the axis mouse position in pixels
 };
 
 #endif // SCALEPICKER_H
