@@ -49,6 +49,7 @@ private:
 
     QStringList discoveredPorts; // list of port names returned by availablePorts
     QStringList userEnteredPorts; // list of port names entered by user
+    void keepPortName(QString portName); // if it's not already in userEn. or discv. list
 
 public slots:
     void loadPortList();

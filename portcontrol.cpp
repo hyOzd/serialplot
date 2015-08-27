@@ -221,6 +221,8 @@ void PortControl::togglePort()
     {
         // port name may contain description
         QString portName = ui->cbPortList->currentText().split(" ")[0];
+        keepPortName(portName);
+
         serialPort->setPortName(portName);
 
         // open port
@@ -263,12 +265,20 @@ void PortControl::enableSkipByte(bool enabled)
     ui->pbSkipByte->setDisabled(enabled);
 }
 
-void PortControl::onPortNameChanged(QString portName)
+void PortControl::keepPortName(QString portName)
 {
-    // was this a user entered name?
     if(!discoveredPorts.contains(portName) &&
        !userEnteredPorts.contains(portName))
     {
         userEnteredPorts << portName;
     }
+    if(ui->cbPortList->findText(portName) < 0)
+    {
+        ui->cbPortList->addItem(portName);
+    }
+}
+
+void PortControl::onPortNameChanged(QString portName)
+{
+    keepPortName(portName);
 }
