@@ -276,7 +276,13 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_4">
      <item>
-      <widget class="CustomCheckableButton" name="pbOpenPort">
+      <widget class="QToolButton" name="pbOpenPort">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -321,13 +327,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>CustomCheckableButton</class>
-   <extends>QPushButton</extends>
-   <header>customcheckablebutton.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

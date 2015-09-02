@@ -58,7 +58,6 @@ add_executable(${PROGRAM_NAME} WIN32
   main.cpp
   mainwindow.cpp
   portcontrol.cpp
-  customcheckablebutton.cpp
   plot.cpp
   zoomer.cpp
   hidabletabwidget.cpp

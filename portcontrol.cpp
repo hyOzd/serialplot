@@ -44,8 +44,7 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     QObject::connect(ui->pbReloadPorts, &QPushButton::clicked,
                      this, &PortControl::loadPortList);
 
-    QObject::connect(ui->pbOpenPort, &QPushButton::clicked,
-                     this, &PortControl::togglePort);
+    ui->pbOpenPort->setDefaultAction(&openAction);
 
     // TODO: port name coming from combobox is dirty, create a separate layer of signals
     //       that will sanitize this information
@@ -248,7 +247,6 @@ void PortControl::togglePort()
             emit portToggled(true);
         }
     }
-    ui->pbOpenPort->setChecked(serialPort->isOpen());
     openAction.setChecked(serialPort->isOpen());
 }
 
