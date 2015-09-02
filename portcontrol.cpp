@@ -21,6 +21,7 @@
 #include "ui_portcontrol.h"
 
 #include <QSerialPortInfo>
+#include <QKeySequence>
 #include <QtDebug>
 #include "utils.h"
 
@@ -36,6 +37,8 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
 
     // setup the toolbar
     openAction.setCheckable(true);
+    openAction.setShortcut(QKeySequence("F2"));
+    openAction.setToolTip("Open Port (F2)");
     QObject::connect(&openAction, &QAction::triggered,
                      this, &PortControl::openActionTriggered);
     portToolBar.addAction(&openAction);
