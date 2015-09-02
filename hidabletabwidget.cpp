@@ -16,6 +16,7 @@ HidableTabWidget::HidableTabWidget(QWidget *parent) :
 
     connect(&hideAction, SIGNAL(toggled(bool)), this, SLOT(onHideAction(bool)));
     connect(this, SIGNAL(tabBarClicked(int)), this, SLOT(onTabBarClicked()));
+    connect(this, SIGNAL(tabBarDoubleClicked(int)), this, SLOT(onTabBarDoubleClicked()));
 }
 
 void HidableTabWidget::onHideAction(bool checked)
@@ -33,4 +34,9 @@ void HidableTabWidget::onHideAction(bool checked)
 void HidableTabWidget::onTabBarClicked()
 {
     hideAction.setChecked(false);
+}
+
+void HidableTabWidget::onTabBarDoubleClicked()
+{
+    hideAction.setChecked(true);
 }

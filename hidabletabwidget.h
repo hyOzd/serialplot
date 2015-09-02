@@ -14,6 +14,7 @@ public:
 private slots:
     void onHideAction(bool checked);
     void onTabBarClicked();
+    void onTabBarDoubleClicked();
 };
 
 #endif // HIDABLETABWIDGET_H
