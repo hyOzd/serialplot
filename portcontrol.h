@@ -24,6 +24,8 @@
 #include <QButtonGroup>
 #include <QSerialPort>
 #include <QStringList>
+#include <QToolBar>
+#include <QAction>
 
 namespace Ui {
 class PortControl;
@@ -39,6 +41,8 @@ public:
 
     QSerialPort* serialPort;
 
+    QToolBar* toolBar();
+
 private:
     Ui::PortControl *ui;
 
@@ -46,6 +50,9 @@ private:
     QButtonGroup dataBitsButtons;
     QButtonGroup stopBitsButtons;
     QButtonGroup flowControlButtons;
+
+    QToolBar portToolBar;
+    QAction openAction;
 
     QStringList discoveredPorts; // list of port names returned by availablePorts
     QStringList userEnteredPorts; // list of port names entered by user
@@ -66,6 +73,7 @@ public slots:
 
 private slots:
     void onPortNameChanged(QString portName);
+    void openActionTriggered(bool checked);
 
 signals:
     void skipByteRequested();

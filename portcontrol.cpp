@@ -26,12 +26,21 @@
 
 PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     QWidget(parent),
-    ui(new Ui::PortControl)
+    ui(new Ui::PortControl),
+    portToolBar("Port"),
+    openAction("Open", this)
 {
     ui->setupUi(this);
 
     serialPort = port;
 
+    // setup the toolbar
+    openAction.setCheckable(true);
+    QObject::connect(&openAction, &QAction::triggered,
+                     this, &PortControl::openActionTriggered);
+    portToolBar.addAction(&openAction);
+
+    // setup buttons
     QObject::connect(ui->pbReloadPorts, &QPushButton::clicked,
                      this, &PortControl::loadPortList);
 
@@ -240,6 +249,7 @@ void PortControl::togglePort()
         }
     }
     ui->pbOpenPort->setChecked(serialPort->isOpen());
+    openAction.setChecked(serialPort->isOpen());
 }
 
 void PortControl::selectPort(QString portName)
@@ -281,4 +291,14 @@ void PortControl::keepPortName(QString portName)
 void PortControl::onPortNameChanged(QString portName)
 {
     keepPortName(portName);
+}
+
+QToolBar* PortControl::toolBar()
+{
+    return &portToolBar;
+}
+
+void PortControl::openActionTriggered(bool checked)
+{
+    togglePort();
 }

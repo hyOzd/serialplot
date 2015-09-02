@@ -48,6 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->tabWidget->insertTab(0, &portControl, "Port");
     ui->tabWidget->setCurrentIndex(0);
+    addToolBar(portControl.toolBar());
 
     setupAboutDialog();
 
