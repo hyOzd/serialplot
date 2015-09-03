@@ -26,6 +26,9 @@
 #include <QStringList>
 #include <QToolBar>
 #include <QAction>
+#include <QComboBox>
+
+#include "portlist.h"
 
 namespace Ui {
 class PortControl;
@@ -53,6 +56,8 @@ private:
 
     QToolBar portToolBar;
     QAction openAction;
+    QComboBox tbPortListBox;
+    PortList portList;
 
     QStringList discoveredPorts; // list of port names returned by availablePorts
     QStringList userEnteredPorts; // list of port names entered by user

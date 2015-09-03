@@ -43,6 +43,9 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
                      this, &PortControl::openActionTriggered);
     portToolBar.addAction(&openAction);
 
+    portToolBar.addWidget(&tbPortListBox);
+    tbPortListBox.setModel(&portList);
+
     // setup buttons
     QObject::connect(ui->pbReloadPorts, &QPushButton::clicked,
                      this, &PortControl::loadPortList);
