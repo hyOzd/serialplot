@@ -56,7 +56,7 @@ private:
 
     QToolBar portToolBar;
     QAction openAction;
-    QComboBox tbPortListBox;
+    QComboBox tbPortList;
     PortList portList;
 
     QStringList discoveredPorts; // list of port names returned by availablePorts
@@ -79,6 +79,9 @@ public slots:
 private slots:
     void onPortNameChanged(QString portName);
     void openActionTriggered(bool checked);
+
+    void onCbPortListActivated(int index);
+    void onTbPortListActivated(int index);
 
 signals:
     void skipByteRequested();
