@@ -58,7 +58,7 @@ void PortListItem::construct(QString name, QString description, quint16 vid, qui
     setData(name, PortNameRole);
 }
 
-QString PortListItem::name()
+QString PortListItem::portName()
 {
     return data(PortNameRole).toString();
 }
@@ -77,4 +77,16 @@ void PortList::loadPortList()
     {
         appendRow(new PortListItem(&portInfo));
     }
+}
+
+int PortList::indexOf(QString portName)
+{
+    for (int i = 0; i < rowCount(); i++)
+    {
+        if (static_cast<PortListItem*>(item(i))->portName() == portName)
+        {
+            return i;
+        }
+    }
+    return -1; // not found
 }

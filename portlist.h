@@ -33,7 +33,7 @@ public:
     PortListItem(QString name, QString description="", quint16 vid=0, quint16 pid=0);
     PortListItem(QSerialPortInfo* portInfo);
 
-    QString name(); // returns only the port name
+    QString portName(); // returns only the port name
 
 private:
     // common constructor
@@ -46,6 +46,7 @@ public:
     PortList(QObject* parent=0);
 
     void loadPortList();
+    int indexOf(QString portName); // return -1 if not found
 
 private:
     QList<PortListItem*> userEnteredPorts;
