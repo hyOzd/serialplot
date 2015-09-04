@@ -17,6 +17,9 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef PORTLIST_H
+#define PORTLIST_H
+
 #include <QStandardItemModel>
 #include <QStandardItem>
 #include <QList>
@@ -24,7 +27,7 @@
 
 enum PortListRoles
 {
-    PortNameRole = Qt::UserRole  // portName as QString
+    PortNameRole = Qt::UserRole+1  // portName as QString
 };
 
 class PortListItem : public QStandardItem
@@ -42,6 +45,7 @@ private:
 
 class PortList : public QStandardItemModel
 {
+    Q_OBJECT
 public:
     PortList(QObject* parent=0);
 
@@ -49,5 +53,10 @@ public:
     int indexOf(QString portName); // return -1 if not found
 
 private:
-    QList<PortListItem*> userEnteredPorts;
+    QStringList userEnteredPorts;
+
+private slots:
+    void onRowsInserted(QModelIndex parent, int start, int end);
 };
+
+#endif // PORTLIST_H

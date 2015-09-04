@@ -67,16 +67,27 @@ PortList::PortList(QObject* parent) :
     QStandardItemModel(parent)
 {
     loadPortList();
+
+    // we have to use macro based notation to be able to disconnect
+    QObject::connect(this, SIGNAL(rowsInserted(const QModelIndex &, int, int)),
+                     this, SLOT(onRowsInserted(QModelIndex, int, int)));
 }
 
 void PortList::loadPortList()
 {
     clear();
 
+    disconnect(this, SLOT(onRowsInserted(QModelIndex,int,int)));
     for (auto portInfo : QSerialPortInfo::availablePorts())
     {
         appendRow(new PortListItem(&portInfo));
     }
+    for (auto portName : userEnteredPorts)
+    {
+        appendRow(new PortListItem(portName));
+    }
+    QObject::connect(this, SIGNAL(rowsInserted(const QModelIndex &, int, int)),
+                     this, SLOT(onRowsInserted(QModelIndex, int, int)));
 }
 
 int PortList::indexOf(QString portName)
@@ -89,4 +100,12 @@ int PortList::indexOf(QString portName)
         }
     }
     return -1; // not found
+}
+
+void PortList::onRowsInserted(QModelIndex parent, int start, int end)
+{
+    PortListItem* newItem = static_cast<PortListItem*>(item(start));
+    QString portName = newItem->text();
+    newItem->setData(portName, PortNameRole);
+    userEnteredPorts << portName;
 }
