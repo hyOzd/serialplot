@@ -129,7 +129,14 @@ PortControl::~PortControl()
 
 void PortControl::loadPortList()
 {
+    QString currentSelection = ui->cbPortList->currentData(PortNameRole).toString();
     portList.loadPortList();
+    int index = portList.indexOf(currentSelection);
+    if (index >= 0)
+    {
+        ui->cbPortList->setCurrentIndex(index);
+        tbPortList.setCurrentIndex(index);
+    }
 }
 
 void PortControl::loadBaudRateList()
