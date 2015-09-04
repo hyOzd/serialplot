@@ -229,7 +229,7 @@ void PortControl::togglePort()
             tbPortList.setCurrentIndex(portList.rowCount()-1);
         }
 
-        serialPort->setPortName(portName);
+        serialPort->setPortName(ui->cbPortList->currentData(PortNameRole).toString());
 
         // open port
         if (serialPort->open(QIODevice::ReadWrite))
