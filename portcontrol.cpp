@@ -22,6 +22,7 @@
 
 #include <QSerialPortInfo>
 #include <QKeySequence>
+#include <QLabel>
 #include <QtDebug>
 #include "utils.h"
 
@@ -41,11 +42,13 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     openAction.setToolTip("Open Port (F2)");
     QObject::connect(&openAction, &QAction::triggered,
                      this, &PortControl::openActionTriggered);
+
+    portToolBar.addWidget(new QLabel("Port:"));
+    portToolBar.addWidget(&tbPortList);
     portToolBar.addAction(&openAction);
 
-    portToolBar.addWidget(&tbPortList);
+    // setup port selection widgets
     tbPortList.setModel(&portList);
-
     ui->cbPortList->setModel(&portList);
     QObject::connect(ui->cbPortList,
                      SELECT<int>::OVERLOAD_OF(&QComboBox::activated),
@@ -53,6 +56,9 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     QObject::connect(&tbPortList,
                      SELECT<int>::OVERLOAD_OF(&QComboBox::activated),
                      this, &PortControl::onTbPortListActivated);
+    QObject::connect(ui->cbPortList,
+                     SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
+                     this, &PortControl::selectPort);
 
     // setup buttons
     QObject::connect(ui->pbReloadPorts, &QPushButton::clicked,
@@ -60,12 +66,7 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
 
     ui->pbOpenPort->setDefaultAction(&openAction);
 
-    // TODO: port name coming from combobox is dirty, create a separate layer of signals
-    //       that will sanitize this information
-    QObject::connect(ui->cbPortList,
-                     SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
-                     this, &PortControl::selectPort);
-
+    // setup baud rate selection widget
     QObject::connect(ui->cbBaudRate,
                      SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
                      this, &PortControl::selectBaudRate);
