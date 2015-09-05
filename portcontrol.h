@@ -59,10 +59,6 @@ private:
     QComboBox tbPortList;
     PortList portList;
 
-    QStringList discoveredPorts; // list of port names returned by availablePorts
-    QStringList userEnteredPorts; // list of port names entered by user
-    void keepPortName(QString portName); // if it's not already in userEn. or discv. list
-
 public slots:
     void loadPortList();
     void loadBaudRateList();
@@ -77,7 +73,6 @@ public slots:
     void selectFlowControl(int flowControl); // flowControl must be one of QSerialPort::FlowControl
 
 private slots:
-    void onPortNameChanged(QString portName);
     void openActionTriggered(bool checked);
 
     void onCbPortListActivated(int index);

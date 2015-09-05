@@ -66,10 +66,6 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
                      SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
                      this, &PortControl::selectPort);
 
-    QObject::connect(ui->cbPortList,
-                     SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
-                     this, &PortControl::onPortNameChanged);
-
     QObject::connect(ui->cbBaudRate,
                      SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
                      this, &PortControl::selectBaudRate);
@@ -277,24 +273,6 @@ void PortControl::selectPort(QString portName)
 void PortControl::enableSkipByte(bool enabled)
 {
     ui->pbSkipByte->setDisabled(enabled);
-}
-
-void PortControl::keepPortName(QString portName)
-{
-    if(!discoveredPorts.contains(portName) &&
-       !userEnteredPorts.contains(portName))
-    {
-        userEnteredPorts << portName;
-    }
-    if(ui->cbPortList->findText(portName) < 0)
-    {
-        ui->cbPortList->addItem(portName);
-    }
-}
-
-void PortControl::onPortNameChanged(QString portName)
-{
-    keepPortName(portName);
 }
 
 QToolBar* PortControl::toolBar()
