@@ -59,6 +59,9 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     QObject::connect(ui->cbPortList,
                      SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
                      this, &PortControl::selectPort);
+    QObject::connect(&tbPortList,
+                     SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
+                     this, &PortControl::selectPort);
 
     // setup buttons
     QObject::connect(ui->pbReloadPorts, &QPushButton::clicked,
