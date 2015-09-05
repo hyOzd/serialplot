@@ -51,8 +51,9 @@ endif (QWT_USE_STATIC)
 # includes
 include_directories(${QWT_INCLUDE_DIR})
 
-# wrap UI files
+# wrap UI and resource files
 qt5_wrap_ui(UI_FILES mainwindow.ui portcontrol.ui about_dialog.ui)
+qt5_add_resources(RES_FILES misc/icons.qrc)
 
 add_executable(${PROGRAM_NAME} WIN32
   main.cpp
@@ -64,6 +65,7 @@ add_executable(${PROGRAM_NAME} WIN32
   framebuffer.cpp
   portlist.cpp
   ${UI_FILES}
+  ${RES_FILES}
   misc/windows_icon.rc
   )
 
