@@ -220,13 +220,21 @@ void PortControl::togglePort()
     {
         // we get the port name from the edit text, which may not be
         // in the portList if user hasn't pressed Enter
-        QString portName = ui->cbPortList->currentText();
-        int portIndex = portList.indexOf(portName);
+        // Also note that, portText may not be the `portName`
+        QString portText = ui->cbPortList->currentText();
+        QString portName;
+        int portIndex = portList.indexOf(portText);
         if (portIndex < 0) // not in list, add to model and update the selections
         {
-            portList.appendRow(new PortListItem(portName));
+            portList.appendRow(new PortListItem(portText));
             ui->cbPortList->setCurrentIndex(portList.rowCount()-1);
             tbPortList.setCurrentIndex(portList.rowCount()-1);
+            portName = portText;
+        }
+        else
+        {
+            // get the port name from the data field
+            portName = static_cast<PortListItem*>(portList.item(portIndex))->portName();
         }
 
         serialPort->setPortName(ui->cbPortList->currentData(PortNameRole).toString());

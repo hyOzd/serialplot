@@ -90,11 +90,11 @@ void PortList::loadPortList()
                      this, SLOT(onRowsInserted(QModelIndex, int, int)));
 }
 
-int PortList::indexOf(QString portName)
+int PortList::indexOf(QString portText)
 {
     for (int i = 0; i < rowCount(); i++)
     {
-        if (static_cast<PortListItem*>(item(i))->portName() == portName)
+        if (item(i)->text() == portText)
         {
             return i;
         }

@@ -50,7 +50,7 @@ public:
     PortList(QObject* parent=0);
 
     void loadPortList();
-    int indexOf(QString portName); // return -1 if not found
+    int indexOf(QString portText); // return -1 if not found
 
 private:
     QStringList userEnteredPorts;
