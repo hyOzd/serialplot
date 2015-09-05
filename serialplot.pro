@@ -39,7 +39,8 @@ SOURCES += main.cpp\
     plot.cpp \
     zoomer.cpp \
     hidabletabwidget.cpp \
-    framebuffer.cpp
+    framebuffer.cpp \
+    portlist.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
@@ -48,7 +49,8 @@ HEADERS  += mainwindow.h \
     plot.h \
     zoomer.h \
     hidabletabwidget.h \
-    framebuffer.h
+    framebuffer.h \
+    portlist.h
 
 FORMS    += mainwindow.ui \
     about_dialog.ui \
@@ -57,3 +59,6 @@ FORMS    += mainwindow.ui \
 INCLUDEPATH += qmake/
 
 CONFIG += c++11
+
+RESOURCES += \
+    misc/icons.qrc
