@@ -39,7 +39,9 @@ SOURCES += main.cpp\
     plot.cpp \
     zoomer.cpp \
     hidabletabwidget.cpp \
-    framebuffer.cpp
+    framebuffer.cpp \
+    scalepicker.cpp \
+    scalezoomer.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
@@ -48,7 +50,9 @@ HEADERS  += mainwindow.h \
     plot.h \
     zoomer.h \
     hidabletabwidget.h \
-    framebuffer.h
+    framebuffer.h \
+    scalepicker.h \
+    scalezoomer.h
 
 FORMS    += mainwindow.ui \
     about_dialog.ui \

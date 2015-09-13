@@ -17,11 +17,12 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QRectF>
 #include "plot.h"
-
 Plot::Plot(QWidget* parent) :
     QwtPlot(parent),
-    zoomer(this->canvas(), false)
+    zoomer(this->canvas(), false),
+    sZoomer(this, &zoomer)
 {
     isAutoScaled = false;
 
@@ -29,6 +30,9 @@ Plot::Plot(QWidget* parent) :
 
     zoomer.setZoomBase();
     grid.attach(this);
+
+    rectItem.setRect(QRectF(0,0,100,1));
+    // rectItem.attach(this);
 
     darkBackground(false);
 }
@@ -94,6 +98,7 @@ void Plot::darkBackground(bool enabled)
         grid.setPen(Qt::darkGray);
         zoomer.setRubberBandPen(QPen(Qt::white));
         zoomer.setTrackerPen(QPen(Qt::white));
+        sZoomer.setPickerPen(QPen(Qt::white));
     }
     else
     {
@@ -101,6 +106,7 @@ void Plot::darkBackground(bool enabled)
         grid.setPen(Qt::lightGray);
         zoomer.setRubberBandPen(QPen(Qt::black));
         zoomer.setTrackerPen(QPen(Qt::black));
+        sZoomer.setPickerPen(QPen(Qt::black));
     }
     replot();
 }

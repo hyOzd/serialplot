@@ -17,41 +17,33 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PLOT_H
-#define PLOT_H
+#ifndef SCALEZOOMER_H
+#define SCALEZOOMER_H
 
+#include <QObject>
+#include <QPen>
 #include <qwt_plot.h>
-#include <qwt_plot_grid.h>
-#include <qwt_plot_shapeitem.h>
-#include "zoomer.h"
-#include "scalezoomer.h"
+#include <qwt_plot_zoomer.h>
 
-class Plot : public QwtPlot
+#include "scalepicker.h"
+
+class ScaleZoomer : public QObject
 {
     Q_OBJECT
 
 public:
-    Plot(QWidget* parent = 0);
-    void setAxis(bool autoScaled, double yMin = 0, double yMax = 1);
+    ScaleZoomer(QwtPlot*, QwtPlotZoomer*);
+    void setPickerPen(QPen pen);
 
 private:
-    bool isAutoScaled;
-    double yMin, yMax;
-    Zoomer zoomer;
-    ScaleZoomer sZoomer;
-    QwtPlotGrid grid;
-    QwtPlotShapeItem rectItem;
-
-    void resetAxes();
-
-public slots:
-    void showGrid(bool show = true);
-    void showMinorGrid(bool show = true);
-    void unzoom();
-    void darkBackground(bool enabled = true);
+    QwtPlot* _plot;
+    QwtPlotZoomer* _zoomer;
+    ScalePicker bottomPicker;
+    ScalePicker leftPicker;
 
 private slots:
-    void unzoomed();
+    void bottomPicked(double firstPos, double lastPos);
+    void leftPicked(double firstPos, double lastPos);
 };
 
-#endif // PLOT_H
+#endif /* SCALEZOOMER_H */
