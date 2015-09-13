@@ -156,10 +156,6 @@ void PortControl::selectBaudRate(QString baudRate)
         {
             qCritical() << "Can't set baud rate!";
         }
-        else
-        {
-            qDebug() << "Baud rate changed to" << serialPort->baudRate();
-        }
     }
 }
 
