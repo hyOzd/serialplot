@@ -41,7 +41,7 @@ SOURCES += main.cpp\
     hidabletabwidget.cpp \
     framebuffer.cpp \
     scalepicker.cpp \
-    scalezoomer.cpp
+    scalezoomer.cpp \
     portlist.cpp
 
 HEADERS  += mainwindow.h \
@@ -53,7 +53,7 @@ HEADERS  += mainwindow.h \
     hidabletabwidget.h \
     framebuffer.h \
     scalepicker.h \
-    scalezoomer.h
+    scalezoomer.h \
     portlist.h
 
 FORMS    += mainwindow.ui \
