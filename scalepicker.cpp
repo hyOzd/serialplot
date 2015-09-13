@@ -134,6 +134,11 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
         }
         return true;
     }
+    else if (event->type() == QEvent::Leave)
+    {
+        scaleOverlay->updateOverlay();
+        return true;
+    }
     else
     {
         return QObject::eventFilter(object, event);
@@ -176,13 +181,19 @@ void ScalePicker::drawScaleOverlay(QPainter* painter)
         {
             int height = painter->device()->height();
             if (started) painter->drawLine(firstPosPx, 0, firstPosPx, height);
-            painter->drawLine(currentPosPx, 0, currentPosPx, height);
+            if (started || _scaleWidget->underMouse())
+            {
+                painter->drawLine(currentPosPx, 0, currentPosPx, height);
+            }
         }
         else // vertical
         {
             int width = painter->device()->width();
             if (started) painter->drawLine(0, firstPosPx, width, firstPosPx);
-            painter->drawLine(0, currentPosPx, width, currentPosPx);
+            if (started || _scaleWidget->underMouse())
+            {
+                painter->drawLine(0, currentPosPx, width, currentPosPx);
+            }
         }
     }
     painter->restore();
