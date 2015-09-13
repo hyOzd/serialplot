@@ -22,6 +22,7 @@
 
 #include <QSerialPortInfo>
 #include <QKeySequence>
+#include <QLabel>
 #include <QtDebug>
 #include "utils.h"
 
@@ -41,7 +42,25 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     openAction.setToolTip("Open Port (F2)");
     QObject::connect(&openAction, &QAction::triggered,
                      this, &PortControl::openActionTriggered);
+
+    portToolBar.addWidget(&tbPortList);
     portToolBar.addAction(&openAction);
+
+    // setup port selection widgets
+    tbPortList.setModel(&portList);
+    ui->cbPortList->setModel(&portList);
+    QObject::connect(ui->cbPortList,
+                     SELECT<int>::OVERLOAD_OF(&QComboBox::activated),
+                     this, &PortControl::onCbPortListActivated);
+    QObject::connect(&tbPortList,
+                     SELECT<int>::OVERLOAD_OF(&QComboBox::activated),
+                     this, &PortControl::onTbPortListActivated);
+    QObject::connect(ui->cbPortList,
+                     SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
+                     this, &PortControl::selectPort);
+    QObject::connect(&tbPortList,
+                     SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
+                     this, &PortControl::selectPort);
 
     // setup buttons
     QObject::connect(ui->pbReloadPorts, &QPushButton::clicked,
@@ -49,16 +68,7 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
 
     ui->pbOpenPort->setDefaultAction(&openAction);
 
-    // TODO: port name coming from combobox is dirty, create a separate layer of signals
-    //       that will sanitize this information
-    QObject::connect(ui->cbPortList,
-                     SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
-                     this, &PortControl::selectPort);
-
-    QObject::connect(ui->cbPortList,
-                     SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
-                     this, &PortControl::onPortNameChanged);
-
+    // setup baud rate selection widget
     QObject::connect(ui->cbBaudRate,
                      SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
                      this, &PortControl::selectBaudRate);
@@ -118,36 +128,13 @@ PortControl::~PortControl()
 
 void PortControl::loadPortList()
 {
-    QString currentSelection = ui->cbPortList->currentText();
-
-    ui->cbPortList->clear();
-
-    discoveredPorts.clear();
-    for (auto port : QSerialPortInfo::availablePorts())
+    QString currentSelection = ui->cbPortList->currentData(PortNameRole).toString();
+    portList.loadPortList();
+    int index = portList.indexOf(currentSelection);
+    if (index >= 0)
     {
-        QString pName = port.portName();
-        if (!port.description().isEmpty()) pName += QString(" ") + port.description();
-        if (port.hasProductIdentifier())
-        {
-            QString vID = QString("%1").arg(port.vendorIdentifier(), 4, 16, QChar('0'));
-            QString pID = QString("%1").arg(port.productIdentifier(), 4, 16, QChar('0'));
-            pName = pName + " [" + vID + ":" + pID + "]";
-        }
-        ui->cbPortList->addItem(pName);
-        discoveredPorts << port.portName();
-    }
-
-    ui->cbPortList->addItems(userEnteredPorts);
-
-    // find current selection in the new list, maybe it doesn't exist anymore?
-    int currentSelectionIndex = ui->cbPortList->findText(currentSelection);
-    if (currentSelectionIndex >= 0)
-    {
-        ui->cbPortList->setCurrentIndex(currentSelectionIndex);
-    }
-    else // our port doesn't exist anymore, close port if it's open
-    {
-        if (serialPort->isOpen()) togglePort();
+        ui->cbPortList->setCurrentIndex(index);
+        tbPortList.setCurrentIndex(index);
     }
 }
 
@@ -230,11 +217,26 @@ void PortControl::togglePort()
     }
     else
     {
-        // port name may contain description
-        QString portName = ui->cbPortList->currentText().split(" ")[0];
-        keepPortName(portName);
+        // we get the port name from the edit text, which may not be
+        // in the portList if user hasn't pressed Enter
+        // Also note that, portText may not be the `portName`
+        QString portText = ui->cbPortList->currentText();
+        QString portName;
+        int portIndex = portList.indexOf(portText);
+        if (portIndex < 0) // not in list, add to model and update the selections
+        {
+            portList.appendRow(new PortListItem(portText));
+            ui->cbPortList->setCurrentIndex(portList.rowCount()-1);
+            tbPortList.setCurrentIndex(portList.rowCount()-1);
+            portName = portText;
+        }
+        else
+        {
+            // get the port name from the data field
+            portName = static_cast<PortListItem*>(portList.item(portIndex))->portName();
+        }
 
-        serialPort->setPortName(portName);
+        serialPort->setPortName(ui->cbPortList->currentData(PortNameRole).toString());
 
         // open port
         if (serialPort->open(QIODevice::ReadWrite))
@@ -276,24 +278,6 @@ void PortControl::enableSkipByte(bool enabled)
     ui->pbSkipByte->setDisabled(enabled);
 }
 
-void PortControl::keepPortName(QString portName)
-{
-    if(!discoveredPorts.contains(portName) &&
-       !userEnteredPorts.contains(portName))
-    {
-        userEnteredPorts << portName;
-    }
-    if(ui->cbPortList->findText(portName) < 0)
-    {
-        ui->cbPortList->addItem(portName);
-    }
-}
-
-void PortControl::onPortNameChanged(QString portName)
-{
-    keepPortName(portName);
-}
-
 QToolBar* PortControl::toolBar()
 {
     return &portToolBar;
@@ -302,4 +286,14 @@ QToolBar* PortControl::toolBar()
 void PortControl::openActionTriggered(bool checked)
 {
     togglePort();
+}
+
+void PortControl::onCbPortListActivated(int index)
+{
+    tbPortList.setCurrentIndex(index);
+}
+
+void PortControl::onTbPortListActivated(int index)
+{
+    ui->cbPortList->setCurrentIndex(index);
 }

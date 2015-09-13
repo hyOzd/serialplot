@@ -26,6 +26,9 @@
 #include <QStringList>
 #include <QToolBar>
 #include <QAction>
+#include <QComboBox>
+
+#include "portlist.h"
 
 namespace Ui {
 class PortControl;
@@ -53,10 +56,8 @@ private:
 
     QToolBar portToolBar;
     QAction openAction;
-
-    QStringList discoveredPorts; // list of port names returned by availablePorts
-    QStringList userEnteredPorts; // list of port names entered by user
-    void keepPortName(QString portName); // if it's not already in userEn. or discv. list
+    QComboBox tbPortList;
+    PortList portList;
 
 public slots:
     void loadPortList();
@@ -72,8 +73,10 @@ public slots:
     void selectFlowControl(int flowControl); // flowControl must be one of QSerialPort::FlowControl
 
 private slots:
-    void onPortNameChanged(QString portName);
     void openActionTriggered(bool checked);
+
+    void onCbPortListActivated(int index);
+    void onTbPortListActivated(int index);
 
 signals:
     void skipByteRequested();

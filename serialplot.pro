@@ -42,6 +42,7 @@ SOURCES += main.cpp\
     framebuffer.cpp \
     scalepicker.cpp \
     scalezoomer.cpp
+    portlist.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
@@ -53,6 +54,7 @@ HEADERS  += mainwindow.h \
     framebuffer.h \
     scalepicker.h \
     scalezoomer.h
+    portlist.h
 
 FORMS    += mainwindow.ui \
     about_dialog.ui \
@@ -61,3 +63,6 @@ FORMS    += mainwindow.ui \
 INCLUDEPATH += qmake/
 
 CONFIG += c++11
+
+RESOURCES += \
+    misc/icons.qrc
