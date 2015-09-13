@@ -56,6 +56,10 @@ void PortListItem::construct(QString name, QString description, quint16 vid, qui
         text += QString("%1]").arg(pid, 4, 16, QChar('0'));
         setIcon(QIcon(":/usb_icon.png"));
     }
+    else if (name.contains("rfcomm"))
+    {
+        setIcon(QIcon(":/bluetooth_icon.png"));
+    }
     setText(text);
     setData(name, PortNameRole);
 }
