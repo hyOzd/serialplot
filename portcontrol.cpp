@@ -43,7 +43,6 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     QObject::connect(&openAction, &QAction::triggered,
                      this, &PortControl::openActionTriggered);
 
-    portToolBar.addWidget(new QLabel("Port:"));
     portToolBar.addWidget(&tbPortList);
     portToolBar.addAction(&openAction);
 
