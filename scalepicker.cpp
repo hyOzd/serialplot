@@ -29,6 +29,7 @@
 // minimum size for pick (in pixels)
 #define MIN_PICK_SIZE (2)
 
+// TODO: rename to PlotOverlay
 class ScalePickerOverlay : public QwtWidgetOverlay
 {
 public:
@@ -52,12 +53,38 @@ void ScalePickerOverlay::drawOverlay(QPainter* painter) const
     _picker->drawOverlay(painter);
 }
 
+class ScaleOverlay : public QwtWidgetOverlay
+{
+public:
+    ScaleOverlay(QWidget* widget, ScalePicker* picker);
+
+protected:
+    virtual void drawOverlay(QPainter*) const;
+
+private:
+    ScalePicker* _picker;
+};
+
+ScaleOverlay::ScaleOverlay(QWidget* widget, ScalePicker* picker) :
+    QwtWidgetOverlay(widget)
+{
+    _picker = picker;
+}
+
+void ScaleOverlay::drawOverlay(QPainter* painter) const
+{
+    _picker->drawScaleOverlay(painter);
+}
+
 ScalePicker::ScalePicker(QwtScaleWidget* scaleWidget, QWidget* canvas) :
     QObject(scaleWidget)
 {
-    scaleWidget->installEventFilter(this);
     _scaleWidget = scaleWidget;
+    _canvas = canvas;
+    scaleWidget->installEventFilter(this);
+    scaleWidget->setMouseTracking(true);
     pickerOverlay = new ScalePickerOverlay(canvas, this);
+    scaleOverlay = new ScaleOverlay(scaleWidget, this);
     started = false;
     pressed = false;
 }
@@ -95,6 +122,7 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
                 pickerOverlay->updateOverlay();
                 emit picking(firstPos, pos);
             }
+            scaleOverlay->updateOverlay();
         }
         else // event->type() == QEvent::MouseButtonRelease
         {
@@ -118,22 +146,48 @@ void ScalePicker::drawOverlay(QPainter* painter)
 {
     if (started)
     {
+        painter->save();
+        painter->setPen(_pen);
+
         QRect rect;
         if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale ||
             _scaleWidget->alignment() == QwtScaleDraw::TopScale)
         {
             int height = painter->device()->height();
-            rect = QRect(firstPosPx, 0, (currentPosPx-firstPosPx), height);
+            rect = QRect(posCanvasPx(firstPosPx), 0, currentPosPx-firstPosPx, height);
         }
         else // vertical
         {
             int width = painter->device()->width();
-            rect = QRect(0, firstPosPx, width, (currentPosPx-firstPosPx));
+            rect = QRect(0, posCanvasPx(firstPosPx), width, currentPosPx-firstPosPx);
         }
-
-        painter->setPen(_pen);
         painter->drawRect(rect);
+        painter->restore();
     }
+}
+
+void ScalePicker::drawScaleOverlay(QPainter* painter)
+{
+    painter->save();
+    painter->setPen(_pen);
+    if (1)
+    {
+
+        if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale ||
+            _scaleWidget->alignment() == QwtScaleDraw::TopScale)
+        {
+            int height = painter->device()->height();
+            if (started) painter->drawLine(firstPosPx, 0, firstPosPx, height);
+            painter->drawLine(currentPosPx, 0, currentPosPx, height);
+        }
+        else // vertical
+        {
+            int width = painter->device()->width();
+            if (started) painter->drawLine(0, firstPosPx, width, firstPosPx);
+            painter->drawLine(0, currentPosPx, width, currentPosPx);
+        }
+    }
+    painter->restore();
 }
 
 void ScalePicker::setPen(QPen pen)
@@ -161,6 +215,27 @@ double ScalePicker::positionPx(QMouseEvent* mouseEvent)
     else // left or right scale
     {
         pos = mouseEvent->pos().y();
+    }
+    return pos;
+}
+
+/*
+ * Scale widget and canvas widget is not always aligned. Especially
+ * when zooming scaleWidget moves around. This causes irregularities
+ * when drawing the tracker lines. This function maps scale widgets
+ * pixel coordinate to canvas' coordinate.
+ */
+double ScalePicker::posCanvasPx(double pos)
+{
+    // assumption: scale.width < canvas.width && scale.x > canvas.x
+    if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale ||
+        _scaleWidget->alignment() == QwtScaleDraw::TopScale)
+    {
+        return pos + (_scaleWidget->x() - _canvas->x());
+    }
+    else // left or right scale
+    {
+        return pos + (_scaleWidget->y() - _canvas->y());
     }
     return pos;
 }
