@@ -35,7 +35,7 @@ public:
     ScalePicker(QwtScaleWidget* scaleWidget, QWidget* canvas);
     virtual bool eventFilter(QObject*, QEvent*);
 
-    void drawOverlay(QPainter*); // called from ScalePickerOverlay
+    void drawPlotOverlay(QPainter*); // called from ScalePickerOverlay
     void drawScaleOverlay(QPainter*); // called from ScaleOverlay
     void setPen(QPen pen);
 
@@ -47,8 +47,8 @@ signals:
 private:
     QwtScaleWidget* _scaleWidget;
     QWidget* _canvas;
-    QwtWidgetOverlay* pickerOverlay; // ScalePickerOverlay
-    QwtWidgetOverlay* scaleOverlay;
+    QwtWidgetOverlay* pickerOverlay; // will be PlotOverlay
+    QwtWidgetOverlay* scaleOverlay;  // will be ScaleOverlay
     QPen _pen;
 
     bool pressed;

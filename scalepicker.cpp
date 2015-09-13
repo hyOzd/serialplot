@@ -29,11 +29,10 @@
 // minimum size for pick (in pixels)
 #define MIN_PICK_SIZE (2)
 
-// TODO: rename to PlotOverlay
-class ScalePickerOverlay : public QwtWidgetOverlay
+class PlotOverlay : public QwtWidgetOverlay
 {
 public:
-    ScalePickerOverlay(QWidget* widget, ScalePicker* picker);
+    PlotOverlay(QWidget* widget, ScalePicker* picker);
 
 protected:
     virtual void drawOverlay(QPainter*) const;
@@ -42,15 +41,15 @@ private:
     ScalePicker* _picker;
 };
 
-ScalePickerOverlay::ScalePickerOverlay(QWidget* widget, ScalePicker* picker) :
+PlotOverlay::PlotOverlay(QWidget* widget, ScalePicker* picker) :
     QwtWidgetOverlay(widget)
 {
     _picker = picker;
 }
 
-void ScalePickerOverlay::drawOverlay(QPainter* painter) const
+void PlotOverlay::drawOverlay(QPainter* painter) const
 {
-    _picker->drawOverlay(painter);
+    _picker->drawPlotOverlay(painter);
 }
 
 class ScaleOverlay : public QwtWidgetOverlay
@@ -83,7 +82,7 @@ ScalePicker::ScalePicker(QwtScaleWidget* scaleWidget, QWidget* canvas) :
     _canvas = canvas;
     scaleWidget->installEventFilter(this);
     scaleWidget->setMouseTracking(true);
-    pickerOverlay = new ScalePickerOverlay(canvas, this);
+    pickerOverlay = new PlotOverlay(canvas, this);
     scaleOverlay = new ScaleOverlay(scaleWidget, this);
     started = false;
     pressed = false;
@@ -142,7 +141,7 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
     }
 }
 
-void ScalePicker::drawOverlay(QPainter* painter)
+void ScalePicker::drawPlotOverlay(QPainter* painter)
 {
     if (started)
     {
