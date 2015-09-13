@@ -40,6 +40,14 @@
 Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
 #endif
 
+struct Range
+{
+    double rmin;
+    double rmax;
+};
+
+Q_DECLARE_METATYPE(Range);
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -155,6 +163,31 @@ MainWindow::MainWindow(QWidget *parent) :
     // init grid
     ui->plot->showGrid(ui->actionGrid->isChecked());
     ui->plot->showMinorGrid(ui->actionMinorGrid->isChecked());
+
+    // init scale range preset list
+    for (int nbits = 8; nbits <= 24; nbits++) // signed binary formats
+    {
+        int rmax = pow(2, nbits-1)-1;
+        int rmin = -rmax-1;
+        Range r = {double(rmin),  double(rmax)};
+        ui->cbRangePresets->addItem(
+            QString().sprintf("Signed %d bits %d to +%d", nbits, rmin, rmax),
+            QVariant::fromValue(r));
+    }
+    for (int nbits = 8; nbits <= 24; nbits++) // unsigned binary formats
+    {
+        int rmax = pow(2, nbits)-1;
+        ui->cbRangePresets->addItem(
+            QString().sprintf("Unsigned %d bits %d to +%d", nbits, 0, rmax),
+            QVariant::fromValue(Range{0, double(rmax)}));
+    }
+    ui->cbRangePresets->addItem("-1 to +1", QVariant::fromValue(Range{-1, +1}));
+    ui->cbRangePresets->addItem("0 to +1", QVariant::fromValue(Range{0, +1}));
+    ui->cbRangePresets->addItem("-100 to +100", QVariant::fromValue(Range{-100, +100}));
+    ui->cbRangePresets->addItem("0 to +100", QVariant::fromValue(Range{0, +100}));
+
+    QObject::connect(ui->cbRangePresets, SIGNAL(activated(int)),
+                     this, SLOT(onRangeSelected()));
 
     // init number format
     if (numberFormatButtons.checkedId() >= 0)
@@ -467,6 +500,14 @@ void MainWindow::onAutoScaleChecked(bool checked)
 void MainWindow::onYScaleChanged()
 {
     ui->plot->setAxis(false,  ui->spYmin->value(), ui->spYmax->value());
+}
+
+void MainWindow::onRangeSelected()
+{
+    Range r = ui->cbRangePresets->currentData().value<Range>();
+    ui->spYmin->setValue(r.rmin);
+    ui->spYmax->setValue(r.rmax);
+    ui->cbAutoScale->setChecked(false);
 }
 
 void MainWindow::onNumberFormatButtonToggled(int numberFormatId, bool checked)
