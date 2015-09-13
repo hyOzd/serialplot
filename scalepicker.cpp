@@ -113,7 +113,6 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
             if (!started && pressed && (fabs(posPx-firstPosPx) > MIN_PICK_SIZE))
             {
                 started = true;
-                // pickerOverlay->updateOverlay();
                 emit pickStarted(pos);
             }
             else if (started)
