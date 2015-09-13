@@ -14,7 +14,7 @@ Small and simple software for plotting data from serial port.
 
 You can obtain installation packages from
 [downloads](https://bitbucket.org/hyOzd/serialplot/downloads). As of
-moment there is only Debian and Windows 64 bits packages.
+moment there are only Debian and Windows 64 bits packages.
 
 ## Dependencies
 - Qt 5, including SerialPort module
@@ -35,9 +35,9 @@ Under Ubuntu/Debian:
 ### Download and Install Qwt
 
 [Qwt](http://qwt.sourceforge.net) is the library that provides
-plotting widgets for SerialPlot. As of this moment there is no
-appropriate version of Qwt in debian repositories. You will need to
-download and build Qwt with Qt5 yourself.
+plotting widgets for SerialPlot. If your distribution doesn't provide
+a Qwt 6 package (the Qt5 version, usually named `libqwt6-qt5`) you
+will need to download and build Qwt with Qt5 yourself.
 
 Download Qwt 6 from here: http://sourceforge.net/projects/qwt/files/
 
