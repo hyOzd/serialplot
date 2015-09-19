@@ -42,7 +42,8 @@ SOURCES += main.cpp\
     framebuffer.cpp \
     scalepicker.cpp \
     scalezoomer.cpp \
-    portlist.cpp
+    portlist.cpp \
+    snapshotview.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
@@ -54,11 +55,13 @@ HEADERS  += mainwindow.h \
     framebuffer.h \
     scalepicker.h \
     scalezoomer.h \
-    portlist.h
+    portlist.h \
+    snapshotview.h
 
 FORMS    += mainwindow.ui \
     about_dialog.ui \
-    portcontrol.ui
+    portcontrol.ui \
+    snapshotview.ui
 
 INCLUDEPATH += qmake/
 

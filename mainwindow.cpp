@@ -31,6 +31,8 @@
 #include <cmath>
 #include <iostream>
 
+#include <snapshotview.h>
+
 #include "utils.h"
 #include "version.h"
 #include "floatswap.h"
@@ -111,6 +113,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(ui->actionClear, SIGNAL(triggered(bool)),
                      this, SLOT(clearPlot()));
+
+    QObject::connect(ui->actionSnapShot, SIGNAL(triggered(bool)),
+                     this, SLOT(takeSnapShot()));
 
     // setup number of channels spinbox
     QObject::connect(ui->spNumOfChannels,
@@ -241,6 +246,12 @@ MainWindow::~MainWindow()
     {
         serialPort.close();
     }
+
+    for (auto snapshot : snapshots)
+    {
+        delete snapshot;
+    }
+
     delete ui;
     ui = NULL; // we check if ui is deleted in messageHandler
 }
@@ -744,4 +755,24 @@ void MainWindow::messageHandler(QtMsgType type,
     {
         ui->statusBar->showMessage(msg, 5000);
     }
+}
+
+void MainWindow::takeSnapShot()
+{
+    qDebug() << "taking a snopshot yay!";
+    auto snapShot = new SnapShot();
+    snapShot->name = QString("SnapShot");
+
+    for (unsigned ci = 0; ci < numOfChannels; ci++)
+    {
+        snapShot->data.append(QVector<QPointF>(numOfSamples));
+        for (unsigned i = 0; i < numOfSamples; i++)
+        {
+            snapShot->data[ci][i] = channelBuffers[ci]->sample(i);
+        }
+    }
+    snapshots.append(snapShot);
+
+    auto sv = new SnapShotView(this, snapShot);
+    sv->show();
 }

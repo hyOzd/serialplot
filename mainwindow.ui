@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <widget class="Plot" name="plot">
+     <widget class="Plot" name="plot" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
         <horstretch>0</horstretch>
@@ -501,6 +501,7 @@
    </attribute>
    <addaction name="actionPause"/>
    <addaction name="actionClear"/>
+   <addaction name="actionSnapShot"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionPause">
@@ -604,12 +605,23 @@
     <string>Toggle Dark Background</string>
    </property>
   </action>
+  <action name="actionSnapShot">
+   <property name="text">
+    <string>SnapShot</string>
+   </property>
+   <property name="toolTip">
+    <string>Take a snapshot of the current plot (F5)</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
    <class>Plot</class>
-   <extends>QFrame</extends>
+   <extends>QWidget</extends>
    <header>plot.h</header>
    <container>1</container>
   </customwidget>

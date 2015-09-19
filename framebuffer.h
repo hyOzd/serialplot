@@ -37,6 +37,7 @@ public:
     // QwtSeriesData implementations
     size_t size() const;
     QPointF sample(size_t i) const;
+    double sampleY(size_t i) const;
     QRectF boundingRect() const;
 
 private:
@@ -46,7 +47,6 @@ private:
 
     QRectF _boundingRect;
 
-    double _sample(size_t i) const;
 };
 
 #endif // FRAMEBUFFER_H
