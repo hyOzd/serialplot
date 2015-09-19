@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QVector>
 #include <QPointF>
+#include <QPen>
 #include <qwt_plot_curve.h>
 #include "plot.h"
 

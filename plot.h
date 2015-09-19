@@ -20,6 +20,7 @@
 #ifndef PLOT_H
 #define PLOT_H
 
+#include <QColor>
 #include <qwt_plot.h>
 #include <qwt_plot_grid.h>
 #include <qwt_plot_shapeitem.h>
@@ -33,6 +34,8 @@ class Plot : public QwtPlot
 public:
     Plot(QWidget* parent = 0);
     void setAxis(bool autoScaled, double yMin = 0, double yMax = 1);
+
+    static QColor makeColor(unsigned int channelIndex);
 
 private:
     bool isAutoScaled;

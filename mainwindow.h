@@ -109,8 +109,6 @@ private:
     bool isDemoRunning();
     QwtPlotTextLabel demoIndicator;
 
-    QColor makeColor(unsigned int channelIndex);
-
 private slots:
     void onPortToggled(bool open);
     void onDataReady();      // used with binary number formats

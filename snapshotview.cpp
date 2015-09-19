@@ -14,6 +14,7 @@ SnapShotView::SnapShotView(QWidget *parent, SnapShot* snapShot) :
         QwtPlotCurve* curve = new QwtPlotCurve();
         curves.append(curve);
         curve->setSamples(snapShot->data[ci]);
+        curve->setPen(Plot::makeColor(ci));
         curve->attach(ui->plot);
     }
 
