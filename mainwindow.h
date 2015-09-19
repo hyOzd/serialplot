@@ -79,7 +79,6 @@ private:
     unsigned int numOfChannels;
 
     QList<QwtPlotCurve*> curves;
-    typedef QVector<double> DataArray;
     // Note: FrameBuffer s are owned by their respective QwtPlotCurve s.
     QList<FrameBuffer*> channelBuffers;
 
