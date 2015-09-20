@@ -34,5 +34,6 @@ SnapShotView::~SnapShotView()
 
 void SnapShotView::closeEvent(QCloseEvent *event)
 {
+    QMainWindow::closeEvent(event);
     emit closed();
 }
