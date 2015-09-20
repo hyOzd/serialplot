@@ -93,7 +93,7 @@ endif()
 # version number
 set(MAJOR_VERSION 0 CACHE INT "Program major version number.")
 set(MINOR_VERSION 5 CACHE INT "Program minor version number.")
-set(PATCH_VERSION 0 CACHE INT "Program patch version number.")
+set(PATCH_VERSION 1 CACHE INT "Program patch version number.")
 set(VERSION_STRING "${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}")
 
 # get revision number from mercurial
