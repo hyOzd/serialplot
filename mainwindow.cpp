@@ -746,6 +746,8 @@ void MainWindow::takeSnapShot()
         }
     }
     snapshots.append(snapShot);
+    QObject::connect(snapShot, &SnapShot::deleteRequested,
+                     this, &MainWindow::deleteSnapshot);
 
     updateSnapShotMenu();
 }
@@ -759,7 +761,7 @@ void MainWindow::updateSnapShotMenu()
         ui->menuSnapShots->addSeparator();
         for (auto ss : snapshots)
         {
-            ui->menuSnapShots->addAction(ss->menuAction());
+            ui->menuSnapShots->addAction(ss->showAction());
         }
         ui->menuSnapShots->addSeparator();
         ui->menuSnapShots->addAction(ui->actionClearSnapShots);
@@ -773,5 +775,11 @@ void MainWindow::clearSnapshots()
         delete snapshot;
     }
     snapshots.clear();
+    updateSnapShotMenu();
+}
+
+void MainWindow::deleteSnapshot(SnapShot* snapshot)
+{
+    delete snapshots.takeAt(snapshots.indexOf(snapshot));
     updateSnapShotMenu();
 }

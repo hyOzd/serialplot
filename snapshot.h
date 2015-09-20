@@ -16,21 +16,30 @@ public:
     SnapShot(QMainWindow* parent, QString name);
     ~SnapShot();
 
-    // QString _name;
     QVector<QVector<QPointF>> data;
-    QAction* menuAction();
+    QAction* showAction();
+    QAction* deleteAction();
+
+    QString name();
 
 public slots:
     void show();
     void hide();
 
+signals:
+    void deleteRequested(SnapShot*);
+
 private:
-    QAction _menuAction;
+    QString _name;
+    QAction _showAction;
+    QAction _deleteAction;
     QMainWindow* mainWindow;
     SnapShotView* view;
 
 private slots:
     void viewClosed();
+
+    void onDeleteTriggered();
 };
 
 #endif /* SNAPSHOT_H */

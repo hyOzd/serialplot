@@ -54,19 +54,10 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionExportCSV"/>
-   <addaction name="actionDelete"/>
   </widget>
   <action name="actionExportCSV">
    <property name="text">
     <string>Export CSV</string>
-   </property>
-  </action>
-  <action name="actionDelete">
-   <property name="text">
-    <string>Delete</string>
-   </property>
-   <property name="toolTip">
-    <string>Delete this snapshot!</string>
    </property>
   </action>
  </widget>

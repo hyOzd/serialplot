@@ -8,11 +8,17 @@
 
 SnapShot::SnapShot(QMainWindow* parent, QString name) :
     QObject(parent),
-    _menuAction(name, this)
+    _showAction(name, this),
+    _deleteAction("Delete", this)
 {
+    _name = name;
+
     view = NULL;
     mainWindow = parent;
-    connect(&_menuAction, &QAction::triggered, this, &SnapShot::show);
+    connect(&_showAction, &QAction::triggered, this, &SnapShot::show);
+
+    _deleteAction.setToolTip(QString("Delete ") + _name);
+    connect(&_deleteAction, &QAction::triggered, this, &SnapShot::onDeleteTriggered);
 }
 
 SnapShot::~SnapShot()
@@ -23,9 +29,14 @@ SnapShot::~SnapShot()
     }
 }
 
-QAction* SnapShot::menuAction()
+QAction* SnapShot::showAction()
 {
-    return &_menuAction;
+    return &_showAction;
+}
+
+QAction* SnapShot::deleteAction()
+{
+    return &_deleteAction;
 }
 
 void SnapShot::show()
@@ -50,4 +61,15 @@ void SnapShot::viewClosed()
 {
     delete view;
     view = NULL;
+}
+
+
+void SnapShot::onDeleteTriggered()
+{
+    emit deleteRequested(this);
+}
+
+QString SnapShot::name()
+{
+    return _name;
 }

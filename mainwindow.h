@@ -134,6 +134,7 @@ private slots:
 
     void takeSnapShot();
     void clearSnapshots();
+    void deleteSnapshot(SnapShot* snapshot);
 
     void demoTimerTimeout();
     void enableDemo(bool enabled);
