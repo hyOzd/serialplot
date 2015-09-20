@@ -71,6 +71,7 @@ add_executable(${PROGRAM_NAME} WIN32
   scalepicker.cpp
   scalezoomer.cpp
   portlist.cpp
+  snapshot.cpp
   snapshotview.cpp
   ${UI_FILES}
   ${RES_FILES}

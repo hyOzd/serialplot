@@ -730,8 +730,7 @@ void MainWindow::messageHandler(QtMsgType type,
 void MainWindow::takeSnapShot()
 {
     qDebug() << "taking a snopshot yay!";
-    auto snapShot = new SnapShot();
-    snapShot->name = QString("SnapShot");
+    auto snapShot = new SnapShot(this, "New Snapshot");
 
     for (unsigned ci = 0; ci < numOfChannels; ci++)
     {
@@ -744,9 +743,6 @@ void MainWindow::takeSnapShot()
     snapshots.append(snapShot);
 
     updateSnapShotMenu();
-
-    auto sv = new SnapShotView(this, snapShot);
-    sv->show();
 }
 
 void MainWindow::updateSnapShotMenu()
@@ -758,7 +754,7 @@ void MainWindow::updateSnapShotMenu()
         ui->menuSnapShots->addSeparator();
         for (auto ss : snapshots)
         {
-            ui->menuSnapShots->addAction(ss->name);
+            ui->menuSnapShots->addAction(ss->menuAction());
         }
         ui->menuSnapShots->addSeparator();
         ui->menuSnapShots->addAction(ui->actionClearSnapShots);

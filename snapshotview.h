@@ -7,14 +7,7 @@
 #include <QPen>
 #include <qwt_plot_curve.h>
 #include "plot.h"
-
-class SnapShotView;
-struct SnapShot
-{
-    QString name;
-    QVector<QVector<QPointF>> data;
-    SnapShotView* view;
-};
+#include "snapshot.h"
 
 namespace Ui {
 class SnapShotView;
