@@ -86,7 +86,8 @@ void SnapshotManager::clearSnapshots()
 
 void SnapshotManager::deleteSnapshot(SnapShot* snapshot)
 {
-    delete snapshots.takeAt(snapshots.indexOf(snapshot));
+    snapshots.removeOne(snapshot);
+    snapshot->deleteLater(); // regular delete causes a crash when triggered from menu
     updateMenu();
 }
 
