@@ -733,7 +733,6 @@ void MainWindow::messageHandler(QtMsgType type,
 
 void MainWindow::takeSnapShot()
 {
-    qDebug() << "taking a snopshot yay!";
     QString name = QTime::currentTime().toString("'Snapshot ['HH:mm:ss']'");
     auto snapShot = new SnapShot(this, name);
 

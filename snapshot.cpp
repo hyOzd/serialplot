@@ -43,7 +43,6 @@ void SnapShot::show()
 {
     if (view == NULL)
     {
-        qDebug() << "view == NULL";
         view = new SnapShotView(mainWindow, this);
         connect(view, &SnapShotView::closed, this, &SnapShot::viewClosed);
     }
@@ -52,17 +51,11 @@ void SnapShot::show()
     view->raise();
 }
 
-void SnapShot::hide()
-{
-
-}
-
 void SnapShot::viewClosed()
 {
     delete view;
     view = NULL;
 }
-
 
 void SnapShot::onDeleteTriggered()
 {

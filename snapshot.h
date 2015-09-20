@@ -22,10 +22,6 @@ public:
 
     QString name();
 
-public slots:
-    void show();
-    void hide();
-
 signals:
     void deleteRequested(SnapShot*);
 
@@ -37,6 +33,7 @@ private:
     SnapShotView* view;
 
 private slots:
+    void show();
     void viewClosed();
 
     void onDeleteTriggered();
