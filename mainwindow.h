@@ -35,9 +35,9 @@
 #include <qwt_plot_textlabel.h>
 
 #include "portcontrol.h"
-#include "snapshotview.h"
 #include "ui_about_dialog.h"
 #include "framebuffer.h"
+#include "snapshotmanager.h"
 
 namespace Ui {
 class MainWindow;
@@ -100,10 +100,7 @@ private:
     unsigned int sampleCount;
     QTimer spsTimer;
 
-    // snapshots
-    QList<SnapShot*> snapshots;
-
-    void updateSnapShotMenu();
+    SnapshotManager snapshotMan;
 
     // demo
     QTimer demoTimer;
@@ -131,10 +128,6 @@ private slots:
     void clearPlot();
 
     void spsTimerTimeout();
-
-    void takeSnapShot();
-    void clearSnapshots();
-    void deleteSnapshot(SnapShot* snapshot);
 
     void demoTimerTimeout();
     void enableDemo(bool enabled);

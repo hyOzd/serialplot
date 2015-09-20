@@ -26,13 +26,11 @@
 #include <QTextStream>
 #include <QtDebug>
 #include <QtEndian>
-#include <QTime>
 #include <qwt_plot.h>
 #include <limits.h>
 #include <cmath>
 #include <iostream>
 
-#include <snapshotview.h>
 #include <plot.h>
 
 #include "utils.h"
@@ -55,12 +53,16 @@ Q_DECLARE_METATYPE(Range);
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    portControl(&serialPort)
+    portControl(&serialPort),
+    snapshotMan(this, &channelBuffers)
 {
     ui->setupUi(this);
     ui->tabWidget->insertTab(0, &portControl, "Port");
     ui->tabWidget->setCurrentIndex(0);
     addToolBar(portControl.toolBar());
+
+    ui->mainToolBar->addAction(snapshotMan.takeSnapshotAction());
+    ui->menuBar->insertMenu(ui->menuHelp->menuAction(), snapshotMan.menu());
 
     setupAboutDialog();
 
@@ -116,11 +118,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionClear, SIGNAL(triggered(bool)),
                      this, SLOT(clearPlot()));
 
-    QObject::connect(ui->actionSnapShot, SIGNAL(triggered(bool)),
-                     this, SLOT(takeSnapShot()));
-
-    QObject::connect(ui->actionClearSnapShots, SIGNAL(triggered(bool)),
-                     this, SLOT(clearSnapshots()));
+    // QObject::connect(ui->actionSnapShot, SIGNAL(triggered(bool)),
+    //                  this, SLOT(takeSnapShot()));
 
     // setup number of channels spinbox
     QObject::connect(ui->spNumOfChannels,
@@ -250,11 +249,6 @@ MainWindow::~MainWindow()
     if (serialPort.isOpen())
     {
         serialPort.close();
-    }
-
-    for (auto snapshot : snapshots)
-    {
-        delete snapshot;
     }
 
     delete ui;
@@ -729,56 +723,4 @@ void MainWindow::messageHandler(QtMsgType type,
     {
         ui->statusBar->showMessage(msg, 5000);
     }
-}
-
-void MainWindow::takeSnapShot()
-{
-    QString name = QTime::currentTime().toString("'Snapshot ['HH:mm:ss']'");
-    auto snapShot = new SnapShot(this, name);
-
-    for (unsigned ci = 0; ci < numOfChannels; ci++)
-    {
-        snapShot->data.append(QVector<QPointF>(numOfSamples));
-        for (unsigned i = 0; i < numOfSamples; i++)
-        {
-            snapShot->data[ci][i] = channelBuffers[ci]->sample(i);
-        }
-    }
-    snapshots.append(snapShot);
-    QObject::connect(snapShot, &SnapShot::deleteRequested,
-                     this, &MainWindow::deleteSnapshot);
-
-    updateSnapShotMenu();
-}
-
-void MainWindow::updateSnapShotMenu()
-{
-    ui->menuSnapShots->clear();
-    ui->menuSnapShots->addAction(ui->actionSnapShot);
-    if (snapshots.size())
-    {
-        ui->menuSnapShots->addSeparator();
-        for (auto ss : snapshots)
-        {
-            ui->menuSnapShots->addAction(ss->showAction());
-        }
-        ui->menuSnapShots->addSeparator();
-        ui->menuSnapShots->addAction(ui->actionClearSnapShots);
-    }
-}
-
-void MainWindow::clearSnapshots()
-{
-    for (auto snapshot : snapshots)
-    {
-        delete snapshot;
-    }
-    snapshots.clear();
-    updateSnapShotMenu();
-}
-
-void MainWindow::deleteSnapshot(SnapShot* snapshot)
-{
-    delete snapshots.takeAt(snapshots.indexOf(snapshot));
-    updateSnapShotMenu();
 }

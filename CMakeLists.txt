@@ -73,6 +73,7 @@ add_executable(${PROGRAM_NAME} WIN32
   portlist.cpp
   snapshot.cpp
   snapshotview.cpp
+  snapshotmanager.cpp
   ${UI_FILES}
   ${RES_FILES}
   misc/windows_icon.rc
