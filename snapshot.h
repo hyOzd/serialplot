@@ -5,6 +5,7 @@
 #include <QMainWindow>
 #include <QAction>
 #include <QVector>
+#include <QString>
 
 class SnapShotView;
 
@@ -21,9 +22,11 @@ public:
     QAction* deleteAction();
 
     QString name();
+    void setName(QString name);
 
 signals:
     void deleteRequested(SnapShot*);
+    void nameChanged(SnapShot*);
 
 private:
     QString _name;

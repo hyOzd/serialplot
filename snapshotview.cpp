@@ -3,8 +3,11 @@
 
 SnapShotView::SnapShotView(QWidget *parent, SnapShot* snapShot) :
     QMainWindow(parent),
-    ui(new Ui::SnapShotView)
+    ui(new Ui::SnapShotView),
+    renameDialog(this)
 {
+    _snapShot = snapShot;
+
     ui->setupUi(this);
     ui->toolBar->addAction(snapShot->deleteAction());
     this->setWindowTitle(snapShot->name());
@@ -20,7 +23,10 @@ SnapShotView::SnapShotView(QWidget *parent, SnapShot* snapShot) :
         curve->attach(ui->plot);
     }
 
-    _snapShot = snapShot;
+    renameDialog.setWindowTitle("Rename Snapshot");
+    renameDialog.setLabelText("Enter new name:");
+    connect(ui->actionRename, &QAction::triggered,
+            this, &SnapShotView::showRenameDialog);
 }
 
 SnapShotView::~SnapShotView()
@@ -36,4 +42,16 @@ void SnapShotView::closeEvent(QCloseEvent *event)
 {
     QMainWindow::closeEvent(event);
     emit closed();
+}
+
+void SnapShotView::showRenameDialog()
+{
+    renameDialog.setTextValue(_snapShot->name());
+    renameDialog.open(this, SLOT(renameSnapshot(QString)));
+}
+
+void SnapShotView::renameSnapshot(QString name)
+{
+    _snapShot->setName(name);
+    setWindowTitle(name);
 }

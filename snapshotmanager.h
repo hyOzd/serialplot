@@ -38,7 +38,6 @@ private slots:
     void takeSnapshot();
     void clearSnapshots();
     void deleteSnapshot(SnapShot* snapshot);
-
 };
 
 #endif /* SNAPSHOTMANAGER_H */

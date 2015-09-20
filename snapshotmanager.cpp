@@ -52,6 +52,8 @@ void SnapshotManager::takeSnapshot()
     snapshots.append(snapShot);
     QObject::connect(snapShot, &SnapShot::deleteRequested,
                      this, &SnapshotManager::deleteSnapshot);
+    QObject::connect(snapShot, &SnapShot::deleteRequested,
+                     this, &SnapshotManager::updateMenu);
 
     updateMenu();
 }

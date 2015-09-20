@@ -2,6 +2,7 @@
 #define SNAPSHOTVIEW_H
 
 #include <QMainWindow>
+#include <QInputDialog>
 #include <QVector>
 #include <QPointF>
 #include <QPen>
@@ -28,9 +29,14 @@ signals:
 private:
     Ui::SnapShotView *ui;
     QList<QwtPlotCurve*> curves;
-
     SnapShot* _snapShot;
+    QInputDialog renameDialog;
+
     void closeEvent(QCloseEvent *event);
+
+private slots:
+    void showRenameDialog();
+    void renameSnapshot(QString name);
 };
 
 #endif // SNAPSHOTVIEW_H

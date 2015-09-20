@@ -29,10 +29,11 @@
      <height>27</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
+   <widget class="QMenu" name="menuSnapshot">
     <property name="title">
-     <string>File</string>
+     <string>Snapshot</string>
     </property>
+    <addaction name="actionRename"/>
     <addaction name="actionExportCSV"/>
    </widget>
    <widget class="QMenu" name="menuView">
@@ -40,7 +41,7 @@
      <string>View</string>
     </property>
    </widget>
-   <addaction name="menuFile"/>
+   <addaction name="menuSnapshot"/>
    <addaction name="menuView"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
@@ -53,11 +54,18 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionExportCSV"/>
   </widget>
   <action name="actionExportCSV">
    <property name="text">
     <string>Export CSV</string>
+   </property>
+  </action>
+  <action name="actionRename">
+   <property name="text">
+    <string>Rename</string>
+   </property>
+   <property name="toolTip">
+    <string>Rename this snapshot</string>
    </property>
   </action>
  </widget>

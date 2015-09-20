@@ -66,3 +66,10 @@ QString SnapShot::name()
 {
     return _name;
 }
+
+void SnapShot::setName(QString name)
+{
+    _name = name;
+    _showAction.setText(_name);
+    emit nameChanged(this);
+}
