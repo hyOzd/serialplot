@@ -24,7 +24,7 @@ Plot::Plot(QWidget* parent) :
     zoomer(this->canvas(), false),
     sZoomer(this, &zoomer)
 {
-    isAutoScaled = false;
+    isAutoScaled = true;
 
     QObject::connect(&zoomer, &Zoomer::unzoomed, this, &Plot::unzoomed);
 
