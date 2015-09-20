@@ -103,6 +103,8 @@ private:
     // snapshots
     QList<SnapShot*> snapshots;
 
+    void updateSnapShotMenu();
+
     // demo
     QTimer demoTimer;
     int demoCount;

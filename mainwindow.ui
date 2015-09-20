@@ -488,8 +488,15 @@
     <addaction name="actionUnzoom"/>
     <addaction name="actionDarkBackground"/>
    </widget>
+   <widget class="QMenu" name="menuSnapShots">
+    <property name="title">
+     <string>SnapShots</string>
+    </property>
+    <addaction name="actionSnapShot"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
+   <addaction name="menuSnapShots"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -607,13 +614,21 @@
   </action>
   <action name="actionSnapShot">
    <property name="text">
-    <string>SnapShot</string>
+    <string>Take Snapshot</string>
    </property>
    <property name="toolTip">
     <string>Take a snapshot of the current plot (F5)</string>
    </property>
    <property name="shortcut">
     <string>F5</string>
+   </property>
+  </action>
+  <action name="actionClearSnapShots">
+   <property name="text">
+    <string>Clear SnapShots</string>
+   </property>
+   <property name="toolTip">
+    <string>Delete all snapshots</string>
    </property>
   </action>
  </widget>

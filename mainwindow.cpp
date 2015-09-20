@@ -743,6 +743,24 @@ void MainWindow::takeSnapShot()
     }
     snapshots.append(snapShot);
 
+    updateSnapShotMenu();
+
     auto sv = new SnapShotView(this, snapShot);
     sv->show();
+}
+
+void MainWindow::updateSnapShotMenu()
+{
+    ui->menuSnapShots->clear();
+    ui->menuSnapShots->addAction(ui->actionSnapShot);
+    if (snapshots.size())
+    {
+        ui->menuSnapShots->addSeparator();
+        for (auto ss : snapshots)
+        {
+            ui->menuSnapShots->addAction(ss->name);
+        }
+        ui->menuSnapShots->addSeparator();
+        ui->menuSnapShots->addAction(ui->actionClearSnapShots);
+    }
 }
