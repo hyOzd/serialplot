@@ -133,6 +133,7 @@ private slots:
     void spsTimerTimeout();
 
     void takeSnapShot();
+    void clearSnapshots();
 
     void demoTimerTimeout();
     void enableDemo(bool enabled);

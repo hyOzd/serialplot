@@ -118,6 +118,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionSnapShot, SIGNAL(triggered(bool)),
                      this, SLOT(takeSnapShot()));
 
+    QObject::connect(ui->actionClearSnapShots, SIGNAL(triggered(bool)),
+                     this, SLOT(clearSnapshots()));
+
     // setup number of channels spinbox
     QObject::connect(ui->spNumOfChannels,
                      SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
@@ -759,4 +762,14 @@ void MainWindow::updateSnapShotMenu()
         ui->menuSnapShots->addSeparator();
         ui->menuSnapShots->addAction(ui->actionClearSnapShots);
     }
+}
+
+void MainWindow::clearSnapshots()
+{
+    for (auto snapshot : snapshots)
+    {
+        delete snapshot;
+    }
+    snapshots.clear();
+    updateSnapShotMenu();
 }
