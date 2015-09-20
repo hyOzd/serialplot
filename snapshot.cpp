@@ -15,6 +15,14 @@ SnapShot::SnapShot(QMainWindow* parent, QString name) :
     connect(&_menuAction, &QAction::triggered, this, &SnapShot::show);
 }
 
+SnapShot::~SnapShot()
+{
+    if (view != NULL)
+    {
+        delete view;
+    }
+}
+
 QAction* SnapShot::menuAction()
 {
     return &_menuAction;
@@ -26,6 +34,7 @@ void SnapShot::show()
     {
         qDebug() << "view == NULL";
         view = new SnapShotView(mainWindow, this);
+        connect(view, &SnapShotView::closed, this, &SnapShot::viewClosed);
     }
     view->show();
 }
@@ -33,4 +42,10 @@ void SnapShot::show()
 void SnapShot::hide()
 {
 
+}
+
+void SnapShot::viewClosed()
+{
+    delete view;
+    view = NULL;
 }

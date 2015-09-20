@@ -14,6 +14,7 @@ class SnapShot : public QObject
 
 public:
     SnapShot(QMainWindow* parent, QString name);
+    ~SnapShot();
 
     // QString _name;
     QVector<QVector<QPointF>> data;
@@ -27,6 +28,9 @@ private:
     QAction _menuAction;
     QMainWindow* mainWindow;
     SnapShotView* view;
+
+private slots:
+    void viewClosed();
 };
 
 #endif /* SNAPSHOT_H */

@@ -29,3 +29,8 @@ SnapShotView::~SnapShotView()
     }
     delete ui;
 }
+
+void SnapShotView::closeEvent(QCloseEvent *event)
+{
+    emit closed();
+}
