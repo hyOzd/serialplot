@@ -37,6 +37,8 @@ void SnapShot::show()
         connect(view, &SnapShotView::closed, this, &SnapShot::viewClosed);
     }
     view->show();
+    view->activateWindow();
+    view->raise();
 }
 
 void SnapShot::hide()
