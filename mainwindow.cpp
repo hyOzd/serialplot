@@ -26,6 +26,7 @@
 #include <QTextStream>
 #include <QtDebug>
 #include <QtEndian>
+#include <QTime>
 #include <qwt_plot.h>
 #include <limits.h>
 #include <cmath>
@@ -733,7 +734,8 @@ void MainWindow::messageHandler(QtMsgType type,
 void MainWindow::takeSnapShot()
 {
     qDebug() << "taking a snopshot yay!";
-    auto snapShot = new SnapShot(this, "New Snapshot");
+    QString name = QTime::currentTime().toString("'Snapshot ['HH:mm:ss']'");
+    auto snapShot = new SnapShot(this, name);
 
     for (unsigned ci = 0; ci < numOfChannels; ci++)
     {
