@@ -124,11 +124,11 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
         }
         else // event->type() == QEvent::MouseButtonRelease
         {
+            pressed = false;
             if (started)
             {
                 // finalize
                 started = false;
-                pressed = false;
                 emit picked(firstPos, pos);
             }
         }
