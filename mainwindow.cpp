@@ -603,7 +603,7 @@ void MainWindow::demoTimerTimeout()
 {
     const double period = 100;
     demoCount++;
-    if (demoCount > 100) demoCount = 0;
+    if (demoCount >= 100) demoCount = 0;
 
     if (!ui->actionPause->isChecked())
     {
