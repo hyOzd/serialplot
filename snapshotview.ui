@@ -34,7 +34,7 @@
      <string>Snapshot</string>
     </property>
     <addaction name="actionRename"/>
-    <addaction name="actionExportCSV"/>
+    <addaction name="actionExport"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -44,9 +44,12 @@
    <addaction name="menuSnapshot"/>
    <addaction name="menuView"/>
   </widget>
-  <action name="actionExportCSV">
+  <action name="actionExport">
    <property name="text">
     <string>Export CSV</string>
+   </property>
+   <property name="toolTip">
+    <string>Save snapshot as CSV file</string>
    </property>
   </action>
   <action name="actionRename">

@@ -1,6 +1,8 @@
 #include "snapshotview.h"
 #include "ui_snapshotview.h"
 
+#include <QSaveFile>
+
 SnapShotView::SnapShotView(QWidget *parent, SnapShot* snapShot) :
     QMainWindow(parent),
     ui(new Ui::SnapShotView),
@@ -27,6 +29,9 @@ SnapShotView::SnapShotView(QWidget *parent, SnapShot* snapShot) :
     renameDialog.setLabelText("Enter new name:");
     connect(ui->actionRename, &QAction::triggered,
             this, &SnapShotView::showRenameDialog);
+
+    connect(ui->actionExport, &QAction::triggered,
+            this, &SnapShotView::save);
 }
 
 SnapShotView::~SnapShotView()
@@ -54,4 +59,48 @@ void SnapShotView::renameSnapshot(QString name)
 {
     _snapShot->setName(name);
     setWindowTitle(name);
+}
+
+void SnapShotView::save()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export CSV File"));
+
+    // TODO: remove code duplication (MainWindow::onExportCsv)
+    QSaveFile file(fileName);
+
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QTextStream fileStream(&file);
+
+        unsigned numOfChannels = _snapShot->data.size();
+        unsigned numOfSamples = _snapShot->data[0].size();
+
+        // print header
+        for (unsigned int ci = 0; ci < numOfChannels; ci++)
+        {
+            fileStream << "Channel " << ci;
+            if (ci != numOfChannels-1) fileStream << ",";
+        }
+        fileStream << '\n';
+
+        // print rows
+        for (unsigned int i = 0; i < numOfSamples; i++)
+        {
+            for (unsigned int ci = 0; ci < numOfChannels; ci++)
+            {
+                fileStream << _snapShot->data[ci][i].y();
+                if (ci != numOfChannels-1) fileStream << ",";
+            }
+            fileStream << '\n';
+        }
+
+        if (!file.commit())
+        {
+            qCritical() << "File save error during snapshot save: " << file.error();
+        }
+    }
+    else
+    {
+        qCritical() << "File open error during snapshot save: " << file.error();
+    }
 }

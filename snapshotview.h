@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QInputDialog>
+#include <QFileDialog>
 #include <QVector>
 #include <QPointF>
 #include <QPen>
@@ -37,6 +38,7 @@ private:
 private slots:
     void showRenameDialog();
     void renameSnapshot(QString name);
+    void save();
 };
 
 #endif // SNAPSHOTVIEW_H
