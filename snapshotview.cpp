@@ -65,6 +65,8 @@ void SnapShotView::save()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export CSV File"));
 
+    if (fileName.isNull()) return; // user canceled
+
     // TODO: remove code duplication (MainWindow::onExportCsv)
     QSaveFile file(fileName);
 
