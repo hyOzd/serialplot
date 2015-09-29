@@ -30,6 +30,7 @@ private:
 
     QMenu _menu;
     QAction _takeSnapshotAction;
+    QAction loadSnapshotAction;
     QAction clearAction;
 
     void updateMenu();
@@ -38,6 +39,7 @@ private slots:
     void takeSnapshot();
     void clearSnapshots();
     void deleteSnapshot(SnapShot* snapshot);
+    void loadSnapshot();
 };
 
 #endif /* SNAPSHOTMANAGER_H */
