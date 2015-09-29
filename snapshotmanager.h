@@ -33,6 +33,7 @@ private:
     QAction loadSnapshotAction;
     QAction clearAction;
 
+    void addSnapshot(SnapShot* snapshot);
     void updateMenu();
 
 private slots:

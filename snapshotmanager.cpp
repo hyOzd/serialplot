@@ -57,12 +57,15 @@ void SnapshotManager::takeSnapshot()
             snapShot->data[ci][i] = _channelBuffers->at(ci)->sample(i);
         }
     }
-    snapshots.append(snapShot);
-    QObject::connect(snapShot, &SnapShot::deleteRequested,
-                     this, &SnapshotManager::deleteSnapshot);
-    QObject::connect(snapShot, &SnapShot::deleteRequested,
-                     this, &SnapshotManager::updateMenu);
 
+    addSnapshot(snapShot);
+}
+
+void SnapshotManager::addSnapshot(SnapShot* snapshot)
+{
+    snapshots.append(snapshot);
+    QObject::connect(snapshot, &SnapShot::deleteRequested,
+                     this, &SnapshotManager::deleteSnapshot);
     updateMenu();
 }
 
@@ -152,16 +155,10 @@ void SnapshotManager::loadSnapshot()
         lineNum++;
     }
 
-    auto snapShot = new SnapShot(_mainWindow, QFileInfo(fileName).baseName());
-    snapShot->data = data;
+    auto snapshot = new SnapShot(_mainWindow, QFileInfo(fileName).baseName());
+    snapshot->data = data;
 
-    snapshots.append(snapShot);
-    QObject::connect(snapShot, &SnapShot::deleteRequested,
-                     this, &SnapshotManager::deleteSnapshot);
-    QObject::connect(snapShot, &SnapShot::deleteRequested,
-                     this, &SnapshotManager::updateMenu);
-
-    updateMenu();
+    addSnapshot(snapshot);
 }
 
 QMenu* SnapshotManager::menu()
