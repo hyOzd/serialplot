@@ -81,6 +81,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionExportCsv, &QAction::triggered,
                      this, &MainWindow::onExportCsv);
 
+    ui->actionQuit->setShortcutContext(Qt::ApplicationShortcut);
+
     QObject::connect(ui->actionQuit, &QAction::triggered,
                      this, &MainWindow::close);
 
