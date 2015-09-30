@@ -66,6 +66,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setupAboutDialog();
 
+    // init view menu
+    for (auto a : ui->plot->menuActions())
+    {
+        ui->menuView->addAction(a);
+    }
+
     // init UI signals
 
     // menu signals
@@ -77,24 +83,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(ui->actionQuit, &QAction::triggered,
                      this, &MainWindow::close);
-
-    QObject::connect(ui->actionGrid, &QAction::toggled, [this](bool show)
-                     {
-                         ui->plot->showGrid(show);
-                         ui->actionMinorGrid->setEnabled(show);
-                     });
-
-    ui->actionMinorGrid->setEnabled(ui->actionGrid->isChecked());
-    QObject::connect(ui->actionMinorGrid, &QAction::toggled,
-                     ui->plot, &Plot::showMinorGrid);
-
-    QObject::connect(ui->actionUnzoom, &QAction::triggered,
-                     ui->plot, &Plot::unzoom);
-
-    QObject::connect(ui->actionDarkBackground, &QAction::toggled,
-                     ui->plot, &Plot::darkBackground);
-
-    ui->plot->darkBackground(ui->actionDarkBackground->isChecked());
 
     // port control signals
     QObject::connect(&portControl, &PortControl::portToggled,
@@ -168,10 +156,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // init auto scale
     ui->plot->setAxis(ui->cbAutoScale->isChecked(),
                       ui->spYmin->value(), ui->spYmax->value());
-
-    // init grid
-    ui->plot->showGrid(ui->actionGrid->isChecked());
-    ui->plot->showMinorGrid(ui->actionMinorGrid->isChecked());
 
     // init scale range preset list
     for (int nbits = 8; nbits <= 24; nbits++) // signed binary formats

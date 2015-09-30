@@ -42,6 +42,7 @@ Plot::Plot(QWidget* parent) :
     rectItem.setRect(QRectF(0,0,100,1));
     // rectItem.attach(this);
 
+    showGrid(false);
     darkBackground(false);
 
     _showGridAction.setToolTip("Show Grid");
@@ -56,9 +57,11 @@ Plot::Plot(QWidget* parent) :
     _showMinorGridAction.setCheckable(true);
     _darkBackgroundAction.setCheckable(true);
 
-    _showGridAction.setChecked(true);
+    _showGridAction.setChecked(false);
     _showMinorGridAction.setChecked(false);
     _darkBackgroundAction.setChecked(false);
+
+    _showMinorGridAction.setEnabled(false);
 
     connect(&_showGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
             this, &Plot::showGrid);
