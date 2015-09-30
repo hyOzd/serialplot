@@ -53,7 +53,7 @@ void SnapShot::show()
 
 void SnapShot::viewClosed()
 {
-    delete view;
+    view->deleteLater();
     view = NULL;
 }
 

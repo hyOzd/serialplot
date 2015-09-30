@@ -11,7 +11,7 @@ SnapShotView::SnapShotView(QWidget *parent, SnapShot* snapShot) :
     _snapShot = snapShot;
 
     ui->setupUi(this);
-    ui->menuSnapshot->addAction(snapShot->deleteAction());
+    ui->menuSnapshot->insertAction(ui->actionClose, snapShot->deleteAction());
     this->setWindowTitle(snapShot->name());
 
     unsigned numOfChannels = snapShot->data.size();
