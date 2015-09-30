@@ -72,6 +72,13 @@ Plot::Plot(QWidget* parent) :
     connect(&_unzoomAction, &QAction::triggered, this, &Plot::unzoom);
     connect(&_darkBackgroundAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
             this, &Plot::darkBackground);
+
+    snapshotOverlay = NULL;
+}
+
+Plot::~Plot()
+{
+    if (snapshotOverlay != NULL) delete snapshotOverlay;
 }
 
 void Plot::setAxis(bool autoScaled, double yAxisMin, double yAxisMax)
@@ -186,4 +193,27 @@ QColor Plot::makeColor(unsigned int channelIndex)
         i = i - n;
         return QColor::fromHsv(360*i/n + 360/pow(2,p+1), 255, 230);
     }
+}
+
+void Plot::flashSnapshotOverlay()
+{
+    if (snapshotOverlay != NULL) delete snapshotOverlay;
+
+    QColor color;
+    if (_darkBackgroundAction.isChecked())
+    {
+        color = QColor(Qt::white);
+    }
+    else
+    {
+        color = QColor(Qt::black);
+    }
+
+    snapshotOverlay = new PlotSnapshotOverlay(this->canvas(), color);
+    connect(snapshotOverlay, &PlotSnapshotOverlay::done,
+            [this]()
+            {
+                delete snapshotOverlay;
+                snapshotOverlay = NULL;
+            });
 }

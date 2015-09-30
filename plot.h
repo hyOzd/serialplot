@@ -26,8 +26,10 @@
 #include <qwt_plot.h>
 #include <qwt_plot_grid.h>
 #include <qwt_plot_shapeitem.h>
+
 #include "zoomer.h"
 #include "scalezoomer.h"
+#include "plotsnapshotoverlay.h"
 
 class Plot : public QwtPlot
 {
@@ -35,6 +37,7 @@ class Plot : public QwtPlot
 
 public:
     Plot(QWidget* parent = 0);
+    ~Plot();
     void setAxis(bool autoScaled, double yMin = 0, double yMax = 1);
 
     QList<QAction*> menuActions();
@@ -48,6 +51,7 @@ private:
     ScaleZoomer sZoomer;
     QwtPlotGrid grid;
     QwtPlotShapeItem rectItem;
+    PlotSnapshotOverlay* snapshotOverlay;
 
     QAction _showGridAction;
     QAction _showMinorGridAction;
@@ -61,6 +65,8 @@ public slots:
     void showMinorGrid(bool show = true);
     void unzoom();
     void darkBackground(bool enabled = true);
+
+    void flashSnapshotOverlay();
 
 private slots:
     void unzoomed();

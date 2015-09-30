@@ -108,6 +108,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionClear, SIGNAL(triggered(bool)),
                      this, SLOT(clearPlot()));
 
+    QObject::connect(snapshotMan.takeSnapshotAction(), &QAction::triggered,
+                     ui->plot, &Plot::flashSnapshotOverlay);
+
     // setup number of channels spinbox
     QObject::connect(ui->spNumOfChannels,
                      SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),

@@ -74,6 +74,7 @@ add_executable(${PROGRAM_NAME} WIN32
   snapshot.cpp
   snapshotview.cpp
   snapshotmanager.cpp
+  plotsnapshotoverlay.cpp
   ${UI_FILES}
   ${RES_FILES}
   misc/windows_icon.rc
