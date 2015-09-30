@@ -13,7 +13,7 @@ SnapshotManager::SnapshotManager(QMainWindow* mainWindow,
                                  QList<FrameBuffer*>* channelBuffers) :
     _menu("Snapshots"),
     _takeSnapshotAction("Take Snapshot", this),
-    loadSnapshotAction("Load Snapshot", this),
+    loadSnapshotAction("Load Snapshots", this),
     clearAction("Clear Snapshots", this)
 {
     _mainWindow = mainWindow;
@@ -21,14 +21,14 @@ SnapshotManager::SnapshotManager(QMainWindow* mainWindow,
 
     _takeSnapshotAction.setToolTip("Take a snapshot of current plot (F5)");
     _takeSnapshotAction.setShortcut(QKeySequence("F5"));
-    loadSnapshotAction.setToolTip("Load a snapshot from CSV file");
+    loadSnapshotAction.setToolTip("Load snapshots from CSV files");
     clearAction.setToolTip("Delete all snapshots");
     connect(&_takeSnapshotAction, SIGNAL(triggered(bool)),
             this, SLOT(takeSnapshot()));
     connect(&clearAction, SIGNAL(triggered(bool)),
             this, SLOT(clearSnapshots()));
     connect(&loadSnapshotAction, SIGNAL(triggered(bool)),
-            this, SLOT(loadSnapshot()));
+            this, SLOT(loadSnapshots()));
 
     updateMenu();
 }
@@ -61,12 +61,12 @@ void SnapshotManager::takeSnapshot()
     addSnapshot(snapShot);
 }
 
-void SnapshotManager::addSnapshot(SnapShot* snapshot)
+void SnapshotManager::addSnapshot(SnapShot* snapshot, bool update_menu)
 {
     snapshots.append(snapshot);
     QObject::connect(snapshot, &SnapShot::deleteRequested,
                      this, &SnapshotManager::deleteSnapshot);
-    updateMenu();
+    if (update_menu) updateMenu();
 }
 
 void SnapshotManager::updateMenu()
@@ -103,12 +103,20 @@ void SnapshotManager::deleteSnapshot(SnapShot* snapshot)
     updateMenu();
 }
 
-void SnapshotManager::loadSnapshot()
+void SnapshotManager::loadSnapshots()
 {
-    QString fileName = QFileDialog::getOpenFileName(_mainWindow, tr("Load CSV File"));
+    auto files = QFileDialog::getOpenFileNames(_mainWindow, tr("Load CSV File"));
 
-    if (fileName.isNull()) return; // user canceled
+    for (auto f : files)
+    {
+        if (!f.isNull()) loadSnapshotFromFile(f);
+    }
 
+    updateMenu();
+}
+
+void SnapshotManager::loadSnapshotFromFile(QString fileName)
+{
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
@@ -158,7 +166,7 @@ void SnapshotManager::loadSnapshot()
     auto snapshot = new SnapShot(_mainWindow, QFileInfo(fileName).baseName());
     snapshot->data = data;
 
-    addSnapshot(snapshot);
+    addSnapshot(snapshot, false);
 }
 
 QMenu* SnapshotManager::menu()

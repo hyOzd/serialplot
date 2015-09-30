@@ -33,14 +33,15 @@ private:
     QAction loadSnapshotAction;
     QAction clearAction;
 
-    void addSnapshot(SnapShot* snapshot);
+    void addSnapshot(SnapShot* snapshot, bool update_menu=true);
     void updateMenu();
 
 private slots:
     void takeSnapshot();
     void clearSnapshots();
     void deleteSnapshot(SnapShot* snapshot);
-    void loadSnapshot();
+    void loadSnapshots();
+    void loadSnapshotFromFile(QString fileName);
 };
 
 #endif /* SNAPSHOTMANAGER_H */
