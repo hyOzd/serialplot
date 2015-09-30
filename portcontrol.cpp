@@ -26,6 +26,8 @@
 #include <QtDebug>
 #include "utils.h"
 
+#define TBPORTLIST_MINWIDTH (200)
+
 PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     QWidget(parent),
     ui(new Ui::PortControl),
@@ -47,6 +49,7 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     portToolBar.addAction(&openAction);
 
     // setup port selection widgets
+    tbPortList.setMinimumWidth(TBPORTLIST_MINWIDTH);
     tbPortList.setModel(&portList);
     ui->cbPortList->setModel(&portList);
     QObject::connect(ui->cbPortList,
