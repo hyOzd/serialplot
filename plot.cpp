@@ -18,11 +18,19 @@
 */
 
 #include <QRectF>
+#include <QKeySequence>
+
 #include "plot.h"
+#include "utils.h"
+
 Plot::Plot(QWidget* parent) :
     QwtPlot(parent),
     zoomer(this->canvas(), false),
-    sZoomer(this, &zoomer)
+    sZoomer(this, &zoomer),
+    _showGridAction("Grid", this),
+    _showMinorGridAction("Minor Grid", this),
+    _unzoomAction("Unzoom", this),
+    _darkBackgroundAction("Dark Background", this)
 {
     isAutoScaled = true;
 
@@ -35,6 +43,32 @@ Plot::Plot(QWidget* parent) :
     // rectItem.attach(this);
 
     darkBackground(false);
+
+    _showGridAction.setToolTip("Show Grid");
+    _showMinorGridAction.setToolTip("Show Minor Grid");
+    _unzoomAction.setToolTip("Unzoom the Plot");
+    _darkBackgroundAction.setToolTip("Enable Dark Plot Background");
+
+    _showGridAction.setShortcut(QKeySequence("G"));
+    _showMinorGridAction.setShortcut(QKeySequence("M"));
+
+    _showGridAction.setCheckable(true);
+    _showMinorGridAction.setCheckable(true);
+    _darkBackgroundAction.setCheckable(true);
+
+    _showGridAction.setChecked(true);
+    _showMinorGridAction.setChecked(false);
+    _darkBackgroundAction.setChecked(false);
+
+    connect(&_showGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+            this, &Plot::showGrid);
+    connect(&_showGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+            &_showMinorGridAction, &QAction::setEnabled);
+    connect(&_showMinorGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+            this, &Plot::showMinorGrid);
+    connect(&_unzoomAction, &QAction::triggered, this, &Plot::unzoom);
+    connect(&_darkBackgroundAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+            this, &Plot::darkBackground);
 }
 
 void Plot::setAxis(bool autoScaled, double yAxisMin, double yAxisMax)
@@ -49,6 +83,16 @@ void Plot::setAxis(bool autoScaled, double yAxisMin, double yAxisMax)
 
     zoomer.zoom(0);
     resetAxes();
+}
+
+QList<QAction*> Plot::menuActions()
+{
+    QList<QAction*> actions;
+    actions << &_showGridAction;
+    actions << &_showMinorGridAction;
+    actions << &_unzoomAction;
+    actions << &_darkBackgroundAction;
+    return actions;
 }
 
 void Plot::resetAxes()

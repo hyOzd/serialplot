@@ -21,6 +21,8 @@
 #define PLOT_H
 
 #include <QColor>
+#include <QList>
+#include <QAction>
 #include <qwt_plot.h>
 #include <qwt_plot_grid.h>
 #include <qwt_plot_shapeitem.h>
@@ -35,6 +37,8 @@ public:
     Plot(QWidget* parent = 0);
     void setAxis(bool autoScaled, double yMin = 0, double yMax = 1);
 
+    QList<QAction*> menuActions();
+
     static QColor makeColor(unsigned int channelIndex);
 
 private:
@@ -44,6 +48,11 @@ private:
     ScaleZoomer sZoomer;
     QwtPlotGrid grid;
     QwtPlotShapeItem rectItem;
+
+    QAction _showGridAction;
+    QAction _showMinorGridAction;
+    QAction _unzoomAction;
+    QAction _darkBackgroundAction;
 
     void resetAxes();
 
