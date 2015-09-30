@@ -37,6 +37,7 @@
 #include "portcontrol.h"
 #include "ui_about_dialog.h"
 #include "framebuffer.h"
+#include "snapshotmanager.h"
 
 namespace Ui {
 class MainWindow;
@@ -99,13 +100,13 @@ private:
     unsigned int sampleCount;
     QTimer spsTimer;
 
+    SnapshotManager snapshotMan;
+
     // demo
     QTimer demoTimer;
     int demoCount;
     bool isDemoRunning();
     QwtPlotTextLabel demoIndicator;
-
-    QColor makeColor(unsigned int channelIndex);
 
 private slots:
     void onPortToggled(bool open);

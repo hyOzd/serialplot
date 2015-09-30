@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <widget class="Plot" name="plot">
+     <widget class="Plot" name="plot" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
         <horstretch>0</horstretch>
@@ -483,10 +483,6 @@
     <property name="title">
      <string>View</string>
     </property>
-    <addaction name="actionGrid"/>
-    <addaction name="actionMinorGrid"/>
-    <addaction name="actionUnzoom"/>
-    <addaction name="actionDarkBackground"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -560,56 +556,12 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
-  <action name="actionGrid">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Grid</string>
-   </property>
-   <property name="toolTip">
-    <string>Show/hide grid</string>
-   </property>
-   <property name="shortcut">
-    <string>G</string>
-   </property>
-  </action>
-  <action name="actionUnzoom">
-   <property name="text">
-    <string>UnZoom</string>
-   </property>
-  </action>
-  <action name="actionMinorGrid">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Minor Grid</string>
-   </property>
-   <property name="toolTip">
-    <string>Show/hide minor grid</string>
-   </property>
-   <property name="shortcut">
-    <string>M</string>
-   </property>
-  </action>
-  <action name="actionDarkBackground">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Dark Background</string>
-   </property>
-   <property name="toolTip">
-    <string>Toggle Dark Background</string>
-   </property>
-  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
    <class>Plot</class>
-   <extends>QFrame</extends>
+   <extends>QWidget</extends>
    <header>plot.h</header>
    <container>1</container>
   </customwidget>

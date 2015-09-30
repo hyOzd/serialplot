@@ -52,7 +52,12 @@ endif (QWT_USE_STATIC)
 include_directories(${QWT_INCLUDE_DIR})
 
 # wrap UI and resource files
-qt5_wrap_ui(UI_FILES mainwindow.ui portcontrol.ui about_dialog.ui)
+qt5_wrap_ui(UI_FILES
+  mainwindow.ui
+  portcontrol.ui
+  about_dialog.ui
+  snapshotview.ui
+  )
 qt5_add_resources(RES_FILES misc/icons.qrc)
 
 add_executable(${PROGRAM_NAME} WIN32
@@ -66,6 +71,10 @@ add_executable(${PROGRAM_NAME} WIN32
   scalepicker.cpp
   scalezoomer.cpp
   portlist.cpp
+  snapshot.cpp
+  snapshotview.cpp
+  snapshotmanager.cpp
+  plotsnapshotoverlay.cpp
   ${UI_FILES}
   ${RES_FILES}
   misc/windows_icon.rc

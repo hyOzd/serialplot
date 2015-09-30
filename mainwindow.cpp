@@ -31,6 +31,8 @@
 #include <cmath>
 #include <iostream>
 
+#include <plot.h>
+
 #include "utils.h"
 #include "version.h"
 #include "floatswap.h"
@@ -51,14 +53,24 @@ Q_DECLARE_METATYPE(Range);
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    portControl(&serialPort)
+    portControl(&serialPort),
+    snapshotMan(this, &channelBuffers)
 {
     ui->setupUi(this);
     ui->tabWidget->insertTab(0, &portControl, "Port");
     ui->tabWidget->setCurrentIndex(0);
     addToolBar(portControl.toolBar());
 
+    ui->mainToolBar->addAction(snapshotMan.takeSnapshotAction());
+    ui->menuBar->insertMenu(ui->menuHelp->menuAction(), snapshotMan.menu());
+
     setupAboutDialog();
+
+    // init view menu
+    for (auto a : ui->plot->menuActions())
+    {
+        ui->menuView->addAction(a);
+    }
 
     // init UI signals
 
@@ -69,26 +81,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionExportCsv, &QAction::triggered,
                      this, &MainWindow::onExportCsv);
 
+    ui->actionQuit->setShortcutContext(Qt::ApplicationShortcut);
+
     QObject::connect(ui->actionQuit, &QAction::triggered,
                      this, &MainWindow::close);
-
-    QObject::connect(ui->actionGrid, &QAction::toggled, [this](bool show)
-                     {
-                         ui->plot->showGrid(show);
-                         ui->actionMinorGrid->setEnabled(show);
-                     });
-
-    ui->actionMinorGrid->setEnabled(ui->actionGrid->isChecked());
-    QObject::connect(ui->actionMinorGrid, &QAction::toggled,
-                     ui->plot, &Plot::showMinorGrid);
-
-    QObject::connect(ui->actionUnzoom, &QAction::triggered,
-                     ui->plot, &Plot::unzoom);
-
-    QObject::connect(ui->actionDarkBackground, &QAction::toggled,
-                     ui->plot, &Plot::darkBackground);
-
-    ui->plot->darkBackground(ui->actionDarkBackground->isChecked());
 
     // port control signals
     QObject::connect(&portControl, &PortControl::portToggled,
@@ -111,6 +107,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(ui->actionClear, SIGNAL(triggered(bool)),
                      this, SLOT(clearPlot()));
+
+    QObject::connect(snapshotMan.takeSnapshotAction(), &QAction::triggered,
+                     ui->plot, &Plot::flashSnapshotOverlay);
 
     // setup number of channels spinbox
     QObject::connect(ui->spNumOfChannels,
@@ -152,17 +151,13 @@ MainWindow::MainWindow(QWidget *parent) :
         channelBuffers.append(new FrameBuffer(numOfSamples));
         curves.append(new QwtPlotCurve());
         curves[i]->setSamples(channelBuffers[i]);
-        curves[i]->setPen(makeColor(i));
+        curves[i]->setPen(Plot::makeColor(i));
         curves[i]->attach(ui->plot);
     }
 
     // init auto scale
     ui->plot->setAxis(ui->cbAutoScale->isChecked(),
                       ui->spYmin->value(), ui->spYmax->value());
-
-    // init grid
-    ui->plot->showGrid(ui->actionGrid->isChecked());
-    ui->plot->showMinorGrid(ui->actionMinorGrid->isChecked());
 
     // init scale range preset list
     for (int nbits = 8; nbits <= 24; nbits++) // signed binary formats
@@ -241,6 +236,7 @@ MainWindow::~MainWindow()
     {
         serialPort.close();
     }
+
     delete ui;
     ui = NULL; // we check if ui is deleted in messageHandler
 }
@@ -460,7 +456,7 @@ void MainWindow::onNumOfChannelsChanged(int value)
             channelBuffers.append(new FrameBuffer(numOfSamples));
             curves.append(new QwtPlotCurve());
             curves.last()->setSamples(channelBuffers.last());
-            curves.last()->setPen(makeColor(curves.length()-1));
+            curves.last()->setPen(Plot::makeColor(curves.length()-1));
             curves.last()->attach(ui->plot);
         }
     }
@@ -639,37 +635,6 @@ void MainWindow::enableDemo(bool enabled)
         ui->actionDemoMode->setChecked(false);
         demoIndicator.hide();
         ui->plot->replot();
-    }
-}
-
-/*
-  Below crude drawing demostrates how color selection occurs for
-  given channel index
-
-  0°                     <--Hue Value-->                           360°
-  |* . o . + . o . * . o . + . o . * . o . + . o . * . o . + . o . |
-
-  * -> 0-3
-  + -> 4-7
-  o -> 8-15
-  . -> 16-31
-
- */
-
-QColor MainWindow::makeColor(unsigned int channelIndex)
-{
-    auto i = channelIndex;
-
-    if (i < 4)
-    {
-        return QColor::fromHsv(360*i/4, 255, 230);
-    }
-    else
-    {
-        double p = floor(log2(i));
-        double n = pow(2, p);
-        i = i - n;
-        return QColor::fromHsv(360*i/n + 360/pow(2,p+1), 255, 230);
     }
 }
 
