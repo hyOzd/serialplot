@@ -50,7 +50,6 @@ private:
     Zoomer zoomer;
     ScaleZoomer sZoomer;
     QwtPlotGrid grid;
-    QwtPlotShapeItem rectItem;
     PlotSnapshotOverlay* snapshotOverlay;
 
     QAction _showGridAction;

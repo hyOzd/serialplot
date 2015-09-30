@@ -39,9 +39,6 @@ Plot::Plot(QWidget* parent) :
     zoomer.setZoomBase();
     grid.attach(this);
 
-    rectItem.setRect(QRectF(0,0,100,1));
-    // rectItem.attach(this);
-
     showGrid(false);
     darkBackground(false);
 
