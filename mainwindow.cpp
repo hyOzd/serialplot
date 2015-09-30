@@ -108,9 +108,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionClear, SIGNAL(triggered(bool)),
                      this, SLOT(clearPlot()));
 
-    // QObject::connect(ui->actionSnapShot, SIGNAL(triggered(bool)),
-    //                  this, SLOT(takeSnapShot()));
-
     // setup number of channels spinbox
     QObject::connect(ui->spNumOfChannels,
                      SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),

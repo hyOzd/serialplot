@@ -1,3 +1,21 @@
+/*
+  Copyright © 2015 Hasan Yavuz Özderya
+
+  This file is part of serialplot.
+
+  serialplot is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  serialplot is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include <QTime>
 #include <QMenuBar>
@@ -44,27 +62,27 @@ SnapshotManager::~SnapshotManager()
 void SnapshotManager::takeSnapshot()
 {
     QString name = QTime::currentTime().toString("'Snapshot ['HH:mm:ss']'");
-    auto snapShot = new SnapShot(_mainWindow, name);
+    auto snapshot = new Snapshot(_mainWindow, name);
 
     unsigned numOfChannels = _channelBuffers->size();
     unsigned numOfSamples = _channelBuffers->at(0)->size();
 
     for (unsigned ci = 0; ci < numOfChannels; ci++)
     {
-        snapShot->data.append(QVector<QPointF>(numOfSamples));
+        snapshot->data.append(QVector<QPointF>(numOfSamples));
         for (unsigned i = 0; i < numOfSamples; i++)
         {
-            snapShot->data[ci][i] = _channelBuffers->at(ci)->sample(i);
+            snapshot->data[ci][i] = _channelBuffers->at(ci)->sample(i);
         }
     }
 
-    addSnapshot(snapShot);
+    addSnapshot(snapshot);
 }
 
-void SnapshotManager::addSnapshot(SnapShot* snapshot, bool update_menu)
+void SnapshotManager::addSnapshot(Snapshot* snapshot, bool update_menu)
 {
     snapshots.append(snapshot);
-    QObject::connect(snapshot, &SnapShot::deleteRequested,
+    QObject::connect(snapshot, &Snapshot::deleteRequested,
                      this, &SnapshotManager::deleteSnapshot);
     if (update_menu) updateMenu();
 }
@@ -96,7 +114,7 @@ void SnapshotManager::clearSnapshots()
     updateMenu();
 }
 
-void SnapshotManager::deleteSnapshot(SnapShot* snapshot)
+void SnapshotManager::deleteSnapshot(Snapshot* snapshot)
 {
     snapshots.removeOne(snapshot);
     snapshot->deleteLater(); // regular delete causes a crash when triggered from menu
@@ -163,7 +181,7 @@ void SnapshotManager::loadSnapshotFromFile(QString fileName)
         lineNum++;
     }
 
-    auto snapshot = new SnapShot(_mainWindow, QFileInfo(fileName).baseName());
+    auto snapshot = new Snapshot(_mainWindow, QFileInfo(fileName).baseName());
     snapshot->data = data;
 
     addSnapshot(snapshot, false);

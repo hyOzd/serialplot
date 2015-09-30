@@ -1,26 +1,45 @@
-#include "snapshotview.h"
-#include "ui_snapshotview.h"
+/*
+  Copyright © 2015 Hasan Yavuz Özderya
+
+  This file is part of serialplot.
+
+  serialplot is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  serialplot is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include <QSaveFile>
 
-SnapShotView::SnapShotView(QWidget *parent, SnapShot* snapShot) :
+#include "snapshotview.h"
+#include "ui_snapshotview.h"
+
+SnapshotView::SnapshotView(QWidget *parent, Snapshot* snapshot) :
     QMainWindow(parent),
-    ui(new Ui::SnapShotView),
+    ui(new Ui::SnapshotView),
     renameDialog(this)
 {
-    _snapShot = snapShot;
+    _snapshot = snapshot;
 
     ui->setupUi(this);
-    ui->menuSnapshot->insertAction(ui->actionClose, snapShot->deleteAction());
-    this->setWindowTitle(snapShot->name());
+    ui->menuSnapshot->insertAction(ui->actionClose, snapshot->deleteAction());
+    this->setWindowTitle(snapshot->name());
 
-    unsigned numOfChannels = snapShot->data.size();
+    unsigned numOfChannels = snapshot->data.size();
 
     for (unsigned ci = 0; ci < numOfChannels; ci++)
     {
         QwtPlotCurve* curve = new QwtPlotCurve();
         curves.append(curve);
-        curve->setSamples(snapShot->data[ci]);
+        curve->setSamples(snapshot->data[ci]);
         curve->setPen(Plot::makeColor(ci));
         curve->attach(ui->plot);
     }
@@ -28,10 +47,10 @@ SnapShotView::SnapShotView(QWidget *parent, SnapShot* snapShot) :
     renameDialog.setWindowTitle("Rename Snapshot");
     renameDialog.setLabelText("Enter new name:");
     connect(ui->actionRename, &QAction::triggered,
-            this, &SnapShotView::showRenameDialog);
+            this, &SnapshotView::showRenameDialog);
 
     connect(ui->actionExport, &QAction::triggered,
-            this, &SnapShotView::save);
+            this, &SnapshotView::save);
 
     for (auto a : ui->plot->menuActions())
     {
@@ -39,7 +58,7 @@ SnapShotView::SnapShotView(QWidget *parent, SnapShot* snapShot) :
     }
 }
 
-SnapShotView::~SnapShotView()
+SnapshotView::~SnapshotView()
 {
     for (auto curve : curves)
     {
@@ -48,25 +67,25 @@ SnapShotView::~SnapShotView()
     delete ui;
 }
 
-void SnapShotView::closeEvent(QCloseEvent *event)
+void SnapshotView::closeEvent(QCloseEvent *event)
 {
     QMainWindow::closeEvent(event);
     emit closed();
 }
 
-void SnapShotView::showRenameDialog()
+void SnapshotView::showRenameDialog()
 {
-    renameDialog.setTextValue(_snapShot->name());
+    renameDialog.setTextValue(_snapshot->name());
     renameDialog.open(this, SLOT(renameSnapshot(QString)));
 }
 
-void SnapShotView::renameSnapshot(QString name)
+void SnapshotView::renameSnapshot(QString name)
 {
-    _snapShot->setName(name);
+    _snapshot->setName(name);
     setWindowTitle(name);
 }
 
-void SnapShotView::save()
+void SnapshotView::save()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export CSV File"));
 
@@ -79,8 +98,8 @@ void SnapShotView::save()
     {
         QTextStream fileStream(&file);
 
-        unsigned numOfChannels = _snapShot->data.size();
-        unsigned numOfSamples = _snapShot->data[0].size();
+        unsigned numOfChannels = _snapshot->data.size();
+        unsigned numOfSamples = _snapshot->data[0].size();
 
         // print header
         for (unsigned int ci = 0; ci < numOfChannels; ci++)
@@ -95,7 +114,7 @@ void SnapShotView::save()
         {
             for (unsigned int ci = 0; ci < numOfChannels; ci++)
             {
-                fileStream << _snapShot->data[ci][i].y();
+                fileStream << _snapshot->data[ci][i].y();
                 if (ci != numOfChannels-1) fileStream << ",";
             }
             fileStream << '\n';
