@@ -57,6 +57,8 @@ qt5_wrap_ui(UI_FILES
   portcontrol.ui
   about_dialog.ui
   snapshotview.ui
+  commandpanel.ui
+  commandwidget.ui
   )
 qt5_add_resources(RES_FILES misc/icons.qrc)
 
@@ -75,6 +77,8 @@ add_executable(${PROGRAM_NAME} WIN32
   snapshotview.cpp
   snapshotmanager.cpp
   plotsnapshotoverlay.cpp
+  commandpanel.cpp
+  commandwidget.cpp
   ${UI_FILES}
   ${RES_FILES}
   misc/windows_icon.rc
