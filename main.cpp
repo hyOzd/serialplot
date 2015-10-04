@@ -23,12 +23,6 @@
 
 #include "version.h"
 
-// TEST CODE
-#include "framebuffer.h"
-// #include <QtDebug>
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
-
 MainWindow* pMainWindow;
 
 void messageHandler(QtMsgType type, const QMessageLogContext &context,
