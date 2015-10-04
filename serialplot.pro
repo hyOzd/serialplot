@@ -45,7 +45,8 @@ SOURCES += main.cpp\
     portlist.cpp \
     snapshotview.cpp \
     snapshotmanager.cpp \
-    snapshot.cpp
+    snapshot.cpp \
+    plotsnapshotoverlay.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
@@ -60,7 +61,8 @@ HEADERS  += mainwindow.h \
     portlist.h \
     snapshotview.h \
     snapshotmanager.h \
-    snapshot.h
+    snapshot.h \
+    plotsnapshotoverlay.h
 
 FORMS    += mainwindow.ui \
     about_dialog.ui \
