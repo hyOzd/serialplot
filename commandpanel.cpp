@@ -48,5 +48,22 @@ void CommandPanel::newCommand()
 
 void CommandPanel::sendCommand(QString command, bool ascii)
 {
-    qDebug() << "command:" << command;
+    if (!serialPort->isOpen())
+    {
+        qCritical() << "Port is not open!";
+        return;
+    }
+
+    if (ascii)
+    {
+        qDebug() << "Sending" << command;
+        if (serialPort->write(command.toLatin1()) < 0)
+        {
+            qCritical() << "Send command failed!";
+        }
+    }
+    else
+    {
+        qCritical("NYI");
+    }
 }
