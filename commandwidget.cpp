@@ -33,7 +33,7 @@ public:
 HexCommandValidator::HexCommandValidator(QObject* parent) :
     QRegExpValidator(parent)
 {
-    QRegExp regExp("([0-9A-F]{2}[ ])*");
+    QRegExp regExp("^(?:(?:[0-9A-F]{2}[ ])+(?:[0-9A-F]{2}))|(?:[0-9A-F]{2})$");
     setRegExp(regExp);
 }
 
@@ -47,10 +47,10 @@ QValidator::State HexCommandValidator::validate(QString & input, int & pos) cons
     pos = orgPos;
 
     // try fixing up spaces
-    if (r == QValidator::Invalid)
+    if (r != QValidator::Acceptable)
     {
         input = input.replace(" ", "");
-        input.replace(QRegExp("([0-9A-F]{2})"), "\\1 ");
+        input.replace(QRegExp("([0-9A-F]{2}(?!$))"), "\\1 ");
         if (pos == input.size()-1) pos = input.size();
         r = QRegExpValidator::validate(input, pos);
     }
