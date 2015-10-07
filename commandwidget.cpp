@@ -23,40 +23,7 @@
 #include <QRegExp>
 #include <QRegExpValidator>
 
-class HexCommandValidator : public QRegExpValidator
-{
-public:
-    explicit HexCommandValidator(QObject* parent = 0);
-    QValidator::State validate(QString & input, int & pos) const;
-};
-
-HexCommandValidator::HexCommandValidator(QObject* parent) :
-    QRegExpValidator(parent)
-{
-    QRegExp regExp("^(?:(?:[0-9A-F]{2}[ ])+(?:[0-9A-F]{2}))|(?:[0-9A-F]{2})$");
-    setRegExp(regExp);
-}
-
-QValidator::State HexCommandValidator::validate(QString & input, int & pos) const
-{
-    input = input.toUpper();
-
-    // don't let pos to be altered at this stage
-    int orgPos = pos;
-    auto r = QRegExpValidator::validate(input, pos);
-    pos = orgPos;
-
-    // try fixing up spaces
-    if (r != QValidator::Acceptable)
-    {
-        input = input.replace(" ", "");
-        input.replace(QRegExp("([0-9A-F]{2}(?!$))"), "\\1 ");
-        if (pos == input.size()-1) pos = input.size();
-        r = QRegExpValidator::validate(input, pos);
-    }
-
-    return r;
-}
+#include <QtDebug>
 
 CommandWidget::CommandWidget(QWidget *parent) :
     QWidget(parent),
@@ -67,14 +34,11 @@ CommandWidget::CommandWidget(QWidget *parent) :
     connect(ui->pbDelete, &QPushButton::clicked, this, &CommandWidget::onDeleteClicked);
     connect(ui->pbSend, &QPushButton::clicked, this, &CommandWidget::onSendClicked);
     connect(ui->pbASCII, &QPushButton::toggled, this, &CommandWidget::onASCIIToggled);
-
-    hexValidator = new HexCommandValidator(this);
 }
 
 CommandWidget::~CommandWidget()
 {
     delete ui;
-    delete hexValidator;
 }
 
 void CommandWidget::onDeleteClicked()
@@ -89,12 +53,5 @@ void CommandWidget::onSendClicked()
 
 void CommandWidget::onASCIIToggled(bool checked)
 {
-    if (checked)
-    {
-        ui->leCommand->setValidator(0);
-    }
-    else
-    {
-        ui->leCommand->setValidator(hexValidator);
-    }
+    ui->leCommand->setMode(checked);
 }

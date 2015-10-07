@@ -17,35 +17,27 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef COMMANDWIDGET_H
-#define COMMANDWIDGET_H
+#ifndef COMMANDEDIT_H
+#define COMMANDEDIT_H
 
-#include <QWidget>
-#include <QString>
+#include <QLineEdit>
+#include <QValidator>
 
-namespace Ui {
-class CommandWidget;
-}
-
-class CommandWidget : public QWidget
+class CommandEdit : public QLineEdit
 {
     Q_OBJECT
 
 public:
-    explicit CommandWidget(QWidget *parent = 0);
-    ~CommandWidget();
-
-signals:
-    void deleteRequested(CommandWidget* thisWidget); // emitted when delete button is clicked
-    void sendCommand(QString command, bool ascii);   // emitted when send button clicked
+    explicit CommandEdit(QWidget *parent = 0);
+    ~CommandEdit();
+    void setMode(bool ascii); // true = ascii, false = hex
 
 private:
-    Ui::CommandWidget *ui;
+    bool ascii_mode;
+    QValidator* hexValidator;
 
-private slots:
-    void onDeleteClicked();
-    void onSendClicked();
-    void onASCIIToggled(bool checked);
+protected:
+    void keyPressEvent(QKeyEvent * event) Q_DECL_OVERRIDE;
 };
 
-#endif // COMMANDWIDGET_H
+#endif // COMMANDEDIT_H

@@ -48,7 +48,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QLineEdit" name="leCommand">
+    <widget class="CommandEdit" name="leCommand">
      <property name="sizePolicy">
       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -155,6 +155,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CommandEdit</class>
+   <extends>QLineEdit</extends>
+   <header>commandedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

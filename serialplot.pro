@@ -48,7 +48,8 @@ SOURCES += main.cpp\
     snapshot.cpp \
     plotsnapshotoverlay.cpp \
     commandpanel.cpp \
-    commandwidget.cpp
+    commandwidget.cpp \
+    commandedit.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
@@ -66,7 +67,8 @@ HEADERS  += mainwindow.h \
     snapshot.h \
     plotsnapshotoverlay.h \
     commandpanel.h \
-    commandwidget.h
+    commandwidget.h \
+    commandedit.h
 
 FORMS    += mainwindow.ui \
     about_dialog.ui \
