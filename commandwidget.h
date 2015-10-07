@@ -22,6 +22,7 @@
 
 #include <QWidget>
 #include <QString>
+#include <QValidator>
 
 namespace Ui {
 class CommandWidget;
@@ -41,10 +42,12 @@ signals:
 
 private:
     Ui::CommandWidget *ui;
+    QValidator* hexValidator;
 
 private slots:
     void onDeleteClicked();
     void onSendClicked();
+    void onASCIIToggled(bool checked);
 };
 
 #endif // COMMANDWIDGET_H
