@@ -20,6 +20,7 @@
 #include "commandpanel.h"
 #include "ui_commandpanel.h"
 
+#include <QByteArray>
 #include <QtDebug>
 
 CommandPanel::CommandPanel(QSerialPort* port, QWidget *parent) :
@@ -64,6 +65,9 @@ void CommandPanel::sendCommand(QString command, bool ascii)
     }
     else
     {
-        qCritical("NYI");
+        if (serialPort->write(QByteArray::fromHex(command.toLatin1())) < 0)
+        {
+            qCritical() << "Send command failed!";
+        }
     }
 }
