@@ -72,6 +72,9 @@ CommandEdit::~CommandEdit()
     delete hexValidator;
 }
 
+QString unEscape(QString str);
+QString escape(QString str);
+
 void CommandEdit::setMode(bool ascii)
 {
     ascii_mode = ascii;
@@ -87,12 +90,13 @@ void CommandEdit::setMode(bool ascii)
             hexText.replace(hexText.size()-1, 1, "3F"); // 0x3F = '?'
             qWarning() << "Broken byte in hex command is replaced. Check your command!";
         }
-        setText(QByteArray::fromHex(hexText.toLatin1()));
+
+        setText(escape(QByteArray::fromHex(hexText.toLatin1())));
     }
     else
     {
         setValidator(hexValidator);
-        setText(text().toLatin1().toHex());
+        setText(unEscape(text()).toLatin1().toHex());
     }
 }
 
@@ -114,4 +118,25 @@ void CommandEdit::keyPressEvent(QKeyEvent * event)
     }
 
     QLineEdit::keyPressEvent(event);
+}
+
+QString CommandEdit::unEscapedText()
+{
+    return unEscape(text());
+}
+
+QString unEscape(QString str)
+{
+    str.replace("\\n", "\n");
+    str.replace("\\r", "\r");
+    str.replace("\\t", "\t");
+    return str;
+}
+
+QString escape(QString str)
+{
+    str.replace("\n", "\\n");
+    str.replace("\r", "\\r");
+    str.replace("\t", "\\t");
+    return str;
 }

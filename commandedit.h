@@ -22,6 +22,7 @@
 
 #include <QLineEdit>
 #include <QValidator>
+#include <QString>
 
 class CommandEdit : public QLineEdit
 {
@@ -31,6 +32,7 @@ public:
     explicit CommandEdit(QWidget *parent = 0);
     ~CommandEdit();
     void setMode(bool ascii); // true = ascii, false = hex
+    QString unEscapedText(); // return unescaped text(), used in ascii_mode only
 
 private:
     bool ascii_mode;
