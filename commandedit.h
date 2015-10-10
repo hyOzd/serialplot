@@ -35,6 +35,7 @@ public:
 private:
     bool ascii_mode;
     QValidator* hexValidator;
+    QValidator* asciiValidator;
 
 protected:
     void keyPressEvent(QKeyEvent * event) Q_DECL_OVERRIDE;

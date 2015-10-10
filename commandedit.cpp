@@ -60,7 +60,9 @@ CommandEdit::CommandEdit(QWidget *parent) :
     QLineEdit(parent)
 {
     hexValidator = new HexCommandValidator(this);
+    asciiValidator = new QRegExpValidator(QRegExp("[\\x0000-\\x007F]+"));
     ascii_mode = true;
+    setValidator(asciiValidator);
 }
 
 CommandEdit::~CommandEdit()
@@ -73,7 +75,7 @@ void CommandEdit::setMode(bool ascii)
     ascii_mode = ascii;
     if (ascii)
     {
-        setValidator(0);
+        setValidator(asciiValidator);
     }
     else
     {
