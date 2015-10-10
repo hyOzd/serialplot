@@ -33,6 +33,8 @@ CommandPanel::CommandPanel(QSerialPort* port, QWidget *parent) :
     ui->scrollAreaWidgetContents->setLayout(new QVBoxLayout);
 
     connect(ui->pbNew, &QPushButton::clicked, this, &CommandPanel::newCommand);
+
+    newCommand(); // add an empty slot by default
 }
 
 CommandPanel::~CommandPanel()
