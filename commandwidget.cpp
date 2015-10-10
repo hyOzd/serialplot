@@ -77,16 +77,6 @@ void CommandWidget::onSendClicked()
 void CommandWidget::onASCIIToggled(bool checked)
 {
     ui->leCommand->setMode(checked);
-    if (checked)
-    {
-        storedHexText = ui->leCommand->text();
-        ui->leCommand->setText(storedAsciiText);
-    }
-    else
-    {
-        storedAsciiText = ui->leCommand->text();
-        ui->leCommand->setText(storedHexText);
-    }
 }
 
 bool CommandWidget::isASCIIMode()

@@ -76,10 +76,12 @@ void CommandEdit::setMode(bool ascii)
     if (ascii)
     {
         setValidator(asciiValidator);
+        setText(QByteArray::fromHex(text().remove(" ").toLatin1()));
     }
     else
     {
         setValidator(hexValidator);
+        setText(text().toLatin1().toHex());
     }
 }
 
