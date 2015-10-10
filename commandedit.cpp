@@ -19,6 +19,8 @@
 
 #include <QKeyEvent>
 
+#include <QtDebug>
+
 #include "commandedit.h"
 
 class HexCommandValidator : public QRegExpValidator
@@ -76,7 +78,16 @@ void CommandEdit::setMode(bool ascii)
     if (ascii)
     {
         setValidator(asciiValidator);
-        setText(QByteArray::fromHex(text().remove(" ").toLatin1()));
+
+        auto hexText = text().remove(" ");
+        // try patching HEX string in case of missing nibble so that
+        // input doesn't turn into gibberish
+        if (hexText.size() % 2 == 1)
+        {
+            hexText.replace(hexText.size()-1, 1, "3F"); // 0x3F = '?'
+            qWarning() << "Broken byte in hex command is replaced. Check your command!";
+        }
+        setText(QByteArray::fromHex(hexText.toLatin1()));
     }
     else
     {
