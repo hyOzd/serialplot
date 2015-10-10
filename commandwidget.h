@@ -46,6 +46,9 @@ signals:
 
 private:
     Ui::CommandWidget *ui;
+    QString storedAsciiText;
+    QString storedHexText;
+
     bool isASCIIMode(); // true: ascii mode, false hex mode
 
 private slots:
