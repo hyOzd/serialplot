@@ -55,6 +55,9 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter your command here.&lt;/p&gt;&lt;p&gt;In ASCII mode you can use backslash '\' to send some special characters. These are:&lt;br/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;\n&lt;/span&gt; : Line Feed (new line)&lt;br/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;\r&lt;/span&gt; : Carriage Return&lt;br/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;\t&lt;/span&gt; : Tab&lt;/p&gt;&lt;p&gt;Be careful though, you cannot escape the backslash character itself!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
     </widget>
    </item>
    <item>
