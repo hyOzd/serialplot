@@ -57,7 +57,12 @@ void CommandWidget::onSendClicked()
         return;
     }
 
-    if (!isASCIIMode()) // hex mode
+    if (isASCIIMode())
+    {
+        qDebug() << "Sending:" << command;
+        emit sendCommand(command.toLatin1());
+    }
+    else // hex mode
     {
         command = command.remove(' ');
         // check if nibbles are missing
@@ -65,13 +70,14 @@ void CommandWidget::onSendClicked()
         {
             qWarning() << "HEX command is missing a nibble at the end!";
             ui->leCommand->setFocus(Qt::OtherFocusReason);
+            // highlight the byte that is missing a nibble (last byte obviously)
             int textSize = ui->leCommand->text().size();
             ui->leCommand->setSelection(textSize-1, textSize);
             return;
         }
+        qDebug() << "Sending HEX:" << command;
+        emit sendCommand(QByteArray::fromHex(command.toLatin1()));
     }
-
-    emit sendCommand(command, ui->pbASCII->isChecked());
 }
 
 void CommandWidget::onASCIIToggled(bool checked)

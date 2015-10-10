@@ -21,7 +21,7 @@
 #define COMMANDWIDGET_H
 
 #include <QWidget>
-#include <QString>
+#include <QByteArray>
 
 namespace Ui {
 class CommandWidget;
@@ -42,12 +42,10 @@ signals:
     //
     // in case of hex mode, command text should be a hexadecimal
     // string containing hexadecimal characters only (not even spaces)
-    void sendCommand(QString command, bool ascii);
+    void sendCommand(QByteArray command);
 
 private:
     Ui::CommandWidget *ui;
-    QString storedAsciiText;
-    QString storedHexText;
 
     bool isASCIIMode(); // true: ascii mode, false hex mode
 

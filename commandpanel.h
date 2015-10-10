@@ -22,6 +22,7 @@
 
 #include <QWidget>
 #include <QSerialPort>
+#include <QByteArray>
 
 #include "commandwidget.h"
 
@@ -43,7 +44,7 @@ private:
 
 private slots:
     void newCommand();
-    void sendCommand(QString command, bool ascii);
+    void sendCommand(QByteArray command);
 };
 
 #endif // COMMANDPANEL_H

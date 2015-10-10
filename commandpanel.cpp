@@ -47,7 +47,7 @@ void CommandPanel::newCommand()
     connect(command, &CommandWidget::sendCommand, this, &CommandPanel::sendCommand);
 }
 
-void CommandPanel::sendCommand(QString command, bool ascii)
+void CommandPanel::sendCommand(QByteArray command)
 {
     if (!serialPort->isOpen())
     {
@@ -55,19 +55,8 @@ void CommandPanel::sendCommand(QString command, bool ascii)
         return;
     }
 
-    if (ascii)
+    if (serialPort->write(command) < 0)
     {
-        qDebug() << "Sending" << command;
-        if (serialPort->write(command.toLatin1()) < 0)
-        {
-            qCritical() << "Send command failed!";
-        }
-    }
-    else
-    {
-        if (serialPort->write(QByteArray::fromHex(command.toLatin1())) < 0)
-        {
-            qCritical() << "Send command failed!";
-        }
+        qCritical() << "Send command failed!";
     }
 }
