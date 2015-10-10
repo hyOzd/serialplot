@@ -37,10 +37,16 @@ public:
 
 signals:
     void deleteRequested(CommandWidget* thisWidget); // emitted when delete button is clicked
-    void sendCommand(QString command, bool ascii);   // emitted when send button clicked
+
+    // emitted when send button is clicked
+    //
+    // in case of hex mode, command text should be a hexadecimal
+    // string containing hexadecimal characters only (not even spaces)
+    void sendCommand(QString command, bool ascii);
 
 private:
     Ui::CommandWidget *ui;
+    bool isASCIIMode(); // true: ascii mode, false hex mode
 
 private slots:
     void onDeleteClicked();

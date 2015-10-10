@@ -48,10 +48,38 @@ void CommandWidget::onDeleteClicked()
 
 void CommandWidget::onSendClicked()
 {
-    emit sendCommand(ui->leCommand->text(), ui->pbASCII->isChecked());
+    auto command = ui->leCommand->text();
+
+    if (command.isEmpty())
+    {
+        qWarning() << "Enter a command to send!";
+        ui->leCommand->setFocus(Qt::OtherFocusReason);
+        return;
+    }
+
+    if (!isASCIIMode()) // hex mode
+    {
+        command = command.remove(' ');
+        // check if nibbles are missing
+        if (command.size() % 2 == 1)
+        {
+            qWarning() << "HEX command is missing a nibble at the end!";
+            ui->leCommand->setFocus(Qt::OtherFocusReason);
+            int textSize = ui->leCommand->text().size();
+            ui->leCommand->setSelection(textSize-1, textSize);
+            return;
+        }
+    }
+
+    emit sendCommand(command, ui->pbASCII->isChecked());
 }
 
 void CommandWidget::onASCIIToggled(bool checked)
 {
     ui->leCommand->setMode(checked);
+}
+
+bool CommandWidget::isASCIIMode()
+{
+    return ui->pbASCII->isChecked();
 }
