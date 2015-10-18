@@ -53,6 +53,7 @@ Q_DECLARE_METATYPE(Range);
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
+    aboutDialog(this),
     portControl(&serialPort),
     commandPanel(&serialPort),
     snapshotMan(this, &channelBuffers)
