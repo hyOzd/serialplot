@@ -22,14 +22,18 @@
 
 #include <QRegExp>
 #include <QRegExpValidator>
-
 #include <QtDebug>
+#include <QIcon>
 
 CommandWidget::CommandWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::CommandWidget)
 {
     ui->setupUi(this);
+
+#ifdef Q_OS_WIN
+    ui->pbDelete->setIcon(QIcon(":/icons/list-remove"));
+#endif // Q_OS_WIN
 
     connect(ui->pbDelete, &QPushButton::clicked, this, &CommandWidget::onDeleteClicked);
     connect(ui->pbSend, &QPushButton::clicked, this, &CommandWidget::onSendClicked);

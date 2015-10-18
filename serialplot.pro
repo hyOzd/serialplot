@@ -81,5 +81,8 @@ INCLUDEPATH += qmake/
 
 CONFIG += c++11
 
-RESOURCES += \
-    misc/icons.qrc
+RESOURCES += misc/icons.qrc
+
+win32 {
+    RESOURCES += misc/winicons.qrc
+}

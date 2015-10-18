@@ -60,7 +60,12 @@ qt5_wrap_ui(UI_FILES
   commandpanel.ui
   commandwidget.ui
   )
-qt5_add_resources(RES_FILES misc/icons.qrc)
+
+if (WIN32)
+  qt5_add_resources(RES_FILES misc/icons.qrc misc/winicons.qrc)
+else (WIN32)
+  qt5_add_resources(RES_FILES misc/icons.qrc)
+endif (WIN32)
 
 add_executable(${PROGRAM_NAME} WIN32
   main.cpp
