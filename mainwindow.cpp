@@ -54,10 +54,12 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     portControl(&serialPort),
+    commandPanel(&serialPort),
     snapshotMan(this, &channelBuffers)
 {
     ui->setupUi(this);
     ui->tabWidget->insertTab(0, &portControl, "Port");
+    ui->tabWidget->insertTab(3, &commandPanel, "Commands");
     ui->tabWidget->setCurrentIndex(0);
     addToolBar(portControl.toolBar());
 

@@ -35,6 +35,7 @@
 #include <qwt_plot_textlabel.h>
 
 #include "portcontrol.h"
+#include "commandpanel.h"
 #include "ui_about_dialog.h"
 #include "framebuffer.h"
 #include "snapshotmanager.h"
@@ -99,6 +100,8 @@ private:
     QLabel spsLabel;
     unsigned int sampleCount;
     QTimer spsTimer;
+
+    CommandPanel commandPanel;
 
     SnapshotManager snapshotMan;
 

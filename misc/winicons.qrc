@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="list-add">tango/list-add.png</file>
+        <file alias="list-remove">tango/list-remove.png</file>
+    </qresource>
+</RCC>

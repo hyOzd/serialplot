@@ -46,7 +46,10 @@ SOURCES += main.cpp\
     snapshotview.cpp \
     snapshotmanager.cpp \
     snapshot.cpp \
-    plotsnapshotoverlay.cpp
+    plotsnapshotoverlay.cpp \
+    commandpanel.cpp \
+    commandwidget.cpp \
+    commandedit.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
@@ -62,16 +65,24 @@ HEADERS  += mainwindow.h \
     snapshotview.h \
     snapshotmanager.h \
     snapshot.h \
-    plotsnapshotoverlay.h
+    plotsnapshotoverlay.h \
+    commandpanel.h \
+    commandwidget.h \
+    commandedit.h
 
 FORMS    += mainwindow.ui \
     about_dialog.ui \
     portcontrol.ui \
-    snapshotview.ui
+    snapshotview.ui \
+    commandpanel.ui \
+    commandwidget.ui
 
 INCLUDEPATH += qmake/
 
 CONFIG += c++11
 
-RESOURCES += \
-    misc/icons.qrc
+RESOURCES += misc/icons.qrc
+
+win32 {
+    RESOURCES += misc/winicons.qrc
+}
