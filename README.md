@@ -9,6 +9,8 @@ Small and simple software for plotting data from serial port.
 * Binary data formats (u)int8, (u)int16, (u)int32, float
 * ASCII input (Comma Separated Values)
 * Synchronized multi channel plotting
+* Define and send commands to the device in ASCII or binary format
+* Take snapshots of the current waveform and save to CSV file
 
 ## Installation
 
