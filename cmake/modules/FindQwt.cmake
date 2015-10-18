@@ -17,10 +17,8 @@
 # along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-#
-# Note: This module will only find local Qwt installations in
-# /usr/local/qwt-VERSION directories.
-#
+## First, we look for local Qwt installations, if this fails we will
+## look into system locations
 
 file(GLOB qwt_glob_dir "/usr/local/qwt*/" "c:/Qwt*")
 
@@ -70,6 +68,29 @@ if(QWT_ROOT)
   set(QWT_INCLUDE_DIR "${QWT_ROOT}/include")
   find_library(QWT_LIBRARY "qwt"
 	PATHS "${QWT_ROOT}/lib")
+else (QWT_ROOT)
+  ## Look into system locations
+  find_path(QWT_INCLUDE_DIR qwt_plot.h PATHS /usr/include/qwt)
+  # try extracting version information
+  if (QWT_INCLUDE_DIR)
+	unset(qwt_version_string)
+	file(STRINGS "${QWT_INCLUDE_DIR}/qwt_global.h" qwt_version_string
+	  REGEX "#define[ \t]+QWT_VERSION_STR")
+	if(qwt_version_string)
+	  string(REGEX REPLACE "[^\"]*\"([0-9.]+)\".*" "\\1"
+		qwt_version_string ${qwt_version_string})
+	  if(Qwt_FIND_VERSION)
+		if( (qwt_version_string VERSION_EQUAL Qwt_FIND_VERSION) OR
+		  (qwt_version_string VERSION_GREATER Qwt_FIND_VERSION))
+		  set(QWT_VERSION ${qwt_version_string})
+		else ()
+		  set(QWT_INCLUDE_DIR "NOTFOUND")
+		endif()
+	  endif(Qwt_FIND_VERSION)
+	endif(qwt_version_string)
+  endif (QWT_INCLUDE_DIR)
+  # look into system locations for lib file
+  find_library(QWT_LIBRARY "qwt" PATHS /usr/lib)
 endif(QWT_ROOT)
 
 # set version variables
