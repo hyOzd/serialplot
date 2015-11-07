@@ -211,16 +211,18 @@ void DataFormatPanel::demoTimerTimeout()
 
 void DataFormatPanel::onDataReady()
 {
-    // TODO: discard data in the size of packageSize
-    if (paused)
-    {
-        serialPort->clear(QSerialPort::Input);
-        return;
-    }
-
     // a package is a set of channel data like {CHAN0_SAMPLE, CHAN1_SAMPLE...}
     int packageSize = sampleSize * _numOfChannels;
     int bytesAvailable = serialPort->bytesAvailable();
+    int numOfPackagesToRead =
+        (bytesAvailable - (bytesAvailable % packageSize)) / packageSize;
+
+    if (paused)
+    {
+        // read and discard data
+        serialPort->read(numOfPackagesToRead*packageSize);
+        return;
+    }
 
     if (bytesAvailable > 0 && skipByteRequested)
     {
@@ -231,8 +233,6 @@ void DataFormatPanel::onDataReady()
 
     if (bytesAvailable < packageSize) return;
 
-    int numOfPackagesToRead =
-        (bytesAvailable - (bytesAvailable % packageSize)) / packageSize;
     double* channelSamples = new double[numOfPackagesToRead*_numOfChannels];
 
     for (int i = 0; i < numOfPackagesToRead; i++)
