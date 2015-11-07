@@ -24,6 +24,7 @@
 #include <QMouseEvent>
 #include <QPen>
 #include <QWidget>
+#include <QList>
 #include <qwt_scale_widget.h>
 #include <qwt_widget_overlay.h>
 
@@ -56,10 +57,14 @@ private:
     double firstPos; // converted to plot coordinates
     double firstPosPx; // pixel coordinates
     double currentPosPx; // current position in pixel coordinates
+    QList<double> snapPoints;
 
-    double position(QMouseEvent*); // returns the axis mouse position relative to plot coordinates
+    double position(double); // returns the axis mouse position relative to plot coordinates
     double positionPx(QMouseEvent*); // returns the axis mouse position in pixels
     double posCanvasPx(double pos); // returns the given position in canvas coordinates
+
+private slots:
+    void updateSnapPoints();
 };
 
 #endif // SCALEPICKER_H

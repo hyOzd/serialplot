@@ -22,12 +22,15 @@
 #include <QPainter>
 #include <qwt_scale_widget.h>
 #include <qwt_scale_map.h>
+#include <qwt_scale_div.h>
 #include <math.h>
 
 #include "scalepicker.h"
 
 // minimum size for pick (in pixels)
 #define MIN_PICK_SIZE (2)
+
+#define SNAP_DISTANCE (5)
 
 class PlotOverlay : public QwtWidgetOverlay
 {
@@ -94,9 +97,22 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
         event->type() == QEvent::MouseButtonRelease ||
         event->type() == QEvent::MouseMove)
     {
+        updateSnapPoints();
+
         QMouseEvent* mouseEvent = (QMouseEvent*) event;
-        double pos = this->position(mouseEvent);
         double posPx = this->positionPx(mouseEvent);
+
+        // do snapping
+        for (double sp : snapPoints)
+        {
+            if (fabs(posPx-sp) <= SNAP_DISTANCE)
+            {
+                posPx = sp;
+                break;
+            }
+        }
+
+        double pos = this->position(posPx);
         currentPosPx = posPx;
 
         if (event->type() == QEvent::MouseButtonPress &&
@@ -204,13 +220,10 @@ void ScalePicker::setPen(QPen pen)
     _pen = pen;
 }
 
-double ScalePicker::position(QMouseEvent* mouseEvent)
+// convert the position of the click to the plot coordinates
+double ScalePicker::position(double posPx)
 {
-    double pos;
-    pos = positionPx(mouseEvent);
-    // convert the position of the click to the plot coordinates
-    pos = _scaleWidget->scaleDraw()->scaleMap().invTransform(pos);
-    return pos;
+    return _scaleWidget->scaleDraw()->scaleMap().invTransform(posPx);
 }
 
 double ScalePicker::positionPx(QMouseEvent* mouseEvent)
@@ -247,4 +260,17 @@ double ScalePicker::posCanvasPx(double pos)
         return pos + (_scaleWidget->y() - _canvas->y());
     }
     return pos;
+}
+
+void ScalePicker::updateSnapPoints()
+{
+    auto allTicks = _scaleWidget->scaleDraw()->scaleDiv().ticks(QwtScaleDiv::MajorTick) +
+        _scaleWidget->scaleDraw()->scaleDiv().ticks(QwtScaleDiv::MediumTick) +
+        _scaleWidget->scaleDraw()->scaleDiv().ticks(QwtScaleDiv::MinorTick);
+
+    snapPoints.clear();
+    for(auto t : allTicks)
+    {
+        snapPoints << _scaleWidget->scaleDraw()->scaleMap().transform(t);
+    }
 }
