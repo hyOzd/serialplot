@@ -31,7 +31,7 @@
 PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     QWidget(parent),
     ui(new Ui::PortControl),
-    portToolBar("Port"),
+    portToolBar("Port Toolbar"),
     openAction("Open", this)
 {
     ui->setupUi(this);

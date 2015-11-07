@@ -64,7 +64,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tabWidget->setCurrentIndex(0);
     addToolBar(portControl.toolBar());
 
-    ui->mainToolBar->addAction(snapshotMan.takeSnapshotAction());
+    ui->plotToolBar->addAction(snapshotMan.takeSnapshotAction());
     ui->menuBar->insertMenu(ui->menuHelp->menuAction(), snapshotMan.menu());
 
     setupAboutDialog();
