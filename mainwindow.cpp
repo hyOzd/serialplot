@@ -25,7 +25,6 @@
 #include <QFile>
 #include <QTextStream>
 #include <QtDebug>
-#include <QtEndian>
 #include <qwt_plot.h>
 #include <limits.h>
 #include <cmath>
@@ -35,7 +34,6 @@
 
 #include "utils.h"
 #include "version.h"
-#include "floatswap.h"
 
 #if defined(Q_OS_WIN) && defined(QT_STATIC)
 #include <QtPlugin>
@@ -56,10 +54,12 @@ MainWindow::MainWindow(QWidget *parent) :
     aboutDialog(this),
     portControl(&serialPort),
     commandPanel(&serialPort),
+    dataFormatPanel(&serialPort, &channelBuffers),
     snapshotMan(this, &channelBuffers)
 {
     ui->setupUi(this);
     ui->tabWidget->insertTab(0, &portControl, "Port");
+    ui->tabWidget->insertTab(1, &dataFormatPanel, "Data Format");
     ui->tabWidget->insertTab(3, &commandPanel, "Commands");
     ui->tabWidget->setCurrentIndex(0);
     addToolBar(portControl.toolBar());
@@ -94,7 +94,7 @@ MainWindow::MainWindow(QWidget *parent) :
                      this, &MainWindow::onPortToggled);
 
     QObject::connect(&portControl, &PortControl::skipByteRequested,
-                     this, &MainWindow::skipByte);
+                     &dataFormatPanel, &DataFormatPanel::requestSkipByte);
 
     QObject::connect(ui->spNumOfSamples, SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
                      this, &MainWindow::onNumOfSamplesChanged);
@@ -114,24 +114,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(snapshotMan.takeSnapshotAction(), &QAction::triggered,
                      ui->plot, &Plot::flashSnapshotOverlay);
 
-    // setup number of channels spinbox
-    QObject::connect(ui->spNumOfChannels,
-                     SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
-                     this, &MainWindow::onNumOfChannelsChanged);
-
-    // setup number format buttons
-    numberFormatButtons.addButton(ui->rbUint8,  NumberFormat_uint8);
-    numberFormatButtons.addButton(ui->rbUint16, NumberFormat_uint16);
-    numberFormatButtons.addButton(ui->rbUint32, NumberFormat_uint32);
-    numberFormatButtons.addButton(ui->rbInt8,   NumberFormat_int8);
-    numberFormatButtons.addButton(ui->rbInt16,  NumberFormat_int16);
-    numberFormatButtons.addButton(ui->rbInt32,  NumberFormat_int32);
-    numberFormatButtons.addButton(ui->rbFloat,  NumberFormat_float);
-    numberFormatButtons.addButton(ui->rbASCII,  NumberFormat_ASCII);
-
-    QObject::connect(&numberFormatButtons, SIGNAL(buttonToggled(int, bool)),
-                     this, SLOT(onNumberFormatButtonToggled(int, bool)));
-
     // init port signals
     QObject::connect(&(this->serialPort), SIGNAL(error(QSerialPort::SerialPortError)),
                      this, SLOT(onPortError(QSerialPort::SerialPortError)));
@@ -143,10 +125,21 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->spYmax->setRange((-1) * std::numeric_limits<double>::max(),
                          std::numeric_limits<double>::max());
 
-    // init data arrays and plot
+    // init data format and reader
+    QObject::connect(&dataFormatPanel, &DataFormatPanel::dataAdded,
+                     ui->plot, &QwtPlot::replot);
 
+    QObject::connect(ui->actionPause, &QAction::triggered,
+                     &dataFormatPanel, &DataFormatPanel::pause);
+
+    // init data arrays and plot
     numOfSamples = ui->spNumOfSamples->value();
-    numOfChannels = ui->spNumOfChannels->value();
+    unsigned numOfChannels = dataFormatPanel.numOfChannels();
+
+    QObject::connect(&dataFormatPanel,
+                     &DataFormatPanel::numOfChannelsChanged,
+                     this,
+                     &MainWindow::onNumOfChannelsChanged);
 
     // init channel data and curve list
     for (unsigned int i = 0; i < numOfChannels; i++)
@@ -187,30 +180,15 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->cbRangePresets, SIGNAL(activated(int)),
                      this, SLOT(onRangeSelected()));
 
-    // init number format
-    if (numberFormatButtons.checkedId() >= 0)
-    {
-        selectNumberFormat((NumberFormat) numberFormatButtons.checkedId());
-    }
-    else
-    {
-        selectNumberFormat(NumberFormat_uint8);
-    }
-
     // Init sps (sample per second) counter
-    sampleCount = 0;
     spsLabel.setText("0sps");
     spsLabel.setToolTip("samples per second (total of all channels)");
     ui->statusBar->addPermanentWidget(&spsLabel);
-    spsTimer.start(SPS_UPDATE_TIMEOUT * 1000);
-    QObject::connect(&spsTimer, &QTimer::timeout,
-                     this, &MainWindow::spsTimerTimeout);
+    QObject::connect(&dataFormatPanel,
+                     &DataFormatPanel::samplesPerSecondChanged,
+                     this, &MainWindow::onSpsChanged);
 
-    // Init demo mode
-    demoCount = 0;
-    demoTimer.setInterval(100);
-    QObject::connect(&demoTimer, &QTimer::timeout,
-                     this, &MainWindow::demoTimerTimeout);
+    // init demo
     QObject::connect(ui->actionDemoMode, &QAction::toggled,
                      this, &MainWindow::enableDemo);
 
@@ -224,7 +202,6 @@ MainWindow::MainWindow(QWidget *parent) :
         demoIndicator.hide();
         demoIndicator.attach(ui->plot);
     }
-
 }
 
 MainWindow::~MainWindow()
@@ -263,97 +240,6 @@ void MainWindow::onPortToggled(bool open)
     // make sure demo mode is disabled
     if (open && isDemoRunning()) enableDemo(false);
     ui->actionDemoMode->setEnabled(!open);
-}
-
-void MainWindow::onDataReady()
-{
-    if (ui->actionPause->isChecked())
-    {
-        serialPort.clear(QSerialPort::Input);
-        return;
-    }
-
-    // a package is a set of channel data like {CHAN0_SAMPLE, CHAN1_SAMPLE...}
-    int packageSize = sampleSize * numOfChannels;
-    int bytesAvailable = serialPort.bytesAvailable();
-
-    if (bytesAvailable > 0 && skipByteRequested)
-    {
-        serialPort.read(1);
-        skipByteRequested = false;
-        bytesAvailable--;
-    }
-
-    if (bytesAvailable < packageSize) return;
-
-    int numOfPackagesToRead =
-        (bytesAvailable - (bytesAvailable % packageSize)) / packageSize;
-    double* channelSamples = new double[numOfPackagesToRead*numOfChannels];
-
-    int i = 0;
-    while(i < numOfPackagesToRead)
-    {
-        for (unsigned int ci = 0; ci < numOfChannels; ci++)
-        {
-            // channelSamples[ci].replace(i, (this->*readSample)());
-            channelSamples[ci*numOfPackagesToRead+i] = (this->*readSample)();
-        }
-        i++;
-    }
-
-    for (unsigned int ci = 0; ci < numOfChannels; ci++)
-    {
-        addChannelData(ci,
-                       channelSamples + ci*numOfPackagesToRead,
-                       numOfPackagesToRead);
-    }
-    ui->plot->replot();
-
-    delete channelSamples;
-}
-
-void MainWindow::onDataReadyASCII()
-{
-    while(serialPort.canReadLine())
-    {
-        QByteArray line = serialPort.readLine();
-
-        // discard data if paused
-        if (ui->actionPause->isChecked())
-        {
-            return;
-        }
-
-        line = line.trimmed();
-        auto separatedValues = line.split(',');
-
-        int numReadChannels; // effective number of channels to read
-        if (separatedValues.length() >= int(numOfChannels))
-        {
-            numReadChannels = numOfChannels;
-        }
-        else // there is missing channel data
-        {
-            numReadChannels = separatedValues.length();
-            qWarning() << "Incoming data is missing data for some channels!";
-        }
-
-        // parse read line
-        for (int ci = 0; ci < numReadChannels; ci++)
-        {
-            bool ok;
-            double channelSample = separatedValues[ci].toDouble(&ok);
-            if (ok)
-            {
-                addChannelData(ci, &channelSample, 1);
-            }
-            else
-            {
-                qWarning() << "Data parsing error for channel: " << ci;
-            }
-        }
-        ui->plot->replot();
-    }
 }
 
 void MainWindow::onPortError(QSerialPort::SerialPortError error)
@@ -414,20 +300,9 @@ required privileges or device is already opened by another process.";
     }
 }
 
-void MainWindow::skipByte()
-{
-    skipByteRequested = true;
-}
-
-void MainWindow::addChannelData(unsigned int channel, double* data, unsigned size)
-{
-    channelBuffers[channel]->addSamples(data, size);
-    sampleCount += size;
-}
-
 void MainWindow::clearPlot()
 {
-    for (unsigned int ci = 0; ci < numOfChannels; ci++)
+    for (int ci = 0; ci < channelBuffers.size(); ci++)
     {
         channelBuffers[ci]->clear();
     }
@@ -438,7 +313,7 @@ void MainWindow::onNumOfSamplesChanged(int value)
 {
     numOfSamples = value;
 
-    for (unsigned int ci = 0; ci < numOfChannels; ci++)
+    for (int ci = 0; ci < channelBuffers.size(); ci++)
     {
         channelBuffers[ci]->resize(numOfSamples);
     }
@@ -446,10 +321,10 @@ void MainWindow::onNumOfSamplesChanged(int value)
     ui->plot->replot();
 }
 
-void MainWindow::onNumOfChannelsChanged(int value)
+void MainWindow::onNumOfChannelsChanged(unsigned value)
 {
-    unsigned int oldNum = this->numOfChannels;
-    this->numOfChannels = value;
+    unsigned int oldNum = channelBuffers.size();
+    unsigned numOfChannels = value;
 
     if (numOfChannels > oldNum)
     {
@@ -509,111 +384,14 @@ void MainWindow::onRangeSelected()
     ui->cbAutoScale->setChecked(false);
 }
 
-void MainWindow::onNumberFormatButtonToggled(int numberFormatId, bool checked)
+void MainWindow::onSpsChanged(unsigned sps)
 {
-    if (checked) selectNumberFormat((NumberFormat) numberFormatId);
-}
-
-void MainWindow::selectNumberFormat(NumberFormat numberFormatId)
-{
-    numberFormat = numberFormatId;
-
-    switch(numberFormat)
-    {
-        case NumberFormat_uint8:
-            sampleSize = 1;
-            readSample = &MainWindow::readSampleAs<quint8>;
-            break;
-        case NumberFormat_int8:
-            sampleSize = 1;
-            readSample = &MainWindow::readSampleAs<qint8>;
-            break;
-        case NumberFormat_uint16:
-            sampleSize = 2;
-            readSample = &MainWindow::readSampleAs<quint16>;
-            break;
-        case NumberFormat_int16:
-            sampleSize = 2;
-            readSample = &MainWindow::readSampleAs<qint16>;
-            break;
-        case NumberFormat_uint32:
-            sampleSize = 4;
-            readSample = &MainWindow::readSampleAs<quint32>;
-            break;
-        case NumberFormat_int32:
-            sampleSize = 4;
-            readSample = &MainWindow::readSampleAs<qint32>;
-            break;
-        case NumberFormat_float:
-            sampleSize = 4;
-            readSample = &MainWindow::readSampleAs<float>;
-            break;
-        case NumberFormat_ASCII:
-            sampleSize = 0;    // these two members should not be used
-            readSample = NULL; // in this mode
-            break;
-    }
-
-    if (numberFormat == NumberFormat_ASCII)
-    {
-        QObject::disconnect(&(this->serialPort), &QSerialPort::readyRead, 0, 0);
-        QObject::connect(&(this->serialPort), &QSerialPort::readyRead,
-                         this, &MainWindow::onDataReadyASCII);
-        portControl.enableSkipByte();
-    }
-    else
-    {
-        QObject::disconnect(&(this->serialPort), &QSerialPort::readyRead, 0, 0);
-        QObject::connect(&(this->serialPort), &QSerialPort::readyRead,
-                         this, &MainWindow::onDataReady);
-        portControl.enableSkipByte(false);
-    }
-}
-
-template<typename T> double MainWindow::readSampleAs()
-{
-    T data;
-    this->serialPort.read((char*) &data, sizeof(data));
-
-    if (ui->rbLittleE->isChecked())
-    {
-        data = qFromLittleEndian(data);
-    }
-    else
-    {
-        data = qFromBigEndian(data);
-    }
-
-    return double(data);
+    spsLabel.setText(QString::number(sps) + "sps");
 }
 
 bool MainWindow::isDemoRunning()
 {
     return ui->actionDemoMode->isChecked();
-}
-
-void MainWindow::spsTimerTimeout()
-{
-    spsLabel.setText(QString::number(sampleCount/SPS_UPDATE_TIMEOUT) + "sps");
-    sampleCount = 0;
-}
-
-void MainWindow::demoTimerTimeout()
-{
-    const double period = 100;
-    demoCount++;
-    if (demoCount >= 100) demoCount = 0;
-
-    if (!ui->actionPause->isChecked())
-    {
-        for (unsigned int ci = 0; ci < numOfChannels; ci++)
-        {
-            // we are calculating the fourier components of square wave
-            double value = 4*sin(2*M_PI*double((ci+1)*demoCount)/period)/((2*(ci+1))*M_PI);
-            addChannelData(ci, &value, 1);
-        }
-        ui->plot->replot();
-    }
 }
 
 void MainWindow::enableDemo(bool enabled)
@@ -622,7 +400,7 @@ void MainWindow::enableDemo(bool enabled)
     {
         if (!serialPort.isOpen())
         {
-            demoTimer.start();
+            dataFormatPanel.enableDemo(true);
             ui->actionDemoMode->setChecked(true);
             demoIndicator.show();
             ui->plot->replot();
@@ -634,7 +412,7 @@ void MainWindow::enableDemo(bool enabled)
     }
     else
     {
-        demoTimer.stop();
+        dataFormatPanel.enableDemo(false);
         ui->actionDemoMode->setChecked(false);
         demoIndicator.hide();
         ui->plot->replot();
@@ -659,6 +437,7 @@ void MainWindow::onExportCsv()
         {
             QTextStream fileStream(&file);
 
+            unsigned numOfChannels = channelBuffers.size();
             for (unsigned int ci = 0; ci < numOfChannels; ci++)
             {
                 fileStream << "Channel " << ci;

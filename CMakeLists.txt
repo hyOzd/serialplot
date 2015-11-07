@@ -59,6 +59,7 @@ qt5_wrap_ui(UI_FILES
   snapshotview.ui
   commandpanel.ui
   commandwidget.ui
+  dataformatpanel.ui
   )
 
 if (WIN32)
@@ -85,6 +86,7 @@ add_executable(${PROGRAM_NAME} WIN32
   commandpanel.cpp
   commandwidget.cpp
   commandedit.cpp
+  dataformatpanel.cpp
   ${UI_FILES}
   ${RES_FILES}
   misc/windows_icon.rc

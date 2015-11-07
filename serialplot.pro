@@ -49,7 +49,8 @@ SOURCES += main.cpp\
     plotsnapshotoverlay.cpp \
     commandpanel.cpp \
     commandwidget.cpp \
-    commandedit.cpp
+    commandedit.cpp \
+    dataformatpanel.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
@@ -68,14 +69,16 @@ HEADERS  += mainwindow.h \
     plotsnapshotoverlay.h \
     commandpanel.h \
     commandwidget.h \
-    commandedit.h
+    commandedit.h \
+    dataformatpanel.h
 
 FORMS    += mainwindow.ui \
     about_dialog.ui \
     portcontrol.ui \
     snapshotview.ui \
     commandpanel.ui \
-    commandwidget.ui
+    commandwidget.ui \
+    dataformatpanel.ui
 
 INCLUDEPATH += qmake/
 

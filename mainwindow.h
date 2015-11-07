@@ -36,6 +36,7 @@
 
 #include "portcontrol.h"
 #include "commandpanel.h"
+#include "dataformatpanel.h"
 #include "ui_about_dialog.h"
 #include "framebuffer.h"
 #include "snapshotmanager.h"
@@ -56,20 +57,7 @@ public:
                         const QString &msg);
 
 private:
-    enum NumberFormat
-    {
-        NumberFormat_uint8,
-        NumberFormat_uint16,
-        NumberFormat_uint32,
-        NumberFormat_int8,
-        NumberFormat_int16,
-        NumberFormat_int32,
-        NumberFormat_float,
-        NumberFormat_ASCII
-    };
-
     Ui::MainWindow *ui;
-    QButtonGroup numberFormatButtons;
 
     QDialog aboutDialog;
     void setupAboutDialog();
@@ -78,61 +66,35 @@ private:
     PortControl portControl;
 
     unsigned int numOfSamples;
-    unsigned int numOfChannels;
 
     QList<QwtPlotCurve*> curves;
     // Note: FrameBuffer s are owned by their respective QwtPlotCurve s.
     QList<FrameBuffer*> channelBuffers;
 
-    // `data` contains i th channels data
-    void addChannelData(unsigned int channel, double* data, unsigned size);
-
-    NumberFormat numberFormat;
-    unsigned int sampleSize; // number of bytes in the selected number format
-    double (MainWindow::*readSample)();
-
-    // note that serialPort should already have enough bytes present
-    template<typename T> double readSampleAs();
-
-    bool skipByteRequested;
-
-    const int SPS_UPDATE_TIMEOUT = 1;  // second
     QLabel spsLabel;
-    unsigned int sampleCount;
-    QTimer spsTimer;
 
     CommandPanel commandPanel;
+    DataFormatPanel dataFormatPanel;
 
     SnapshotManager snapshotMan;
 
-    // demo
-    QTimer demoTimer;
-    int demoCount;
-    bool isDemoRunning();
     QwtPlotTextLabel demoIndicator;
+    bool isDemoRunning();
 
 private slots:
     void onPortToggled(bool open);
-    void onDataReady();      // used with binary number formats
-    void onDataReadyASCII(); // used with ASCII number format
     void onPortError(QSerialPort::SerialPortError error);
-
-    void skipByte();
 
     void onNumOfSamplesChanged(int value);
     void onAutoScaleChecked(bool checked);
     void onYScaleChanged();
     void onRangeSelected();
-
-    void onNumOfChannelsChanged(int value);
-    void onNumberFormatButtonToggled(int numberFormatId, bool checked);
-    void selectNumberFormat(NumberFormat numberFormatId);
+    void onNumOfChannelsChanged(unsigned value);
 
     void clearPlot();
 
-    void spsTimerTimeout();
+    void onSpsChanged(unsigned sps);
 
-    void demoTimerTimeout();
     void enableDemo(bool enabled);
 
     void onExportCsv();
