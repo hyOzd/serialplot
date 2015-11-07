@@ -235,16 +235,13 @@ void DataFormatPanel::onDataReady()
         (bytesAvailable - (bytesAvailable % packageSize)) / packageSize;
     double* channelSamples = new double[numOfPackagesToRead*_numOfChannels];
 
-    // TODO: use `for`, it is for this
-    int i = 0;
-    while(i < numOfPackagesToRead)
+    for (int i = 0; i < numOfPackagesToRead; i++)
     {
         for (unsigned int ci = 0; ci < _numOfChannels; ci++)
         {
             // channelSamples[ci].replace(i, (this->*readSample)());
             channelSamples[ci*numOfPackagesToRead+i] = (this->*readSample)();
         }
-        i++;
     }
 
     for (unsigned int ci = 0; ci < _numOfChannels; ci++)
