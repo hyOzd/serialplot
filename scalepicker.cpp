@@ -102,13 +102,16 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
         QMouseEvent* mouseEvent = (QMouseEvent*) event;
         double posPx = this->positionPx(mouseEvent);
 
-        // do snapping
-        for (double sp : snapPoints)
+        // do snapping unless Shift is pressed
+        if (! (mouseEvent->modifiers() & Qt::ShiftModifier))
         {
-            if (fabs(posPx-sp) <= SNAP_DISTANCE)
+            for (double sp : snapPoints)
             {
-                posPx = sp;
-                break;
+                if (fabs(posPx-sp) <= SNAP_DISTANCE)
+                {
+                    posPx = sp;
+                    break;
+                }
             }
         }
 
