@@ -24,6 +24,7 @@
 #include <QFileDialog>
 #include <QFile>
 #include <QTextStream>
+#include <QMenu>
 #include <QtDebug>
 #include <qwt_plot.h>
 #include <limits.h>
@@ -74,6 +75,12 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         ui->menuView->addAction(a);
     }
+
+    ui->menuView->addSeparator();
+
+    QMenu* tbMenu = ui->menuView->addMenu("Toolbars");
+    tbMenu->addAction(ui->plotToolBar->toggleViewAction());
+    tbMenu->addAction(portControl.toolBar()->toggleViewAction());
 
     // init UI signals
 
