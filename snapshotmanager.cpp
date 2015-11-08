@@ -37,7 +37,7 @@ SnapshotManager::SnapshotManager(QMainWindow* mainWindow,
     _mainWindow = mainWindow;
     _channelBuffers = channelBuffers;
 
-    _takeSnapshotAction.setToolTip("Take a snapshot of current plot (F5)");
+    _takeSnapshotAction.setToolTip("Take a snapshot of current plot");
     _takeSnapshotAction.setShortcut(QKeySequence("F5"));
     loadSnapshotAction.setToolTip("Load snapshots from CSV files");
     clearAction.setToolTip("Delete all snapshots");
