@@ -87,6 +87,7 @@ add_executable(${PROGRAM_NAME} WIN32
   commandwidget.cpp
   commandedit.cpp
   dataformatpanel.cpp
+  tooltipfilter.cpp
   ${UI_FILES}
   ${RES_FILES}
   misc/windows_icon.rc

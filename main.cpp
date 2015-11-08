@@ -17,11 +17,13 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "mainwindow.h"
 #include <QApplication>
 #include <QtGlobal>
 
+#include "mainwindow.h"
+#include "tooltipfilter.h"
 #include "version.h"
+
 
 MainWindow* pMainWindow;
 
@@ -39,6 +41,9 @@ int main(int argc, char *argv[])
     pMainWindow = &w;
 
     qInstallMessageHandler(messageHandler);
+
+    ToolTipFilter ttf;
+    a.installEventFilter(&ttf);
 
     // log application information
     qDebug() << "SerialPlot" << VERSION_STRING;
