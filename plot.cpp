@@ -19,6 +19,7 @@
 
 #include <QRectF>
 #include <QKeySequence>
+#include <QColor>
 
 #include "plot.h"
 #include "utils.h"
@@ -143,10 +144,12 @@ void Plot::unzoom()
 
 void Plot::darkBackground(bool enabled)
 {
+    QColor gridColor;
     if (enabled)
     {
         setCanvasBackground(QBrush(Qt::black));
-        grid.setPen(Qt::darkGray);
+        gridColor.setHsvF(0, 0, 0.25);
+        grid.setPen(gridColor);
         zoomer.setRubberBandPen(QPen(Qt::white));
         zoomer.setTrackerPen(QPen(Qt::white));
         sZoomer.setPickerPen(QPen(Qt::white));
@@ -154,7 +157,8 @@ void Plot::darkBackground(bool enabled)
     else
     {
         setCanvasBackground(QBrush(Qt::white));
-        grid.setPen(Qt::lightGray);
+        gridColor.setHsvF(0, 0, 0.80);
+        grid.setPen(gridColor);
         zoomer.setRubberBandPen(QPen(Qt::black));
         zoomer.setTrackerPen(QPen(Qt::black));
         sZoomer.setPickerPen(QPen(Qt::black));
