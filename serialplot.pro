@@ -50,7 +50,8 @@ SOURCES += main.cpp\
     commandpanel.cpp \
     commandwidget.cpp \
     commandedit.cpp \
-    dataformatpanel.cpp
+    dataformatpanel.cpp \
+    tooltipfilter.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
@@ -70,7 +71,8 @@ HEADERS  += mainwindow.h \
     commandpanel.h \
     commandwidget.h \
     commandedit.h \
-    dataformatpanel.h
+    dataformatpanel.h \
+    tooltipfilter.h
 
 FORMS    += mainwindow.ui \
     about_dialog.ui \
