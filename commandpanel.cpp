@@ -38,6 +38,7 @@ CommandPanel::CommandPanel(QSerialPort* port, QWidget *parent) :
 
     connect(ui->pbNew, &QPushButton::clicked, this, &CommandPanel::newCommand);
 
+    command_name_counter = 0;
     newCommand(); // add an empty slot by default
 }
 
@@ -49,6 +50,8 @@ CommandPanel::~CommandPanel()
 void CommandPanel::newCommand()
 {
     auto command = new CommandWidget();
+    command_name_counter++;
+    command->setName(trUtf8("Command ") + QString::number(command_name_counter));
     ui->scrollAreaWidgetContents->layout()->addWidget(command);
     connect(command, &CommandWidget::sendCommand, this, &CommandPanel::sendCommand);
 }

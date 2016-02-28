@@ -42,6 +42,8 @@ private:
     Ui::CommandPanel *ui;
     QSerialPort* serialPort;
 
+    unsigned command_name_counter;
+
 private slots:
     void newCommand();
     void sendCommand(QByteArray command);

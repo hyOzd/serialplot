@@ -48,6 +48,9 @@
     </widget>
    </item>
    <item>
+    <widget class="SneakyLineEdit" name="leName"/>
+   </item>
+   <item>
     <widget class="CommandEdit" name="leCommand">
      <property name="sizePolicy">
       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -166,6 +169,11 @@
    <class>CommandEdit</class>
    <extends>QLineEdit</extends>
    <header>commandedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SneakyLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>sneakylineedit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

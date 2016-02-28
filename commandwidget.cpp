@@ -93,3 +93,13 @@ bool CommandWidget::isASCIIMode()
 {
     return ui->pbASCII->isChecked();
 }
+
+void CommandWidget::setName(QString name)
+{
+    ui->leName->setText(name);
+}
+
+QString CommandWidget::name()
+{
+    return ui->leName->text();
+}

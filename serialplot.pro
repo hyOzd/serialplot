@@ -51,7 +51,8 @@ SOURCES += main.cpp\
     commandwidget.cpp \
     commandedit.cpp \
     dataformatpanel.cpp \
-    tooltipfilter.cpp
+    tooltipfilter.cpp \
+    sneakylineedit.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
@@ -72,7 +73,8 @@ HEADERS  += mainwindow.h \
     commandwidget.h \
     commandedit.h \
     dataformatpanel.h \
-    tooltipfilter.h
+    tooltipfilter.h \
+    sneakylineedit.h
 
 FORMS    += mainwindow.ui \
     about_dialog.ui \

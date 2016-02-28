@@ -35,6 +35,9 @@ public:
     explicit CommandWidget(QWidget *parent = 0);
     ~CommandWidget();
 
+    void setName(QString name);
+    QString name();
+
 signals:
     void deleteRequested(CommandWidget* thisWidget); // emitted when delete button is clicked
 
