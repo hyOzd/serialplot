@@ -32,15 +32,23 @@ bool ToolTipFilter::eventFilter(QObject *obj, QEvent *ev)
         // prepare tooltip message
         QToolButton* toolButton = (QToolButton*) obj;
         QAction* action = toolButton->defaultAction();
-        QString toolTip = action->toolTip();
+
+        QString toolTip;
+        if (action != NULL)
+        {
+            toolTip = action->toolTip();
+            QKeySequence keys = action->shortcut();
+            if (!keys.isEmpty())
+            {
+                toolTip += QString(" <b>[") + keys.toString() + "]</b>";
+            }
+        }
+        else
+        {
+            toolTip = toolButton->toolTip();
+        }
 
         if (toolTip.isEmpty()) return false;
-
-        QKeySequence keys = action->shortcut();
-        if (!keys.isEmpty())
-        {
-            toolTip += QString(" <b>[") + keys.toString() + "]</b>";
-        }
 
         // show tooltip message
         QHelpEvent *helpEvent = static_cast<QHelpEvent *>(ev);
