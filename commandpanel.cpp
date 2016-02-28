@@ -41,6 +41,7 @@ CommandPanel::CommandPanel(QSerialPort* port, QWidget *parent) :
     connect(&_newCommandAction, &QAction::triggered, this, &CommandPanel::newCommand);
 
     _menu.addAction(&_newCommandAction);
+    _menu.addSeparator();
 
     command_name_counter = 0;
     newCommand(); // add an empty slot by default
@@ -59,6 +60,7 @@ void CommandPanel::newCommand()
     ui->scrollAreaWidgetContents->layout()->addWidget(command);
     command->setFocusToEdit();
     connect(command, &CommandWidget::sendCommand, this, &CommandPanel::sendCommand);
+    _menu.addAction(command->sendAction());
 }
 
 void CommandPanel::sendCommand(QByteArray command)

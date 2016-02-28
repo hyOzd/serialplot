@@ -22,6 +22,7 @@
 
 #include <QWidget>
 #include <QByteArray>
+#include <QAction>
 
 namespace Ui {
 class CommandWidget;
@@ -38,6 +39,7 @@ public:
     void setName(QString name);
     QString name();
     void setFocusToEdit();
+    QAction* sendAction();
 
 signals:
     void deleteRequested(CommandWidget* thisWidget); // emitted when delete button is clicked
@@ -50,6 +52,7 @@ signals:
 
 private:
     Ui::CommandWidget *ui;
+    QAction _sendAction;
 
     bool isASCIIMode(); // true: ascii mode, false hex mode
 

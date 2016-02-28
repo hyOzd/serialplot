@@ -27,7 +27,8 @@
 
 CommandWidget::CommandWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::CommandWidget)
+    ui(new Ui::CommandWidget),
+    _sendAction(this)
 {
     ui->setupUi(this);
 
@@ -38,6 +39,11 @@ CommandWidget::CommandWidget(QWidget *parent) :
     connect(ui->pbDelete, &QPushButton::clicked, this, &CommandWidget::onDeleteClicked);
     connect(ui->pbSend, &QPushButton::clicked, this, &CommandWidget::onSendClicked);
     connect(ui->pbASCII, &QPushButton::toggled, this, &CommandWidget::onASCIIToggled);
+    connect(ui->leName, &QLineEdit::textChanged, [this](QString text)
+            {
+                this->_sendAction.setText(text);
+            });
+    connect(&_sendAction, &QAction::triggered, this, &CommandWidget::onSendClicked);
 }
 
 CommandWidget::~CommandWidget()
@@ -107,4 +113,9 @@ QString CommandWidget::name()
 void CommandWidget::setFocusToEdit()
 {
     ui->leCommand->setFocus(Qt::OtherFocusReason);
+}
+
+QAction* CommandWidget::sendAction()
+{
+    return &_sendAction;
 }
