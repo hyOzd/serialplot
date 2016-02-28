@@ -67,6 +67,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->plotToolBar->addAction(snapshotMan.takeSnapshotAction());
     ui->menuBar->insertMenu(ui->menuHelp->menuAction(), snapshotMan.menu());
+    ui->menuBar->insertMenu(ui->menuHelp->menuAction(), commandPanel.menu());
+    connect(commandPanel.newCommandAction(), &QAction::triggered, [this]()
+            {
+                this->ui->tabWidget->setCurrentWidget(&commandPanel);
+            });
 
     setupAboutDialog();
 

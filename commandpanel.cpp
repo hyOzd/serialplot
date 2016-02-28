@@ -25,7 +25,8 @@
 
 CommandPanel::CommandPanel(QSerialPort* port, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::CommandPanel)
+    ui(new Ui::CommandPanel),
+    _menu(trUtf8("Commands")), _newCommandAction(trUtf8("New Command"), this)
 {
     serialPort = port;
 
@@ -37,6 +38,9 @@ CommandPanel::CommandPanel(QSerialPort* port, QWidget *parent) :
 #endif // Q_OS_WIN
 
     connect(ui->pbNew, &QPushButton::clicked, this, &CommandPanel::newCommand);
+    connect(&_newCommandAction, &QAction::triggered, this, &CommandPanel::newCommand);
+
+    _menu.addAction(&_newCommandAction);
 
     command_name_counter = 0;
     newCommand(); // add an empty slot by default
@@ -53,6 +57,7 @@ void CommandPanel::newCommand()
     command_name_counter++;
     command->setName(trUtf8("Command ") + QString::number(command_name_counter));
     ui->scrollAreaWidgetContents->layout()->addWidget(command);
+    command->setFocusToEdit();
     connect(command, &CommandWidget::sendCommand, this, &CommandPanel::sendCommand);
 }
 
@@ -68,4 +73,14 @@ void CommandPanel::sendCommand(QByteArray command)
     {
         qCritical() << "Send command failed!";
     }
+}
+
+QMenu* CommandPanel::menu()
+{
+    return &_menu;
+}
+
+QAction* CommandPanel::newCommandAction()
+{
+    return &_newCommandAction;
 }

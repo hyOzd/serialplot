@@ -23,6 +23,8 @@
 #include <QWidget>
 #include <QSerialPort>
 #include <QByteArray>
+#include <QMenu>
+#include <QAction>
 
 #include "commandwidget.h"
 
@@ -38,9 +40,14 @@ public:
     explicit CommandPanel(QSerialPort* port, QWidget *parent = 0);
     ~CommandPanel();
 
+    QMenu* menu();
+    QAction* newCommandAction();
+
 private:
     Ui::CommandPanel *ui;
     QSerialPort* serialPort;
+    QMenu _menu;
+    QAction _newCommandAction;
 
     unsigned command_name_counter;
 

@@ -37,6 +37,7 @@ public:
 
     void setName(QString name);
     QString name();
+    void setFocusToEdit();
 
 signals:
     void deleteRequested(CommandWidget* thisWidget); // emitted when delete button is clicked

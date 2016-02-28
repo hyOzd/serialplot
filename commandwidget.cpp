@@ -103,3 +103,8 @@ QString CommandWidget::name()
 {
     return ui->leName->text();
 }
+
+void CommandWidget::setFocusToEdit()
+{
+    ui->leCommand->setFocus(Qt::OtherFocusReason);
+}
