@@ -49,17 +49,17 @@ else (QWT_USE_STATIC)
 endif (QWT_USE_STATIC)
 
 # includes
-include_directories(${QWT_INCLUDE_DIR})
+include_directories("./src" ${QWT_INCLUDE_DIR})
 
 # wrap UI and resource files
 qt5_wrap_ui(UI_FILES
-  mainwindow.ui
-  portcontrol.ui
-  about_dialog.ui
-  snapshotview.ui
-  commandpanel.ui
-  commandwidget.ui
-  dataformatpanel.ui
+  src/mainwindow.ui
+  src/portcontrol.ui
+  src/about_dialog.ui
+  src/snapshotview.ui
+  src/commandpanel.ui
+  src/commandwidget.ui
+  src/dataformatpanel.ui
   )
 
 if (WIN32)
@@ -69,29 +69,29 @@ else (WIN32)
 endif (WIN32)
 
 add_executable(${PROGRAM_NAME} WIN32
-  main.cpp
-  mainwindow.cpp
-  portcontrol.cpp
-  plot.cpp
-  zoomer.cpp
-  hidabletabwidget.cpp
-  framebuffer.cpp
-  scalepicker.cpp
-  scalezoomer.cpp
-  portlist.cpp
-  snapshot.cpp
-  snapshotview.cpp
-  snapshotmanager.cpp
-  plotsnapshotoverlay.cpp
-  commandpanel.cpp
-  commandwidget.cpp
-  commandedit.cpp
-  dataformatpanel.cpp
-  tooltipfilter.cpp
-  sneakylineedit.cpp
+  src/main.cpp
+  src/mainwindow.cpp
+  src/portcontrol.cpp
+  src/plot.cpp
+  src/zoomer.cpp
+  src/hidabletabwidget.cpp
+  src/framebuffer.cpp
+  src/scalepicker.cpp
+  src/scalezoomer.cpp
+  src/portlist.cpp
+  src/snapshot.cpp
+  src/snapshotview.cpp
+  src/snapshotmanager.cpp
+  src/plotsnapshotoverlay.cpp
+  src/commandpanel.cpp
+  src/commandwidget.cpp
+  src/commandedit.cpp
+  src/dataformatpanel.cpp
+  src/tooltipfilter.cpp
+  src/sneakylineedit.cpp
+  misc/windows_icon.rc
   ${UI_FILES}
   ${RES_FILES}
-  misc/windows_icon.rc
   )
 
 # Use the Widgets module from Qt 5.
@@ -140,7 +140,7 @@ endif (NOT VERSION_REVISION)
 message("SCM revision: ${VERSION_REVISION}")
 
 # configure version file
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/version.h.in" "${CMAKE_CURRENT_BINARY_DIR}/version.h")
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/version.h.in" "${CMAKE_CURRENT_BINARY_DIR}/version.h")
 
 # add make run target
 add_custom_target(run

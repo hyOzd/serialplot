@@ -32,59 +32,61 @@ TEMPLATE = app
 
 CONFIG += qwt
 
+SOURCES += \
+    src/main.cpp\
+    src/mainwindow.cpp \
+    src/portcontrol.cpp \
+    src/plot.cpp \
+    src/zoomer.cpp \
+    src/hidabletabwidget.cpp \
+    src/framebuffer.cpp \
+    src/scalepicker.cpp \
+    src/scalezoomer.cpp \
+    src/portlist.cpp \
+    src/snapshotview.cpp \
+    src/snapshotmanager.cpp \
+    src/snapshot.cpp \
+    src/plotsnapshotoverlay.cpp \
+    src/commandpanel.cpp \
+    src/commandwidget.cpp \
+    src/commandedit.cpp \
+    src/dataformatpanel.cpp \
+    src/tooltipfilter.cpp \
+    src/sneakylineedit.cpp
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
-    portcontrol.cpp \
-    plot.cpp \
-    zoomer.cpp \
-    hidabletabwidget.cpp \
-    framebuffer.cpp \
-    scalepicker.cpp \
-    scalezoomer.cpp \
-    portlist.cpp \
-    snapshotview.cpp \
-    snapshotmanager.cpp \
-    snapshot.cpp \
-    plotsnapshotoverlay.cpp \
-    commandpanel.cpp \
-    commandwidget.cpp \
-    commandedit.cpp \
-    dataformatpanel.cpp \
-    tooltipfilter.cpp \
-    sneakylineedit.cpp
+HEADERS += \
+    src/mainwindow.h \
+    src/utils.h \
+    src/portcontrol.h \
+    src/floatswap.h \
+    src/plot.h \
+    src/zoomer.h \
+    src/hidabletabwidget.h \
+    src/framebuffer.h \
+    src/scalepicker.h \
+    src/scalezoomer.h \
+    src/portlist.h \
+    src/snapshotview.h \
+    src/snapshotmanager.h \
+    src/snapshot.h \
+    src/plotsnapshotoverlay.h \
+    src/commandpanel.h \
+    src/commandwidget.h \
+    src/commandedit.h \
+    src/dataformatpanel.h \
+    src/tooltipfilter.h \
+    src/sneakylineedit.h
 
-HEADERS  += mainwindow.h \
-    utils.h \
-    portcontrol.h \
-    floatswap.h \
-    plot.h \
-    zoomer.h \
-    hidabletabwidget.h \
-    framebuffer.h \
-    scalepicker.h \
-    scalezoomer.h \
-    portlist.h \
-    snapshotview.h \
-    snapshotmanager.h \
-    snapshot.h \
-    plotsnapshotoverlay.h \
-    commandpanel.h \
-    commandwidget.h \
-    commandedit.h \
-    dataformatpanel.h \
-    tooltipfilter.h \
-    sneakylineedit.h
+FORMS += \
+    src/mainwindow.ui \
+    src/about_dialog.ui \
+    src/portcontrol.ui \
+    src/snapshotview.ui \
+    src/commandpanel.ui \
+    src/commandwidget.ui \
+    src/dataformatpanel.ui
 
-FORMS    += mainwindow.ui \
-    about_dialog.ui \
-    portcontrol.ui \
-    snapshotview.ui \
-    commandpanel.ui \
-    commandwidget.ui \
-    dataformatpanel.ui
-
-INCLUDEPATH += qmake/
+INCLUDEPATH += qmake/ src/
 
 CONFIG += c++11
 
