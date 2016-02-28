@@ -18,6 +18,8 @@
 */
 
 #include <stddef.h>
+#include <QSaveFile>
+#include <QTextStream>
 
 #include "snapshot.h"
 #include "snapshotview.h"
@@ -88,4 +90,46 @@ void Snapshot::setName(QString name)
     _name = name;
     _showAction.setText(_name);
     emit nameChanged(this);
+}
+
+void Snapshot::save(QString fileName)
+{
+    // TODO: remove code duplication (MainWindow::onExportCsv)
+    QSaveFile file(fileName);
+
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QTextStream fileStream(&file);
+
+        unsigned numOfChannels = data.size();
+        unsigned numOfSamples = data[0].size();
+
+        // print header
+        for (unsigned int ci = 0; ci < numOfChannels; ci++)
+        {
+            fileStream << "Channel " << ci;
+            if (ci != numOfChannels-1) fileStream << ",";
+        }
+        fileStream << '\n';
+
+        // print rows
+        for (unsigned int i = 0; i < numOfSamples; i++)
+        {
+            for (unsigned int ci = 0; ci < numOfChannels; ci++)
+            {
+                fileStream << data[ci][i].y();
+                if (ci != numOfChannels-1) fileStream << ",";
+            }
+            fileStream << '\n';
+        }
+
+        if (!file.commit())
+        {
+            qCritical() << "File save error during snapshot save: " << file.error();
+        }
+    }
+    else
+    {
+        qCritical() << "File open error during snapshot save: " << file.error();
+    }
 }

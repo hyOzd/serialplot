@@ -17,8 +17,6 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QSaveFile>
-
 #include "snapshotview.h"
 #include "ui_snapshotview.h"
 
@@ -91,42 +89,5 @@ void SnapshotView::save()
 
     if (fileName.isNull()) return; // user canceled
 
-    // TODO: remove code duplication (MainWindow::onExportCsv)
-    QSaveFile file(fileName);
-
-    if (file.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
-        QTextStream fileStream(&file);
-
-        unsigned numOfChannels = _snapshot->data.size();
-        unsigned numOfSamples = _snapshot->data[0].size();
-
-        // print header
-        for (unsigned int ci = 0; ci < numOfChannels; ci++)
-        {
-            fileStream << "Channel " << ci;
-            if (ci != numOfChannels-1) fileStream << ",";
-        }
-        fileStream << '\n';
-
-        // print rows
-        for (unsigned int i = 0; i < numOfSamples; i++)
-        {
-            for (unsigned int ci = 0; ci < numOfChannels; ci++)
-            {
-                fileStream << _snapshot->data[ci][i].y();
-                if (ci != numOfChannels-1) fileStream << ",";
-            }
-            fileStream << '\n';
-        }
-
-        if (!file.commit())
-        {
-            qCritical() << "File save error during snapshot save: " << file.error();
-        }
-    }
-    else
-    {
-        qCritical() << "File open error during snapshot save: " << file.error();
-    }
+    _snapshot->save(fileName);
 }

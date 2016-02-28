@@ -43,6 +43,8 @@ public:
     QString name();
     void setName(QString name);
 
+    void save(QString fileName); /// save snapshot data as CSV
+
 signals:
     void deleteRequested(Snapshot*);
     void nameChanged(Snapshot*);
