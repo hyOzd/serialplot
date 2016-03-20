@@ -39,6 +39,7 @@ Plot::Plot(QWidget* parent) :
 
     zoomer.setZoomBase();
     grid.attach(this);
+    legend.attach(this);
 
     showGrid(false);
     darkBackground(false);

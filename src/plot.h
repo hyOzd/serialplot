@@ -26,6 +26,7 @@
 #include <qwt_plot.h>
 #include <qwt_plot_grid.h>
 #include <qwt_plot_shapeitem.h>
+#include <qwt_plot_legenditem.h>
 
 #include "zoomer.h"
 #include "scalezoomer.h"
@@ -51,6 +52,7 @@ private:
     ScaleZoomer sZoomer;
     QwtPlotGrid grid;
     PlotSnapshotOverlay* snapshotOverlay;
+    QwtPlotLegendItem legend;
 
     QAction _showGridAction;
     QAction _showMinorGridAction;

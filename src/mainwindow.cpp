@@ -157,7 +157,7 @@ MainWindow::MainWindow(QWidget *parent) :
     for (unsigned int i = 0; i < numOfChannels; i++)
     {
         channelBuffers.append(new FrameBuffer(numOfSamples));
-        curves.append(new QwtPlotCurve());
+        curves.append(new QwtPlotCurve(QString("Channel %1").arg(i+1)));
         curves[i]->setSamples(channelBuffers[i]);
         curves[i]->setPen(Plot::makeColor(i));
         curves[i]->attach(ui->plot);
@@ -344,7 +344,7 @@ void MainWindow::onNumOfChannelsChanged(unsigned value)
         for (unsigned int i = 0; i < numOfChannels - oldNum; i++)
         {
             channelBuffers.append(new FrameBuffer(numOfSamples));
-            curves.append(new QwtPlotCurve());
+            curves.append(new QwtPlotCurve(QString("Channel %1").arg(oldNum+i+1)));
             curves.last()->setSamples(channelBuffers.last());
             curves.last()->setPen(Plot::makeColor(curves.length()-1));
             curves.last()->attach(ui->plot);
