@@ -304,7 +304,7 @@ required privileges or device is already opened by another process.";
             qCritical() << "A timeout error occurred.";
             break;
         case QSerialPort::UnknownError:
-            qCritical() << "Unknown error!";
+            qCritical() << "Unknown error! Error: " << serialPort.errorString();
             break;
         default:
             qCritical() << "Unhandled port error: " << error;
