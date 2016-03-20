@@ -54,10 +54,10 @@ private:
     PlotSnapshotOverlay* snapshotOverlay;
     QwtPlotLegendItem legend;
 
-    QAction _showGridAction;
-    QAction _showMinorGridAction;
-    QAction _unzoomAction;
-    QAction _darkBackgroundAction;
+    QAction showGridAction;
+    QAction showMinorGridAction;
+    QAction unzoomAction;
+    QAction darkBackgroundAction;
 
     void resetAxes();
 

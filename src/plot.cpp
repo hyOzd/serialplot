@@ -28,10 +28,10 @@ Plot::Plot(QWidget* parent) :
     QwtPlot(parent),
     zoomer(this->canvas(), false),
     sZoomer(this, &zoomer),
-    _showGridAction("Grid", this),
-    _showMinorGridAction("Minor Grid", this),
-    _unzoomAction("Unzoom", this),
-    _darkBackgroundAction("Dark Background", this)
+    showGridAction("Grid", this),
+    showMinorGridAction("Minor Grid", this),
+    unzoomAction("Unzoom", this),
+    darkBackgroundAction("Dark Background", this)
 {
     isAutoScaled = true;
 
@@ -44,32 +44,32 @@ Plot::Plot(QWidget* parent) :
     showGrid(false);
     darkBackground(false);
 
-    _showGridAction.setToolTip("Show Grid");
-    _showMinorGridAction.setToolTip("Show Minor Grid");
-    _unzoomAction.setToolTip("Unzoom the Plot");
-    _darkBackgroundAction.setToolTip("Enable Dark Plot Background");
+    showGridAction.setToolTip("Show Grid");
+    showMinorGridAction.setToolTip("Show Minor Grid");
+    unzoomAction.setToolTip("Unzoom the Plot");
+    darkBackgroundAction.setToolTip("Enable Dark Plot Background");
 
-    _showGridAction.setShortcut(QKeySequence("G"));
-    _showMinorGridAction.setShortcut(QKeySequence("M"));
+    showGridAction.setShortcut(QKeySequence("G"));
+    showMinorGridAction.setShortcut(QKeySequence("M"));
 
-    _showGridAction.setCheckable(true);
-    _showMinorGridAction.setCheckable(true);
-    _darkBackgroundAction.setCheckable(true);
+    showGridAction.setCheckable(true);
+    showMinorGridAction.setCheckable(true);
+    darkBackgroundAction.setCheckable(true);
 
-    _showGridAction.setChecked(false);
-    _showMinorGridAction.setChecked(false);
-    _darkBackgroundAction.setChecked(false);
+    showGridAction.setChecked(false);
+    showMinorGridAction.setChecked(false);
+    darkBackgroundAction.setChecked(false);
 
-    _showMinorGridAction.setEnabled(false);
+    showMinorGridAction.setEnabled(false);
 
-    connect(&_showGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+    connect(&showGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
             this, &Plot::showGrid);
-    connect(&_showGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
-            &_showMinorGridAction, &QAction::setEnabled);
-    connect(&_showMinorGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+    connect(&showGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+            &showMinorGridAction, &QAction::setEnabled);
+    connect(&showMinorGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
             this, &Plot::showMinorGrid);
-    connect(&_unzoomAction, &QAction::triggered, this, &Plot::unzoom);
-    connect(&_darkBackgroundAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+    connect(&unzoomAction, &QAction::triggered, this, &Plot::unzoom);
+    connect(&darkBackgroundAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
             this, &Plot::darkBackground);
 
     snapshotOverlay = NULL;
@@ -97,10 +97,10 @@ void Plot::setAxis(bool autoScaled, double yAxisMin, double yAxisMax)
 QList<QAction*> Plot::menuActions()
 {
     QList<QAction*> actions;
-    actions << &_showGridAction;
-    actions << &_showMinorGridAction;
-    actions << &_unzoomAction;
-    actions << &_darkBackgroundAction;
+    actions << &showGridAction;
+    actions << &showMinorGridAction;
+    actions << &unzoomAction;
+    actions << &darkBackgroundAction;
     return actions;
 }
 
@@ -202,7 +202,7 @@ void Plot::flashSnapshotOverlay()
     if (snapshotOverlay != NULL) delete snapshotOverlay;
 
     QColor color;
-    if (_darkBackgroundAction.isChecked())
+    if (darkBackgroundAction.isChecked())
     {
         color = QColor(Qt::white);
     }
