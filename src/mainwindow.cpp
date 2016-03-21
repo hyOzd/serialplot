@@ -31,6 +31,9 @@
 #include <cmath>
 #include <iostream>
 
+// test code
+#include <QListView>
+
 #include <plot.h>
 
 #include "utils.h"
@@ -54,9 +57,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     aboutDialog(this),
     portControl(&serialPort),
+    channelMan(1, 1, this),
     commandPanel(&serialPort),
-    dataFormatPanel(&serialPort, &channelBuffers),
-    snapshotMan(this, &channelBuffers)
+    dataFormatPanel(&serialPort, &channelMan),
+    snapshotMan(this, &channelMan)
 {
     ui->setupUi(this);
     ui->tabWidget->insertTab(0, &portControl, "Port");
@@ -148,17 +152,28 @@ MainWindow::MainWindow(QWidget *parent) :
     numOfSamples = ui->spNumOfSamples->value();
     unsigned numOfChannels = dataFormatPanel.numOfChannels();
 
-    QObject::connect(&dataFormatPanel,
-                     &DataFormatPanel::numOfChannelsChanged,
-                     this,
-                     &MainWindow::onNumOfChannelsChanged);
+    channelMan.setNumOfSamples(ui->spNumOfSamples->value());
+    channelMan.setNumOfChannels(dataFormatPanel.numOfChannels());
+
+    connect(&dataFormatPanel, &DataFormatPanel::numOfChannelsChanged,
+            &channelMan, &ChannelManager::setNumOfChannels);
+
+    connect(&channelMan, &ChannelManager::numOfChannelsChanged,
+            this, &MainWindow::onNumOfChannelsChanged);
+
+    connect(&channelMan, &ChannelManager::channelNameChanged,
+            this, &MainWindow::onChannelNameChanged);
+
+    // TODO: move this into the plot tab
+    QListView* channelNamesView = new QListView();
+    channelNamesView->setModel(channelMan.channelNames());
+    channelNamesView->show();
 
     // init channel data and curve list
     for (unsigned int i = 0; i < numOfChannels; i++)
     {
-        channelBuffers.append(new FrameBuffer(numOfSamples));
-        curves.append(new QwtPlotCurve(QString("Channel %1").arg(i+1)));
-        curves[i]->setSamples(channelBuffers[i]);
+        curves.append(new QwtPlotCurve(channelMan.channelName(i)));
+        curves[i]->setSamples(channelMan.channelBuffer(i));
         curves[i]->setPen(Plot::makeColor(i));
         curves[i]->attach(ui->plot);
     }
@@ -314,9 +329,9 @@ required privileges or device is already opened by another process.";
 
 void MainWindow::clearPlot()
 {
-    for (int ci = 0; ci < channelBuffers.size(); ci++)
+    for (unsigned ci = 0; ci < channelMan.numOfChannels(); ci++)
     {
-        channelBuffers[ci]->clear();
+        channelMan.channelBuffer(ci)->clear();
     }
     ui->plot->replot();
 }
@@ -324,30 +339,28 @@ void MainWindow::clearPlot()
 void MainWindow::onNumOfSamplesChanged(int value)
 {
     numOfSamples = value;
-
-    for (int ci = 0; ci < channelBuffers.size(); ci++)
-    {
-        channelBuffers[ci]->resize(numOfSamples);
-    }
-
+    channelMan.setNumOfSamples(value);
     ui->plot->replot();
 }
 
 void MainWindow::onNumOfChannelsChanged(unsigned value)
 {
-    unsigned int oldNum = channelBuffers.size();
+    unsigned int oldNum = curves.size();
     unsigned numOfChannels = value;
 
     if (numOfChannels > oldNum)
     {
         // add new channels
-        for (unsigned int i = 0; i < numOfChannels - oldNum; i++)
+        for (unsigned int i = oldNum; i < numOfChannels; i++)
         {
-            channelBuffers.append(new FrameBuffer(numOfSamples));
-            curves.append(new QwtPlotCurve(QString("Channel %1").arg(oldNum+i+1)));
-            curves.last()->setSamples(channelBuffers.last());
-            curves.last()->setPen(Plot::makeColor(curves.length()-1));
-            curves.last()->attach(ui->plot);
+            QwtPlotCurve* curve = new QwtPlotCurve(channelMan.channelName(i));
+            // TODO: create a wrapper around FrameBuffer that holds a
+            // pointer to it and provides the QwtDataSeries interface,
+            // that wrapper should be created for and owned by 'curve'
+            curve->setSamples(channelMan.channelBuffer(i));
+            curve->setPen(Plot::makeColor(i));
+            curve->attach(ui->plot);
+            curves.append(curve);
         }
     }
     else if(numOfChannels < oldNum)
@@ -355,10 +368,23 @@ void MainWindow::onNumOfChannelsChanged(unsigned value)
         // remove channels
         for (unsigned int i = 0; i < oldNum - numOfChannels; i++)
         {
-            // also deletes owned FrameBuffer
+            // also deletes owned FrameBuffer TODO: which souldn't happen
             delete curves.takeLast();
-            channelBuffers.removeLast();
         }
+    }
+
+    ui->plot->replot();
+}
+
+void MainWindow::onChannelNameChanged(unsigned channel, QString name)
+{
+    // This slot is triggered also when a new channel is added, in
+    // this case curve list doesn't contain said channel. No worries,
+    // since `onNumOfChannelsChanged` slot will update curve list.
+    if (channel < curves.size()) // check if channel exists in curve list
+    {
+        curves[channel]->setTitle(name);
+        ui->plot->replot();
     }
 }
 
@@ -449,7 +475,7 @@ void MainWindow::onExportCsv()
         {
             QTextStream fileStream(&file);
 
-            unsigned numOfChannels = channelBuffers.size();
+            unsigned numOfChannels = channelMan.numOfChannels();
             for (unsigned int ci = 0; ci < numOfChannels; ci++)
             {
                 fileStream << "Channel " << ci;
@@ -461,7 +487,7 @@ void MainWindow::onExportCsv()
             {
                 for (unsigned int ci = 0; ci < numOfChannels; ci++)
                 {
-                    fileStream << channelBuffers[ci]->sample(i).y();
+                    fileStream << channelMan.channelBuffer(ci)->sample(i).y();
                     if (ci != numOfChannels-1) fileStream << ",";
                 }
                 fileStream << '\n';

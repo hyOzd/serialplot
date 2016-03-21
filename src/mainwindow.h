@@ -39,6 +39,7 @@
 #include "dataformatpanel.h"
 #include "ui_about_dialog.h"
 #include "framebuffer.h"
+#include "channelmanager.h"
 #include "snapshotmanager.h"
 
 namespace Ui {
@@ -69,7 +70,8 @@ private:
 
     QList<QwtPlotCurve*> curves;
     // Note: FrameBuffer s are owned by their respective QwtPlotCurve s.
-    QList<FrameBuffer*> channelBuffers;
+    // QList<FrameBuffer*> channelBuffers;
+    ChannelManager channelMan;
 
     QLabel spsLabel;
 
@@ -90,6 +92,7 @@ private slots:
     void onYScaleChanged();
     void onRangeSelected();
     void onNumOfChannelsChanged(unsigned value);
+    void onChannelNameChanged(unsigned channel, QString name);
 
     void clearPlot();
 

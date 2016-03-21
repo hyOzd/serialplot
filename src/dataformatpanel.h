@@ -28,6 +28,7 @@
 #include <QtGlobal>
 
 #include "framebuffer.h"
+#include "channelmanager.h"
 
 namespace Ui {
 class DataFormatPanel;
@@ -39,7 +40,7 @@ class DataFormatPanel : public QWidget
 
 public:
     explicit DataFormatPanel(QSerialPort* port,
-                             QList<FrameBuffer*>* channelBuffers,
+                             ChannelManager* channelMan,
                              QWidget *parent = 0);
     ~DataFormatPanel();
 
@@ -77,7 +78,7 @@ private:
     QButtonGroup numberFormatButtons;
 
     QSerialPort* serialPort;
-    QList<FrameBuffer*>* _channelBuffers;
+    ChannelManager* _channelMan;
 
     unsigned int _numOfChannels;
     NumberFormat numberFormat;
