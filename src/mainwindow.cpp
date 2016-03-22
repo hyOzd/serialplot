@@ -164,12 +164,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&channelMan, &ChannelManager::channelNameChanged,
             this, &MainWindow::onChannelNameChanged);
 
-    // TODO: move this into the plot tab
-    QListView* channelNamesView = new QListView();
-    channelNamesView->setModel(channelMan.channelNames());
-    channelNamesView->show();
+    ui->lvChannelNames->setModel(channelMan.channelNames());
 
-    // init channel data and curve list
+    // init curve list
     for (unsigned int i = 0; i < numOfChannels; i++)
     {
         curves.append(new QwtPlotCurve(channelMan.channelName(i)));
