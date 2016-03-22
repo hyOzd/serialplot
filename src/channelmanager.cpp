@@ -78,12 +78,13 @@ void ChannelManager::setNumOfChannels(unsigned number)
     else if(number < oldNum)
     {
         // remove channels
-        for (unsigned int i = 0; i < oldNum - number; i++)
+        for (unsigned int i = oldNum-1; i > number-1; i--)
         {
             // also deletes owned FrameBuffer
             // delete curves.takeLast();
             // TODO: important, remove channelBuffer
             channelBuffers.removeLast();
+            _channelNames.removeRow(i);
         }
     }
 
