@@ -90,6 +90,7 @@ add_executable(${PROGRAM_NAME} WIN32
   src/tooltipfilter.cpp
   src/sneakylineedit.cpp
   src/channelmanager.cpp
+  src/framebufferseries.cpp
   misc/windows_icon.rc
   ${UI_FILES}
   ${RES_FILES}

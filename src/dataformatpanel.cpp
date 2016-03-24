@@ -21,6 +21,7 @@
 #include "ui_dataformatpanel.h"
 
 #include <QtEndian>
+#include <QtDebug>
 
 #include "utils.h"
 #include "floatswap.h"

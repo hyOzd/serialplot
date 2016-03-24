@@ -31,11 +31,9 @@
 #include <cmath>
 #include <iostream>
 
-// test code
-#include <QListView>
-
 #include <plot.h>
 
+#include "framebufferseries.h"
 #include "utils.h"
 #include "version.h"
 
@@ -170,7 +168,8 @@ MainWindow::MainWindow(QWidget *parent) :
     for (unsigned int i = 0; i < numOfChannels; i++)
     {
         curves.append(new QwtPlotCurve(channelMan.channelName(i)));
-        curves[i]->setSamples(channelMan.channelBuffer(i));
+        curves[i]->setSamples(
+            new FrameBufferSeries(channelMan.channelBuffer(i)));
         curves[i]->setPen(Plot::makeColor(i));
         curves[i]->attach(ui->plot);
     }
@@ -351,10 +350,8 @@ void MainWindow::onNumOfChannelsChanged(unsigned value)
         for (unsigned int i = oldNum; i < numOfChannels; i++)
         {
             QwtPlotCurve* curve = new QwtPlotCurve(channelMan.channelName(i));
-            // TODO: create a wrapper around FrameBuffer that holds a
-            // pointer to it and provides the QwtDataSeries interface,
-            // that wrapper should be created for and owned by 'curve'
-            curve->setSamples(channelMan.channelBuffer(i));
+            curve->setSamples(
+                new FrameBufferSeries(channelMan.channelBuffer(i)));
             curve->setPen(Plot::makeColor(i));
             curve->attach(ui->plot);
             curves.append(curve);
@@ -365,7 +362,6 @@ void MainWindow::onNumOfChannelsChanged(unsigned value)
         // remove channels
         for (unsigned int i = 0; i < oldNum - numOfChannels; i++)
         {
-            // also deletes owned FrameBuffer TODO: which souldn't happen
             delete curves.takeLast();
         }
     }

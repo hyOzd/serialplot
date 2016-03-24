@@ -20,11 +20,10 @@
 #ifndef FRAMEBUFFER_H
 #define FRAMEBUFFER_H
 
-#include <qwt_series_data.h>
 #include <QPointF>
 #include <QRectF>
 
-class FrameBuffer : public QwtSeriesData<QPointF>
+class FrameBuffer
 {
 public:
     FrameBuffer(size_t size);

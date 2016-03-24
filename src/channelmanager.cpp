@@ -34,11 +34,6 @@ ChannelManager::ChannelManager(unsigned numberOfChannels, unsigned numberOfSampl
     {
         channelBuffers.append(new FrameBuffer(numberOfSamples));
         channelNamesList << QString("Channel %1").arg(i+1);
-
-        // curves.append(new QwtPlotCurve(QString("Channel %1").arg(i+1)));
-        // curves[i]->setSamples(channelBuffers[i]);
-        // curves[i]->setPen(Plot::makeColor(i));
-        // curves[i]->attach(ui->plot);
     }
 
     _channelNames.setStringList(channelNamesList);
@@ -49,7 +44,10 @@ ChannelManager::ChannelManager(unsigned numberOfChannels, unsigned numberOfSampl
 
 ChannelManager::~ChannelManager()
 {
-    // TODO: remove all channelBuffers
+    for (auto buffer : channelBuffers)
+    {
+        delete buffer;
+    }
 }
 
 unsigned ChannelManager::numOfChannels()
@@ -80,10 +78,7 @@ void ChannelManager::setNumOfChannels(unsigned number)
         // remove channels
         for (unsigned int i = oldNum-1; i > number-1; i--)
         {
-            // also deletes owned FrameBuffer
-            // delete curves.takeLast();
-            // TODO: important, remove channelBuffer
-            channelBuffers.removeLast();
+            delete channelBuffers.takeLast();
             _channelNames.removeRow(i);
         }
     }
@@ -133,6 +128,7 @@ void ChannelManager::onChannelNameDataChange(const QModelIndex & topLeft,
                                              const QModelIndex & bottomRight,
                                              const QVector<int> & roles)
 {
+    Q_UNUSED(roles);
     int start = topLeft.row();
     int end = bottomRight.row();
 

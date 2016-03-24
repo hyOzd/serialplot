@@ -57,7 +57,7 @@ private:
     QList<FrameBuffer*> channelBuffers;
     QStringListModel _channelNames;
 
-    void addChannelName(QString name); /// appends a new channel name at the end of list
+    void addChannelName(QString name); ///< appends a new channel name at the end of list
 
 private slots:
     void onChannelNameDataChange(const QModelIndex & topLeft,

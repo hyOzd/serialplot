@@ -24,6 +24,7 @@
 #include <QFile>
 #include <QVector>
 #include <QPointF>
+#include <QtDebug>
 
 #include "snapshotmanager.h"
 
