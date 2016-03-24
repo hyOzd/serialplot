@@ -25,6 +25,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QMenu>
+#include <QDesktopServices>
 #include <QtDebug>
 #include <qwt_plot.h>
 #include <limits.h>
@@ -34,6 +35,7 @@
 #include <plot.h>
 
 #include "utils.h"
+#include "defines.h"
 #include "version.h"
 
 #if defined(Q_OS_WIN) && defined(QT_STATIC)
@@ -92,6 +94,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // menu signals
     QObject::connect(ui->actionHelpAbout, &QAction::triggered,
               &aboutDialog, &QWidget::show);
+
+    QObject::connect(ui->actionReportBug, &QAction::triggered,
+                     [](){QDesktopServices::openUrl(QUrl(BUG_REPORT_URL));});
 
     QObject::connect(ui->actionExportCsv, &QAction::triggered,
                      this, &MainWindow::onExportCsv);
