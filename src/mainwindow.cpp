@@ -480,7 +480,7 @@ void MainWindow::onExportCsv()
             {
                 for (unsigned int ci = 0; ci < numOfChannels; ci++)
                 {
-                    fileStream << channelMan.channelBuffer(ci)->sample(i).y();
+                    fileStream << channelMan.channelBuffer(ci)->sample(i);
                     if (ci != numOfChannels-1) fileStream << ",";
                 }
                 fileStream << '\n';

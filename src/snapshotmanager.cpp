@@ -73,7 +73,7 @@ void SnapshotManager::takeSnapshot()
         snapshot->data.append(QVector<QPointF>(numOfSamples));
         for (unsigned i = 0; i < numOfSamples; i++)
         {
-            snapshot->data[ci][i] = _channelMan->channelBuffer(ci)->sample(i);
+            snapshot->data[ci][i] = QPointF(i, _channelMan->channelBuffer(ci)->sample(i));
         }
     }
 

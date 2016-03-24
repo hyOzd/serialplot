@@ -33,10 +33,10 @@ public:
     void addSamples(double* samples, size_t size);
     void clear(); // fill 0
 
-    // QwtSeriesData implementations
+    // QwtSeriesData related implementations
     size_t size() const;
-    QPointF sample(size_t i) const;
     QRectF boundingRect() const;
+    double sample(size_t i) const;
 
 private:
     size_t _size; // size of `data`
@@ -44,8 +44,6 @@ private:
     size_t headIndex; // indicates the actual `0` index of the ring buffer
 
     QRectF _boundingRect;
-
-    double _sample(size_t i) const;
 };
 
 #endif // FRAMEBUFFER_H

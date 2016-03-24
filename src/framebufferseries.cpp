@@ -13,7 +13,7 @@ size_t FrameBufferSeries::size() const
 
 QPointF FrameBufferSeries::sample(size_t i) const
 {
-    return _buffer->sample(i);
+    return QPointF(i, _buffer->sample(i));
 }
 
 QRectF FrameBufferSeries::boundingRect() const

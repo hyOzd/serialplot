@@ -45,7 +45,7 @@ void FrameBuffer::resize(size_t size)
 
     for (int i = fill_start; i < int(size); i++)
     {
-        newData[i] = _sample(i - offset);
+        newData[i] = sample(i - offset);
     }
 
     // fill the beginning of the new data
@@ -141,17 +141,12 @@ size_t FrameBuffer::size() const
     return _size;
 }
 
-QPointF FrameBuffer::sample(size_t i) const
-{
-    return QPointF(i, _sample(i));
-}
-
 QRectF FrameBuffer::boundingRect() const
 {
     return _boundingRect;
 }
 
-double FrameBuffer::_sample(size_t i) const
+double FrameBuffer::sample(size_t i) const
 {
     size_t index = headIndex + i;
     if (index >= _size) index -= _size;
