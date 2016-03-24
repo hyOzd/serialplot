@@ -69,7 +69,14 @@
            </widget>
           </item>
           <item>
-           <widget class="QListView" name="lvChannelNames"/>
+           <widget class="QListView" name="lvChannelNames">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>170</height>
+             </size>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
