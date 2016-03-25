@@ -199,7 +199,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Init sps (sample per second) counter
     spsLabel.setText("0sps");
-    spsLabel.setToolTip("samples per second (total of all channels)");
+    spsLabel.setToolTip("samples per second (per channel)");
     ui->statusBar->addPermanentWidget(&spsLabel);
     QObject::connect(&dataFormatPanel,
                      &DataFormatPanel::samplesPerSecondChanged,

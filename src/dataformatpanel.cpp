@@ -182,7 +182,7 @@ void DataFormatPanel::enableDemo(bool enabled)
 void DataFormatPanel::spsTimerTimeout()
 {
     unsigned currentSps = _samplesPerSecond;
-    _samplesPerSecond = sampleCount/SPS_UPDATE_TIMEOUT;
+    _samplesPerSecond = (sampleCount/_numOfChannels)/SPS_UPDATE_TIMEOUT;
     if (currentSps != _samplesPerSecond)
     {
         emit samplesPerSecondChanged(_samplesPerSecond);
