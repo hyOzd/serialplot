@@ -25,6 +25,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QMenu>
+#include <QDesktopServices>
 #include <QtDebug>
 #include <qwt_plot.h>
 #include <limits.h>
@@ -35,6 +36,7 @@
 
 #include "framebufferseries.h"
 #include "utils.h"
+#include "defines.h"
 #include "version.h"
 
 #if defined(Q_OS_WIN) && defined(QT_STATIC)
@@ -94,6 +96,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // menu signals
     QObject::connect(ui->actionHelpAbout, &QAction::triggered,
               &aboutDialog, &QWidget::show);
+
+    QObject::connect(ui->actionReportBug, &QAction::triggered,
+                     [](){QDesktopServices::openUrl(QUrl(BUG_REPORT_URL));});
 
     QObject::connect(ui->actionExportCsv, &QAction::triggered,
                      this, &MainWindow::onExportCsv);
@@ -205,7 +210,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Init sps (sample per second) counter
     spsLabel.setText("0sps");
-    spsLabel.setToolTip("samples per second (total of all channels)");
+    spsLabel.setToolTip("samples per second (per channel)");
     ui->statusBar->addPermanentWidget(&spsLabel);
     QObject::connect(&dataFormatPanel,
                      &DataFormatPanel::samplesPerSecondChanged,

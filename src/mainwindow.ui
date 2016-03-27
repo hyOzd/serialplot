@@ -250,6 +250,7 @@
      <string>Help</string>
     </property>
     <addaction name="actionDemoMode"/>
+    <addaction name="actionReportBug"/>
     <addaction name="actionHelpAbout"/>
    </widget>
    <widget class="QMenu" name="menuFile">
@@ -338,6 +339,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionReportBug">
+   <property name="text">
+    <string>Report a Bug</string>
+   </property>
+   <property name="toolTip">
+    <string>Report a Bug on SerialPlot Website</string>
    </property>
   </action>
  </widget>
