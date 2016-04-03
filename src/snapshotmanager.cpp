@@ -147,7 +147,8 @@ void SnapshotManager::loadSnapshotFromFile(QString fileName)
 
     // read first row as headlines and determine number of channels
     auto headLine = QString(file.readLine());
-    unsigned numOfChannels = headLine.split(',').size();
+    QStringList channelNames = headLine.split(',');
+    unsigned numOfChannels = channelNames.size();
 
     // read data
     QVector<QVector<QPointF>> data(numOfChannels);
@@ -185,6 +186,7 @@ void SnapshotManager::loadSnapshotFromFile(QString fileName)
 
     auto snapshot = new Snapshot(_mainWindow, QFileInfo(fileName).baseName());
     snapshot->data = data;
+    snapshot->setChannelNames(channelNames);
 
     addSnapshot(snapshot, false);
 }
