@@ -60,7 +60,7 @@ SnapshotManager::~SnapshotManager()
     }
 }
 
-void SnapshotManager::takeSnapshot()
+Snapshot* SnapshotManager::makeSnapshot()
 {
     QString name = QTime::currentTime().toString("'Snapshot ['HH:mm:ss']'");
     auto snapshot = new Snapshot(_mainWindow, name);
@@ -78,7 +78,12 @@ void SnapshotManager::takeSnapshot()
     }
     snapshot->setChannelNames(_channelMan->channelNames()->stringList());
 
-    addSnapshot(snapshot);
+    return snapshot;
+}
+
+void SnapshotManager::takeSnapshot()
+{
+    addSnapshot(makeSnapshot());
 }
 
 void SnapshotManager::addSnapshot(Snapshot* snapshot, bool update_menu)

@@ -39,6 +39,10 @@ public:
     QMenu* menu();
     QAction* takeSnapshotAction();
 
+    /// Creates a dynamically allocated snapshot object but doesn't record it in snapshots list.
+    /// @note Caller is responsible for deletion of the returned `Snapshot` object.
+    Snapshot* makeSnapshot();
+
 private:
     QMainWindow* _mainWindow;
     ChannelManager* _channelMan;

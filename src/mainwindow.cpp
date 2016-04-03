@@ -468,33 +468,9 @@ void MainWindow::onExportCsv()
     }
     else
     {
-        QFile file(fileName);
-        if (file.open(QIODevice::WriteOnly | QIODevice::Text))
-        {
-            QTextStream fileStream(&file);
-
-            unsigned numOfChannels = channelMan.numOfChannels();
-            for (unsigned int ci = 0; ci < numOfChannels; ci++)
-            {
-                fileStream << "Channel " << ci;
-                if (ci != numOfChannels-1) fileStream << ",";
-            }
-            fileStream << '\n';
-
-            for (unsigned int i = 0; i < numOfSamples; i++)
-            {
-                for (unsigned int ci = 0; ci < numOfChannels; ci++)
-                {
-                    fileStream << channelMan.channelBuffer(ci)->sample(i);
-                    if (ci != numOfChannels-1) fileStream << ",";
-                }
-                fileStream << '\n';
-            }
-        }
-        else
-        {
-            qCritical() << "File open error during export: " << file.error();
-        }
+        Snapshot* snapshot = snapshotMan.makeSnapshot();
+        snapshot->save(fileName);
+        delete snapshot;
     }
 }
 
