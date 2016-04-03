@@ -25,6 +25,7 @@
 #include <QAction>
 #include <QVector>
 #include <QString>
+#include <QStringList>
 
 class SnapshotView;
 
@@ -42,6 +43,8 @@ public:
 
     QString name();
     void setName(QString name);
+    void setChannelNames(QStringList names); // must be called when setting data!
+    QString channelName(unsigned channel);
 
     void save(QString fileName); /// save snapshot data as CSV
 
@@ -51,6 +54,7 @@ signals:
 
 private:
     QString _name;
+    QStringList _channelNames;
     QAction _showAction;
     QAction _deleteAction;
     QMainWindow* mainWindow;

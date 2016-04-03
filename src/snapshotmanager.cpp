@@ -76,6 +76,7 @@ void SnapshotManager::takeSnapshot()
             snapshot->data[ci][i] = QPointF(i, _channelMan->channelBuffer(ci)->sample(i));
         }
     }
+    snapshot->setChannelNames(_channelMan->channelNames()->stringList());
 
     addSnapshot(snapshot);
 }

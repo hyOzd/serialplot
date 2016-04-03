@@ -35,7 +35,7 @@ SnapshotView::SnapshotView(QWidget *parent, Snapshot* snapshot) :
 
     for (unsigned ci = 0; ci < numOfChannels; ci++)
     {
-        QwtPlotCurve* curve = new QwtPlotCurve();
+        QwtPlotCurve* curve = new QwtPlotCurve(snapshot->channelName(ci));
         curves.append(curve);
         curve->setSamples(snapshot->data[ci]);
         curve->setPen(Plot::makeColor(ci));

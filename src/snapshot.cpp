@@ -92,6 +92,16 @@ void Snapshot::setName(QString name)
     emit nameChanged(this);
 }
 
+void Snapshot::setChannelNames(QStringList names)
+{
+    _channelNames = names;
+}
+
+QString Snapshot::channelName(unsigned channel)
+{
+    return _channelNames[channel];
+}
+
 void Snapshot::save(QString fileName)
 {
     // TODO: remove code duplication (MainWindow::onExportCsv)
