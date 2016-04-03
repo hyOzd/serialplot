@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2016 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -17,33 +17,33 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FRAMEBUFFER_H
-#define FRAMEBUFFER_H
+#ifndef FRAMEBUFFERSERIES_H
+#define FRAMEBUFFERSERIES_H
 
 #include <QPointF>
 #include <QRectF>
+#include <qwt_series_data.h>
 
-class FrameBuffer
+#include "framebuffer.h"
+
+/**
+ * This class provides an interface for actual FrameBuffer
+ * object. That way we can keep our data structures relatively
+ * isolated from Qwt. Otherwise QwtPlotCurve owns FrameBuffer
+ * structures.
+ */
+class FrameBufferSeries : public QwtSeriesData<QPointF>
 {
 public:
-    FrameBuffer(size_t size);
-    ~FrameBuffer();
+    FrameBufferSeries(FrameBuffer* buffer);
 
-    void resize(size_t size);
-    void addSamples(double* samples, size_t size);
-    void clear(); // fill 0
-
-    // QwtSeriesData related implementations
+    // QwtSeriesData implementations
     size_t size() const;
+    QPointF sample(size_t i) const;
     QRectF boundingRect() const;
-    double sample(size_t i) const;
 
 private:
-    size_t _size; // size of `data`
-    double* data;
-    size_t headIndex; // indicates the actual `0` index of the ring buffer
-
-    QRectF _boundingRect;
+    FrameBuffer* _buffer;
 };
 
-#endif // FRAMEBUFFER_H
+#endif // FRAMEBUFFERSERIES_H

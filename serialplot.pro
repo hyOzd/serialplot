@@ -52,7 +52,9 @@ SOURCES += \
     src/commandedit.cpp \
     src/dataformatpanel.cpp \
     src/tooltipfilter.cpp \
-    src/sneakylineedit.cpp
+    src/sneakylineedit.cpp \
+    src/channelmanager.cpp \
+    src/framebufferseries.cpp
 
 HEADERS += \
     src/mainwindow.h \
@@ -75,7 +77,9 @@ HEADERS += \
     src/commandedit.h \
     src/dataformatpanel.h \
     src/tooltipfilter.h \
-    src/sneakylineedit.h
+    src/sneakylineedit.h \
+    src/channelmanager.h \
+    src/framebufferseries.h
 
 FORMS += \
     src/mainwindow.ui \

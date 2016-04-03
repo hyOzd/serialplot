@@ -92,6 +92,16 @@ void Snapshot::setName(QString name)
     emit nameChanged(this);
 }
 
+void Snapshot::setChannelNames(QStringList names)
+{
+    _channelNames = names;
+}
+
+QString Snapshot::channelName(unsigned channel)
+{
+    return _channelNames[channel];
+}
+
 void Snapshot::save(QString fileName)
 {
     // TODO: remove code duplication (MainWindow::onExportCsv)
@@ -107,7 +117,7 @@ void Snapshot::save(QString fileName)
         // print header
         for (unsigned int ci = 0; ci < numOfChannels; ci++)
         {
-            fileStream << "Channel " << ci;
+            fileStream << channelName(ci);
             if (ci != numOfChannels-1) fileStream << ",";
         }
         fileStream << '\n';

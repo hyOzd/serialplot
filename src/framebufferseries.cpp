@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2016 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -17,33 +17,24 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FRAMEBUFFER_H
-#define FRAMEBUFFER_H
+#include "framebufferseries.h"
 
-#include <QPointF>
-#include <QRectF>
-
-class FrameBuffer
+FrameBufferSeries::FrameBufferSeries(FrameBuffer* buffer)
 {
-public:
-    FrameBuffer(size_t size);
-    ~FrameBuffer();
+    _buffer = buffer;
+}
 
-    void resize(size_t size);
-    void addSamples(double* samples, size_t size);
-    void clear(); // fill 0
+size_t FrameBufferSeries::size() const
+{
+    return _buffer->size();
+}
 
-    // QwtSeriesData related implementations
-    size_t size() const;
-    QRectF boundingRect() const;
-    double sample(size_t i) const;
+QPointF FrameBufferSeries::sample(size_t i) const
+{
+    return QPointF(i, _buffer->sample(i));
+}
 
-private:
-    size_t _size; // size of `data`
-    double* data;
-    size_t headIndex; // indicates the actual `0` index of the ring buffer
-
-    QRectF _boundingRect;
-};
-
-#endif // FRAMEBUFFER_H
+QRectF FrameBufferSeries::boundingRect() const
+{
+    return _buffer->boundingRect();
+}

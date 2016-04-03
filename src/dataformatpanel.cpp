@@ -21,12 +21,13 @@
 #include "ui_dataformatpanel.h"
 
 #include <QtEndian>
+#include <QtDebug>
 
 #include "utils.h"
 #include "floatswap.h"
 
 DataFormatPanel::DataFormatPanel(QSerialPort* port,
-                                 QList<FrameBuffer*>* channelBuffers,
+                                 ChannelManager* channelMan,
                                  QWidget *parent) :
     QWidget(parent),
     ui(new Ui::DataFormatPanel)
@@ -34,7 +35,7 @@ DataFormatPanel::DataFormatPanel(QSerialPort* port,
     ui->setupUi(this);
 
     serialPort = port;
-    _channelBuffers = channelBuffers;
+    _channelMan = channelMan;
     paused = false;
 
     // setup number format buttons
@@ -319,6 +320,6 @@ template<typename T> double DataFormatPanel::readSampleAs()
 void DataFormatPanel::addChannelData(unsigned int channel,
                                      double* data, unsigned size)
 {
-    (*_channelBuffers)[channel]->addSamples(data, size);
+    _channelMan->addChannelData(channel, data, size);
     sampleCount += size;
 }

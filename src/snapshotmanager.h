@@ -25,6 +25,7 @@
 #include <QMenu>
 
 #include "framebuffer.h"
+#include "channelmanager.h"
 #include "snapshot.h"
 
 class SnapshotManager : public QObject
@@ -32,7 +33,7 @@ class SnapshotManager : public QObject
     Q_OBJECT
 
 public:
-    SnapshotManager(QMainWindow* mainWindow, QList<FrameBuffer*>* channelBuffers);
+    SnapshotManager(QMainWindow* mainWindow, ChannelManager* channelMan);
     ~SnapshotManager();
 
     QMenu* menu();
@@ -40,7 +41,7 @@ public:
 
 private:
     QMainWindow* _mainWindow;
-    QList<FrameBuffer*>* _channelBuffers;
+    ChannelManager* _channelMan;
 
     QList<Snapshot*> snapshots;
 

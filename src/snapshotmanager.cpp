@@ -24,18 +24,19 @@
 #include <QFile>
 #include <QVector>
 #include <QPointF>
+#include <QtDebug>
 
 #include "snapshotmanager.h"
 
 SnapshotManager::SnapshotManager(QMainWindow* mainWindow,
-                                 QList<FrameBuffer*>* channelBuffers) :
+                                 ChannelManager* channelMan) :
     _menu("Snapshots"),
     _takeSnapshotAction("Take Snapshot", this),
     loadSnapshotAction("Load Snapshots", this),
     clearAction("Clear Snapshots", this)
 {
     _mainWindow = mainWindow;
-    _channelBuffers = channelBuffers;
+    _channelMan = channelMan;
 
     _takeSnapshotAction.setToolTip("Take a snapshot of current plot");
     _takeSnapshotAction.setShortcut(QKeySequence("F5"));
@@ -64,17 +65,18 @@ void SnapshotManager::takeSnapshot()
     QString name = QTime::currentTime().toString("'Snapshot ['HH:mm:ss']'");
     auto snapshot = new Snapshot(_mainWindow, name);
 
-    unsigned numOfChannels = _channelBuffers->size();
-    unsigned numOfSamples = _channelBuffers->at(0)->size();
+    unsigned numOfChannels = _channelMan->numOfChannels();
+    unsigned numOfSamples = _channelMan->numOfSamples();
 
     for (unsigned ci = 0; ci < numOfChannels; ci++)
     {
         snapshot->data.append(QVector<QPointF>(numOfSamples));
         for (unsigned i = 0; i < numOfSamples; i++)
         {
-            snapshot->data[ci][i] = _channelBuffers->at(ci)->sample(i);
+            snapshot->data[ci][i] = QPointF(i, _channelMan->channelBuffer(ci)->sample(i));
         }
     }
+    snapshot->setChannelNames(_channelMan->channelNames()->stringList());
 
     addSnapshot(snapshot);
 }
@@ -145,7 +147,8 @@ void SnapshotManager::loadSnapshotFromFile(QString fileName)
 
     // read first row as headlines and determine number of channels
     auto headLine = QString(file.readLine());
-    unsigned numOfChannels = headLine.split(',').size();
+    QStringList channelNames = headLine.split(',');
+    unsigned numOfChannels = channelNames.size();
 
     // read data
     QVector<QVector<QPointF>> data(numOfChannels);
@@ -183,6 +186,7 @@ void SnapshotManager::loadSnapshotFromFile(QString fileName)
 
     auto snapshot = new Snapshot(_mainWindow, QFileInfo(fileName).baseName());
     snapshot->data = data;
+    snapshot->setChannelNames(channelNames);
 
     addSnapshot(snapshot, false);
 }
