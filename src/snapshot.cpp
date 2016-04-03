@@ -117,7 +117,7 @@ void Snapshot::save(QString fileName)
         // print header
         for (unsigned int ci = 0; ci < numOfChannels; ci++)
         {
-            fileStream << "Channel " << ci;
+            fileStream << channelName(ci);
             if (ci != numOfChannels-1) fileStream << ",";
         }
         fileStream << '\n';
