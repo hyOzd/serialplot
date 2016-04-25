@@ -60,6 +60,10 @@ void PortListItem::construct(QString name, QString description, quint16 vid, qui
     {
         setIcon(QIcon(":/bluetooth_icon.png"));
     }
+    else
+    {
+        setIcon(QIcon(":/rs232_icon.png"));
+    }
     setText(text);
     setData(name, PortNameRole);
 }

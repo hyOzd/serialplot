@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>usb_icon.png</file>
         <file>bluetooth_icon.png</file>
+        <file>rs232_icon.png</file>
     </qresource>
 </RCC>
