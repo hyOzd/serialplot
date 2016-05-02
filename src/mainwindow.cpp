@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2016 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -44,14 +44,6 @@
 Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
 #endif
 
-struct Range
-{
-    double rmin;
-    double rmax;
-};
-
-Q_DECLARE_METATYPE(Range);
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -65,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->tabWidget->insertTab(0, &portControl, "Port");
     ui->tabWidget->insertTab(1, &dataFormatPanel, "Data Format");
+    ui->tabWidget->insertTab(2, &plotControlPanel, "Plot");
     ui->tabWidget->insertTab(3, &commandPanel, "Commands");
     ui->tabWidget->setCurrentIndex(0);
     addToolBar(portControl.toolBar());
@@ -115,17 +108,11 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&portControl, &PortControl::skipByteRequested,
                      &dataFormatPanel, &DataFormatPanel::requestSkipByte);
 
-    QObject::connect(ui->spNumOfSamples, SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
-                     this, &MainWindow::onNumOfSamplesChanged);
+    connect(&plotControlPanel, &PlotControlPanel::numOfSamplesChanged,
+            this, &MainWindow::onNumOfSamplesChanged);
 
-    QObject::connect(ui->cbAutoScale, &QCheckBox::toggled,
-                     this, &MainWindow::onAutoScaleChecked);
-
-    QObject::connect(ui->spYmin, SIGNAL(valueChanged(double)),
-                     this, SLOT(onYScaleChanged()));
-
-    QObject::connect(ui->spYmax, SIGNAL(valueChanged(double)),
-                     this, SLOT(onYScaleChanged()));
+    connect(&plotControlPanel, &PlotControlPanel::scaleChanged,
+            ui->plot, &Plot::setAxis);
 
     QObject::connect(ui->actionClear, SIGNAL(triggered(bool)),
                      this, SLOT(clearPlot()));
@@ -137,13 +124,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&(this->serialPort), SIGNAL(error(QSerialPort::SerialPortError)),
                      this, SLOT(onPortError(QSerialPort::SerialPortError)));
 
-    // set limits for axis limit boxes
-    ui->spYmin->setRange((-1) * std::numeric_limits<double>::max(),
-                         std::numeric_limits<double>::max());
-
-    ui->spYmax->setRange((-1) * std::numeric_limits<double>::max(),
-                         std::numeric_limits<double>::max());
-
     // init data format and reader
     QObject::connect(&dataFormatPanel, &DataFormatPanel::dataAdded,
                      ui->plot, &QwtPlot::replot);
@@ -152,10 +132,10 @@ MainWindow::MainWindow(QWidget *parent) :
                      &dataFormatPanel, &DataFormatPanel::pause);
 
     // init data arrays and plot
-    numOfSamples = ui->spNumOfSamples->value();
+    numOfSamples = plotControlPanel.numOfSamples();
     unsigned numOfChannels = dataFormatPanel.numOfChannels();
 
-    channelMan.setNumOfSamples(ui->spNumOfSamples->value());
+    channelMan.setNumOfSamples(numOfSamples);
     channelMan.setNumOfChannels(dataFormatPanel.numOfChannels());
 
     connect(&dataFormatPanel, &DataFormatPanel::numOfChannelsChanged,
@@ -167,7 +147,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&channelMan, &ChannelManager::channelNameChanged,
             this, &MainWindow::onChannelNameChanged);
 
-    ui->lvChannelNames->setModel(channelMan.channelNames());
+    plotControlPanel.setChannelNamesModel(channelMan.channelNames());
 
     // init curve list
     for (unsigned int i = 0; i < numOfChannels; i++)
@@ -180,33 +160,8 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     // init auto scale
-    ui->plot->setAxis(ui->cbAutoScale->isChecked(),
-                      ui->spYmin->value(), ui->spYmax->value());
-
-    // init scale range preset list
-    for (int nbits = 8; nbits <= 24; nbits++) // signed binary formats
-    {
-        int rmax = pow(2, nbits-1)-1;
-        int rmin = -rmax-1;
-        Range r = {double(rmin),  double(rmax)};
-        ui->cbRangePresets->addItem(
-            QString().sprintf("Signed %d bits %d to +%d", nbits, rmin, rmax),
-            QVariant::fromValue(r));
-    }
-    for (int nbits = 8; nbits <= 24; nbits++) // unsigned binary formats
-    {
-        int rmax = pow(2, nbits)-1;
-        ui->cbRangePresets->addItem(
-            QString().sprintf("Unsigned %d bits %d to +%d", nbits, 0, rmax),
-            QVariant::fromValue(Range{0, double(rmax)}));
-    }
-    ui->cbRangePresets->addItem("-1 to +1", QVariant::fromValue(Range{-1, +1}));
-    ui->cbRangePresets->addItem("0 to +1", QVariant::fromValue(Range{0, +1}));
-    ui->cbRangePresets->addItem("-100 to +100", QVariant::fromValue(Range{-100, +100}));
-    ui->cbRangePresets->addItem("0 to +100", QVariant::fromValue(Range{0, +100}));
-
-    QObject::connect(ui->cbRangePresets, SIGNAL(activated(int)),
-                     this, SLOT(onRangeSelected()));
+    ui->plot->setAxis(plotControlPanel.autoScale(),
+                      plotControlPanel.yMin(), plotControlPanel.yMax());
 
     // Init sps (sample per second) counter
     spsLabel.setText("0sps");
@@ -384,40 +339,6 @@ void MainWindow::onChannelNameChanged(unsigned channel, QString name)
         curves[channel]->setTitle(name);
         ui->plot->replot();
     }
-}
-
-void MainWindow::onAutoScaleChecked(bool checked)
-{
-    if (checked)
-    {
-        ui->plot->setAxis(true);
-        ui->lYmin->setEnabled(false);
-        ui->lYmax->setEnabled(false);
-        ui->spYmin->setEnabled(false);
-        ui->spYmax->setEnabled(false);
-    }
-    else
-    {
-        ui->lYmin->setEnabled(true);
-        ui->lYmax->setEnabled(true);
-        ui->spYmin->setEnabled(true);
-        ui->spYmax->setEnabled(true);
-
-        ui->plot->setAxis(false,  ui->spYmin->value(), ui->spYmax->value());
-    }
-}
-
-void MainWindow::onYScaleChanged()
-{
-    ui->plot->setAxis(false,  ui->spYmin->value(), ui->spYmax->value());
-}
-
-void MainWindow::onRangeSelected()
-{
-    Range r = ui->cbRangePresets->currentData().value<Range>();
-    ui->spYmin->setValue(r.rmin);
-    ui->spYmax->setValue(r.rmax);
-    ui->cbAutoScale->setChecked(false);
 }
 
 void MainWindow::onSpsChanged(unsigned sps)

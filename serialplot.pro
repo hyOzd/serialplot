@@ -54,7 +54,8 @@ SOURCES += \
     src/tooltipfilter.cpp \
     src/sneakylineedit.cpp \
     src/channelmanager.cpp \
-    src/framebufferseries.cpp
+    src/framebufferseries.cpp \
+    src/plotcontrolpanel.cpp
 
 HEADERS += \
     src/mainwindow.h \
@@ -79,7 +80,8 @@ HEADERS += \
     src/tooltipfilter.h \
     src/sneakylineedit.h \
     src/channelmanager.h \
-    src/framebufferseries.h
+    src/framebufferseries.h \
+    src/plotcontrolpanel.h
 
 FORMS += \
     src/mainwindow.ui \
@@ -88,7 +90,8 @@ FORMS += \
     src/snapshotview.ui \
     src/commandpanel.ui \
     src/commandwidget.ui \
-    src/dataformatpanel.ui
+    src/dataformatpanel.ui \
+    src/plotcontrolpanel.ui
 
 INCLUDEPATH += qmake/ src/
 

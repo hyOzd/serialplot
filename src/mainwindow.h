@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2016 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -37,6 +37,7 @@
 #include "portcontrol.h"
 #include "commandpanel.h"
 #include "dataformatpanel.h"
+#include "plotcontrolpanel.h"
 #include "ui_about_dialog.h"
 #include "framebuffer.h"
 #include "channelmanager.h"
@@ -77,6 +78,7 @@ private:
 
     CommandPanel commandPanel;
     DataFormatPanel dataFormatPanel;
+    PlotControlPanel plotControlPanel;
 
     SnapshotManager snapshotMan;
 
@@ -88,9 +90,6 @@ private slots:
     void onPortError(QSerialPort::SerialPortError error);
 
     void onNumOfSamplesChanged(int value);
-    void onAutoScaleChecked(bool checked);
-    void onYScaleChanged();
-    void onRangeSelected();
     void onNumOfChannelsChanged(unsigned value);
     void onChannelNameChanged(unsigned channel, QString name);
 

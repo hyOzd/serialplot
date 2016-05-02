@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2016 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -39,7 +39,6 @@ class Plot : public QwtPlot
 public:
     Plot(QWidget* parent = 0);
     ~Plot();
-    void setAxis(bool autoScaled, double yMin = 0, double yMax = 1);
 
     QList<QAction*> menuActions();
 
@@ -66,6 +65,7 @@ public slots:
     void showMinorGrid(bool show = true);
     void unzoom();
     void darkBackground(bool enabled = true);
+    void setAxis(bool autoScaled, double yMin = 0, double yMax = 1);
 
     void flashSnapshotOverlay();
 

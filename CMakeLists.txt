@@ -60,6 +60,7 @@ qt5_wrap_ui(UI_FILES
   src/commandpanel.ui
   src/commandwidget.ui
   src/dataformatpanel.ui
+  src/plotcontrolpanel.ui
   )
 
 if (WIN32)
@@ -87,6 +88,7 @@ add_executable(${PROGRAM_NAME} WIN32
   src/commandwidget.cpp
   src/commandedit.cpp
   src/dataformatpanel.cpp
+  src/plotcontrolpanel.cpp
   src/tooltipfilter.cpp
   src/sneakylineedit.cpp
   src/channelmanager.cpp
