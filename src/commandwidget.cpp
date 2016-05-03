@@ -69,7 +69,7 @@ void CommandWidget::onSendClicked()
 
     if (isASCIIMode())
     {
-        qDebug() << "Sending:" << command;
+        qDebug() << "Sending " << name() << ":" << command;
         emit sendCommand(ui->leCommand->unEscapedText().toLatin1());
     }
     else // hex mode
