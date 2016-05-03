@@ -57,6 +57,7 @@ private:
     QAction showMinorGridAction;
     QAction unzoomAction;
     QAction darkBackgroundAction;
+    QAction showLegendAction;
 
     void resetAxes();
 

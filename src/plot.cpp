@@ -31,7 +31,8 @@ Plot::Plot(QWidget* parent) :
     showGridAction("Grid", this),
     showMinorGridAction("Minor Grid", this),
     unzoomAction("Unzoom", this),
-    darkBackgroundAction("Dark Background", this)
+    darkBackgroundAction("Dark Background", this),
+    showLegendAction("Legend", this)
 {
     isAutoScaled = true;
 
@@ -48,6 +49,7 @@ Plot::Plot(QWidget* parent) :
     showMinorGridAction.setToolTip("Show Minor Grid");
     unzoomAction.setToolTip("Unzoom the Plot");
     darkBackgroundAction.setToolTip("Enable Dark Plot Background");
+    showLegendAction.setToolTip("Display the Legend on Plot");
 
     showGridAction.setShortcut(QKeySequence("G"));
     showMinorGridAction.setShortcut(QKeySequence("M"));
@@ -55,10 +57,12 @@ Plot::Plot(QWidget* parent) :
     showGridAction.setCheckable(true);
     showMinorGridAction.setCheckable(true);
     darkBackgroundAction.setCheckable(true);
+    showLegendAction.setCheckable(true);
 
     showGridAction.setChecked(false);
     showMinorGridAction.setChecked(false);
     darkBackgroundAction.setChecked(false);
+    showLegendAction.setChecked(true);
 
     showMinorGridAction.setEnabled(false);
 
@@ -71,6 +75,8 @@ Plot::Plot(QWidget* parent) :
     connect(&unzoomAction, &QAction::triggered, this, &Plot::unzoom);
     connect(&darkBackgroundAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
             this, &Plot::darkBackground);
+    connect(&showLegendAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+            [this](bool enabled){legend.setVisible(enabled); replot();});
 
     snapshotOverlay = NULL;
 }
@@ -101,6 +107,7 @@ QList<QAction*> Plot::menuActions()
     actions << &showMinorGridAction;
     actions << &unzoomAction;
     actions << &darkBackgroundAction;
+    actions << &showLegendAction;
     return actions;
 }
 
