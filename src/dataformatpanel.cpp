@@ -32,8 +32,9 @@ DataFormatPanel::DataFormatPanel(QSerialPort* port,
                                  QWidget *parent) :
     QWidget(parent),
     ui(new Ui::DataFormatPanel),
-    bsReader(port, channelMan),
-    asciiReader(port, channelMan)
+    bsReader(port, channelMan, this),
+    asciiReader(port, channelMan, this),
+    demoReader(port, channelMan, this)
 {
     ui->setupUi(this);
 
@@ -63,11 +64,9 @@ DataFormatPanel::DataFormatPanel(QSerialPort* port,
                 if (checked) selectReader(&asciiReader);
             });
 
-    // Init demo mode
-    demoCount = 0;
-    demoTimer.setInterval(100);
-    QObject::connect(&demoTimer, &QTimer::timeout,
-                     this, &DataFormatPanel::demoTimerTimeout);
+    // re-purpose numofchannels settings from actual reader settings to demo reader
+    connect(this, &DataFormatPanel::numOfChannelsChanged,
+            &demoReader, &DemoReader::setNumOfChannels);
 }
 
 DataFormatPanel::~DataFormatPanel()
@@ -83,35 +82,23 @@ unsigned DataFormatPanel::numOfChannels()
 void DataFormatPanel::pause(bool enabled)
 {
     currentReader->pause(enabled);
+    demoReader.pause(enabled);
 }
 
 void DataFormatPanel::enableDemo(bool enabled)
 {
     if (enabled)
     {
-        demoTimer.start();
+        demoReader.enable();
+        connect(&demoReader, &DemoReader::dataAdded,
+                this, &DataFormatPanel::dataAdded);
+        connect(&demoReader, &DemoReader::samplesPerSecondChanged,
+                this, &DataFormatPanel::samplesPerSecondChanged);
     }
     else
     {
-        demoTimer.stop();
-    }
-}
-
-void DataFormatPanel::demoTimerTimeout()
-{
-    const double period = 100;
-    demoCount++;
-    if (demoCount >= 100) demoCount = 0;
-
-    if (!paused)
-    {
-        for (unsigned ci = 0; ci < currentReader->numOfChannels(); ci++)
-        {
-            // we are calculating the fourier components of square wave
-            double value = 4*sin(2*M_PI*double((ci+1)*demoCount)/period)/((2*(ci+1))*M_PI);
-            addChannelData(ci, &value, 1);
-        }
-        emit dataAdded();
+        demoReader.enable(false);
+        disconnect(&demoReader, 0, this, 0);
     }
 }
 

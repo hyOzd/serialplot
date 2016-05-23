@@ -104,6 +104,7 @@ add_executable(${PROGRAM_NAME} WIN32
   src/binarystreamreadersettings.cpp
   src/asciireader.cpp
   src/asciireadersettings.cpp
+  src/demoreader.cpp
   misc/windows_icon.rc
   ${UI_FILES}
   ${RES_FILES}

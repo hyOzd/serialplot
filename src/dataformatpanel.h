@@ -31,6 +31,7 @@
 #include "channelmanager.h"
 #include "binarystreamreader.h"
 #include "asciireader.h"
+#include "demoreader.h"
 
 namespace Ui {
 class DataFormatPanel;
@@ -72,15 +73,10 @@ private:
 
     bool paused; // remove
 
-    // demo
-    QTimer demoTimer;
-    int demoCount;
+    DemoReader demoReader;
 
     // `data` contains i th channels data
     void addChannelData(unsigned int channel, double* data, unsigned size);
-
-private slots:
-    void demoTimerTimeout();
 };
 
 #endif // DATAFORMATPANEL_H
