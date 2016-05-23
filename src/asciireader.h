@@ -40,7 +40,6 @@ private:
     AsciiReaderSettings _settingsWidget;
     unsigned _numOfChannels;
     bool paused;
-    unsigned sampleCount; ///< used for sps counter
 
 private slots:
     void onDataReady();

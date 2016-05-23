@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2016 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -49,6 +49,8 @@ DataFormatPanel::DataFormatPanel(QSerialPort* port,
     connect(&bsReader, SIGNAL(dataAdded()), this, SIGNAL(dataAdded()));
     connect(&bsReader, SIGNAL(numOfChannelsChanged(unsigned)),
             this, SIGNAL(numOfChannelsChanged(unsigned)));
+    connect(&bsReader, SIGNAL(samplesPerSecondChanged(unsigned)),
+            this, SIGNAL(samplesPerSecondChanged(unsigned)));
 
     // initalize reader selection buttons
     connect(ui->rbBinary, &QRadioButton::toggled, [this](bool checked)
@@ -60,12 +62,6 @@ DataFormatPanel::DataFormatPanel(QSerialPort* port,
             {
                 if (checked) selectReader(&asciiReader);
             });
-
-    // Init sps (sample per second) counter
-    // sampleCount = 0;
-    // QObject::connect(&spsTimer, &QTimer::timeout,
-    //                  this, &DataFormatPanel::spsTimerTimeout);
-    // spsTimer.start(SPS_UPDATE_TIMEOUT * 1000);
 
     // Init demo mode
     demoCount = 0;
@@ -79,21 +75,9 @@ DataFormatPanel::~DataFormatPanel()
     delete ui;
 }
 
-// TODO: remove
-bool DataFormatPanel::skipByteEnabled()
-{
-    return false;
-}
-
 unsigned DataFormatPanel::numOfChannels()
 {
     return currentReader->numOfChannels();
-}
-
-// TODO: remove
-void DataFormatPanel::requestSkipByte()
-{
-    skipByteRequested = true;
 }
 
 void DataFormatPanel::pause(bool enabled)
@@ -111,17 +95,6 @@ void DataFormatPanel::enableDemo(bool enabled)
     {
         demoTimer.stop();
     }
-}
-
-void DataFormatPanel::spsTimerTimeout()
-{
-    // unsigned currentSps = _samplesPerSecond;
-    // _samplesPerSecond = (sampleCount/_numOfChannels)/SPS_UPDATE_TIMEOUT;
-    // if (currentSps != _samplesPerSecond)
-    // {
-    //     emit samplesPerSecondChanged(_samplesPerSecond);
-    // }
-    // sampleCount = 0;
 }
 
 void DataFormatPanel::demoTimerTimeout()
@@ -146,7 +119,6 @@ void DataFormatPanel::addChannelData(unsigned int channel,
                                      double* data, unsigned size)
 {
     _channelMan->addChannelData(channel, data, size);
-    sampleCount += size;
 }
 
 void DataFormatPanel::selectReader(AbstractReader* reader)
@@ -159,6 +131,8 @@ void DataFormatPanel::selectReader(AbstractReader* reader)
     connect(reader, SIGNAL(dataAdded()), this, SIGNAL(dataAdded()));
     connect(reader, SIGNAL(numOfChannelsChanged(unsigned)),
             this, SIGNAL(numOfChannelsChanged(unsigned)));
+    connect(reader, SIGNAL(samplesPerSecondChanged(unsigned)),
+            this, SIGNAL(samplesPerSecondChanged(unsigned)));
 
     // switch the settings widget
     ui->horizontalLayout->removeWidget(currentReader->settingsWidget());

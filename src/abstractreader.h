@@ -23,6 +23,7 @@
 #include <QObject>
 #include <QIODevice>
 #include <QWidget>
+#include <QTimer>
 
 #include "channelmanager.h"
 
@@ -72,6 +73,17 @@ public slots:
 protected:
     QIODevice* _device;
     ChannelManager* _channelMan;
+
+    /// Implementing class should simply increase this count as samples are read
+    unsigned sampleCount;
+
+private:
+    const int SPS_UPDATE_TIMEOUT = 1;  // second
+    unsigned samplesPerSecond;
+    QTimer spsTimer;
+
+private slots:
+    void spsTimerTimeout();
 };
 
 #endif // ABSTRACTREADER_H

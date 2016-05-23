@@ -46,7 +46,6 @@ private:
     unsigned sampleSize;
     bool paused;
     bool skipByteRequested;
-    unsigned sampleCount; ///< used for sps counter
 
     /// points to the readSampleAs function for currently selected number format
     double (BinaryStreamReader::*readSample)();

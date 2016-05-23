@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2016 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -47,20 +47,14 @@ public:
     ~DataFormatPanel();
 
     unsigned numOfChannels();
-    unsigned samplesPerSecond();
-    bool skipByteEnabled(void); // true for binary formats
 
 public slots:
-    // during next read operation reader will skip 1 byte,
-    // requests are not accumulated
-    void requestSkipByte();
     void pause(bool);
     void enableDemo(bool); // demo shouldn't be enabled when port is open
 
 signals:
     void numOfChannelsChanged(unsigned);
     void samplesPerSecondChanged(unsigned);
-    void skipByteEnabledChanged(bool); // remove
     void dataAdded();
 
 private:
@@ -76,13 +70,7 @@ private:
     /// Disable current reader and enable a another one
     void selectReader(AbstractReader* reader);
 
-    bool skipByteRequested; // remove
     bool paused; // remove
-
-    const int SPS_UPDATE_TIMEOUT = 1;  // second
-    unsigned _samplesPerSecond;
-    unsigned int sampleCount;
-    QTimer spsTimer;
 
     // demo
     QTimer demoTimer;
@@ -92,7 +80,6 @@ private:
     void addChannelData(unsigned int channel, double* data, unsigned size);
 
 private slots:
-    void spsTimerTimeout();
     void demoTimerTimeout();
 };
 

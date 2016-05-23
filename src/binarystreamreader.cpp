@@ -47,8 +47,6 @@ BinaryStreamReader::BinaryStreamReader(QIODevice* device, ChannelManager* channe
             {
                 skipByteRequested = true;
             });
-
-    // TODO sps counter
 }
 
 QWidget* BinaryStreamReader::settingsWidget()
