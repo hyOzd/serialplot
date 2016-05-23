@@ -105,9 +105,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&portControl, &PortControl::portToggled,
                      this, &MainWindow::onPortToggled);
 
-    QObject::connect(&portControl, &PortControl::skipByteRequested,
-                     &dataFormatPanel, &DataFormatPanel::requestSkipByte);
-
     connect(&plotControlPanel, &PlotControlPanel::numOfSamplesChanged,
             this, &MainWindow::onNumOfSamplesChanged);
 

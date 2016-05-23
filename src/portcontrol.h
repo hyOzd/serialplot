@@ -64,7 +64,6 @@ public slots:
     void loadBaudRateList();
     void togglePort();
     void selectPort(QString portName);
-    void enableSkipByte(bool enabled = true);
 
     void selectBaudRate(QString baudRate);
     void selectParity(int parity); // parity must be one of QSerialPort::Parity
@@ -79,7 +78,6 @@ private slots:
     void onTbPortListActivated(int index);
 
 signals:
-    void skipByteRequested();
     void portToggled(bool open);
 };
 

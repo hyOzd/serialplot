@@ -115,10 +115,6 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
                      SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
                      this, &PortControl::selectFlowControl);
 
-    // init skip byte button
-    QObject::connect(ui->pbSkipByte, &QPushButton::clicked,
-                     [this](){emit skipByteRequested();});
-
     loadPortList();
     loadBaudRateList();
     ui->cbBaudRate->setCurrentIndex(ui->cbBaudRate->findText("9600"));
@@ -270,11 +266,6 @@ void PortControl::selectPort(QString portName)
             togglePort();
         }
     }
-}
-
-void PortControl::enableSkipByte(bool enabled)
-{
-    ui->pbSkipByte->setDisabled(enabled);
 }
 
 QToolBar* PortControl::toolBar()
