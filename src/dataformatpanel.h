@@ -29,6 +29,8 @@
 
 #include "framebuffer.h"
 #include "channelmanager.h"
+#include "binarystreamreader.h"
+#include "asciireader.h"
 
 namespace Ui {
 class DataFormatPanel;
@@ -58,33 +60,24 @@ public slots:
 signals:
     void numOfChannelsChanged(unsigned);
     void samplesPerSecondChanged(unsigned);
-    void skipByteEnabledChanged(bool);
+    void skipByteEnabledChanged(bool); // remove
     void dataAdded();
 
 private:
-    enum NumberFormat
-    {
-        NumberFormat_uint8,
-        NumberFormat_uint16,
-        NumberFormat_uint32,
-        NumberFormat_int8,
-        NumberFormat_int16,
-        NumberFormat_int32,
-        NumberFormat_float,
-        NumberFormat_ASCII
-    };
-
     Ui::DataFormatPanel *ui;
-    QButtonGroup numberFormatButtons;
 
     QSerialPort* serialPort;
     ChannelManager* _channelMan;
 
-    unsigned int _numOfChannels;
-    NumberFormat numberFormat;
-    unsigned int sampleSize; // number of bytes in the selected number format
-    bool skipByteRequested;
-    bool paused;
+    BinaryStreamReader bsReader;
+    AsciiReader asciiReader;
+    /// Currently selected reader
+    AbstractReader* currentReader;
+    /// Disable current reader and enable a another one
+    void selectReader(AbstractReader* reader);
+
+    bool skipByteRequested; // remove
+    bool paused; // remove
 
     const int SPS_UPDATE_TIMEOUT = 1;  // second
     unsigned _samplesPerSecond;
@@ -95,22 +88,10 @@ private:
     QTimer demoTimer;
     int demoCount;
 
-    void selectNumberFormat(NumberFormat numberFormatId);
-
-    // points to the readSampleAs function for currently selected number format
-    double (DataFormatPanel::*readSample)();
-
-    // note that serialPort should already have enough bytes present
-    template<typename T> double readSampleAs();
-
     // `data` contains i th channels data
     void addChannelData(unsigned int channel, double* data, unsigned size);
 
 private slots:
-    void onDataReady();      // used with binary number formats
-    void onDataReadyASCII(); // used with ASCII number format
-    void onNumberFormatButtonToggled(int numberFormatId, bool checked);
-    void onNumOfChannelsSP(int value);
     void spsTimerTimeout();
     void demoTimerTimeout();
 };

@@ -61,6 +61,10 @@ qt5_wrap_ui(UI_FILES
   src/commandwidget.ui
   src/dataformatpanel.ui
   src/plotcontrolpanel.ui
+  src/numberformatbox.ui
+  src/endiannessbox.ui
+  src/binarystreamreadersettings.ui
+  src/asciireadersettings.ui
   )
 
 if (WIN32)
@@ -93,6 +97,13 @@ add_executable(${PROGRAM_NAME} WIN32
   src/sneakylineedit.cpp
   src/channelmanager.cpp
   src/framebufferseries.cpp
+  src/numberformatbox.cpp
+  src/endiannessbox.cpp
+  src/abstractreader.cpp
+  src/binarystreamreader.cpp
+  src/binarystreamreadersettings.cpp
+  src/asciireader.cpp
+  src/asciireadersettings.cpp
   misc/windows_icon.rc
   ${UI_FILES}
   ${RES_FILES}

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>BinaryStreamReaderSettings</class>
+ <widget class="QWidget" name="BinaryStreamReaderSettings">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>432</width>
+    <height>203</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>17</x>
+     <y>10</y>
+     <width>127</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Number Of Channels:</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="spNumOfChannels">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>10</y>
+     <width>60</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>60</width>
+     <height>0</height>
+    </size>
+   </property>
+   <property name="keyboardTracking">
+    <bool>false</bool>
+   </property>
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>32</number>
+   </property>
+  </widget>
+  <widget class="NumberFormatBox" name="nfBox" native="true">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>50</y>
+     <width>161</width>
+     <height>141</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="EndiannessBox" name="endiBox" native="true">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>50</y>
+     <width>120</width>
+     <height>80</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbSkipByte">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>10</y>
+     <width>85</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Skip reading 1 byte to correct the alignment</string>
+   </property>
+   <property name="text">
+    <string>Skip Byte</string>
+   </property>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>NumberFormatBox</class>
+   <extends>QWidget</extends>
+   <header>numberformatbox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>EndiannessBox</class>
+   <extends>QWidget</extends>
+   <header>endiannessbox.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

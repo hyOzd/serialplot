@@ -20,6 +20,7 @@
 #include "dataformatpanel.h"
 #include "ui_dataformatpanel.h"
 
+#include <QRadioButton>
 #include <QtEndian>
 #include <QtDebug>
 
@@ -30,7 +31,9 @@ DataFormatPanel::DataFormatPanel(QSerialPort* port,
                                  ChannelManager* channelMan,
                                  QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::DataFormatPanel)
+    ui(new Ui::DataFormatPanel),
+    bsReader(port, channelMan),
+    asciiReader(port, channelMan)
 {
     ui->setupUi(this);
 
@@ -38,35 +41,31 @@ DataFormatPanel::DataFormatPanel(QSerialPort* port,
     _channelMan = channelMan;
     paused = false;
 
-    // setup number format buttons
-    numberFormatButtons.addButton(ui->rbUint8,  NumberFormat_uint8);
-    numberFormatButtons.addButton(ui->rbUint16, NumberFormat_uint16);
-    numberFormatButtons.addButton(ui->rbUint32, NumberFormat_uint32);
-    numberFormatButtons.addButton(ui->rbInt8,   NumberFormat_int8);
-    numberFormatButtons.addButton(ui->rbInt16,  NumberFormat_int16);
-    numberFormatButtons.addButton(ui->rbInt32,  NumberFormat_int32);
-    numberFormatButtons.addButton(ui->rbFloat,  NumberFormat_float);
-    numberFormatButtons.addButton(ui->rbASCII,  NumberFormat_ASCII);
+    // initalize default reader
+    currentReader = &bsReader;
+    bsReader.enable();
+    ui->rbBinary->setChecked(true);
+    ui->horizontalLayout->addWidget(bsReader.settingsWidget(), 1);
+    connect(&bsReader, SIGNAL(dataAdded()), this, SIGNAL(dataAdded()));
+    connect(&bsReader, SIGNAL(numOfChannelsChanged(unsigned)),
+            this, SIGNAL(numOfChannelsChanged(unsigned)));
 
-    QObject::connect(
-        &numberFormatButtons, SIGNAL(buttonToggled(int, bool)),
-        this, SLOT(onNumberFormatButtonToggled(int, bool)));
+    // initalize reader selection buttons
+    connect(ui->rbBinary, &QRadioButton::toggled, [this](bool checked)
+            {
+                if (checked) selectReader(&bsReader);
+            });
 
-    // init number format
-    selectNumberFormat((NumberFormat) numberFormatButtons.checkedId());
-
-    // setup number of channels spinbox
-    QObject::connect(ui->spNumOfChannels,
-                     SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
-                     this, &DataFormatPanel::onNumOfChannelsSP);
-
-    _numOfChannels = ui->spNumOfChannels->value();
+    connect(ui->rbAscii, &QRadioButton::toggled, [this](bool checked)
+            {
+                if (checked) selectReader(&asciiReader);
+            });
 
     // Init sps (sample per second) counter
-    sampleCount = 0;
-    QObject::connect(&spsTimer, &QTimer::timeout,
-                     this, &DataFormatPanel::spsTimerTimeout);
-    spsTimer.start(SPS_UPDATE_TIMEOUT * 1000);
+    // sampleCount = 0;
+    // QObject::connect(&spsTimer, &QTimer::timeout,
+    //                  this, &DataFormatPanel::spsTimerTimeout);
+    // spsTimer.start(SPS_UPDATE_TIMEOUT * 1000);
 
     // Init demo mode
     demoCount = 0;
@@ -80,84 +79,18 @@ DataFormatPanel::~DataFormatPanel()
     delete ui;
 }
 
-void DataFormatPanel::onNumberFormatButtonToggled(int numberFormatId,
-                                                  bool checked)
-{
-    if (checked) selectNumberFormat((NumberFormat) numberFormatId);
-}
-
-void DataFormatPanel::selectNumberFormat(NumberFormat numberFormatId)
-{
-    numberFormat = numberFormatId;
-
-    switch(numberFormat)
-    {
-        case NumberFormat_uint8:
-            sampleSize = 1;
-            readSample = &DataFormatPanel::readSampleAs<quint8>;
-            break;
-        case NumberFormat_int8:
-            sampleSize = 1;
-            readSample = &DataFormatPanel::readSampleAs<qint8>;
-            break;
-        case NumberFormat_uint16:
-            sampleSize = 2;
-            readSample = &DataFormatPanel::readSampleAs<quint16>;
-            break;
-        case NumberFormat_int16:
-            sampleSize = 2;
-            readSample = &DataFormatPanel::readSampleAs<qint16>;
-            break;
-        case NumberFormat_uint32:
-            sampleSize = 4;
-            readSample = &DataFormatPanel::readSampleAs<quint32>;
-            break;
-        case NumberFormat_int32:
-            sampleSize = 4;
-            readSample = &DataFormatPanel::readSampleAs<qint32>;
-            break;
-        case NumberFormat_float:
-            sampleSize = 4;
-            readSample = &DataFormatPanel::readSampleAs<float>;
-            break;
-        case NumberFormat_ASCII:
-            sampleSize = 0;    // these two members should not be used
-            readSample = NULL; // in this mode
-            break;
-    }
-
-    if (numberFormat == NumberFormat_ASCII)
-    {
-        QObject::disconnect(serialPort, &QSerialPort::readyRead, 0, 0);
-        QObject::connect(this->serialPort, &QSerialPort::readyRead,
-                         this, &DataFormatPanel::onDataReadyASCII);
-    }
-    else
-    {
-        QObject::disconnect(serialPort, &QSerialPort::readyRead, 0, 0);
-        QObject::connect(serialPort, &QSerialPort::readyRead,
-                         this, &DataFormatPanel::onDataReady);
-    }
-
-    emit skipByteEnabledChanged(skipByteEnabled());
-}
-
+// TODO: remove
 bool DataFormatPanel::skipByteEnabled()
 {
-    return numberFormat != NumberFormat_ASCII;
+    return false;
 }
 
 unsigned DataFormatPanel::numOfChannels()
 {
-    return _numOfChannels;
+    return currentReader->numOfChannels();
 }
 
-void DataFormatPanel::onNumOfChannelsSP(int value)
-{
-    _numOfChannels = value;
-    emit numOfChannelsChanged(value);
-}
-
+// TODO: remove
 void DataFormatPanel::requestSkipByte()
 {
     skipByteRequested = true;
@@ -165,7 +98,7 @@ void DataFormatPanel::requestSkipByte()
 
 void DataFormatPanel::pause(bool enabled)
 {
-    paused = enabled;
+    currentReader->pause(enabled);
 }
 
 void DataFormatPanel::enableDemo(bool enabled)
@@ -182,15 +115,14 @@ void DataFormatPanel::enableDemo(bool enabled)
 
 void DataFormatPanel::spsTimerTimeout()
 {
-    unsigned currentSps = _samplesPerSecond;
-    _samplesPerSecond = (sampleCount/_numOfChannels)/SPS_UPDATE_TIMEOUT;
-    if (currentSps != _samplesPerSecond)
-    {
-        emit samplesPerSecondChanged(_samplesPerSecond);
-    }
-    sampleCount = 0;
+    // unsigned currentSps = _samplesPerSecond;
+    // _samplesPerSecond = (sampleCount/_numOfChannels)/SPS_UPDATE_TIMEOUT;
+    // if (currentSps != _samplesPerSecond)
+    // {
+    //     emit samplesPerSecondChanged(_samplesPerSecond);
+    // }
+    // sampleCount = 0;
 }
-
 
 void DataFormatPanel::demoTimerTimeout()
 {
@@ -200,7 +132,7 @@ void DataFormatPanel::demoTimerTimeout()
 
     if (!paused)
     {
-        for (unsigned ci = 0; ci < _numOfChannels; ci++)
+        for (unsigned ci = 0; ci < currentReader->numOfChannels(); ci++)
         {
             // we are calculating the fourier components of square wave
             double value = 4*sin(2*M_PI*double((ci+1)*demoCount)/period)/((2*(ci+1))*M_PI);
@@ -210,116 +142,29 @@ void DataFormatPanel::demoTimerTimeout()
     }
 }
 
-void DataFormatPanel::onDataReady()
-{
-    // a package is a set of channel data like {CHAN0_SAMPLE, CHAN1_SAMPLE...}
-    int packageSize = sampleSize * _numOfChannels;
-    int bytesAvailable = serialPort->bytesAvailable();
-    int numOfPackagesToRead =
-        (bytesAvailable - (bytesAvailable % packageSize)) / packageSize;
-
-    if (paused)
-    {
-        // read and discard data
-        serialPort->read(numOfPackagesToRead*packageSize);
-        return;
-    }
-
-    if (bytesAvailable > 0 && skipByteRequested)
-    {
-        serialPort->read(1);
-        skipByteRequested = false;
-        bytesAvailable--;
-    }
-
-    if (bytesAvailable < packageSize) return;
-
-    double* channelSamples = new double[numOfPackagesToRead*_numOfChannels];
-
-    for (int i = 0; i < numOfPackagesToRead; i++)
-    {
-        for (unsigned int ci = 0; ci < _numOfChannels; ci++)
-        {
-            // channelSamples[ci].replace(i, (this->*readSample)());
-            channelSamples[ci*numOfPackagesToRead+i] = (this->*readSample)();
-        }
-    }
-
-    for (unsigned int ci = 0; ci < _numOfChannels; ci++)
-    {
-        addChannelData(ci,
-                       channelSamples + ci*numOfPackagesToRead,
-                       numOfPackagesToRead);
-    }
-    emit dataAdded();
-
-    delete channelSamples;
-}
-
-void DataFormatPanel::onDataReadyASCII()
-{
-    while(serialPort->canReadLine())
-    {
-        QByteArray line = serialPort->readLine();
-
-        // discard data if paused
-        if (paused)
-        {
-            return;
-        }
-
-        line = line.trimmed();
-        auto separatedValues = line.split(',');
-
-        int numReadChannels; // effective number of channels to read
-        if (separatedValues.length() >= int(_numOfChannels))
-        {
-            numReadChannels = _numOfChannels;
-        }
-        else // there is missing channel data
-        {
-            numReadChannels = separatedValues.length();
-            qWarning() << "Incoming data is missing data for some channels!";
-        }
-
-        // parse read line
-        for (int ci = 0; ci < numReadChannels; ci++)
-        {
-            bool ok;
-            double channelSample = separatedValues[ci].toDouble(&ok);
-            if (ok)
-            {
-                addChannelData(ci, &channelSample, 1);
-            }
-            else
-            {
-                qWarning() << "Data parsing error for channel: " << ci;
-            }
-        }
-        emit dataAdded();
-    }
-}
-
-template<typename T> double DataFormatPanel::readSampleAs()
-{
-    T data;
-    serialPort->read((char*) &data, sizeof(data));
-
-    if (ui->rbLittleE->isChecked())
-    {
-        data = qFromLittleEndian(data);
-    }
-    else
-    {
-        data = qFromBigEndian(data);
-    }
-
-    return double(data);
-}
-
 void DataFormatPanel::addChannelData(unsigned int channel,
                                      double* data, unsigned size)
 {
     _channelMan->addChannelData(channel, data, size);
     sampleCount += size;
+}
+
+void DataFormatPanel::selectReader(AbstractReader* reader)
+{
+    currentReader->enable(false);
+    reader->enable();
+
+    // re-connect signals
+    disconnect(currentReader, 0, this, 0);
+    connect(reader, SIGNAL(dataAdded()), this, SIGNAL(dataAdded()));
+    connect(reader, SIGNAL(numOfChannelsChanged(unsigned)),
+            this, SIGNAL(numOfChannelsChanged(unsigned)));
+
+    // switch the settings widget
+    ui->horizontalLayout->removeWidget(currentReader->settingsWidget());
+    currentReader->settingsWidget()->hide();
+    ui->horizontalLayout->addWidget(reader->settingsWidget(), 1);
+    reader->settingsWidget()->show();
+
+    currentReader = reader;
 }
