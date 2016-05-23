@@ -166,5 +166,11 @@ void DataFormatPanel::selectReader(AbstractReader* reader)
     ui->horizontalLayout->addWidget(reader->settingsWidget(), 1);
     reader->settingsWidget()->show();
 
+    // notify if number of channels is different
+    if (currentReader->numOfChannels() != reader->numOfChannels())
+    {
+        emit numOfChannelsChanged(reader->numOfChannels());
+    }
+
     currentReader = reader;
 }
