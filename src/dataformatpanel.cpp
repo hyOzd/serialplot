@@ -81,6 +81,7 @@ unsigned DataFormatPanel::numOfChannels()
 
 void DataFormatPanel::pause(bool enabled)
 {
+    paused = enabled;
     currentReader->pause(enabled);
     demoReader.pause(enabled);
 }
@@ -132,6 +133,9 @@ void DataFormatPanel::selectReader(AbstractReader* reader)
     {
         emit numOfChannelsChanged(reader->numOfChannels());
     }
+
+    // pause
+    reader->pause(paused);
 
     currentReader = reader;
 }

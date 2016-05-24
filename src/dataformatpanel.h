@@ -71,7 +71,7 @@ private:
     /// Disable current reader and enable a another one
     void selectReader(AbstractReader* reader);
 
-    bool paused; // remove
+    bool paused;
 
     DemoReader demoReader;
 
