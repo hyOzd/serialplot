@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FramedReaderSettings</class>
+ <widget class="QWidget" name="FramedReaderSettings">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>542</width>
+    <height>222</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="NumberFormatBox" name="nfBox" native="true">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>40</y>
+     <width>141</width>
+     <height>141</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="EndiannessBox" name="endiBox" native="true">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>40</y>
+     <width>120</width>
+     <height>80</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>0</y>
+     <width>211</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <item>
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Number Of Channels:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QSpinBox" name="spNumOfChannels">
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>32</number>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QLabel" name="lMessage">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>180</y>
+     <width>471</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>All is well.</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>1</x>
+     <y>39</y>
+     <width>204</width>
+     <height>93</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Frame Size:</string>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QRadioButton" name="rbFixedSize">
+        <property name="text">
+         <string>Fixed Size:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="spSize">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>255</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="rbSizeByte">
+      <property name="text">
+       <string>First byte of frame is size</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="">
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <item>
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Sync Word:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="CommandEdit" name="leSyncWord"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QCheckBox" name="cbChecksum">
+   <property name="geometry">
+    <rect>
+     <x>1</x>
+     <y>138</y>
+     <width>123</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Checksum Byte</string>
+   </property>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>NumberFormatBox</class>
+   <extends>QWidget</extends>
+   <header>numberformatbox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>EndiannessBox</class>
+   <extends>QWidget</extends>
+   <header>endiannessbox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CommandEdit</class>
+   <extends>QLineEdit</extends>
+   <header>commandedit.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

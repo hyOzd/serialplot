@@ -34,6 +34,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QRadioButton" name="rbFramed">
+       <property name="text">
+        <string>Framed</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="verticalSpacer">
        <property name="orientation">
         <enum>Qt::Vertical</enum>

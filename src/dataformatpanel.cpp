@@ -34,6 +34,7 @@ DataFormatPanel::DataFormatPanel(QSerialPort* port,
     ui(new Ui::DataFormatPanel),
     bsReader(port, channelMan, this),
     asciiReader(port, channelMan, this),
+    framedReader(port, channelMan, this),
     demoReader(port, channelMan, this)
 {
     ui->setupUi(this);
@@ -62,6 +63,11 @@ DataFormatPanel::DataFormatPanel(QSerialPort* port,
     connect(ui->rbAscii, &QRadioButton::toggled, [this](bool checked)
             {
                 if (checked) selectReader(&asciiReader);
+            });
+
+    connect(ui->rbFramed, &QRadioButton::toggled, [this](bool checked)
+            {
+                if (checked) selectReader(&framedReader);
             });
 
     // re-purpose numofchannels settings from actual reader settings to demo reader

@@ -32,6 +32,7 @@
 #include "binarystreamreader.h"
 #include "asciireader.h"
 #include "demoreader.h"
+#include "framedreader.h"
 
 namespace Ui {
 class DataFormatPanel;
@@ -66,6 +67,7 @@ private:
 
     BinaryStreamReader bsReader;
     AsciiReader asciiReader;
+    FramedReader framedReader;
     /// Currently selected reader
     AbstractReader* currentReader;
     /// Disable current reader and enable a another one

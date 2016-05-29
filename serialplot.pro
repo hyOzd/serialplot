@@ -55,7 +55,17 @@ SOURCES += \
     src/sneakylineedit.cpp \
     src/channelmanager.cpp \
     src/framebufferseries.cpp \
-    src/plotcontrolpanel.cpp
+    src/plotcontrolpanel.cpp \
+    src/numberformatbox.cpp \
+    src/endiannessbox.cpp \
+    src/framedreadersettings.cpp \
+    src/abstractreader.cpp \
+    src/binarystreamreader.cpp \
+    src/binarystreamreadersettings.cpp \
+    src/asciireadersettings.cpp \
+    src/asciireader.cpp \
+    src/demoreader.cpp \
+    src/framedreader.cpp
 
 HEADERS += \
     src/mainwindow.h \
@@ -81,7 +91,17 @@ HEADERS += \
     src/sneakylineedit.h \
     src/channelmanager.h \
     src/framebufferseries.h \
-    src/plotcontrolpanel.h
+    src/plotcontrolpanel.h \
+    src/numberformatbox.h \
+    src/endiannessbox.h \
+    src/framedreadersettings.h \
+    src/abstractreader.h \
+    src/binarystreamreader.h \
+    src/binarystreamreadersettings.h \
+    src/asciireadersettings.h \
+    src/asciireader.h \
+    src/demoreader.h \
+    src/framedreader.h
 
 FORMS += \
     src/mainwindow.ui \
@@ -91,7 +111,12 @@ FORMS += \
     src/commandpanel.ui \
     src/commandwidget.ui \
     src/dataformatpanel.ui \
-    src/plotcontrolpanel.ui
+    src/plotcontrolpanel.ui \
+    src/numberformatbox.ui \
+    src/endiannessbox.ui \
+    src/framedreadersettings.ui \
+    src/binarystreamreadersettings.ui \
+    src/asciireadersettings.ui
 
 INCLUDEPATH += qmake/ src/
 
