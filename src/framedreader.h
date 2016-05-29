@@ -54,7 +54,7 @@ private:
     unsigned settingsInvalid;   /// settings are all valid if this is 0, if not no reading is done
     QByteArray syncWord;
     bool checksumEnabled;
-    bool hasFrameByte;
+    bool hasSizeByte;
     unsigned frameSize;
 
     // TODO: create a base class that contains common functionality between binary readers

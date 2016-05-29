@@ -31,7 +31,7 @@ FramedReader::FramedReader(QIODevice* device, ChannelManager* channelMan, QObjec
     // initial settings
     settingsInvalid = 0;
     _numOfChannels = _settingsWidget.numOfChannels();
-    hasFrameByte = _settingsWidget.frameSize() == 0;
+    hasSizeByte = _settingsWidget.frameSize() == 0;
     frameSize = _settingsWidget.frameSize();
     syncWord = _settingsWidget.syncWord();
     checksumEnabled = _settingsWidget.isChecksumEnabled();
@@ -153,7 +153,7 @@ void FramedReader::checkSettings()
     }
 
     // check if fixed frame size is multiple of a sample set size
-    if (!hasFrameByte && frameSize % (_numOfChannels * sampleSize) != 0)
+    if (!hasSizeByte && frameSize % (_numOfChannels * sampleSize) != 0)
     {
         settingsInvalid |= FRAMESIZE_INVALID;
     }
@@ -197,11 +197,11 @@ void FramedReader::onFrameSizeChanged(unsigned value)
 {
     if (value == 0)
     {
-        hasFrameByte = true;
+        hasSizeByte = true;
     }
     else
     {
-        hasFrameByte = false;
+        hasSizeByte = false;
         frameSize = value;
     }
     checkSettings();
