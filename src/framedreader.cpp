@@ -36,6 +36,7 @@ FramedReader::FramedReader(QIODevice* device, ChannelManager* channelMan, QObjec
     syncWord = _settingsWidget.syncWord();
     checksumEnabled = _settingsWidget.isChecksumEnabled();
     onNumberFormatChanged(_settingsWidget.numberFormat());
+    debugModeEnabled = _settingsWidget.isDebugModeEnabled();
     checkSettings();
 
     // init setting connections
@@ -53,6 +54,9 @@ FramedReader::FramedReader(QIODevice* device, ChannelManager* channelMan, QObjec
 
     connect(&_settingsWidget, &FramedReaderSettings::checksumChanged,
             [this](bool enabled){checksumEnabled = enabled; reset();});
+
+    connect(&_settingsWidget, &FramedReaderSettings::debugModeChanged,
+            [this](bool enabled){debugModeEnabled = enabled;});
 
     // init reader state
     reset();
@@ -235,6 +239,7 @@ void FramedReader::onDataReady()
             }
             else
             {
+                if (debugModeEnabled) qDebug() << "Frame size:" << frameSize;
                 gotSize = true;
             }
         }

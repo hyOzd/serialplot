@@ -57,6 +57,7 @@ private:
     bool checksumEnabled;
     bool hasSizeByte;
     unsigned frameSize;
+    bool debugModeEnabled;
 
     /// Checks the validity of syncWord and frameSize then shows an
     /// error message. Also updates `settingsInvalid`. If settings are
@@ -78,7 +79,6 @@ private:
     void readFrameDataAndCheck();
     // `data` contains i th channels data
     void addChannelData(unsigned int channel, double* data, unsigned size);
-
 
 private slots:
     void onDataReady();

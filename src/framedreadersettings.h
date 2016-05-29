@@ -46,6 +46,7 @@ public:
     QByteArray syncWord();
     unsigned frameSize(); /// If frame bye is enabled `0` is returned
     bool isChecksumEnabled();
+    bool isDebugModeEnabled();
 
 signals:
     /// If sync word is invalid (empty or 1 nibble missing at the end)
@@ -56,6 +57,7 @@ signals:
     void checksumChanged(bool);
     void numOfChannelsChanged(unsigned);
     void numberFormatChanged(NumberFormat);
+    void debugModeChanged(bool);
 
 private:
     Ui::FramedReaderSettings *ui;

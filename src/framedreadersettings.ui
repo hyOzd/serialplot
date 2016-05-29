@@ -75,6 +75,22 @@
     <string>All is well.</string>
    </property>
   </widget>
+  <widget class="QCheckBox" name="cbDebugMode">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>160</y>
+     <width>111</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Enable printing of extra log messages that can be useful for debugging</string>
+   </property>
+   <property name="text">
+    <string>Debug Mode</string>
+   </property>
+  </widget>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>

@@ -35,6 +35,9 @@ FramedReaderSettings::FramedReaderSettings(QWidget *parent) :
                 emit checksumChanged(enabled);
             });
 
+    connect(ui->cbDebugMode, &QCheckBox::toggled,
+            this, &FramedReaderSettings::debugModeChanged);
+
     connect(ui->rbFixedSize, &QRadioButton::toggled,
             ui->spSize, &QWidget::setEnabled);
 
@@ -134,4 +137,9 @@ unsigned FramedReaderSettings::frameSize()
 bool FramedReaderSettings::isChecksumEnabled()
 {
     return ui->cbChecksum->isChecked();
+}
+
+bool FramedReaderSettings::isDebugModeEnabled()
+{
+    return ui->cbDebugMode->isChecked();
 }
