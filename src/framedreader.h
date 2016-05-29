@@ -47,6 +47,7 @@ private:
         FRAMESIZE_INVALID = 2
     };
 
+    // settings related members
     FramedReaderSettings _settingsWidget;
     unsigned _numOfChannels;
     unsigned sampleSize;
@@ -57,21 +58,30 @@ private:
     bool hasSizeByte;
     unsigned frameSize;
 
-    // TODO: create a base class that contains common functionality between binary readers
-
-    /// points to the readSampleAs function for currently selected number format
-    double (FramedReader::*readSample)();
-    template<typename T> double readSampleAs();
-    // `data` contains i th channels data
-    void addChannelData(unsigned int channel, double* data, unsigned size);
-
     /// Checks the validity of syncWord and frameSize then shows an
     /// error message. Also updates `settingsInvalid`. If settings are
     /// valid `settingsInvalid` should be `0`.
     void checkSettings();
 
+    // read state related members
+    unsigned sync_i; /// sync byte index to be read next
+    bool gotSync;    /// indicates if sync word is captured
+    bool gotSize;    /// indicates if size is captured, ignored if size byte is disabled (fixed size)
+    unsigned calcChecksum;
+
+    void reset();    /// Resets the reading state. Used in case of error or setting change.
+    /// points to the readSampleAs function for currently selected number format
+    double (FramedReader::*readSample)();
+    template<typename T> double readSampleAs();
+    /// reads payload portion of the frame, calculates checksum and commits data
+    /// @note should be called only if there are enough bytes on device
+    void readFrameDataAndCheck();
+    // `data` contains i th channels data
+    void addChannelData(unsigned int channel, double* data, unsigned size);
+
+
 private slots:
-    // void onDataReady();
+    void onDataReady();
 
     void onNumberFormatChanged(NumberFormat numberFormat);
     void onNumOfChannelsChanged(unsigned value);
