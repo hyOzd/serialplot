@@ -34,7 +34,7 @@ FramedReader::FramedReader(QIODevice* device, ChannelManager* channelMan, QObjec
     hasFrameByte = _settingsWidget.frameSize() == 0;
     frameSize = _settingsWidget.frameSize();
     syncWord = _settingsWidget.syncWord();
-    checksumEnabled = _settingsWidget.checksumEnabled();
+    checksumEnabled = _settingsWidget.isChecksumEnabled();
     onNumberFormatChanged(_settingsWidget.numberFormat());
     checkSettings();
 

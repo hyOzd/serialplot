@@ -131,7 +131,7 @@ unsigned FramedReaderSettings::frameSize()
     }
 }
 
-bool FramedReaderSettings::checksumEnabled()
+bool FramedReaderSettings::isChecksumEnabled()
 {
     return ui->cbChecksum->isChecked();
 }

@@ -45,7 +45,7 @@ public:
     Endianness endianness();
     QByteArray syncWord();
     unsigned frameSize(); /// If frame bye is enabled `0` is returned
-    bool checksumEnabled();
+    bool isChecksumEnabled();
 
 signals:
     /// If sync word is invalid (empty or 1 nibble missing at the end)
