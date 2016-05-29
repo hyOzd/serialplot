@@ -219,6 +219,10 @@ void FramedReader::onDataReady()
                     gotSync = true;
                 }
             }
+            else
+            {
+                if (debugModeEnabled) qCritical() << "Missed " << sync_i+1 << "th sync byte.";
+            }
         }
         else if (hasSizeByte && !gotSize) // skipped if fixed frame size
         {
