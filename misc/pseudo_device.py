@@ -71,6 +71,34 @@ def uint32_test(port, little):
         time.sleep(0.05)
         i = i+1 if i <= maxi else 0
 
+def frame_test(port, fixed_size=False, hasChecksum=True):
+    """Sends binary data in framed format."""
+    SYNCWORD = [0xAA, 0xBB]
+    NUMSAMPLES = 10
+    SIZE = NUMSAMPLES * 4 # integer
+    if fixed_size:
+        HEADER = bytes(SYNCWORD)
+    else:
+        HEADER = bytes(SYNCWORD + [SIZE])
+    i = 0
+    checksum = 0
+    bytesent = 0
+    while True:
+        if i > 100: i = 0
+        if bytesent == 0: # beginning of a frame?
+            os.write(port, HEADER)
+        os.write(port, struct.pack('<I', i))
+        bytesent += 4
+        checksum += i
+        i += 1
+        if bytesent == SIZE: # end of a frame
+            if hasChecksum:
+                data = struct.pack('<I', checksum)[:1]
+                os.write(port, data)
+            checksum = 0
+            bytesent = 0
+        time.sleep(0.1)
+
 def run():
     # create the pseudo terminal
     master, slave = pty.openpty()
@@ -80,7 +108,9 @@ def run():
     print("Master terminal: {}\nSlave terminal: {}".format(master_name, slave_name))
 
     try:
-        float_sine(master)
+        # float_sine(master)
+        frame_test(master)
+        # ascii_test(master)
     finally:
         # close the pseudo terminal files
         os.close(master)

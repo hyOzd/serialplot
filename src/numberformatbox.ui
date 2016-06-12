@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>NumberFormatBox</class>
+ <widget class="QWidget" name="NumberFormatBox">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>440</width>
+    <height>22</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>NumberFormat</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="spacing">
+    <number>3</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QRadioButton" name="rbUint8">
+     <property name="toolTip">
+      <string>unsigned 1 byte integer</string>
+     </property>
+     <property name="text">
+      <string>uint8</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="rbUint16">
+     <property name="toolTip">
+      <string>unsigned 2 bytes integer</string>
+     </property>
+     <property name="text">
+      <string>uint16</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="rbUint32">
+     <property name="toolTip">
+      <string>unsigned 4 bytes integer</string>
+     </property>
+     <property name="text">
+      <string>uint32</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="rbInt8">
+     <property name="toolTip">
+      <string>signed 1 byte integer</string>
+     </property>
+     <property name="text">
+      <string>int8</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="rbInt16">
+     <property name="toolTip">
+      <string>signed 2 bytes integer</string>
+     </property>
+     <property name="text">
+      <string>int16</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="rbInt32">
+     <property name="toolTip">
+      <string>signed 4 bytes integer</string>
+     </property>
+     <property name="text">
+      <string>int32</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="rbFloat">
+     <property name="toolTip">
+      <string>4 bytes floating point number</string>
+     </property>
+     <property name="text">
+      <string>float</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

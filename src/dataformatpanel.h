@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2016 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -29,6 +29,10 @@
 
 #include "framebuffer.h"
 #include "channelmanager.h"
+#include "binarystreamreader.h"
+#include "asciireader.h"
+#include "demoreader.h"
+#include "framedreader.h"
 
 namespace Ui {
 class DataFormatPanel;
@@ -45,74 +49,36 @@ public:
     ~DataFormatPanel();
 
     unsigned numOfChannels();
-    unsigned samplesPerSecond();
-    bool skipByteEnabled(void); // true for binary formats
 
 public slots:
-    // during next read operation reader will skip 1 byte,
-    // requests are not accumulated
-    void requestSkipByte();
     void pause(bool);
     void enableDemo(bool); // demo shouldn't be enabled when port is open
 
 signals:
     void numOfChannelsChanged(unsigned);
     void samplesPerSecondChanged(unsigned);
-    void skipByteEnabledChanged(bool);
     void dataAdded();
 
 private:
-    enum NumberFormat
-    {
-        NumberFormat_uint8,
-        NumberFormat_uint16,
-        NumberFormat_uint32,
-        NumberFormat_int8,
-        NumberFormat_int16,
-        NumberFormat_int32,
-        NumberFormat_float,
-        NumberFormat_ASCII
-    };
-
     Ui::DataFormatPanel *ui;
-    QButtonGroup numberFormatButtons;
 
     QSerialPort* serialPort;
     ChannelManager* _channelMan;
 
-    unsigned int _numOfChannels;
-    NumberFormat numberFormat;
-    unsigned int sampleSize; // number of bytes in the selected number format
-    bool skipByteRequested;
+    BinaryStreamReader bsReader;
+    AsciiReader asciiReader;
+    FramedReader framedReader;
+    /// Currently selected reader
+    AbstractReader* currentReader;
+    /// Disable current reader and enable a another one
+    void selectReader(AbstractReader* reader);
+
     bool paused;
 
-    const int SPS_UPDATE_TIMEOUT = 1;  // second
-    unsigned _samplesPerSecond;
-    unsigned int sampleCount;
-    QTimer spsTimer;
-
-    // demo
-    QTimer demoTimer;
-    int demoCount;
-
-    void selectNumberFormat(NumberFormat numberFormatId);
-
-    // points to the readSampleAs function for currently selected number format
-    double (DataFormatPanel::*readSample)();
-
-    // note that serialPort should already have enough bytes present
-    template<typename T> double readSampleAs();
+    DemoReader demoReader;
 
     // `data` contains i th channels data
     void addChannelData(unsigned int channel, double* data, unsigned size);
-
-private slots:
-    void onDataReady();      // used with binary number formats
-    void onDataReadyASCII(); // used with ASCII number format
-    void onNumberFormatButtonToggled(int numberFormatId, bool checked);
-    void onNumOfChannelsSP(int value);
-    void spsTimerTimeout();
-    void demoTimerTimeout();
 };
 
 #endif // DATAFORMATPANEL_H
