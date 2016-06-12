@@ -20,7 +20,7 @@
 #ifndef NUMBERFORMATBOX_H
 #define NUMBERFORMATBOX_H
 
-#include <QGroupBox>
+#include <QWidget>
 #include <QButtonGroup>
 
 namespace Ui {
@@ -38,7 +38,7 @@ enum NumberFormat
     NumberFormat_float,
 };
 
-class NumberFormatBox : public QGroupBox
+class NumberFormatBox : public QWidget
 {
     Q_OBJECT
 

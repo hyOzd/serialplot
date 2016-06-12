@@ -1,22 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>EndiannessBox</class>
- <widget class="QGroupBox" name="EndiannessBox">
+ <widget class="QWidget" name="EndiannessBox">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>131</width>
-    <height>86</height>
+    <width>202</width>
+    <height>22</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>GroupBox</string>
+   <string>EndiannessBox</string>
   </property>
-  <property name="title">
-   <string>Byte Order:</string>
-  </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="spacing">
+    <number>3</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QRadioButton" name="rbBigE">
+     <property name="toolTip">
+      <string>most significant byte first</string>
+     </property>
+     <property name="text">
+      <string>Big Endian</string>
+     </property>
+    </widget>
+   </item>
    <item>
     <widget class="QRadioButton" name="rbLittleE">
      <property name="toolTip">
@@ -27,16 +49,6 @@
      </property>
      <property name="checked">
       <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QRadioButton" name="rbBigE">
-     <property name="toolTip">
-      <string>most significant byte first</string>
-     </property>
-     <property name="text">
-      <string>Big Endian</string>
      </property>
     </widget>
    </item>

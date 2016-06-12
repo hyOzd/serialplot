@@ -20,7 +20,7 @@
 #ifndef ENDIANNESSBOX_H
 #define ENDIANNESSBOX_H
 
-#include <QGroupBox>
+#include <QWidget>
 
 namespace Ui {
 class EndiannessBox;
@@ -32,7 +32,7 @@ enum Endianness
     BigEndian
 };
 
-class EndiannessBox : public QGroupBox
+class EndiannessBox : public QWidget
 {
     Q_OBJECT
 

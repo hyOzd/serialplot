@@ -21,7 +21,7 @@
 #include "ui_numberformatbox.h"
 
 NumberFormatBox::NumberFormatBox(QWidget *parent) :
-    QGroupBox(parent),
+    QWidget(parent),
     ui(new Ui::NumberFormatBox)
 {
     ui->setupUi(this);

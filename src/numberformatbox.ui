@@ -1,23 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>NumberFormatBox</class>
- <widget class="QGroupBox" name="NumberFormatBox">
+ <widget class="QWidget" name="NumberFormatBox">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>158</width>
-    <height>142</height>
+    <width>440</width>
+    <height>22</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>GroupBox</string>
+   <string>NumberFormat</string>
   </property>
-  <property name="title">
-   <string>Number Format:</string>
-  </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="spacing">
+    <number>3</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QRadioButton" name="rbFloat">
+     <property name="toolTip">
+      <string>4 bytes floating point number</string>
+     </property>
+     <property name="text">
+      <string>float</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="rbUint32">
+     <property name="toolTip">
+      <string>unsigned 4 bytes integer</string>
+     </property>
+     <property name="text">
+      <string>uint32</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="rbUint16">
+     <property name="toolTip">
+      <string>unsigned 2 bytes integer</string>
+     </property>
+     <property name="text">
+      <string>uint16</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QRadioButton" name="rbUint8">
      <property name="toolTip">
       <string>unsigned 1 byte integer</string>
@@ -30,47 +72,7 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QRadioButton" name="rbInt8">
-     <property name="toolTip">
-      <string>signed 1 byte integer</string>
-     </property>
-     <property name="text">
-      <string>int8</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QRadioButton" name="rbUint16">
-     <property name="toolTip">
-      <string>unsigned 2 bytes integer</string>
-     </property>
-     <property name="text">
-      <string>uint16</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QRadioButton" name="rbInt16">
-     <property name="toolTip">
-      <string>signed 2 bytes integer</string>
-     </property>
-     <property name="text">
-      <string>int16</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QRadioButton" name="rbUint32">
-     <property name="toolTip">
-      <string>unsigned 4 bytes integer</string>
-     </property>
-     <property name="text">
-      <string>uint32</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
+   <item>
     <widget class="QRadioButton" name="rbInt32">
      <property name="toolTip">
       <string>signed 4 bytes integer</string>
@@ -80,13 +82,23 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="0">
-    <widget class="QRadioButton" name="rbFloat">
+   <item>
+    <widget class="QRadioButton" name="rbInt16">
      <property name="toolTip">
-      <string>4 bytes floating point number</string>
+      <string>signed 2 bytes integer</string>
      </property>
      <property name="text">
-      <string>float</string>
+      <string>int16</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="rbInt8">
+     <property name="toolTip">
+      <string>signed 1 byte integer</string>
+     </property>
+     <property name="text">
+      <string>int8</string>
      </property>
     </widget>
    </item>

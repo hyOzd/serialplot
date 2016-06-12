@@ -21,7 +21,7 @@
 #include "ui_endiannessbox.h"
 
 EndiannessBox::EndiannessBox(QWidget *parent) :
-    QGroupBox(parent),
+    QWidget(parent),
     ui(new Ui::EndiannessBox)
 {
     ui->setupUi(this);
