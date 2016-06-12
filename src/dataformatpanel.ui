@@ -36,7 +36,7 @@
      <item>
       <widget class="QRadioButton" name="rbFramed">
        <property name="text">
-        <string>Framed</string>
+        <string>Custom Frame</string>
        </property>
       </widget>
      </item>
