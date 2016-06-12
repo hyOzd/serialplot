@@ -18,6 +18,9 @@
     <layout class="QVBoxLayout" name="vlRadioButtons">
      <item>
       <widget class="QRadioButton" name="rbBinary">
+       <property name="toolTip">
+        <string>Data is sent as consecutive samples in binary form. Syncing can be a problem.</string>
+       </property>
        <property name="text">
         <string>Simple Binary</string>
        </property>
@@ -28,6 +31,9 @@
      </item>
      <item>
       <widget class="QRadioButton" name="rbAscii">
+       <property name="toolTip">
+        <string>Data is sent in the form of ASCII text as comma seperated values. Easy to implement.</string>
+       </property>
        <property name="text">
         <string>ASCII</string>
        </property>
@@ -35,6 +41,9 @@
      </item>
      <item>
       <widget class="QRadioButton" name="rbFramed">
+       <property name="toolTip">
+        <string>Define a custom binary frame. Powerful.</string>
+       </property>
        <property name="text">
         <string>Custom Frame</string>
        </property>
