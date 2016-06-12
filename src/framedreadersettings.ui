@@ -35,7 +35,11 @@
       <enum>QFormLayout::FieldsStayAtSizeHint</enum>
      </property>
      <item row="0" column="1">
-      <widget class="CommandEdit" name="leSyncWord"/>
+      <widget class="CommandEdit" name="leSyncWord">
+       <property name="toolTip">
+        <string>Enter the 'Frame Start' bytes in hexadecimal.</string>
+       </property>
+      </widget>
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="label_2">
