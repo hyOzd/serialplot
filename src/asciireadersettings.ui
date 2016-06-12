@@ -43,6 +43,9 @@
          <height>0</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>Select number of channels</string>
+       </property>
        <property name="keyboardTracking">
         <bool>false</bool>
        </property>

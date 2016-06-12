@@ -39,6 +39,9 @@
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="label_2">
+       <property name="toolTip">
+        <string>Number of Channels</string>
+       </property>
        <property name="text">
         <string># Channels:</string>
        </property>
@@ -46,6 +49,9 @@
      </item>
      <item row="1" column="1">
       <widget class="QSpinBox" name="spNumOfChannels">
+       <property name="toolTip">
+        <string>Select number of channels</string>
+       </property>
        <property name="minimum">
         <number>1</number>
        </property>
@@ -65,6 +71,9 @@
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="QRadioButton" name="rbFixedSize">
+         <property name="toolTip">
+          <string>Frame size is always the same</string>
+         </property>
          <property name="text">
           <string>Fixed Size:</string>
          </property>
@@ -74,6 +83,9 @@
         <widget class="QSpinBox" name="spSize">
          <property name="enabled">
           <bool>false</bool>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter the frame size. It &lt;span style=&quot; font-weight:600;&quot;&gt;must&lt;/span&gt; be the multiple of (#channels * sample size).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="minimum">
           <number>1</number>
@@ -85,8 +97,11 @@
        </item>
        <item>
         <widget class="QRadioButton" name="rbSizeByte">
+         <property name="toolTip">
+          <string>First byte after the 'frame start' bytes should be the size of the frame. Not counting itself and checksum.</string>
+         </property>
          <property name="text">
-          <string>First byte of frame is size</string>
+          <string>First byte of the payload is size</string>
          </property>
          <property name="checked">
           <bool>true</bool>
@@ -97,6 +112,9 @@
      </item>
      <item row="3" column="0">
       <widget class="QLabel" name="label_4">
+       <property name="toolTip">
+        <string>Number Type</string>
+       </property>
        <property name="text">
         <string>Num. Type:</string>
        </property>
@@ -114,6 +132,9 @@
      </item>
      <item row="4" column="0">
       <widget class="QLabel" name="label_5">
+       <property name="toolTip">
+        <string>Byte Order</string>
+       </property>
        <property name="text">
         <string>Endianness:</string>
        </property>
@@ -131,6 +152,9 @@
      </item>
      <item row="5" column="1">
       <widget class="QCheckBox" name="cbChecksum">
+       <property name="toolTip">
+        <string>Last byte of the frame is checksum.</string>
+       </property>
        <property name="text">
         <string>Enabled</string>
        </property>
