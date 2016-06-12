@@ -30,22 +30,15 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QRadioButton" name="rbFloat">
+    <widget class="QRadioButton" name="rbUint8">
      <property name="toolTip">
-      <string>4 bytes floating point number</string>
+      <string>unsigned 1 byte integer</string>
      </property>
      <property name="text">
-      <string>float</string>
+      <string>uint8</string>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QRadioButton" name="rbUint32">
-     <property name="toolTip">
-      <string>unsigned 4 bytes integer</string>
-     </property>
-     <property name="text">
-      <string>uint32</string>
+     <property name="checked">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -60,25 +53,22 @@
     </widget>
    </item>
    <item>
-    <widget class="QRadioButton" name="rbUint8">
+    <widget class="QRadioButton" name="rbUint32">
      <property name="toolTip">
-      <string>unsigned 1 byte integer</string>
+      <string>unsigned 4 bytes integer</string>
      </property>
      <property name="text">
-      <string>uint8</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
+      <string>uint32</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QRadioButton" name="rbInt32">
+    <widget class="QRadioButton" name="rbInt8">
      <property name="toolTip">
-      <string>signed 4 bytes integer</string>
+      <string>signed 1 byte integer</string>
      </property>
      <property name="text">
-      <string>int32</string>
+      <string>int8</string>
      </property>
     </widget>
    </item>
@@ -93,12 +83,22 @@
     </widget>
    </item>
    <item>
-    <widget class="QRadioButton" name="rbInt8">
+    <widget class="QRadioButton" name="rbInt32">
      <property name="toolTip">
-      <string>signed 1 byte integer</string>
+      <string>signed 4 bytes integer</string>
      </property>
      <property name="text">
-      <string>int8</string>
+      <string>int32</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="rbFloat">
+     <property name="toolTip">
+      <string>4 bytes floating point number</string>
+     </property>
+     <property name="text">
+      <string>float</string>
      </property>
     </widget>
    </item>
