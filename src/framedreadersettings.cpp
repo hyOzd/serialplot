@@ -28,6 +28,7 @@ FramedReaderSettings::FramedReaderSettings(QWidget *parent) :
     ui->setupUi(this);
 
     ui->leSyncWord->setMode(false); // hex mode
+    ui->leSyncWord->setText("AA BB");
 
     connect(ui->cbChecksum, &QCheckBox::toggled,
             [this](bool enabled)
