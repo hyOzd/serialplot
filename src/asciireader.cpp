@@ -26,7 +26,6 @@ AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan, QObject 
 {
     paused = false;
     sampleCount = 0;
-    // TODO: sps counter
 
     _numOfChannels = _settingsWidget.numOfChannels();
     connect(&_settingsWidget, &AsciiReaderSettings::numOfChannelsChanged,

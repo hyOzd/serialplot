@@ -108,7 +108,6 @@ QByteArray FramedReaderSettings::syncWord()
     // check if nibble is missing
     if (text.size() % 2 == 1)
     {
-        // TODO: remove this warning
         return QByteArray();
     }
     else
