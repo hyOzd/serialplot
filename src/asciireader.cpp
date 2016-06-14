@@ -88,6 +88,15 @@ void AsciiReader::onDataReady()
 
         // parse data
         line = line.trimmed();
+
+        // Note: When data coming from pseudo terminal is buffered by
+        // system CR is converted to LF for some reason. This causes
+        // empty lines in the input when the port is just opened.
+        if (line.isEmpty())
+        {
+            continue;
+        }
+
         auto separatedValues = line.split(',');
 
         int numReadChannels; // effective number of channels to read
