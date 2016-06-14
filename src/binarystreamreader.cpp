@@ -122,15 +122,6 @@ void BinaryStreamReader::onDataReady()
     // a package is a set of channel data like {CHAN0_SAMPLE, CHAN1_SAMPLE...}
     int packageSize = sampleSize * _numOfChannels;
     int bytesAvailable = _device->bytesAvailable();
-    int numOfPackagesToRead =
-        (bytesAvailable - (bytesAvailable % packageSize)) / packageSize;
-
-    if (paused)
-    {
-        // read and discard data
-        _device->read(numOfPackagesToRead*packageSize);
-        return;
-    }
 
     if (bytesAvailable > 0 && skipByteRequested)
     {
@@ -140,6 +131,16 @@ void BinaryStreamReader::onDataReady()
     }
 
     if (bytesAvailable < packageSize) return;
+
+    int numOfPackagesToRead =
+        (bytesAvailable - (bytesAvailable % packageSize)) / packageSize;
+
+    if (paused)
+    {
+        // read and discard data
+        _device->read(numOfPackagesToRead*packageSize);
+        return;
+    }
 
     double* channelSamples = new double[numOfPackagesToRead*_numOfChannels];
 
