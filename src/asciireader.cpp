@@ -83,7 +83,7 @@ void AsciiReader::onDataReady()
         // discard data if paused
         if (paused)
         {
-            return;
+            continue;
         }
 
         // parse data
