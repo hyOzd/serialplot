@@ -25,6 +25,7 @@ AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan, QObject 
     AbstractReader(device, channelMan, parent)
 {
     paused = false;
+    discardFirstLine = true;
     sampleCount = 0;
 
     _numOfChannels = _settingsWidget.numOfChannels();
@@ -32,6 +33,8 @@ AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan, QObject 
             this, &AsciiReader::numOfChannelsChanged);
     connect(&_settingsWidget, &AsciiReaderSettings::numOfChannelsChanged,
             [this](unsigned value){_numOfChannels = value;});
+
+    connect(device, &QIODevice::aboutToClose, [this](){discardFirstLine=true;});
 }
 
 QWidget* AsciiReader::settingsWidget()
@@ -49,6 +52,7 @@ void AsciiReader::enable(bool enabled)
 {
     if (enabled)
     {
+        discardFirstLine = true;
         QObject::connect(_device, &QIODevice::readyRead,
                          this, &AsciiReader::onDataReady);
     }
@@ -69,12 +73,20 @@ void AsciiReader::onDataReady()
     {
         QByteArray line = _device->readLine();
 
+        // discard only once when we just started reading
+        if (discardFirstLine)
+        {
+            discardFirstLine = false;
+            continue;
+        }
+
         // discard data if paused
         if (paused)
         {
             return;
         }
 
+        // parse data
         line = line.trimmed();
         auto separatedValues = line.split(',');
 

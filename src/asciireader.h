@@ -41,6 +41,10 @@ private:
     unsigned _numOfChannels;
     bool paused;
 
+    // We may have (usually true) started reading in the middle of a
+    // line, so its a better idea to just discard first line.
+    bool discardFirstLine;
+
 private slots:
     void onDataReady();
 };
