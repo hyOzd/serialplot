@@ -33,11 +33,6 @@ AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan, QObject 
 
     _numOfChannels = _settingsWidget.numOfChannels();
     autoNumOfChannels = (_numOfChannels == NUMOFCHANNELS_AUTO);
-    // do not allow '0'
-    if (_numOfChannels == 0)
-    {
-        _numOfChannels = 1;
-    }
 
     connect(&_settingsWidget, &AsciiReaderSettings::numOfChannelsChanged,
             [this](unsigned value)
@@ -60,7 +55,15 @@ QWidget* AsciiReader::settingsWidget()
 
 unsigned AsciiReader::numOfChannels()
 {
-    return _numOfChannels;
+    // do not allow '0'
+    if (_numOfChannels == 0)
+    {
+        return 1;
+    }
+    else
+    {
+        return _numOfChannels;
+    }
 }
 
 // TODO: this could be a part of AbstractReader
