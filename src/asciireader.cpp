@@ -21,6 +21,9 @@
 
 #include "asciireader.h"
 
+/// If set to this value number of channels is determined from input
+#define NUMOFCHANNELS_AUTO   (0)
+
 AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan, QObject *parent) :
     AbstractReader(device, channelMan, parent)
 {
@@ -29,10 +32,23 @@ AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan, QObject 
     sampleCount = 0;
 
     _numOfChannels = _settingsWidget.numOfChannels();
+    autoNumOfChannels = (_numOfChannels == NUMOFCHANNELS_AUTO);
+    // do not allow '0'
+    if (_numOfChannels == 0)
+    {
+        _numOfChannels = 1;
+    }
+
     connect(&_settingsWidget, &AsciiReaderSettings::numOfChannelsChanged,
-            this, &AsciiReader::numOfChannelsChanged);
-    connect(&_settingsWidget, &AsciiReaderSettings::numOfChannelsChanged,
-            [this](unsigned value){_numOfChannels = value;});
+            [this](unsigned value)
+            {
+                _numOfChannels = value;
+                autoNumOfChannels = (_numOfChannels == NUMOFCHANNELS_AUTO);
+                if (!autoNumOfChannels)
+                {
+                    emit numOfChannelsChanged(value);
+                }
+            });
 
     connect(device, &QIODevice::aboutToClose, [this](){discardFirstLine=true;});
 }
@@ -99,8 +115,20 @@ void AsciiReader::onDataReady()
 
         auto separatedValues = line.split(',');
 
-        int numReadChannels; // effective number of channels to read
-        if (separatedValues.length() >= int(_numOfChannels))
+        unsigned numReadChannels; // effective number of channels to read
+        unsigned numComingChannels = separatedValues.length();
+
+        if (autoNumOfChannels)
+        {
+            // did number of channels changed?
+            if (numComingChannels != _numOfChannels)
+            {
+                _numOfChannels = numComingChannels;
+                emit numOfChannelsChanged(numComingChannels);
+            }
+            numReadChannels = numComingChannels;
+        }
+        else if (numComingChannels >= _numOfChannels)
         {
             numReadChannels = _numOfChannels;
         }
@@ -111,7 +139,7 @@ void AsciiReader::onDataReady()
         }
 
         // parse read line
-        for (int ci = 0; ci < numReadChannels; ci++)
+        for (unsigned ci = 0; ci < numReadChannels; ci++)
         {
             bool ok;
             double channelSample = separatedValues[ci].toDouble(&ok);

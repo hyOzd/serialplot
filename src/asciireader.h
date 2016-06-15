@@ -39,6 +39,8 @@ public slots:
 private:
     AsciiReaderSettings _settingsWidget;
     unsigned _numOfChannels;
+    /// number of channels will be determined from incoming data
+    unsigned autoNumOfChannels;
     bool paused;
 
     // We may have (usually true) started reading in the middle of a

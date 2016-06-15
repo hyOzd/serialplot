@@ -44,13 +44,16 @@
         </size>
        </property>
        <property name="toolTip">
-        <string>Select number of channels</string>
+        <string>Select number of channels or set to 0 for Auto (determined from incoming data)</string>
+       </property>
+       <property name="specialValueText">
+        <string>Auto</string>
        </property>
        <property name="keyboardTracking">
         <bool>false</bool>
        </property>
        <property name="minimum">
-        <number>1</number>
+        <number>0</number>
        </property>
        <property name="maximum">
         <number>32</number>
