@@ -46,6 +46,7 @@ private:
     unsigned sampleSize;
     bool paused;
     bool skipByteRequested;
+    bool skipSampleRequested;
 
     /// points to the readSampleAs function for currently selected number format
     double (BinaryStreamReader::*readSample)();

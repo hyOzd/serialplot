@@ -73,10 +73,20 @@
      <item>
       <widget class="QPushButton" name="pbSkipByte">
        <property name="toolTip">
-        <string>Skip reading 1 byte to correct the alignment</string>
+        <string>Skip 1 byte while reading to correct the alignment</string>
        </property>
        <property name="text">
         <string>Skip Byte</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbSkipSample">
+       <property name="toolTip">
+        <string>Skip reading 1 sample while reading to shift channel order</string>
+       </property>
+       <property name="text">
+        <string>Skip Sample</string>
        </property>
       </widget>
      </item>

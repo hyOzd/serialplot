@@ -44,6 +44,7 @@ signals:
     void numOfChannelsChanged(unsigned);
     void numberFormatChanged(NumberFormat);
     void skipByteRequested();
+    void skipSampleRequested();
 
 private:
     Ui::BinaryStreamReaderSettings *ui;

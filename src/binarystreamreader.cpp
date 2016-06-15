@@ -28,6 +28,7 @@ BinaryStreamReader::BinaryStreamReader(QIODevice* device, ChannelManager* channe
 {
     paused = false;
     skipByteRequested = false;
+    skipSampleRequested = false;
     sampleCount = 0;
 
     _numOfChannels = _settingsWidget.numOfChannels();
@@ -41,11 +42,16 @@ BinaryStreamReader::BinaryStreamReader(QIODevice* device, ChannelManager* channe
     connect(&_settingsWidget, &BinaryStreamReaderSettings::numberFormatChanged,
             this, &BinaryStreamReader::onNumberFormatChanged);
 
-    // enable skip byte button
+    // enable skip byte and sample buttons
     connect(&_settingsWidget, &BinaryStreamReaderSettings::skipByteRequested,
             [this]()
             {
                 skipByteRequested = true;
+            });
+    connect(&_settingsWidget, &BinaryStreamReaderSettings::skipSampleRequested,
+            [this]()
+            {
+                skipSampleRequested = true;
             });
 }
 
@@ -123,10 +129,19 @@ void BinaryStreamReader::onDataReady()
     int packageSize = sampleSize * _numOfChannels;
     int bytesAvailable = _device->bytesAvailable();
 
+    // skip 1 byte if requested
     if (bytesAvailable > 0 && skipByteRequested)
     {
         _device->read(1);
         skipByteRequested = false;
+        bytesAvailable--;
+    }
+
+    // skip 1 sample (channel) if requested
+    if (bytesAvailable >= (int) sampleSize && skipSampleRequested)
+    {
+        _device->read(sampleSize);
+        skipSampleRequested = false;
         bytesAvailable--;
     }
 

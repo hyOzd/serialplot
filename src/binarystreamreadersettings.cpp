@@ -39,6 +39,7 @@ BinaryStreamReaderSettings::BinaryStreamReaderSettings(QWidget *parent) :
             this, SIGNAL(numberFormatChanged(NumberFormat)));
 
     connect(ui->pbSkipByte, SIGNAL(clicked()), this, SIGNAL(skipByteRequested()));
+    connect(ui->pbSkipSample, SIGNAL(clicked()), this, SIGNAL(skipSampleRequested()));
 }
 
 BinaryStreamReaderSettings::~BinaryStreamReaderSettings()
