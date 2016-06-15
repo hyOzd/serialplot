@@ -31,7 +31,9 @@ CommandPanel::CommandPanel(QSerialPort* port, QWidget *parent) :
     serialPort = port;
 
     ui->setupUi(this);
-    ui->scrollAreaWidgetContents->setLayout(new QVBoxLayout);
+    auto layout = new QVBoxLayout();
+    layout->setSpacing(0);
+    ui->scrollAreaWidgetContents->setLayout(layout);
 
 #ifdef Q_OS_WIN
     ui->pbNew->setIcon(QIcon(":/icons/list-add"));
