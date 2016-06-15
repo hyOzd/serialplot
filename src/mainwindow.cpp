@@ -70,6 +70,11 @@ MainWindow::MainWindow(QWidget *parent) :
                 this->ui->tabWidget->setCurrentWidget(&commandPanel);
             });
 
+    connect(&commandPanel, &CommandPanel::focusRequested, [this]()
+            {
+                this->ui->tabWidget->setCurrentWidget(&commandPanel);
+            });
+
     setupAboutDialog();
 
     // init view menu

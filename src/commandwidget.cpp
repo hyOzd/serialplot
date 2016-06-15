@@ -64,6 +64,7 @@ void CommandWidget::onSendClicked()
     {
         qWarning() << "Enter a command to send!";
         ui->leCommand->setFocus(Qt::OtherFocusReason);
+        emit focusRequested();
         return;
     }
 

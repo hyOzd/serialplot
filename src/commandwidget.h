@@ -50,6 +50,9 @@ signals:
     // string containing hexadecimal characters only (not even spaces)
     void sendCommand(QByteArray command);
 
+    // emitted when user tries to send an empty command
+    void focusRequested();
+
 private:
     Ui::CommandWidget *ui;
     QAction _sendAction;

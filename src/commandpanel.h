@@ -43,6 +43,10 @@ public:
     QMenu* menu();
     QAction* newCommandAction();
 
+signals:
+    // emitted when user tries to send an empty command
+    void focusRequested();
+
 private:
     Ui::CommandPanel *ui;
     QSerialPort* serialPort;

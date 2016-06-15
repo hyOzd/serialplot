@@ -62,6 +62,7 @@ void CommandPanel::newCommand()
     ui->scrollAreaWidgetContents->layout()->addWidget(command);
     command->setFocusToEdit();
     connect(command, &CommandWidget::sendCommand, this, &CommandPanel::sendCommand);
+    connect(command, &CommandWidget::focusRequested, this, &CommandPanel::focusRequested);
     _menu.addAction(command->sendAction());
 }
 
