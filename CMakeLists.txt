@@ -1,5 +1,5 @@
 #
-# Copyright © 2015 Hasan Yavuz Özderya
+# Copyright © 2015-2016 Hasan Yavuz Özderya
 #
 # This file is part of serialplot.
 #
@@ -36,17 +36,23 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 # Find the QtWidgets library
 find_package(Qt5Widgets)
 
-# Find QWT or use static
+# If set, cmake will download Qwt over SVN, build and use it as a static library.
+set(BUILD_QWT true CACHE BOOL "Download and build Qwt automatically.")
+# Find QWT or use static manually provided by user
 set(QWT_USE_STATIC false CACHE BOOL "Use a static version of Qwt provided by user.")
 set(QWT_STATIC_LIBRARY "" CACHE FILEPATH "Path to the static Qwt library, libqwt.a.")
 set(QWT_STATIC_INCLUDE "" CACHE PATH "Path to the Qwt include directory when building Qwt static.")
 
-if (QWT_USE_STATIC)
-  set(QWT_LIBRARY ${QWT_STATIC_LIBRARY})
-  set(QWT_INCLUDE_DIR ${QWT_STATIC_INCLUDE})
-else (QWT_USE_STATIC)
-  find_package(Qwt 6.1 REQUIRED)
-endif (QWT_USE_STATIC)
+if (BUILD_QWT)
+  include(BuildQwt)
+else (BUILD_QWT)
+  if (QWT_USE_STATIC)
+	set(QWT_LIBRARY ${QWT_STATIC_LIBRARY})
+	set(QWT_INCLUDE_DIR ${QWT_STATIC_INCLUDE})
+  else (QWT_USE_STATIC)
+	find_package(Qwt 6.1 REQUIRED)
+  endif (QWT_USE_STATIC)
+endif (BUILD_QWT)
 
 # includes
 include_directories("./src" ${QWT_INCLUDE_DIR})
@@ -116,6 +122,10 @@ add_executable(${PROGRAM_NAME} WIN32
 # Use the Widgets module from Qt 5.
 target_link_libraries(${PROGRAM_NAME} ${QWT_LIBRARY})
 qt5_use_modules(${PROGRAM_NAME} Widgets SerialPort Svg)
+
+if (BUILD_QWT)
+  add_dependencies(${PROGRAM_NAME} QWT)
+endif (BUILD_QWT)
 
 # set compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
