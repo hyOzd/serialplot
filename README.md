@@ -37,16 +37,19 @@ Under Ubuntu/Debian:
 ### Download and Install Qwt
 
 [Qwt](http://qwt.sourceforge.net) is the library that provides
-plotting widgets for SerialPlot. If your distribution doesn't provide
-a Qwt 6 package (the Qt5 version, usually named `libqwt6-qt5`) you
-will need to download and build Qwt with Qt5 yourself.
+plotting widgets for SerialPlot. You have 3 different options for Qwt.
 
-Download Qwt 6 from here: http://sourceforge.net/projects/qwt/files/
+* Leave it to serialplot build scripts. Qwt will be downloaded over
+  SVN and built for you.
 
-Follow these instructions to build and install:
-http://qwt.sourceforge.net/qwtinstall.html#qwtinstall-unix
+* If your linux distribution has `libqwt-qt5-dev` or `qwt-qt5-devel`
+  package, install it and set `BUILD_QWT` cmake option to `false`.
 
-Make sure that you have built the Qwt with Qt 5 not Qt 4.
+* Download Qwt 6 [here](http://sourceforge.net/projects/qwt/files/)
+  and build it yourself per these
+  [instructions](http://qwt.sourceforge.net/qwtinstall.html#qwtinstall-unix). Make
+  sure you use Qt5 (not Qt4) to build it. And set `BUILD_QWT` cmake
+  option to `false`.
 
 ### Download and Build SerialPlot
 
