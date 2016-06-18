@@ -27,7 +27,7 @@
 
 HidableTabWidget::HidableTabWidget(QWidget *parent) :
     QTabWidget(parent),
-    hideAction("➖", this)
+    hideAction("▾", this)
 {
     hideAction.setCheckable(true);
     hideAction.setToolTip("Hide Panels");
