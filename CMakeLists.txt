@@ -252,6 +252,7 @@ elseif (WIN32)
   set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/COPYING")
   set(CPACK_NSIS_MENU_LINKS
     "https://bitbucket.org/hyOzd/serialplot" "SerialPlot source code on bitbucket.org")
+  set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL true)
 endif (UNIX)
 
 if (UNIX)
