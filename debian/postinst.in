@@ -1,3 +1,0 @@
-#!/bin/bash
-xdg-desktop-menu install --novendor /usr/share/serialplot/@PROGRAM_NAME@.desktop
-xdg-icon-resource install --novendor --size 256 /usr/share/@PROGRAM_NAME@/@PROGRAM_NAME@.png

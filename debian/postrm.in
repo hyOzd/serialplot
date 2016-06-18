@@ -1,3 +1,0 @@
-#!/bin/bash
-xdg-desktop-menu uninstall --novendor @PROGRAM_NAME@.desktop
-xdg-icon-resource uninstall --novendor --size 256 @PROGRAM_NAME@

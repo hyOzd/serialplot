@@ -194,25 +194,14 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/misc/program_name.desktop.in"
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/misc/program_name.png"
   "${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.png" COPYONLY)
 
-find_program(XDG-DESKTOP-MENU xdg-desktop-menu)
-find_program(XDG-ICON-RESOURCE xdg-icon-resource)
-
 if (UNIX)
   # first copy files to share/serialplot/
   install(FILES
     ${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.desktop
-    ${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.png
-    DESTINATION share/${PROGRAM_NAME})
-
-  # install copyright file (in debian format)
+    DESTINATION share/applications/)
   install(FILES
-    ${CMAKE_SOURCE_DIR}/debian/copyright
-    DESTINATION share/doc/${PROGRAM_NAME}/)
-
-  install(CODE "
-  execute_process(COMMAND ${XDG-DESKTOP-MENU} install --novendor ${CMAKE_INSTALL_PREFIX}/share/${PROGRAM_NAME}/${PROGRAM_NAME}.desktop)
-  execute_process(COMMAND ${XDG-ICON-RESOURCE} install --novendor --size 256 ${CMAKE_INSTALL_PREFIX}/share/${PROGRAM_NAME}/${PROGRAM_NAME}.png)
-")
+    ${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.png
+	DESTINATION share/icons/hicolor/256x256/apps/)
 endif (UNIX)
 
 # uninstalling
@@ -223,9 +212,7 @@ configure_file(
 
 if (UNIX)
   add_custom_target(uninstall
-    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
-    COMMAND ${XDG-DESKTOP-MENU} uninstall --novendor ${PROGRAM_NAME}.desktop
-    COMMAND ${XDG-ICON-RESOURCE} uninstall --novendor --size 256 ${PROGRAM_NAME})
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 endif (UNIX)
 
 # packaging
@@ -236,10 +223,6 @@ elseif (WIN32)
 endif (UNIX)
 
 include(InstallRequiredSystemLibraries)
-
-# configure debian scripts
-configure_file(${CMAKE_SOURCE_DIR}/debian/postinst.in ${CMAKE_BINARY_DIR}/debian/postinst)
-configure_file(${CMAKE_SOURCE_DIR}/debian/postrm.in ${CMAKE_BINARY_DIR}/debian/postrm)
 
 set(CPACK_PACKAGE_NAME "${PROGRAM_NAME}")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Small and simple software for plotting data from serial port")
@@ -257,9 +240,6 @@ set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Small and simple software for plotting dat
 if (NOT QWT_USE_STATIC)
   set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libqwt6-qt5 (>= 6.1.1)")
 endif (NOT QWT_USE_STATIC)
-set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA
-  "${CMAKE_BINARY_DIR}/debian/postinst"
-  "${CMAKE_BINARY_DIR}/debian/postrm")
 
 if (UNIX)
   set(CPACK_PACKAGE_EXECUTABLES "${PROGRAM_NAME}")
