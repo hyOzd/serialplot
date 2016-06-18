@@ -25,7 +25,7 @@ ExternalProject_Add(QWT
   # disable QwtDesigner plugin and enable static build
   PATCH_COMMAND sed -i -r -e "s/QWT_CONFIG\\s*\\+=\\s*QwtDesigner/#&/"
                           -e "s/QWT_CONFIG\\s*\\+=\\s*QwtDll/#&/"
-						  -e "s:/usr/local/.*:<INSTALL_DIR>:"
+						  -e "s|QWT_INSTALL_PREFIX\\s*=.*|QWT_INSTALL_PREFIX = <INSTALL_DIR>|"
 							 <SOURCE_DIR>/qwtconfig.pri
   CONFIGURE_COMMAND qmake <SOURCE_DIR>/qwt.pro
   )
