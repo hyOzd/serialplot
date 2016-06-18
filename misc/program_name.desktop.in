@@ -5,4 +5,4 @@ Icon=@PROGRAM_NAME@
 Exec=@PROGRAM_NAME@
 Terminal=false
 Type=Application
-Categories=Utility Electronics
+Categories=Development;Electronics;
