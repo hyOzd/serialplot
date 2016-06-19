@@ -1,12 +1,13 @@
 # SerialPlot
 
-Small and simple software for plotting data from serial port.
+Small and simple software for plotting data from serial port in realtime.
 
 ![SerialPlot v0.4 Screenshot](http://i.imgur.com/Wb53LRt.png)
 
 ## Features
 * Reading data from serial port
 * Binary data formats (u)int8, (u)int16, (u)int32, float
+* User defined frame format for robust operation
 * ASCII input (Comma Separated Values)
 * Synchronized multi channel plotting
 * Define and send commands to the device in ASCII or binary format
@@ -14,9 +15,23 @@ Small and simple software for plotting data from serial port.
 
 ## Installation
 
-You can obtain installation packages from
-[downloads](https://bitbucket.org/hyOzd/serialplot/downloads). As of
-moment there are only Debian and Windows 64 bits packages.
+### Linux
+
+You can install SerialPlot for Ubuntu/Linux Mint (and other ubuntu based
+distributions) via
+[Ubuntu PPA](https://launchpad.net/~hyozd/+archive/ubuntu/serialplot). Use
+below commands to add ppa to your system and install SerialPlot.
+
+    sudo add-apt-repository ppa:hyozd/serialplot
+    sudo apt-get update
+    sudo apt-get install serialplot
+
+
+### Windows
+
+You can obtain windows installation packages from
+[downloads](https://bitbucket.org/hyOzd/serialplot/downloads)
+section. As of moment there are only 64 bits packages.
 
 ## Dependencies
 - Qt 5, including SerialPort module
@@ -47,9 +62,9 @@ plotting widgets for SerialPlot. You have 3 different options for Qwt.
 
 * Download Qwt 6 [here](http://sourceforge.net/projects/qwt/files/)
   and build it yourself per these
-  [instructions](http://qwt.sourceforge.net/qwtinstall.html#qwtinstall-unix). Make
-  sure you use Qt5 (not Qt4) to build it. And set `BUILD_QWT` cmake
-  option to `false`.
+  [instructions](http://qwt.sourceforge.net/qwtinstall.html#qwtinstall-unix)
+  and install. Make sure you use Qt5 (not Qt4) to build. And set
+  `BUILD_QWT` cmake option to `false`.
 
 ### Download and Build SerialPlot
 
