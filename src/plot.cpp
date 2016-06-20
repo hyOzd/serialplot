@@ -21,6 +21,8 @@
 #include <QKeySequence>
 #include <QColor>
 
+#include <math.h>
+
 #include "plot.h"
 #include "utils.h"
 

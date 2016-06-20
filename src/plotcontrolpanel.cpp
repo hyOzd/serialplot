@@ -17,10 +17,13 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QVariant>
+
+#include <math.h>
+
 #include "plotcontrolpanel.h"
 #include "ui_plotcontrolpanel.h"
 
-#include <QVariant>
 
 /// Used for scale range selection combobox
 struct Range
