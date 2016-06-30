@@ -17,6 +17,8 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QButtonGroup>
+
 #include "utils.h"
 #include "framedreadersettings.h"
 #include "ui_framedreadersettings.h"
@@ -66,6 +68,11 @@ FramedReaderSettings::FramedReaderSettings(QWidget *parent) :
 
     connect(ui->nfBox, SIGNAL(selectionChanged(NumberFormat)),
             this, SIGNAL(numberFormatChanged(NumberFormat)));
+
+    // add frame size selection buttons to same group
+    QButtonGroup* group = new QButtonGroup(this);
+    group->addButton(ui->rbFixedSize);
+    group->addButton(ui->rbSizeByte);
 }
 
 FramedReaderSettings::~FramedReaderSettings()
