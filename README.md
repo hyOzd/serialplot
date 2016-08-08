@@ -52,13 +52,13 @@ section. As of moment there are only 64 bits packages.
 Under Ubuntu/Debian:
 ```apt install qtbase5-dev libqt5serialport5-dev cmake mercurial```
 
-### Download and Install Qwt
+### Download and Install Qwt [Optional]
 
 [Qwt](http://qwt.sourceforge.net) is the library that provides
 plotting widgets for SerialPlot. You have 3 different options for Qwt.
 
 * Leave it to serialplot build scripts. Qwt will be downloaded over
-  SVN and built for you.
+  SVN and built for you. You should have `svn` installed for this.
 
 * If your linux distribution has `libqwt-qt5-dev` or `qwt-qt5-devel`
   package, install it and set `BUILD_QWT` cmake option to `false`.
