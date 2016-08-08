@@ -27,9 +27,8 @@ distributions) via
 below commands to add ppa to your system and install SerialPlot.
 
     sudo add-apt-repository ppa:hyozd/serialplot
-    sudo apt-get update
-    sudo apt-get install serialplot
-
+    apt update
+    apt install serialplot
 
 ### Windows
 
@@ -51,7 +50,7 @@ section. As of moment there are only 64 bits packages.
 - Mercurial
 
 Under Ubuntu/Debian:
-```sudo apt-get install qtbase5-dev libqt5serialport5-dev cmake mercurial```
+```apt install qtbase5-dev libqt5serialport5-dev cmake mercurial```
 
 ### Download and Install Qwt
 
