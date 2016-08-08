@@ -85,6 +85,13 @@ https://bitbucket.org/hyOzd/serialplot/downloads
 You can also build with QtCreator IDE using `serialplot.pro` file.
 
 ## Known Issues
+- On Ubuntu 16.04 / Linux Mint 18, removing USB serial device while it
+  is open in SerialPlot, causes application to go into a nasty loop
+  and eventually it crashes. This is a bug of Qt 5.5. I have uploaded
+  a patched version of the problematic `libqt5serialport5` package to
+  launchpad ppa. If you install SerialPlot from there, you shouldn't
+  have any problems.
+
 - Port error 13 happens when closing. This is a Qt issue. It's known
   to not happen with Qt 5.4.1 . Not fatal.
 
