@@ -56,6 +56,7 @@ private:
 
     QToolBar portToolBar;
     QAction openAction;
+    QAction loadPortListAction;
     QComboBox tbPortList;
     PortList portList;
 

@@ -32,20 +32,26 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     QWidget(parent),
     ui(new Ui::PortControl),
     portToolBar("Port Toolbar"),
-    openAction("Open", this)
+    openAction("Open", this),
+    loadPortListAction("↺", this)
 {
     ui->setupUi(this);
 
     serialPort = port;
 
-    // setup the toolbar
+    // setup actions
     openAction.setCheckable(true);
     openAction.setShortcut(QKeySequence("F12"));
     openAction.setToolTip("Open Port");
     QObject::connect(&openAction, &QAction::triggered,
                      this, &PortControl::openActionTriggered);
 
+    QObject::connect(&loadPortListAction, &QAction::triggered,
+                     [this](bool checked){loadPortList();});
+
+    // setup toolbar
     portToolBar.addWidget(&tbPortList);
+    portToolBar.addAction(&loadPortListAction);
     portToolBar.addAction(&openAction);
 
     // setup port selection widgets
@@ -66,10 +72,8 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
                      this, &PortControl::selectPort);
 
     // setup buttons
-    QObject::connect(ui->pbReloadPorts, &QPushButton::clicked,
-                     this, &PortControl::loadPortList);
-
     ui->pbOpenPort->setDefaultAction(&openAction);
+    ui->pbReloadPorts->setDefaultAction(&loadPortListAction);
 
     // setup baud rate selection widget
     QObject::connect(ui->cbBaudRate,
