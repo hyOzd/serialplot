@@ -275,6 +275,13 @@ void FramedReader::reset()
 // Important: this function assumes device has enough bytes to read a full frames data and checksum
 void FramedReader::readFrameDataAndCheck()
 {
+    // if paused just read and waste data
+    if (paused)
+    {
+        _device->read((checksumEnabled ? frameSize+1 : frameSize));
+        return;
+    }
+
     // a package is 1 set of samples for all channels
     unsigned numOfPackagesToRead = frameSize / (_numOfChannels * sampleSize);
     double* channelSamples = new double[numOfPackagesToRead * _numOfChannels];
