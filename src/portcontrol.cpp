@@ -46,6 +46,7 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     QObject::connect(&openAction, &QAction::triggered,
                      this, &PortControl::openActionTriggered);
 
+    loadPortListAction.setToolTip("Reload port list");
     QObject::connect(&loadPortListAction, &QAction::triggered,
                      [this](bool checked){loadPortList();});
 

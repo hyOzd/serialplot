@@ -70,7 +70,7 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>Reload port list</string>
+          <string/>
          </property>
          <property name="text">
           <string>↺</string>
