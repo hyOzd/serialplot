@@ -100,12 +100,12 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
         updateSnapPoints();
 
         QMouseEvent* mouseEvent = (QMouseEvent*) event;
-        double posPx = this->positionPx(mouseEvent);
+        int posPx = this->positionPx(mouseEvent);
 
         // do snapping unless Shift is pressed
         if (! (mouseEvent->modifiers() & Qt::ShiftModifier))
         {
-            for (double sp : snapPoints)
+            for (auto sp : snapPoints)
             {
                 if (fabs(posPx-sp) <= SNAP_DISTANCE)
                 {
@@ -227,7 +227,7 @@ double ScalePicker::position(double posPx)
     return _scaleWidget->scaleDraw()->scaleMap().invTransform(posPx);
 }
 
-double ScalePicker::positionPx(QMouseEvent* mouseEvent)
+int ScalePicker::positionPx(QMouseEvent* mouseEvent)
 {
     double pos;
     if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale ||
@@ -272,6 +272,7 @@ void ScalePicker::updateSnapPoints()
     snapPoints.clear();
     for(auto t : allTicks)
     {
-        snapPoints << _scaleWidget->scaleDraw()->scaleMap().transform(t);
+        // `round` is used because `allTicks` is double but `snapPoints` is int
+        snapPoints << round(_scaleWidget->scaleDraw()->scaleMap().transform(t));
     }
 }
