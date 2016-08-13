@@ -192,29 +192,27 @@ void ScalePicker::drawScaleOverlay(QPainter* painter)
 {
     painter->save();
     painter->setPen(_pen);
-    if (1)
-    {
 
-        if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale ||
-            _scaleWidget->alignment() == QwtScaleDraw::TopScale)
+    if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale ||
+        _scaleWidget->alignment() == QwtScaleDraw::TopScale)
+    {
+        int height = painter->device()->height();
+        if (started) painter->drawLine(firstPosPx, 0, firstPosPx, height);
+        if (started || _scaleWidget->underMouse())
         {
-            int height = painter->device()->height();
-            if (started) painter->drawLine(firstPosPx, 0, firstPosPx, height);
-            if (started || _scaleWidget->underMouse())
-            {
-                painter->drawLine(currentPosPx, 0, currentPosPx, height);
-            }
-        }
-        else // vertical
-        {
-            int width = painter->device()->width();
-            if (started) painter->drawLine(0, firstPosPx, width, firstPosPx);
-            if (started || _scaleWidget->underMouse())
-            {
-                painter->drawLine(0, currentPosPx, width, currentPosPx);
-            }
+            painter->drawLine(currentPosPx, 0, currentPosPx, height);
         }
     }
+    else // vertical
+    {
+        int width = painter->device()->width();
+        if (started) painter->drawLine(0, firstPosPx, width, firstPosPx);
+        if (started || _scaleWidget->underMouse())
+        {
+            painter->drawLine(0, currentPosPx, width, currentPosPx);
+        }
+    }
+
     painter->restore();
 }
 
