@@ -114,8 +114,8 @@ void FrameBuffer::addSamples(double* samples, size_t size)
     }
 
     // update bounding rectangle
-    double minValue = 0;
-    double maxValue = 0;
+    double minValue = data[0];
+    double maxValue = data[0];
     for (size_t i = 0; i < _size; i++)
     {
         if (data[i] > maxValue)
