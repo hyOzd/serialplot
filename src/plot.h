@@ -63,6 +63,7 @@ private:
     /// update the display of symbols depending on `isSymbolsOn`
     void updateSymbols();
     void resetAxes();
+    void resizeEvent(QResizeEvent * event);
 
 public slots:
     void showGrid(bool show = true);

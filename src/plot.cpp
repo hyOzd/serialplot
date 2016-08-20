@@ -277,7 +277,6 @@ void Plot::updateSymbols()
         {
             QwtSymbol* symbol = NULL;
             QwtPlotCurve* curve = static_cast<QwtPlotCurve*>(curves[i]);
-            qDebug() << i;
             if (isSymbolsOn)
             {
                 symbol = new QwtSymbol(QwtSymbol::Ellipse,
@@ -288,4 +287,10 @@ void Plot::updateSymbols()
             curve->setSymbol(symbol);
         }
     }
+}
+
+void Plot::resizeEvent(QResizeEvent * event)
+{
+    QwtPlot::resizeEvent(event);
+    onXScaleChanged();
 }
