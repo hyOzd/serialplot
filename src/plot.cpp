@@ -20,11 +20,15 @@
 #include <QRectF>
 #include <QKeySequence>
 #include <QColor>
-
+#include <qwt_symbol.h>
+#include <qwt_plot_curve.h>
 #include <math.h>
 
 #include "plot.h"
 #include "utils.h"
+
+static const int SYMBOL_SIZE = 5;
+static const int SYMBOL_SHOW_AT_WIDTH = 15;
 
 Plot::Plot(QWidget* parent) :
     QwtPlot(parent),
@@ -37,6 +41,7 @@ Plot::Plot(QWidget* parent) :
     showLegendAction("Legend", this)
 {
     isAutoScaled = true;
+    isSymbolsOn = true;
 
     QObject::connect(&zoomer, &Zoomer::unzoomed, this, &Plot::unzoomed);
 
@@ -79,6 +84,18 @@ Plot::Plot(QWidget* parent) :
             this, &Plot::darkBackground);
     connect(&showLegendAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
             [this](bool enabled){legend.setVisible(enabled); replot();});
+
+    connect(&zoomer, &QwtPlotZoomer::zoomed,
+            [this](const QRectF &rect)
+            {
+                onXScaleChanged();
+            });
+
+    connect(this, &QwtPlot::itemAttached,
+            [this](QwtPlotItem *plotItem, bool on)
+            {
+                if (isSymbolsOn) updateSymbols();
+            });
 
     snapshotOverlay = NULL;
 }
@@ -229,4 +246,46 @@ void Plot::flashSnapshotOverlay()
                 delete snapshotOverlay;
                 snapshotOverlay = NULL;
             });
+}
+
+void Plot::onXScaleChanged()
+{
+    auto sw = axisWidget(QwtPlot::xBottom);
+    auto paintDist = sw->scaleDraw()->scaleMap().pDist();
+    auto scaleDist = sw->scaleDraw()->scaleMap().sDist();
+    double symDisPx = paintDist / scaleDist;
+
+    if (symDisPx > SYMBOL_SHOW_AT_WIDTH)
+    {
+        isSymbolsOn = true;
+    }
+    else
+    {
+        isSymbolsOn = false;
+    }
+
+    updateSymbols();
+}
+
+void Plot::updateSymbols()
+{
+    const QwtPlotItemList curves = itemList( QwtPlotItem::Rtti_PlotCurve );
+
+    if (curves.size() > 0)
+    {
+        for (unsigned i = 0; i < curves.size(); i++)
+        {
+            QwtSymbol* symbol = NULL;
+            QwtPlotCurve* curve = static_cast<QwtPlotCurve*>(curves[i]);
+            qDebug() << i;
+            if (isSymbolsOn)
+            {
+                symbol = new QwtSymbol(QwtSymbol::Ellipse,
+                                       QBrush(Qt::white),
+                                       curve->pen(),
+                                       QSize(SYMBOL_SIZE, SYMBOL_SIZE));
+            }
+            curve->setSymbol(symbol);
+        }
+    }
 }

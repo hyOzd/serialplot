@@ -47,6 +47,7 @@ public:
 private:
     bool isAutoScaled;
     double yMin, yMax;
+    bool isSymbolsOn;
     Zoomer zoomer;
     ScaleZoomer sZoomer;
     QwtPlotGrid grid;
@@ -59,6 +60,8 @@ private:
     QAction darkBackgroundAction;
     QAction showLegendAction;
 
+    /// update the display of symbols depending on `isSymbolsOn`
+    void updateSymbols();
     void resetAxes();
 
 public slots:
@@ -72,6 +75,7 @@ public slots:
 
 private slots:
     void unzoomed();
+    void onXScaleChanged();
 };
 
 #endif // PLOT_H
