@@ -47,7 +47,7 @@ public:
 private:
     bool isAutoScaled;
     double yMin, yMax;
-    bool isSymbolsOn;
+    int symbolSize;
     Zoomer zoomer;
     ScaleZoomer sZoomer;
     QwtPlotGrid grid;
@@ -60,7 +60,7 @@ private:
     QAction darkBackgroundAction;
     QAction showLegendAction;
 
-    /// update the display of symbols depending on `isSymbolsOn`
+    /// update the display of symbols depending on `symbolSize`
     void updateSymbols();
     void resetAxes();
     void resizeEvent(QResizeEvent * event);
@@ -73,6 +73,8 @@ public slots:
     void setAxis(bool autoScaled, double yMin = 0, double yMax = 1);
 
     void flashSnapshotOverlay();
+
+    void onNumOfSamplesChanged(unsigned value);
 
 private slots:
     void unzoomed();

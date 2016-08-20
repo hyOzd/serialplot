@@ -23,12 +23,13 @@
 #include <qwt_symbol.h>
 #include <qwt_plot_curve.h>
 #include <math.h>
+#include <algorithm>
 
 #include "plot.h"
 #include "utils.h"
 
-static const int SYMBOL_SIZE = 5;
-static const int SYMBOL_SHOW_AT_WIDTH = 15;
+static const int SYMBOL_SHOW_AT_WIDTH = 5;
+static const int SYMBOL_SIZE_MAX = 7;
 
 Plot::Plot(QWidget* parent) :
     QwtPlot(parent),
@@ -41,7 +42,7 @@ Plot::Plot(QWidget* parent) :
     showLegendAction("Legend", this)
 {
     isAutoScaled = true;
-    isSymbolsOn = true;
+    symbolSize = 0;
 
     QObject::connect(&zoomer, &Zoomer::unzoomed, this, &Plot::unzoomed);
 
@@ -94,7 +95,7 @@ Plot::Plot(QWidget* parent) :
     connect(this, &QwtPlot::itemAttached,
             [this](QwtPlotItem *plotItem, bool on)
             {
-                if (isSymbolsOn) updateSymbols();
+                if (symbolSize) updateSymbols();
             });
 
     snapshotOverlay = NULL;
@@ -253,15 +254,15 @@ void Plot::onXScaleChanged()
     auto sw = axisWidget(QwtPlot::xBottom);
     auto paintDist = sw->scaleDraw()->scaleMap().pDist();
     auto scaleDist = sw->scaleDraw()->scaleMap().sDist();
-    double symDisPx = paintDist / scaleDist;
+    int symDisPx = round(paintDist / scaleDist);
 
-    if (symDisPx > SYMBOL_SHOW_AT_WIDTH)
+    if (symDisPx < SYMBOL_SHOW_AT_WIDTH)
     {
-        isSymbolsOn = true;
+        symbolSize = 0;
     }
     else
     {
-        isSymbolsOn = false;
+        symbolSize = std::min(SYMBOL_SIZE_MAX, symDisPx-SYMBOL_SHOW_AT_WIDTH+1);
     }
 
     updateSymbols();
@@ -277,12 +278,12 @@ void Plot::updateSymbols()
         {
             QwtSymbol* symbol = NULL;
             QwtPlotCurve* curve = static_cast<QwtPlotCurve*>(curves[i]);
-            if (isSymbolsOn)
+            if (symbolSize)
             {
                 symbol = new QwtSymbol(QwtSymbol::Ellipse,
                                        QBrush(Qt::white),
                                        curve->pen(),
-                                       QSize(SYMBOL_SIZE, SYMBOL_SIZE));
+                                       QSize(symbolSize, symbolSize));
             }
             curve->setSymbol(symbol);
         }
@@ -292,5 +293,13 @@ void Plot::updateSymbols()
 void Plot::resizeEvent(QResizeEvent * event)
 {
     QwtPlot::resizeEvent(event);
+    onXScaleChanged();
+}
+
+void Plot::onNumOfSamplesChanged(unsigned value)
+{
+    auto currentBase = zoomer.zoomBase();
+    currentBase.setWidth(value);
+    zoomer.setZoomBase(currentBase);
     onXScaleChanged();
 }
