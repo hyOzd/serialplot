@@ -54,7 +54,17 @@ MainWindow::MainWindow(QWidget *parent) :
     dataFormatPanel(&serialPort, &channelMan),
     snapshotMan(this, &channelMan)
 {
+
     ui->setupUi(this);
+    ui->plot->setParent(NULL);
+    ui->plot->show();
+
+    ((QVBoxLayout*) ui->centralWidget->layout())->insertWidget(0, &plotArea);
+    plotMan = new PlotManager(&plotArea);
+
+    // test code
+    // plotArea.show();
+
     ui->tabWidget->insertTab(0, &portControl, "Port");
     ui->tabWidget->insertTab(1, &dataFormatPanel, "Data Format");
     ui->tabWidget->insertTab(2, &plotControlPanel, "Plot");

@@ -42,6 +42,7 @@
 #include "framebuffer.h"
 #include "channelmanager.h"
 #include "snapshotmanager.h"
+#include "plotmanager.h"
 
 namespace Ui {
 class MainWindow;
@@ -84,6 +85,10 @@ private:
 
     QwtPlotTextLabel demoIndicator;
     bool isDemoRunning();
+
+    // test widget
+    QWidget plotArea;
+    PlotManager* plotMan;
 
 private slots:
     void onPortToggled(bool open);

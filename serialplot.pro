@@ -65,7 +65,8 @@ SOURCES += \
     src/asciireadersettings.cpp \
     src/asciireader.cpp \
     src/demoreader.cpp \
-    src/framedreader.cpp
+    src/framedreader.cpp \
+    src/plotmanager.cpp
 
 HEADERS += \
     src/mainwindow.h \
@@ -101,7 +102,8 @@ HEADERS += \
     src/asciireadersettings.h \
     src/asciireader.h \
     src/demoreader.h \
-    src/framedreader.h
+    src/framedreader.h \
+    src/plotmanager.h
 
 FORMS += \
     src/mainwindow.ui \

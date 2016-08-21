@@ -114,6 +114,7 @@ add_executable(${PROGRAM_NAME} WIN32
   src/demoreader.cpp
   src/framedreader.cpp
   src/framedreadersettings.cpp
+  src/plotmanager.cpp
   misc/windows_icon.rc
   ${UI_FILES}
   ${RES_FILES}
