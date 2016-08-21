@@ -48,6 +48,9 @@ public:
     /// Removes curves from the end
     void removeCurves(unsigned number);
 
+    /// Returns current number of curves known by plot manager
+    unsigned numOfCurves();
+
 signals:
 
 public slots:

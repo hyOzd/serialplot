@@ -34,12 +34,12 @@ PlotManager::PlotManager(QWidget* plotArea, QObject *parent) :
     addPlotWidget();
 
     // test code
-    addCurve("test", new FrameBuffer(100));
-    addCurve("test", new FrameBuffer(100));
-    addCurve("test", new FrameBuffer(100));
+    // addCurve("test", new FrameBuffer(100));
+    // addCurve("test", new FrameBuffer(100));
+    // addCurve("test", new FrameBuffer(100));
 
-    setMulti(true);
-    setMulti(false);
+    // setMulti(true);
+    // setMulti(false);
 }
 
 PlotManager::~PlotManager()
@@ -163,4 +163,25 @@ void PlotManager::addCurve(QString title, FrameBuffer* buffer)
     curve->setPen(Plot::makeColor(index));
 
     curve->attach(plot);
+    plot->replot();
+}
+
+void PlotManager::removeCurves(unsigned number)
+{
+    for (unsigned i = 0; i < number; i++)
+    {
+        if (!curves.isEmpty())
+        {
+            delete curves.takeLast();
+            if (isMulti) // delete corresponding widget as well
+            {
+                delete plotWidgets.takeLast();
+            }
+        }
+    }
+}
+
+unsigned PlotManager::numOfCurves()
+{
+    return curves.size();
 }

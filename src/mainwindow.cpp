@@ -164,13 +164,10 @@ MainWindow::MainWindow(QWidget *parent) :
     // init curve list
     for (unsigned int i = 0; i < numOfChannels; i++)
     {
-        curves.append(new QwtPlotCurve(channelMan.channelName(i)));
-        curves[i]->setSamples(
-            new FrameBufferSeries(channelMan.channelBuffer(i)));
-        curves[i]->setPen(Plot::makeColor(i));
-        curves[i]->attach(ui->plot);
+        plotMan->addCurve(channelMan.channelName(i), channelMan.channelBuffer(i));
     }
 
+    // TODO: plotman
     // init auto scale
     ui->plot->setAxis(plotControlPanel.autoScale(),
                       plotControlPanel.yMin(), plotControlPanel.yMax());
@@ -201,16 +198,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    for (auto curve : curves)
-    {
-        // also deletes respective FrameBuffer
-        delete curve;
-    }
-
     if (serialPort.isOpen())
     {
         serialPort.close();
     }
+
+    delete plotMan;
 
     delete ui;
     ui = NULL; // we check if ui is deleted in messageHandler
@@ -313,7 +306,7 @@ void MainWindow::onNumOfSamplesChanged(int value)
 
 void MainWindow::onNumOfChannelsChanged(unsigned value)
 {
-    unsigned int oldNum = curves.size();
+    unsigned int oldNum = plotMan->numOfCurves();
     unsigned numOfChannels = value;
 
     if (numOfChannels > oldNum)
@@ -321,23 +314,15 @@ void MainWindow::onNumOfChannelsChanged(unsigned value)
         // add new channels
         for (unsigned int i = oldNum; i < numOfChannels; i++)
         {
-            QwtPlotCurve* curve = new QwtPlotCurve(channelMan.channelName(i));
-            curve->setSamples(
-                new FrameBufferSeries(channelMan.channelBuffer(i)));
-            curve->setPen(Plot::makeColor(i));
-            curve->attach(ui->plot);
-            curves.append(curve);
+            plotMan->addCurve(channelMan.channelName(i), channelMan.channelBuffer(i));
         }
     }
     else if(numOfChannels < oldNum)
     {
-        // remove channels
-        for (unsigned int i = 0; i < oldNum - numOfChannels; i++)
-        {
-            delete curves.takeLast();
-        }
+        plotMan->removeCurves(oldNum - numOfChannels);
     }
 
+    // TODO: plotman.replot
     ui->plot->replot();
 }
 
