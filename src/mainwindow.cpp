@@ -126,6 +126,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&plotControlPanel, &PlotControlPanel::scaleChanged,
             ui->plot, &Plot::setAxis);
 
+    connect(&plotControlPanel, &PlotControlPanel::multiPlotChanged,
+            plotMan, &PlotManager::setMulti);
+
     QObject::connect(ui->actionClear, SIGNAL(triggered(bool)),
                      this, SLOT(clearPlot()));
 

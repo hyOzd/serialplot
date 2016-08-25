@@ -39,12 +39,14 @@ public:
     bool autoScale();
     double yMax();
     double yMin();
+    bool multiPlot(); ///< returns true if multi plot is selected
 
     void setChannelNamesModel(QAbstractItemModel * model);
 
 signals:
     void numOfSamplesChanged(int value);
     void scaleChanged(bool autoScaled, double yMin = 0, double yMax = 1);
+    void multiPlotChanged(bool enabled);
 
 private:
     Ui::PlotControlPanel *ui;
