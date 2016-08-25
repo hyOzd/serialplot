@@ -207,15 +207,8 @@ Plot* PlotManager::plotWidget(unsigned curveIndex)
 
 void PlotManager::replot()
 {
-    if (isMulti)
+    for (auto plot : plotWidgets)
     {
-        for (auto plot : plotWidgets)
-        {
-            plot->replot();
-        }
-    }
-    else
-    {
-        plotWidgets[0]->replot();
+        plot->replot();
     }
 }
