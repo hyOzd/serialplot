@@ -67,6 +67,8 @@ private:
 
     void setupLayout(bool multiPlot);
     Plot* addPlotWidget(); ///< inserts a new plot widget to the current layout
+    /// Returns the plot widget that given curve is attached to
+    Plot* plotWidget(unsigned curveIndex);
 };
 
 #endif // PLOTMANAGER_H

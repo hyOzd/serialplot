@@ -331,10 +331,9 @@ void MainWindow::onChannelNameChanged(unsigned channel, QString name)
     // This slot is triggered also when a new channel is added, in
     // this case curve list doesn't contain said channel. No worries,
     // since `onNumOfChannelsChanged` slot will update curve list.
-    if ((int) channel < curves.size()) // check if channel exists in curve list
+    if (channel < plotMan->numOfCurves()) // check if channel exists in curve list
     {
-        curves[channel]->setTitle(name);
-        ui->plot->replot();
+        plotMan->setTitle(channel, name);
     }
 }
 
