@@ -103,7 +103,6 @@ void PlotControlPanel::onAutoScaleChecked(bool checked)
 {
     if (checked)
     {
-        // ui->plot->setAxis(true);
         ui->lYmin->setEnabled(false);
         ui->lYmax->setEnabled(false);
         ui->spYmin->setEnabled(false);
@@ -118,7 +117,6 @@ void PlotControlPanel::onAutoScaleChecked(bool checked)
         ui->spYmin->setEnabled(true);
         ui->spYmax->setEnabled(true);
 
-        // ui->plot->setAxis(false,  ui->spYmin->value(), ui->spYmax->value());
         emit scaleChanged(false, ui->spYmin->value(), ui->spYmax->value());
     }
 }
