@@ -56,6 +56,8 @@ signals:
 public slots:
     /// Enable/Disable multiple plot display
     void setMulti(bool enabled);
+    /// Update all plot widgets
+    void replot();
 
 private:
     bool isMulti;

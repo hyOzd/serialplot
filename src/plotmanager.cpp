@@ -204,3 +204,18 @@ Plot* PlotManager::plotWidget(unsigned curveIndex)
         return plotWidgets[0];
     }
 }
+
+void PlotManager::replot()
+{
+    if (isMulti)
+    {
+        for (auto plot : plotWidgets)
+        {
+            plot->replot();
+        }
+    }
+    else
+    {
+        plotWidgets[0]->replot();
+    }
+}

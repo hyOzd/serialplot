@@ -141,7 +141,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // init data format and reader
     QObject::connect(&dataFormatPanel, &DataFormatPanel::dataAdded,
-                     ui->plot, &QwtPlot::replot);
+                     plotMan, &PlotManager::replot);
 
     QObject::connect(ui->actionPause, &QAction::triggered,
                      &dataFormatPanel, &DataFormatPanel::pause);
@@ -297,14 +297,14 @@ void MainWindow::clearPlot()
     {
         channelMan.channelBuffer(ci)->clear();
     }
-    ui->plot->replot();
+    plotMan->replot();
 }
 
 void MainWindow::onNumOfSamplesChanged(int value)
 {
     numOfSamples = value;
     channelMan.setNumOfSamples(value);
-    ui->plot->replot();
+    plotMan->replot();
 }
 
 void MainWindow::onNumOfChannelsChanged(unsigned value)
@@ -325,8 +325,7 @@ void MainWindow::onNumOfChannelsChanged(unsigned value)
         plotMan->removeCurves(oldNum - numOfChannels);
     }
 
-    // TODO: plotman.replot
-    ui->plot->replot();
+    plotMan->replot();
 }
 
 void MainWindow::onChannelNameChanged(unsigned channel, QString name)
@@ -359,7 +358,7 @@ void MainWindow::enableDemo(bool enabled)
             dataFormatPanel.enableDemo(true);
             ui->actionDemoMode->setChecked(true);
             demoIndicator.show();
-            ui->plot->replot();
+            plotMan->replot();
         }
         else
         {
@@ -371,7 +370,7 @@ void MainWindow::enableDemo(bool enabled)
         dataFormatPanel.enableDemo(false);
         ui->actionDemoMode->setChecked(false);
         demoIndicator.hide();
-        ui->plot->replot();
+        plotMan->replot();
     }
 }
 
