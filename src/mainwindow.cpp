@@ -88,7 +88,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setupAboutDialog();
 
     // init view menu
-    for (auto a : ui->plot->menuActions())
+    for (auto a : plotMan->menuActions())
     {
         ui->menuView->addAction(a);
     }

@@ -17,15 +17,21 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "plot.h"
-
-#include "plotmanager.h"
-
 #include <QtDebug>
+
+#include "plot.h"
+#include "plotmanager.h"
+#include "utils.h"
+
 
 PlotManager::PlotManager(QWidget* plotArea, QObject *parent) :
     QObject(parent),
-    _plotArea(plotArea)
+    _plotArea(plotArea),
+    showGridAction("Grid", this),
+    showMinorGridAction("Minor Grid", this),
+    unzoomAction("Unzoom", this),
+    darkBackgroundAction("Dark Background", this),
+    showLegendAction("Legend", this)
 {
     // initalize layout and single widget
     isMulti = false;
@@ -33,13 +39,40 @@ PlotManager::PlotManager(QWidget* plotArea, QObject *parent) :
     setupLayout(isMulti);
     addPlotWidget();
 
-    // test code
-    // addCurve("test", new FrameBuffer(100));
-    // addCurve("test", new FrameBuffer(100));
-    // addCurve("test", new FrameBuffer(100));
+    // initialize menu actions
+    showGridAction.setToolTip("Show Grid");
+    showMinorGridAction.setToolTip("Show Minor Grid");
+    unzoomAction.setToolTip("Unzoom the Plot");
+    darkBackgroundAction.setToolTip("Enable Dark Plot Background");
+    showLegendAction.setToolTip("Display the Legend on Plot");
 
-    // setMulti(true);
-    // setMulti(false);
+    showGridAction.setShortcut(QKeySequence("G"));
+    showMinorGridAction.setShortcut(QKeySequence("M"));
+
+    showGridAction.setCheckable(true);
+    showMinorGridAction.setCheckable(true);
+    darkBackgroundAction.setCheckable(true);
+    showLegendAction.setCheckable(true);
+
+    showGridAction.setChecked(false);
+    showMinorGridAction.setChecked(false);
+    darkBackgroundAction.setChecked(false);
+    showLegendAction.setChecked(true);
+
+    showMinorGridAction.setEnabled(false);
+
+    connect(&showGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+            this, &PlotManager::showGrid);
+    connect(&showGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+            &showMinorGridAction, &QAction::setEnabled);
+    connect(&showMinorGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+            this, &PlotManager::showMinorGrid);
+    connect(&unzoomAction, &QAction::triggered, this, &PlotManager::unzoom);
+    connect(&darkBackgroundAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+            this, &PlotManager::darkBackground);
+    // TODO: enable legend
+    // connect(&showLegendAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+    //         [this](bool enabled){legend.setVisible(enabled); replot();});
 }
 
 PlotManager::~PlotManager()
@@ -210,5 +243,45 @@ void PlotManager::replot()
     for (auto plot : plotWidgets)
     {
         plot->replot();
+    }
+}
+
+QList<QAction*> PlotManager::menuActions()
+{
+    QList<QAction*> actions;
+    actions << &showGridAction;
+    actions << &showMinorGridAction;
+    actions << &unzoomAction;
+    actions << &darkBackgroundAction;
+    actions << &showLegendAction;
+    return actions;
+}
+
+void PlotManager::showGrid(bool show)
+{
+    for (auto plot : plotWidgets)
+    {
+        plot->showGrid(show);
+    }
+}
+void PlotManager::showMinorGrid(bool show)
+{
+    for (auto plot : plotWidgets)
+    {
+        plot->showMinorGrid(show);
+    }
+}
+void PlotManager::unzoom()
+{
+    for (auto plot : plotWidgets)
+    {
+        plot->unzoom();
+    }
+}
+void PlotManager::darkBackground(bool enabled)
+{
+    for (auto plot : plotWidgets)
+    {
+        plot->darkBackground(enabled);
     }
 }

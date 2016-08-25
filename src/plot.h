@@ -40,8 +40,6 @@ public:
     Plot(QWidget* parent = 0);
     ~Plot();
 
-    QList<QAction*> menuActions();
-
     static QColor makeColor(unsigned int channelIndex);
 
 private:
@@ -52,12 +50,6 @@ private:
     QwtPlotGrid grid;
     PlotSnapshotOverlay* snapshotOverlay;
     QwtPlotLegendItem legend;
-
-    QAction showGridAction;
-    QAction showMinorGridAction;
-    QAction unzoomAction;
-    QAction darkBackgroundAction;
-    QAction showLegendAction;
 
     void resetAxes();
 

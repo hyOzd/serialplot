@@ -50,10 +50,11 @@ SnapshotView::SnapshotView(QWidget *parent, Snapshot* snapshot) :
     connect(ui->actionExport, &QAction::triggered,
             this, &SnapshotView::save);
 
-    for (auto a : ui->plot->menuActions())
-    {
-        ui->menuView->addAction(a);
-    }
+    // TODO: fix snapshot menu
+    // for (auto a : ui->plot->menuActions())
+    // {
+    //     ui->menuView->addAction(a);
+    // }
 }
 
 SnapshotView::~SnapshotView()

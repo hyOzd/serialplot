@@ -51,7 +51,8 @@ public:
     /// Returns current number of curves known by plot manager
     unsigned numOfCurves();
 
-signals:
+    /// Returns the list of actions to be inserted into the `View` menu
+    QList<QAction*> menuActions();
 
 public slots:
     /// Enable/Disable multiple plot display
@@ -67,10 +68,23 @@ private:
     QList<QwtPlotCurve*> curves;
     QList<Plot*> plotWidgets;
 
+    // menu actions
+    QAction showGridAction;
+    QAction showMinorGridAction;
+    QAction unzoomAction;
+    QAction darkBackgroundAction;
+    QAction showLegendAction;
+
     void setupLayout(bool multiPlot);
     Plot* addPlotWidget(); ///< inserts a new plot widget to the current layout
     /// Returns the plot widget that given curve is attached to
     Plot* plotWidget(unsigned curveIndex);
+
+private slots:
+    void showGrid(bool show = true);
+    void showMinorGrid(bool show = true);
+    void unzoom();
+    void darkBackground(bool enabled = true);
 };
 
 #endif // PLOTMANAGER_H
