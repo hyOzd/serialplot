@@ -70,9 +70,8 @@ PlotManager::PlotManager(QWidget* plotArea, QObject *parent) :
     connect(&unzoomAction, &QAction::triggered, this, &PlotManager::unzoom);
     connect(&darkBackgroundAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
             this, &PlotManager::darkBackground);
-    // TODO: enable legend
-    // connect(&showLegendAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
-    //         [this](bool enabled){legend.setVisible(enabled); replot();});
+    connect(&showLegendAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+            this, &PlotManager::showLegend);
 }
 
 PlotManager::~PlotManager()
@@ -174,7 +173,7 @@ Plot* PlotManager::addPlotWidget()
     plot->darkBackground(darkBackgroundAction.isChecked());
     plot->showGrid(showGridAction.isChecked());
     plot->showMinorGrid(showMinorGridAction.isChecked());
-    // TODO: show legend
+    plot->showLegend(showLegendAction.isChecked());
 
     return plot;
 }
@@ -270,6 +269,7 @@ void PlotManager::showGrid(bool show)
         plot->showGrid(show);
     }
 }
+
 void PlotManager::showMinorGrid(bool show)
 {
     for (auto plot : plotWidgets)
@@ -277,6 +277,15 @@ void PlotManager::showMinorGrid(bool show)
         plot->showMinorGrid(show);
     }
 }
+
+void PlotManager::showLegend(bool show)
+{
+    for (auto plot : plotWidgets)
+    {
+        plot->showLegend(show);
+    }
+}
+
 void PlotManager::unzoom()
 {
     for (auto plot : plotWidgets)
@@ -284,6 +293,7 @@ void PlotManager::unzoom()
         plot->unzoom();
     }
 }
+
 void PlotManager::darkBackground(bool enabled)
 {
     for (auto plot : plotWidgets)

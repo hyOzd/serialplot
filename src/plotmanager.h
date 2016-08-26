@@ -83,6 +83,7 @@ private:
 private slots:
     void showGrid(bool show = true);
     void showMinorGrid(bool show = true);
+    void showLegend(bool show = true);
     void unzoom();
     void darkBackground(bool enabled = true);
 };

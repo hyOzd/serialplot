@@ -98,6 +98,12 @@ void Plot::showMinorGrid(bool show)
     replot();
 }
 
+void Plot::showLegend(bool show)
+{
+    legend.setVisible(show);
+    replot();
+}
+
 void Plot::unzoom()
 {
     zoomer.zoom(0);
