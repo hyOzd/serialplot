@@ -170,6 +170,12 @@ Plot* PlotManager::addPlotWidget()
     auto plot = new Plot();
     plotWidgets.append(plot);
     layout->addWidget(plot);
+
+    plot->darkBackground(darkBackgroundAction.isChecked());
+    plot->showGrid(showGridAction.isChecked());
+    plot->showMinorGrid(showMinorGridAction.isChecked());
+    // TODO: show legend
+
     return plot;
 }
 
