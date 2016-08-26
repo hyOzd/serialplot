@@ -59,6 +59,8 @@ public slots:
     void setMulti(bool enabled);
     /// Update all plot widgets
     void replot();
+    /// Enable display of a "DEMO" label on each plot
+    void showDemoIndicator(bool show = true);
 
 private:
     bool isMulti;
@@ -67,6 +69,7 @@ private:
     QScrollArea* scrollArea;
     QList<QwtPlotCurve*> curves;
     QList<Plot*> plotWidgets;
+    bool isDemoShown;
 
     // menu actions
     QAction showGridAction;

@@ -43,6 +43,16 @@ Plot::Plot(QWidget* parent) :
     darkBackground(false);
 
     snapshotOverlay = NULL;
+
+    // init demo indicator
+    QwtText demoText(" DEMO RUNNING ");  // looks better with spaces
+    demoText.setColor(QColor("white"));
+    demoText.setBackgroundBrush(Qt::darkRed);
+    demoText.setBorderRadius(4);
+    demoText.setRenderFlags(Qt::AlignLeft | Qt::AlignTop);
+    demoIndicator.setText(demoText);
+    demoIndicator.hide();
+    demoIndicator.attach(this);
 }
 
 Plot::~Plot()
@@ -101,6 +111,12 @@ void Plot::showMinorGrid(bool show)
 void Plot::showLegend(bool show)
 {
     legend.setVisible(show);
+    replot();
+}
+
+void Plot::showDemoIndicator(bool show)
+{
+    demoIndicator.setVisible(show);
     replot();
 }
 

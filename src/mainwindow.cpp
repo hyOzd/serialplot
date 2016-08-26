@@ -187,16 +187,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionDemoMode, &QAction::toggled,
                      this, &MainWindow::enableDemo);
 
-    {   // init demo indicator
-        QwtText demoText(" DEMO RUNNING ");  // looks better with spaces
-        demoText.setColor(QColor("white"));
-        demoText.setBackgroundBrush(Qt::darkRed);
-        demoText.setBorderRadius(4);
-        demoText.setRenderFlags(Qt::AlignLeft | Qt::AlignTop);
-        demoIndicator.setText(demoText);
-        demoIndicator.hide();
-        demoIndicator.attach(ui->plot);
-    }
+    QObject::connect(ui->actionDemoMode, &QAction::toggled,
+                     plotMan, &PlotManager::showDemoIndicator);
 }
 
 MainWindow::~MainWindow()
@@ -356,9 +348,6 @@ void MainWindow::enableDemo(bool enabled)
         if (!serialPort.isOpen())
         {
             dataFormatPanel.enableDemo(true);
-            ui->actionDemoMode->setChecked(true);
-            demoIndicator.show();
-            plotMan->replot();
         }
         else
         {
@@ -369,8 +358,6 @@ void MainWindow::enableDemo(bool enabled)
     {
         dataFormatPanel.enableDemo(false);
         ui->actionDemoMode->setChecked(false);
-        demoIndicator.hide();
-        plotMan->replot();
     }
 }
 

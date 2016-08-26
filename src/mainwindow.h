@@ -32,7 +32,6 @@
 #include <QColor>
 #include <QtGlobal>
 #include <qwt_plot_curve.h>
-#include <qwt_plot_textlabel.h>
 
 #include "portcontrol.h"
 #include "commandpanel.h"
@@ -83,7 +82,6 @@ private:
 
     SnapshotManager snapshotMan;
 
-    QwtPlotTextLabel demoIndicator;
     bool isDemoRunning();
 
     // test widget

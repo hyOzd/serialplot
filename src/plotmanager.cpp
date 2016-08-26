@@ -35,6 +35,7 @@ PlotManager::PlotManager(QWidget* plotArea, QObject *parent) :
 {
     // initalize layout and single widget
     isMulti = false;
+    isDemoShown = false;
     scrollArea = NULL;
     setupLayout(isMulti);
     addPlotWidget();
@@ -174,6 +175,7 @@ Plot* PlotManager::addPlotWidget()
     plot->showGrid(showGridAction.isChecked());
     plot->showMinorGrid(showMinorGridAction.isChecked());
     plot->showLegend(showLegendAction.isChecked());
+    plot->showDemoIndicator(isDemoShown);
 
     return plot;
 }
@@ -283,6 +285,15 @@ void PlotManager::showLegend(bool show)
     for (auto plot : plotWidgets)
     {
         plot->showLegend(show);
+    }
+}
+
+void PlotManager::showDemoIndicator(bool show)
+{
+    isDemoShown = show;
+    for (auto plot : plotWidgets)
+    {
+        plot->showDemoIndicator(show);
     }
 }
 
