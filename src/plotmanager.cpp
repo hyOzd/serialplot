@@ -328,3 +328,11 @@ void PlotManager::setAxis(bool autoScaled, double yAxisMin, double yAxisMax)
         plot->setAxis(autoScaled, yAxisMin, yAxisMax);
     }
 }
+
+void PlotManager::flashSnapshotOverlay()
+{
+    for (auto plot : plotWidgets)
+    {
+        plot->flashSnapshotOverlay(darkBackgroundAction.isChecked());
+    }
+}

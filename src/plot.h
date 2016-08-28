@@ -64,7 +64,12 @@ public slots:
     void darkBackground(bool enabled = true);
     void setAxis(bool autoScaled, double yMin = 0, double yMax = 1);
 
-    void flashSnapshotOverlay();
+    /**
+     * Displays an animation for snapshot.
+     *
+     * @param light show a light colored (white) animation or the opposite
+     */
+    void flashSnapshotOverlay(bool light);
 
 private slots:
     void unzoomed();

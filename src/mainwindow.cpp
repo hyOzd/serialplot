@@ -133,7 +133,7 @@ MainWindow::MainWindow(QWidget *parent) :
                      this, SLOT(clearPlot()));
 
     QObject::connect(snapshotMan.takeSnapshotAction(), &QAction::triggered,
-                     ui->plot, &Plot::flashSnapshotOverlay);
+                     plotMan, &PlotManager::flashSnapshotOverlay);
 
     // init port signals
     QObject::connect(&(this->serialPort), SIGNAL(error(QSerialPort::SerialPortError)),

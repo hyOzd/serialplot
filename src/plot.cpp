@@ -181,14 +181,12 @@ QColor Plot::makeColor(unsigned int channelIndex)
     }
 }
 
-void Plot::flashSnapshotOverlay()
+void Plot::flashSnapshotOverlay(bool light)
 {
     if (snapshotOverlay != NULL) delete snapshotOverlay;
 
     QColor color;
-    // TODO: fix snapshot overlay
-    // if (darkBackgroundAction.isChecked())
-    if(1)
+    if(light)
     {
         color = QColor(Qt::white);
     }

@@ -63,6 +63,8 @@ public slots:
     void showDemoIndicator(bool show = true);
     /// Set the Y axis
     void setAxis(bool autoScaled, double yMin = 0, double yMax = 1);
+    /// Display an animation for snapshot
+    void flashSnapshotOverlay();
 
 private:
     bool isMulti;
