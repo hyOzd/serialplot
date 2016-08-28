@@ -33,9 +33,13 @@ PlotManager::PlotManager(QWidget* plotArea, QObject *parent) :
     darkBackgroundAction("Dark Background", this),
     showLegendAction("Legend", this)
 {
+    _autoScaled = true;
+    _yMin = 0;
+    _yMax = 1;
+    isDemoShown = false;
+
     // initalize layout and single widget
     isMulti = false;
-    isDemoShown = false;
     scrollArea = NULL;
     setupLayout(isMulti);
     addPlotWidget();
@@ -176,6 +180,7 @@ Plot* PlotManager::addPlotWidget()
     plot->showMinorGrid(showMinorGridAction.isChecked());
     plot->showLegend(showLegendAction.isChecked());
     plot->showDemoIndicator(isDemoShown);
+    plot->setAxis(_autoScaled, _yMin, _yMax);
 
     return plot;
 }
@@ -310,5 +315,16 @@ void PlotManager::darkBackground(bool enabled)
     for (auto plot : plotWidgets)
     {
         plot->darkBackground(enabled);
+    }
+}
+
+void PlotManager::setAxis(bool autoScaled, double yAxisMin, double yAxisMax)
+{
+    _autoScaled = autoScaled;
+    _yMin = yAxisMin;
+    _yMax = yAxisMax;
+    for (auto plot : plotWidgets)
+    {
+        plot->setAxis(autoScaled, yAxisMin, yAxisMax);
     }
 }

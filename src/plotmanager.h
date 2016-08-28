@@ -61,6 +61,8 @@ public slots:
     void replot();
     /// Enable display of a "DEMO" label on each plot
     void showDemoIndicator(bool show = true);
+    /// Set the Y axis
+    void setAxis(bool autoScaled, double yMin = 0, double yMax = 1);
 
 private:
     bool isMulti;
@@ -70,6 +72,9 @@ private:
     QList<QwtPlotCurve*> curves;
     QList<Plot*> plotWidgets;
     bool isDemoShown;
+    bool _autoScaled;
+    double _yMin;
+    double _yMax;
 
     // menu actions
     QAction showGridAction;

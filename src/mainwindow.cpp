@@ -124,7 +124,7 @@ MainWindow::MainWindow(QWidget *parent) :
             this, &MainWindow::onNumOfSamplesChanged);
 
     connect(&plotControlPanel, &PlotControlPanel::scaleChanged,
-            ui->plot, &Plot::setAxis);
+            plotMan, &PlotManager::setAxis);
 
     connect(&plotControlPanel, &PlotControlPanel::multiPlotChanged,
             plotMan, &PlotManager::setMulti);
@@ -170,10 +170,9 @@ MainWindow::MainWindow(QWidget *parent) :
         plotMan->addCurve(channelMan.channelName(i), channelMan.channelBuffer(i));
     }
 
-    // TODO: plotman
     // init auto scale
-    ui->plot->setAxis(plotControlPanel.autoScale(),
-                      plotControlPanel.yMin(), plotControlPanel.yMax());
+    plotMan->setAxis(plotControlPanel.autoScale(),
+                     plotControlPanel.yMin(), plotControlPanel.yMax());
 
     // Init sps (sample per second) counter
     spsLabel.setText("0sps");
