@@ -60,9 +60,6 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
     connect(ui->spYmin, SIGNAL(valueChanged(double)),
             this, SLOT(onYScaleChanged()));
 
-    connect(ui->cbMultiPlot, &QCheckBox::toggled,
-            this, &PlotControlPanel::multiPlotChanged);
-
     // init scale range preset list
     for (int nbits = 8; nbits <= 24; nbits++) // signed binary formats
     {
@@ -152,9 +149,4 @@ void PlotControlPanel::onRangeSelected()
 void PlotControlPanel::setChannelNamesModel(QAbstractItemModel * model)
 {
     ui->lvChannelNames->setModel(model);
-}
-
-bool PlotControlPanel::multiPlot()
-{
-    return ui->cbMultiPlot->isChecked();
 }

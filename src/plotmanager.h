@@ -81,6 +81,7 @@ private:
     QAction unzoomAction;
     QAction darkBackgroundAction;
     QAction showLegendAction;
+    QAction showMultiAction;
 
     void setupLayout(bool multiPlot);
     /// Inserts a new plot widget to the current layout.

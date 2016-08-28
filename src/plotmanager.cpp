@@ -31,7 +31,8 @@ PlotManager::PlotManager(QWidget* plotArea, QObject *parent) :
     showMinorGridAction("Minor Grid", this),
     unzoomAction("Unzoom", this),
     darkBackgroundAction("Dark Background", this),
-    showLegendAction("Legend", this)
+    showLegendAction("Legend", this),
+    showMultiAction("Multi Plot", this)
 {
     _autoScaled = true;
     _yMin = 0;
@@ -50,6 +51,7 @@ PlotManager::PlotManager(QWidget* plotArea, QObject *parent) :
     unzoomAction.setToolTip("Unzoom the Plot");
     darkBackgroundAction.setToolTip("Enable Dark Plot Background");
     showLegendAction.setToolTip("Display the Legend on Plot");
+    showMultiAction.setToolTip("Display All Channels Separately");
 
     showGridAction.setShortcut(QKeySequence("G"));
     showMinorGridAction.setShortcut(QKeySequence("M"));
@@ -58,11 +60,13 @@ PlotManager::PlotManager(QWidget* plotArea, QObject *parent) :
     showMinorGridAction.setCheckable(true);
     darkBackgroundAction.setCheckable(true);
     showLegendAction.setCheckable(true);
+    showMultiAction.setCheckable(true);
 
     showGridAction.setChecked(false);
     showMinorGridAction.setChecked(false);
     darkBackgroundAction.setChecked(false);
     showLegendAction.setChecked(true);
+    showMultiAction.setChecked(false);
 
     showMinorGridAction.setEnabled(false);
 
@@ -77,6 +81,10 @@ PlotManager::PlotManager(QWidget* plotArea, QObject *parent) :
             this, &PlotManager::darkBackground);
     connect(&showLegendAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
             this, &PlotManager::showLegend);
+    connect(&showLegendAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+            this, &PlotManager::showLegend);
+    connect(&showMultiAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+            this, &PlotManager::setMulti);
 }
 
 PlotManager::~PlotManager()
@@ -279,6 +287,7 @@ QList<QAction*> PlotManager::menuActions()
     actions << &unzoomAction;
     actions << &darkBackgroundAction;
     actions << &showLegendAction;
+    actions << &showMultiAction;
     return actions;
 }
 
