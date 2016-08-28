@@ -70,23 +70,16 @@ private:
     unsigned int numOfSamples;
 
     QList<QwtPlotCurve*> curves;
-    // Note: FrameBuffer s are owned by their respective QwtPlotCurve s.
-    // QList<FrameBuffer*> channelBuffers;
     ChannelManager channelMan;
+    PlotManager* plotMan;
+    SnapshotManager snapshotMan;
 
     QLabel spsLabel;
-
     CommandPanel commandPanel;
     DataFormatPanel dataFormatPanel;
     PlotControlPanel plotControlPanel;
 
-    SnapshotManager snapshotMan;
-
     bool isDemoRunning();
-
-    // test widget
-    QWidget plotArea;
-    PlotManager* plotMan;
 
 private slots:
     void onPortToggled(bool open);
