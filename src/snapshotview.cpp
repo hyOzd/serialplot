@@ -28,18 +28,17 @@ SnapshotView::SnapshotView(QWidget *parent, Snapshot* snapshot) :
     _snapshot = snapshot;
 
     ui->setupUi(this);
+
+    plotMan = new PlotManager(ui->plotArea);
+
     ui->menuSnapshot->insertAction(ui->actionClose, snapshot->deleteAction());
     this->setWindowTitle(snapshot->name());
 
+    // initialize curves
     unsigned numOfChannels = snapshot->data.size();
-
     for (unsigned ci = 0; ci < numOfChannels; ci++)
     {
-        QwtPlotCurve* curve = new QwtPlotCurve(snapshot->channelName(ci));
-        curves.append(curve);
-        curve->setSamples(snapshot->data[ci]);
-        curve->setPen(Plot::makeColor(ci));
-        curve->attach(ui->plot);
+        plotMan->addCurve(snapshot->channelName(ci), snapshot->data[ci]);
     }
 
     renameDialog.setWindowTitle("Rename Snapshot");
@@ -50,11 +49,10 @@ SnapshotView::SnapshotView(QWidget *parent, Snapshot* snapshot) :
     connect(ui->actionExport, &QAction::triggered,
             this, &SnapshotView::save);
 
-    // TODO: fix snapshot menu
-    // for (auto a : ui->plot->menuActions())
-    // {
-    //     ui->menuView->addAction(a);
-    // }
+    for (auto a : plotMan->menuActions())
+    {
+        ui->menuView->addAction(a);
+    }
 }
 
 SnapshotView::~SnapshotView()

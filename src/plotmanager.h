@@ -37,20 +37,17 @@ class PlotManager : public QObject
 public:
     explicit PlotManager(QWidget* plotArea, QObject *parent = 0);
     ~PlotManager();
-
     /// Add a new curve with title and buffer. A color is
     /// automatically chosen for curve.
     void addCurve(QString title, FrameBuffer* buffer);
-
+    /// Alternative of `addCurve` for static curve data (snapshots).
+    void addCurve(QString title, QVector<QPointF> data);
     /// Set the displayed title for a curve
     void setTitle(unsigned index, QString title);
-
     /// Removes curves from the end
     void removeCurves(unsigned number);
-
     /// Returns current number of curves known by plot manager
     unsigned numOfCurves();
-
     /// Returns the list of actions to be inserted into the `View` menu
     QList<QAction*> menuActions();
 
@@ -86,9 +83,12 @@ private:
     QAction showLegendAction;
 
     void setupLayout(bool multiPlot);
-    Plot* addPlotWidget(); ///< inserts a new plot widget to the current layout
+    /// Inserts a new plot widget to the current layout.
+    Plot* addPlotWidget();
     /// Returns the plot widget that given curve is attached to
     Plot* plotWidget(unsigned curveIndex);
+    /// Common part of overloaded `addCurve` functions
+    void _addCurve(QwtPlotCurve* curve);
 
 private slots:
     void showGrid(bool show = true);

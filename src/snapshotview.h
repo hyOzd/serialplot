@@ -29,7 +29,7 @@
 #include <QCloseEvent>
 #include <qwt_plot_curve.h>
 
-#include "plot.h"
+#include "plotmanager.h"
 #include "snapshot.h"
 
 namespace Ui {
@@ -52,6 +52,7 @@ private:
     QList<QwtPlotCurve*> curves;
     Snapshot* _snapshot;
     QInputDialog renameDialog;
+    PlotManager* plotMan;
 
     void closeEvent(QCloseEvent *event);
 

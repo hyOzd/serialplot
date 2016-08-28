@@ -187,8 +187,28 @@ Plot* PlotManager::addPlotWidget()
 
 void PlotManager::addCurve(QString title, FrameBuffer* buffer)
 {
-    Plot* plot;
+    auto curve = new QwtPlotCurve(title);
+    curve->setSamples(new FrameBufferSeries(buffer));
+    _addCurve(curve);
+}
 
+void PlotManager::addCurve(QString title, QVector<QPointF> data)
+{
+    auto curve = new QwtPlotCurve(title);
+    curve->setSamples(data);
+    _addCurve(curve);
+}
+
+void PlotManager::_addCurve(QwtPlotCurve* curve)
+{
+    // store and init the curve
+    curves.append(curve);
+
+    unsigned index = curves.size()-1;
+    curve->setPen(Plot::makeColor(index));
+
+    // create the plot for the curve if we are on multi display
+    Plot* plot;
     if (isMulti)
     {
         // create a new plot widget
@@ -199,14 +219,7 @@ void PlotManager::addCurve(QString title, FrameBuffer* buffer)
         plot = plotWidgets[0];
     }
 
-    // create the curve
-    QwtPlotCurve* curve = new QwtPlotCurve(title);
-    curves.append(curve);
-
-    curve->setSamples(new FrameBufferSeries(buffer));
-    unsigned index = curves.size()-1;
-    curve->setPen(Plot::makeColor(index));
-
+    // show the curve
     curve->attach(plot);
     plot->replot();
 }
