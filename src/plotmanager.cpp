@@ -163,6 +163,7 @@ void PlotManager::setupLayout(bool multiPlot)
 
         _plotArea->setLayout(new QVBoxLayout());
         _plotArea->layout()->addWidget(scrollArea);
+        _plotArea->layout()->setContentsMargins(0,0,0,0);
 
         layout = new QVBoxLayout(scrolledPlotArea);
     }
@@ -174,6 +175,7 @@ void PlotManager::setupLayout(bool multiPlot)
         layout = new QVBoxLayout(_plotArea);
     }
 
+    layout->setContentsMargins(2,2,2,2);
     layout->setSpacing(1);
 }
 
