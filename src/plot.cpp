@@ -29,12 +29,7 @@
 Plot::Plot(QWidget* parent) :
     QwtPlot(parent),
     zoomer(this->canvas(), false),
-    sZoomer(this, &zoomer),
-    showGridAction("Grid", this),
-    showMinorGridAction("Minor Grid", this),
-    unzoomAction("Unzoom", this),
-    darkBackgroundAction("Dark Background", this),
-    showLegendAction("Legend", this)
+    sZoomer(this, &zoomer)
 {
     isAutoScaled = true;
 
@@ -47,40 +42,17 @@ Plot::Plot(QWidget* parent) :
     showGrid(false);
     darkBackground(false);
 
-    showGridAction.setToolTip("Show Grid");
-    showMinorGridAction.setToolTip("Show Minor Grid");
-    unzoomAction.setToolTip("Unzoom the Plot");
-    darkBackgroundAction.setToolTip("Enable Dark Plot Background");
-    showLegendAction.setToolTip("Display the Legend on Plot");
-
-    showGridAction.setShortcut(QKeySequence("G"));
-    showMinorGridAction.setShortcut(QKeySequence("M"));
-
-    showGridAction.setCheckable(true);
-    showMinorGridAction.setCheckable(true);
-    darkBackgroundAction.setCheckable(true);
-    showLegendAction.setCheckable(true);
-
-    showGridAction.setChecked(false);
-    showMinorGridAction.setChecked(false);
-    darkBackgroundAction.setChecked(false);
-    showLegendAction.setChecked(true);
-
-    showMinorGridAction.setEnabled(false);
-
-    connect(&showGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
-            this, &Plot::showGrid);
-    connect(&showGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
-            &showMinorGridAction, &QAction::setEnabled);
-    connect(&showMinorGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
-            this, &Plot::showMinorGrid);
-    connect(&unzoomAction, &QAction::triggered, this, &Plot::unzoom);
-    connect(&darkBackgroundAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
-            this, &Plot::darkBackground);
-    connect(&showLegendAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
-            [this](bool enabled){legend.setVisible(enabled); replot();});
-
     snapshotOverlay = NULL;
+
+    // init demo indicator
+    QwtText demoText(" DEMO RUNNING ");  // looks better with spaces
+    demoText.setColor(QColor("white"));
+    demoText.setBackgroundBrush(Qt::darkRed);
+    demoText.setBorderRadius(4);
+    demoText.setRenderFlags(Qt::AlignLeft | Qt::AlignTop);
+    demoIndicator.setText(demoText);
+    demoIndicator.hide();
+    demoIndicator.attach(this);
 }
 
 Plot::~Plot()
@@ -100,17 +72,6 @@ void Plot::setAxis(bool autoScaled, double yAxisMin, double yAxisMax)
 
     zoomer.zoom(0);
     resetAxes();
-}
-
-QList<QAction*> Plot::menuActions()
-{
-    QList<QAction*> actions;
-    actions << &showGridAction;
-    actions << &showMinorGridAction;
-    actions << &unzoomAction;
-    actions << &darkBackgroundAction;
-    actions << &showLegendAction;
-    return actions;
 }
 
 void Plot::resetAxes()
@@ -144,6 +105,18 @@ void Plot::showMinorGrid(bool show)
 {
     grid.enableXMin(show);
     grid.enableYMin(show);
+    replot();
+}
+
+void Plot::showLegend(bool show)
+{
+    legend.setVisible(show);
+    replot();
+}
+
+void Plot::showDemoIndicator(bool show)
+{
+    demoIndicator.setVisible(show);
     replot();
 }
 
@@ -208,12 +181,12 @@ QColor Plot::makeColor(unsigned int channelIndex)
     }
 }
 
-void Plot::flashSnapshotOverlay()
+void Plot::flashSnapshotOverlay(bool light)
 {
     if (snapshotOverlay != NULL) delete snapshotOverlay;
 
     QColor color;
-    if (darkBackgroundAction.isChecked())
+    if(light)
     {
         color = QColor(Qt::white);
     }

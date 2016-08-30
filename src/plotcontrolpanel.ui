@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>590</width>
-    <height>183</height>
+    <height>187</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -147,15 +147,15 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
-      <widget class="QComboBox" name="cbRangePresets"/>
-     </item>
      <item row="4" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
         <string>Select Range Preset:</string>
        </property>
       </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QComboBox" name="cbRangePresets"/>
      </item>
     </layout>
    </item>

@@ -27,6 +27,7 @@
 #include <qwt_plot_grid.h>
 #include <qwt_plot_shapeitem.h>
 #include <qwt_plot_legenditem.h>
+#include <qwt_plot_textlabel.h>
 
 #include "zoomer.h"
 #include "scalezoomer.h"
@@ -40,8 +41,6 @@ public:
     Plot(QWidget* parent = 0);
     ~Plot();
 
-    QList<QAction*> menuActions();
-
     static QColor makeColor(unsigned int channelIndex);
 
 private:
@@ -52,23 +51,25 @@ private:
     QwtPlotGrid grid;
     PlotSnapshotOverlay* snapshotOverlay;
     QwtPlotLegendItem legend;
-
-    QAction showGridAction;
-    QAction showMinorGridAction;
-    QAction unzoomAction;
-    QAction darkBackgroundAction;
-    QAction showLegendAction;
+    QwtPlotTextLabel demoIndicator;
 
     void resetAxes();
 
 public slots:
     void showGrid(bool show = true);
     void showMinorGrid(bool show = true);
+    void showLegend(bool show = true);
+    void showDemoIndicator(bool show = true);
     void unzoom();
     void darkBackground(bool enabled = true);
     void setAxis(bool autoScaled, double yMin = 0, double yMax = 1);
 
-    void flashSnapshotOverlay();
+    /**
+     * Displays an animation for snapshot.
+     *
+     * @param light show a light colored (white) animation or the opposite
+     */
+    void flashSnapshotOverlay(bool light);
 
 private slots:
     void unzoomed();

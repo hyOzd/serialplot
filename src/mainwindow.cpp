@@ -50,11 +50,14 @@ MainWindow::MainWindow(QWidget *parent) :
     aboutDialog(this),
     portControl(&serialPort),
     channelMan(1, 1, this),
+    snapshotMan(this, &channelMan),
     commandPanel(&serialPort),
-    dataFormatPanel(&serialPort, &channelMan),
-    snapshotMan(this, &channelMan)
+    dataFormatPanel(&serialPort, &channelMan)
 {
     ui->setupUi(this);
+
+    plotMan = new PlotManager(ui->plotArea);
+
     ui->tabWidget->insertTab(0, &portControl, "Port");
     ui->tabWidget->insertTab(1, &dataFormatPanel, "Data Format");
     ui->tabWidget->insertTab(2, &plotControlPanel, "Plot");
@@ -78,7 +81,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setupAboutDialog();
 
     // init view menu
-    for (auto a : ui->plot->menuActions())
+    for (auto a : plotMan->menuActions())
     {
         ui->menuView->addAction(a);
     }
@@ -114,13 +117,13 @@ MainWindow::MainWindow(QWidget *parent) :
             this, &MainWindow::onNumOfSamplesChanged);
 
     connect(&plotControlPanel, &PlotControlPanel::scaleChanged,
-            ui->plot, &Plot::setAxis);
+            plotMan, &PlotManager::setAxis);
 
     QObject::connect(ui->actionClear, SIGNAL(triggered(bool)),
                      this, SLOT(clearPlot()));
 
     QObject::connect(snapshotMan.takeSnapshotAction(), &QAction::triggered,
-                     ui->plot, &Plot::flashSnapshotOverlay);
+                     plotMan, &PlotManager::flashSnapshotOverlay);
 
     // init port signals
     QObject::connect(&(this->serialPort), SIGNAL(error(QSerialPort::SerialPortError)),
@@ -128,7 +131,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // init data format and reader
     QObject::connect(&dataFormatPanel, &DataFormatPanel::dataAdded,
-                     ui->plot, &QwtPlot::replot);
+                     plotMan, &PlotManager::replot);
 
     QObject::connect(ui->actionPause, &QAction::triggered,
                      &dataFormatPanel, &DataFormatPanel::pause);
@@ -154,16 +157,12 @@ MainWindow::MainWindow(QWidget *parent) :
     // init curve list
     for (unsigned int i = 0; i < numOfChannels; i++)
     {
-        curves.append(new QwtPlotCurve(channelMan.channelName(i)));
-        curves[i]->setSamples(
-            new FrameBufferSeries(channelMan.channelBuffer(i)));
-        curves[i]->setPen(Plot::makeColor(i));
-        curves[i]->attach(ui->plot);
+        plotMan->addCurve(channelMan.channelName(i), channelMan.channelBuffer(i));
     }
 
     // init auto scale
-    ui->plot->setAxis(plotControlPanel.autoScale(),
-                      plotControlPanel.yMin(), plotControlPanel.yMax());
+    plotMan->setAxis(plotControlPanel.autoScale(),
+                     plotControlPanel.yMin(), plotControlPanel.yMax());
 
     // Init sps (sample per second) counter
     spsLabel.setText("0sps");
@@ -177,30 +176,18 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionDemoMode, &QAction::toggled,
                      this, &MainWindow::enableDemo);
 
-    {   // init demo indicator
-        QwtText demoText(" DEMO RUNNING ");  // looks better with spaces
-        demoText.setColor(QColor("white"));
-        demoText.setBackgroundBrush(Qt::darkRed);
-        demoText.setBorderRadius(4);
-        demoText.setRenderFlags(Qt::AlignLeft | Qt::AlignTop);
-        demoIndicator.setText(demoText);
-        demoIndicator.hide();
-        demoIndicator.attach(ui->plot);
-    }
+    QObject::connect(ui->actionDemoMode, &QAction::toggled,
+                     plotMan, &PlotManager::showDemoIndicator);
 }
 
 MainWindow::~MainWindow()
 {
-    for (auto curve : curves)
-    {
-        // also deletes respective FrameBuffer
-        delete curve;
-    }
-
     if (serialPort.isOpen())
     {
         serialPort.close();
     }
+
+    delete plotMan;
 
     delete ui;
     ui = NULL; // we check if ui is deleted in messageHandler
@@ -291,19 +278,19 @@ void MainWindow::clearPlot()
     {
         channelMan.channelBuffer(ci)->clear();
     }
-    ui->plot->replot();
+    plotMan->replot();
 }
 
 void MainWindow::onNumOfSamplesChanged(int value)
 {
     numOfSamples = value;
     channelMan.setNumOfSamples(value);
-    ui->plot->replot();
+    plotMan->replot();
 }
 
 void MainWindow::onNumOfChannelsChanged(unsigned value)
 {
-    unsigned int oldNum = curves.size();
+    unsigned int oldNum = plotMan->numOfCurves();
     unsigned numOfChannels = value;
 
     if (numOfChannels > oldNum)
@@ -311,24 +298,15 @@ void MainWindow::onNumOfChannelsChanged(unsigned value)
         // add new channels
         for (unsigned int i = oldNum; i < numOfChannels; i++)
         {
-            QwtPlotCurve* curve = new QwtPlotCurve(channelMan.channelName(i));
-            curve->setSamples(
-                new FrameBufferSeries(channelMan.channelBuffer(i)));
-            curve->setPen(Plot::makeColor(i));
-            curve->attach(ui->plot);
-            curves.append(curve);
+            plotMan->addCurve(channelMan.channelName(i), channelMan.channelBuffer(i));
         }
     }
     else if(numOfChannels < oldNum)
     {
-        // remove channels
-        for (unsigned int i = 0; i < oldNum - numOfChannels; i++)
-        {
-            delete curves.takeLast();
-        }
+        plotMan->removeCurves(oldNum - numOfChannels);
     }
 
-    ui->plot->replot();
+    plotMan->replot();
 }
 
 void MainWindow::onChannelNameChanged(unsigned channel, QString name)
@@ -336,10 +314,9 @@ void MainWindow::onChannelNameChanged(unsigned channel, QString name)
     // This slot is triggered also when a new channel is added, in
     // this case curve list doesn't contain said channel. No worries,
     // since `onNumOfChannelsChanged` slot will update curve list.
-    if ((int) channel < curves.size()) // check if channel exists in curve list
+    if (channel < plotMan->numOfCurves()) // check if channel exists in curve list
     {
-        curves[channel]->setTitle(name);
-        ui->plot->replot();
+        plotMan->setTitle(channel, name);
     }
 }
 
@@ -360,9 +337,6 @@ void MainWindow::enableDemo(bool enabled)
         if (!serialPort.isOpen())
         {
             dataFormatPanel.enableDemo(true);
-            ui->actionDemoMode->setChecked(true);
-            demoIndicator.show();
-            ui->plot->replot();
         }
         else
         {
@@ -373,8 +347,6 @@ void MainWindow::enableDemo(bool enabled)
     {
         dataFormatPanel.enableDemo(false);
         ui->actionDemoMode->setChecked(false);
-        demoIndicator.hide();
-        ui->plot->replot();
     }
 }
 
