@@ -166,6 +166,7 @@ void Plot::darkBackground(bool enabled)
         sZoomer.setPickerPen(QPen(Qt::black));
         legend.setTextPen(QPen(Qt::black));
     }
+    updateSymbols();
     replot();
 }
 
@@ -254,7 +255,7 @@ void Plot::updateSymbols()
             if (symbolSize)
             {
                 symbol = new QwtSymbol(QwtSymbol::Ellipse,
-                                       QBrush(Qt::white),
+                                       canvasBackground(),
                                        curve->pen(),
                                        QSize(symbolSize, symbolSize));
             }
