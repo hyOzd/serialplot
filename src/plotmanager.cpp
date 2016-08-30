@@ -170,7 +170,11 @@ void PlotManager::setupLayout(bool multiPlot)
     else
     {
         // delete scrollArea left from multi layout
-        if (scrollArea != NULL) delete scrollArea;
+        if (scrollArea != NULL)
+        {
+            delete scrollArea;
+            scrollArea = NULL;
+        }
 
         layout = new QVBoxLayout(_plotArea);
     }
