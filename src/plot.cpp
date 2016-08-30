@@ -20,11 +20,16 @@
 #include <QRectF>
 #include <QKeySequence>
 #include <QColor>
-
+#include <qwt_symbol.h>
+#include <qwt_plot_curve.h>
 #include <math.h>
+#include <algorithm>
 
 #include "plot.h"
 #include "utils.h"
+
+static const int SYMBOL_SHOW_AT_WIDTH = 5;
+static const int SYMBOL_SIZE_MAX = 7;
 
 Plot::Plot(QWidget* parent) :
     QwtPlot(parent),
@@ -32,6 +37,7 @@ Plot::Plot(QWidget* parent) :
     sZoomer(this, &zoomer)
 {
     isAutoScaled = true;
+    symbolSize = 0;
 
     QObject::connect(&zoomer, &Zoomer::unzoomed, this, &Plot::unzoomed);
 
@@ -43,6 +49,18 @@ Plot::Plot(QWidget* parent) :
     darkBackground(false);
 
     snapshotOverlay = NULL;
+
+    connect(&zoomer, &QwtPlotZoomer::zoomed,
+            [this](const QRectF &rect)
+            {
+                onXScaleChanged();
+            });
+
+    connect(this, &QwtPlot::itemAttached,
+            [this](QwtPlotItem *plotItem, bool on)
+            {
+                if (symbolSize) updateSymbols();
+            });
 
     // init demo indicator
     QwtText demoText(" DEMO RUNNING ");  // looks better with spaces
@@ -148,6 +166,7 @@ void Plot::darkBackground(bool enabled)
         sZoomer.setPickerPen(QPen(Qt::black));
         legend.setTextPen(QPen(Qt::black));
     }
+    updateSymbols();
     replot();
 }
 
@@ -202,4 +221,59 @@ void Plot::flashSnapshotOverlay(bool light)
                 delete snapshotOverlay;
                 snapshotOverlay = NULL;
             });
+}
+
+void Plot::onXScaleChanged()
+{
+    auto sw = axisWidget(QwtPlot::xBottom);
+    auto paintDist = sw->scaleDraw()->scaleMap().pDist();
+    auto scaleDist = sw->scaleDraw()->scaleMap().sDist();
+    int symDisPx = round(paintDist / scaleDist);
+
+    if (symDisPx < SYMBOL_SHOW_AT_WIDTH)
+    {
+        symbolSize = 0;
+    }
+    else
+    {
+        symbolSize = std::min(SYMBOL_SIZE_MAX, symDisPx-SYMBOL_SHOW_AT_WIDTH+1);
+    }
+
+    updateSymbols();
+}
+
+void Plot::updateSymbols()
+{
+    const QwtPlotItemList curves = itemList( QwtPlotItem::Rtti_PlotCurve );
+
+    if (curves.size() > 0)
+    {
+        for (int i = 0; i < curves.size(); i++)
+        {
+            QwtSymbol* symbol = NULL;
+            QwtPlotCurve* curve = static_cast<QwtPlotCurve*>(curves[i]);
+            if (symbolSize)
+            {
+                symbol = new QwtSymbol(QwtSymbol::Ellipse,
+                                       canvasBackground(),
+                                       curve->pen(),
+                                       QSize(symbolSize, symbolSize));
+            }
+            curve->setSymbol(symbol);
+        }
+    }
+}
+
+void Plot::resizeEvent(QResizeEvent * event)
+{
+    QwtPlot::resizeEvent(event);
+    onXScaleChanged();
+}
+
+void Plot::onNumOfSamplesChanged(unsigned value)
+{
+    auto currentBase = zoomer.zoomBase();
+    currentBase.setWidth(value);
+    zoomer.setZoomBase(currentBase);
+    onXScaleChanged();
 }

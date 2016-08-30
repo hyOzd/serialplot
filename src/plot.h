@@ -46,6 +46,7 @@ public:
 private:
     bool isAutoScaled;
     double yMin, yMax;
+    int symbolSize;
     Zoomer zoomer;
     ScaleZoomer sZoomer;
     QwtPlotGrid grid;
@@ -53,7 +54,10 @@ private:
     QwtPlotLegendItem legend;
     QwtPlotTextLabel demoIndicator;
 
+    /// update the display of symbols depending on `symbolSize`
+    void updateSymbols();
     void resetAxes();
+    void resizeEvent(QResizeEvent * event);
 
 public slots:
     void showGrid(bool show = true);
@@ -71,8 +75,11 @@ public slots:
      */
     void flashSnapshotOverlay(bool light);
 
+    void onNumOfSamplesChanged(unsigned value);
+
 private slots:
     void unzoomed();
+    void onXScaleChanged();
 };
 
 #endif // PLOT_H
