@@ -247,7 +247,7 @@ void Plot::updateSymbols()
 
     if (curves.size() > 0)
     {
-        for (unsigned i = 0; i < curves.size(); i++)
+        for (int i = 0; i < curves.size(); i++)
         {
             QwtSymbol* symbol = NULL;
             QwtPlotCurve* curve = static_cast<QwtPlotCurve*>(curves[i]);
