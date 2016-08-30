@@ -364,3 +364,11 @@ void PlotManager::flashSnapshotOverlay()
         plot->flashSnapshotOverlay(darkBackgroundAction.isChecked());
     }
 }
+
+void PlotManager::onNumOfSamplesChanged(unsigned value)
+{
+    for (auto plot : plotWidgets)
+    {
+        plot->onNumOfSamplesChanged(value);
+    }
+}

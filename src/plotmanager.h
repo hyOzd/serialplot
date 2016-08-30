@@ -62,6 +62,8 @@ public slots:
     void setAxis(bool autoScaled, double yMin = 0, double yMax = 1);
     /// Display an animation for snapshot
     void flashSnapshotOverlay();
+    /// Should be called to update zoom base
+    void onNumOfSamplesChanged(unsigned value);
 
 private:
     bool isMulti;

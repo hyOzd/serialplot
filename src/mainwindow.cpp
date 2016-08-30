@@ -117,7 +117,7 @@ MainWindow::MainWindow(QWidget *parent) :
             this, &MainWindow::onNumOfSamplesChanged);
 
     connect(&plotControlPanel, &PlotControlPanel::numOfSamplesChanged,
-            ui->plot, &Plot::onNumOfSamplesChanged);
+            plotMan, &PlotManager::onNumOfSamplesChanged);
 
     connect(&plotControlPanel, &PlotControlPanel::scaleChanged,
             plotMan, &PlotManager::setAxis);
