@@ -32,7 +32,6 @@
 #include <QColor>
 #include <QtGlobal>
 #include <qwt_plot_curve.h>
-#include <qwt_plot_textlabel.h>
 
 #include "portcontrol.h"
 #include "commandpanel.h"
@@ -42,6 +41,7 @@
 #include "framebuffer.h"
 #include "channelmanager.h"
 #include "snapshotmanager.h"
+#include "plotmanager.h"
 
 namespace Ui {
 class MainWindow;
@@ -70,19 +70,15 @@ private:
     unsigned int numOfSamples;
 
     QList<QwtPlotCurve*> curves;
-    // Note: FrameBuffer s are owned by their respective QwtPlotCurve s.
-    // QList<FrameBuffer*> channelBuffers;
     ChannelManager channelMan;
+    PlotManager* plotMan;
+    SnapshotManager snapshotMan;
 
     QLabel spsLabel;
-
     CommandPanel commandPanel;
     DataFormatPanel dataFormatPanel;
     PlotControlPanel plotControlPanel;
 
-    SnapshotManager snapshotMan;
-
-    QwtPlotTextLabel demoIndicator;
     bool isDemoRunning();
 
 private slots:
