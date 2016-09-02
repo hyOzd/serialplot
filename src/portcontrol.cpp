@@ -313,6 +313,7 @@ void PortControl::saveSettings(QSettings* settings)
 {
     settings->beginGroup("Port");
     settings->setValue("selectedPort", selectedPortName());
+    settings->setValue("baudRate", ui->cbBaudRate->currentText());
     settings->endGroup();
 }
 
@@ -327,6 +328,12 @@ void PortControl::loadSettings(QSettings* settings)
         int index = portList.indexOfName(portName);
         if (index > -1) ui->cbPortList->setCurrentIndex(index);
     }
+
+    // load baud rate setting if it exists in baud rate list
+    QString baudSetting = settings->value(
+        "baudRate", ui->cbBaudRate->currentText()).toString();
+    int baudIndex = ui->cbBaudRate->findText(baudSetting);
+    if (baudIndex > -1) ui->cbBaudRate->setCurrentIndex(baudIndex);
 
     settings->endGroup();
 }
