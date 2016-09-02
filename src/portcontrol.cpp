@@ -314,6 +314,21 @@ void PortControl::saveSettings(QSettings* settings)
     settings->beginGroup("Port");
     settings->setValue("selectedPort", selectedPortName());
     settings->setValue("baudRate", ui->cbBaudRate->currentText());
+
+    // save parity setting
+    if (parityButtons.checkedId() == QSerialPort::OddParity)
+    {
+        settings->setValue("parity", "odd");
+    }
+    else if (parityButtons.checkedId() == QSerialPort::EvenParity)
+    {
+        settings->setValue("parity", "even");
+    }
+    else
+    {
+        settings->setValue("parity", "none");
+    }
+
     settings->endGroup();
 }
 
@@ -334,6 +349,22 @@ void PortControl::loadSettings(QSettings* settings)
         "baudRate", ui->cbBaudRate->currentText()).toString();
     int baudIndex = ui->cbBaudRate->findText(baudSetting);
     if (baudIndex > -1) ui->cbBaudRate->setCurrentIndex(baudIndex);
+
+    // load parity setting
+    QString paritySetting = settings->value("parity", "none").toString();
+    if (paritySetting == "odd")
+    {
+        ui->rbOddParity->setChecked(true);
+    }
+    else if (paritySetting == "even")
+    {
+        ui->rbEvenParity->setChecked(true);
+    }
+    else
+    {
+        ui->rbNoParity->setChecked(true);
+    }
+    selectParity((QSerialPort::Parity) parityButtons.checkedId());
 
     settings->endGroup();
 }
