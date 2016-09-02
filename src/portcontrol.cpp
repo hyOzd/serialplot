@@ -330,12 +330,9 @@ void PortControl::saveSettings(QSettings* settings)
     settings->beginGroup("Port");
     settings->setValue("selectedPort", selectedPortName());
     settings->setValue("baudRate", ui->cbBaudRate->currentText());
-
-    // save parity setting
     settings->setValue("parity", currentParityText());
-
-    // save number of bits
     settings->setValue("dataBits", dataBitsButtons.checkedId());
+    settings->setValue("stopBits", stopBitsButtons.checkedId());
 
     settings->endGroup();
 }
@@ -382,6 +379,19 @@ void PortControl::loadSettings(QSettings* settings)
     {
         dataBitsButtons.button((QSerialPort::DataBits) dataBits)->setChecked(true);
         selectDataBits(dataBits);
+    }
+
+    // load stop bits
+    int stopBits = settings->value("stopBits", stopBitsButtons.checkedId()).toInt();
+    if (stopBits == QSerialPort::OneStop)
+    {
+        ui->rb1StopBit->setChecked(true);
+        selectStopBits(QSerialPort::OneStop);
+    }
+    else if (stopBits == QSerialPort::TwoStop)
+    {
+        ui->rb2StopBit->setChecked(true);
+        selectStopBits(QSerialPort::TwoStop);
     }
 
     settings->endGroup();
