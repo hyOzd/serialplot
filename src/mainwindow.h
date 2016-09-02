@@ -81,10 +81,14 @@ private:
     PlotControlPanel plotControlPanel;
 
     bool isDemoRunning();
+    /// Stores settings for all modules
+    void saveAllSettings(QSettings* settings);
+    /// Load settings for all modules
+    void loadAllSettings(QSettings* settings);
     /// Stores main window settings into a `QSettings`
-    void saveSettings(QSettings* settings);
+    void saveMWSettings(QSettings* settings);
     /// Loads main window settings from a `QSettings`
-    void loadSettings(QSettings* settings);
+    void loadMWSettings(QSettings* settings);
 
 private slots:
     void onPortToggled(bool open);

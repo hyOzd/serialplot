@@ -191,14 +191,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // load default settings
     QSettings settings("serialplot", "serialplot");
-    loadSettings(&settings);
+    loadAllSettings(&settings);
 }
 
 MainWindow::~MainWindow()
 {
     // save settings
     QSettings settings("serialplot", "serialplot");
-    saveSettings(&settings);
+    saveAllSettings(&settings);
 
     if (serialPort.isOpen())
     {
@@ -418,28 +418,34 @@ void MainWindow::messageHandler(QtMsgType type,
     }
 }
 
-void MainWindow::saveSettings(QSettings* settings)
+void MainWindow::saveAllSettings(QSettings* settings)
+{
+    saveMWSettings(settings);
+    portControl.saveSettings(settings);
+}
+
+void MainWindow::loadAllSettings(QSettings* settings)
+{
+    loadMWSettings(settings);
+    portControl.loadSettings(settings);
+}
+
+void MainWindow::saveMWSettings(QSettings* settings)
 {
     // save window geometry
     settings->beginGroup("MainWindow");
     settings->setValue("size", size());
     settings->setValue("pos", pos());
     settings->endGroup();
-
-    // save port settings
-    portControl.saveSettings(settings);
 }
 
-void MainWindow::loadSettings(QSettings* settings)
+void MainWindow::loadMWSettings(QSettings* settings)
 {
     // load window geometry
     settings->beginGroup("MainWindow");
     resize(settings->value("size", size()).toSize());
     move(settings->value("pos", pos()).toPoint());
     settings->endGroup();
-
-    // load port settings
-    portControl.loadSettings(settings);
 }
 
 void MainWindow::onSaveSettings()
@@ -450,7 +456,7 @@ void MainWindow::onSaveSettings()
     if (!fileName.isNull()) // user canceled
     {
         QSettings settings(fileName, QSettings::IniFormat);
-        saveSettings(&settings);
+        saveAllSettings(&settings);
     }
 }
 
@@ -462,6 +468,6 @@ void MainWindow::onLoadSettings()
     if (!fileName.isNull()) // user canceled
     {
         QSettings settings(fileName, QSettings::IniFormat);
-        loadSettings(&settings);
+        loadAllSettings(&settings);
     }
 }
