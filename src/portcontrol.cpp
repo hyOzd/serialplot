@@ -329,6 +329,9 @@ void PortControl::saveSettings(QSettings* settings)
         settings->setValue("parity", "none");
     }
 
+    // save number of bits
+    settings->setValue("dataBits", dataBitsButtons.checkedId());
+
     settings->endGroup();
 }
 
@@ -365,6 +368,14 @@ void PortControl::loadSettings(QSettings* settings)
         ui->rbNoParity->setChecked(true);
     }
     selectParity((QSerialPort::Parity) parityButtons.checkedId());
+
+    // load number of bits
+    int dataBits = settings->value("dataBits", dataBitsButtons.checkedId()).toInt();
+    if (dataBits >=5 && dataBits <= 8)
+    {
+        dataBitsButtons.button((QSerialPort::DataBits) dataBits)->setChecked(true);
+        selectDataBits(dataBits);
+    }
 
     settings->endGroup();
 }
