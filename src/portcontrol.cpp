@@ -325,6 +325,22 @@ QString PortControl::currentParityText()
     }
 }
 
+QString PortControl::currentFlowControlText()
+{
+    if (flowControlButtons.checkedId() == QSerialPort::HardwareControl)
+    {
+        return "hardware";
+    }
+    else if (flowControlButtons.checkedId() == QSerialPort::SoftwareControl)
+    {
+        return "software";
+    }
+    else // no parity
+    {
+        return "none";
+    }
+}
+
 void PortControl::saveSettings(QSettings* settings)
 {
     settings->beginGroup("Port");
@@ -333,6 +349,7 @@ void PortControl::saveSettings(QSettings* settings)
     settings->setValue("parity", currentParityText());
     settings->setValue("dataBits", dataBitsButtons.checkedId());
     settings->setValue("stopBits", stopBitsButtons.checkedId());
+    settings->setValue("flowControl", currentFlowControlText());
 
     settings->endGroup();
 }
@@ -393,6 +410,23 @@ void PortControl::loadSettings(QSettings* settings)
         ui->rb2StopBit->setChecked(true);
         selectStopBits(QSerialPort::TwoStop);
     }
+
+    // load flow control
+    QString flowControlSetting =
+        settings->value("flowControl", currentFlowControlText()).toString();
+    if (flowControlSetting == "hardware")
+    {
+        ui->rbHardwareControl->setChecked(true);
+    }
+    else if (flowControlSetting == "software")
+    {
+        ui->rbSoftwareControl->setChecked(true);
+    }
+    else
+    {
+        ui->rbNoFlowControl->setChecked(true);
+    }
+    selectFlowControl(flowControlButtons.checkedId());
 
     settings->endGroup();
 }

@@ -69,6 +69,8 @@ private:
     QString selectedPortName();
     /// Returns currently selected parity as text to be saved in settings
     QString currentParityText();
+    /// Returns currently selected flow control as text to be saved in settings
+    QString currentFlowControlText();
 
 public slots:
     void loadPortList();
