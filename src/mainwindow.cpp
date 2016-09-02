@@ -181,10 +181,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(ui->actionDemoMode, &QAction::toggled,
                      plotMan, &PlotManager::showDemoIndicator);
+
+    // load default settings
+    QSettings settings("serialplot", "serialplot");
+    loadSettings(&settings);
 }
 
 MainWindow::~MainWindow()
 {
+    // save settings
+    QSettings settings("serialplot", "serialplot");
+    saveSettings(&settings);
+
     if (serialPort.isOpen())
     {
         serialPort.close();
@@ -401,4 +409,22 @@ void MainWindow::messageHandler(QtMsgType type,
     {
         ui->statusBar->showMessage(msg, 5000);
     }
+}
+
+void MainWindow::saveSettings(QSettings* settings)
+{
+    // save window geometry
+    settings->beginGroup("MainWindow");
+    settings->setValue("size", size());
+    settings->setValue("pos", pos());
+    settings->endGroup();
+}
+
+void MainWindow::loadSettings(QSettings* settings)
+{
+    // load window geometry
+    settings->beginGroup("MainWindow");
+    resize(settings->value("size", size()).toSize());
+    move(settings->value("pos", pos()).toPoint());
+    settings->endGroup();
 }

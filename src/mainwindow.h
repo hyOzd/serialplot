@@ -31,6 +31,7 @@
 #include <QTimer>
 #include <QColor>
 #include <QtGlobal>
+#include <QSettings>
 #include <qwt_plot_curve.h>
 
 #include "portcontrol.h"
@@ -80,6 +81,10 @@ private:
     PlotControlPanel plotControlPanel;
 
     bool isDemoRunning();
+    /// Stores main window settings into a `QSettings`
+    void saveSettings(QSettings* settings);
+    /// Loads main window settings from a `QSettings`
+    void loadSettings(QSettings* settings);
 
 private slots:
     void onPortToggled(bool open);
@@ -90,11 +95,8 @@ private slots:
     void onChannelNameChanged(unsigned channel, QString name);
 
     void clearPlot();
-
     void onSpsChanged(unsigned sps);
-
     void enableDemo(bool enabled);
-
     void onExportCsv();
 };
 
