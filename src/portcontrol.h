@@ -67,6 +67,8 @@ private:
 
     /// Returns the currently selected (entered) "portName" in the UI
     QString selectedPortName();
+    /// Returns currently selected parity as text to be saved in settings
+    QString currentParityText();
 
 public slots:
     void loadPortList();

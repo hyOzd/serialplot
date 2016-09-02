@@ -309,6 +309,22 @@ void PortControl::onTbPortListActivated(int index)
     ui->cbPortList->setCurrentIndex(index);
 }
 
+QString PortControl::currentParityText()
+{
+    if (parityButtons.checkedId() == QSerialPort::OddParity)
+    {
+        return "odd";
+    }
+    else if (parityButtons.checkedId() == QSerialPort::EvenParity)
+    {
+        return "even";
+    }
+    else // no parity
+    {
+        return "none";
+    }
+}
+
 void PortControl::saveSettings(QSettings* settings)
 {
     settings->beginGroup("Port");
@@ -316,18 +332,7 @@ void PortControl::saveSettings(QSettings* settings)
     settings->setValue("baudRate", ui->cbBaudRate->currentText());
 
     // save parity setting
-    if (parityButtons.checkedId() == QSerialPort::OddParity)
-    {
-        settings->setValue("parity", "odd");
-    }
-    else if (parityButtons.checkedId() == QSerialPort::EvenParity)
-    {
-        settings->setValue("parity", "even");
-    }
-    else
-    {
-        settings->setValue("parity", "none");
-    }
+    settings->setValue("parity", currentParityText());
 
     // save number of bits
     settings->setValue("dataBits", dataBitsButtons.checkedId());
@@ -354,7 +359,9 @@ void PortControl::loadSettings(QSettings* settings)
     if (baudIndex > -1) ui->cbBaudRate->setCurrentIndex(baudIndex);
 
     // load parity setting
-    QString paritySetting = settings->value("parity", "none").toString();
+    QString paritySetting =
+        settings->value("parity", currentParityText()).toString();
+
     if (paritySetting == "odd")
     {
         ui->rbOddParity->setChecked(true);
