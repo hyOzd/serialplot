@@ -425,6 +425,9 @@ void MainWindow::saveSettings(QSettings* settings)
     settings->setValue("size", size());
     settings->setValue("pos", pos());
     settings->endGroup();
+
+    // save port settings
+    portControl.saveSettings(settings);
 }
 
 void MainWindow::loadSettings(QSettings* settings)
@@ -434,6 +437,9 @@ void MainWindow::loadSettings(QSettings* settings)
     resize(settings->value("size", size()).toSize());
     move(settings->value("pos", pos()).toPoint());
     settings->endGroup();
+
+    // load port settings
+    portControl.loadSettings(settings);
 }
 
 void MainWindow::onSaveSettings()

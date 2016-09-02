@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2016 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -273,6 +273,22 @@ void PortControl::selectPort(QString portName)
     }
 }
 
+QString PortControl::selectedPortName()
+{
+    QString portText = ui->cbPortList->currentText();
+    int portIndex = portList.indexOf(portText);
+    if (portIndex < 0) // not in the list yet
+    {
+        // return the displayed name as port name
+        return portText;
+    }
+    else
+    {
+        // get the port name from the 'port list'
+        return static_cast<PortListItem*>(portList.item(portIndex))->portName();
+    }
+}
+
 QToolBar* PortControl::toolBar()
 {
     return &portToolBar;
@@ -291,4 +307,26 @@ void PortControl::onCbPortListActivated(int index)
 void PortControl::onTbPortListActivated(int index)
 {
     ui->cbPortList->setCurrentIndex(index);
+}
+
+void PortControl::saveSettings(QSettings* settings)
+{
+    settings->beginGroup("Port");
+    settings->setValue("selectedPort", selectedPortName());
+    settings->endGroup();
+}
+
+void PortControl::loadSettings(QSettings* settings)
+{
+    settings->beginGroup("Port");
+
+    // set port name if it exists in the current list otherwise ignore
+    QString portName = settings->value("selectedPort", QString()).toString();
+    if (!portName.isEmpty())
+    {
+        int index = portList.indexOfName(portName);
+        if (index > -1) ui->cbPortList->setCurrentIndex(index);
+    }
+
+    settings->endGroup();
 }

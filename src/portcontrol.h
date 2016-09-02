@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2016 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -27,6 +27,7 @@
 #include <QToolBar>
 #include <QAction>
 #include <QComboBox>
+#include <QSettings>
 
 #include "portlist.h"
 
@@ -43,8 +44,12 @@ public:
     ~PortControl();
 
     QSerialPort* serialPort;
-
     QToolBar* toolBar();
+
+    /// Stores port settings into a `QSettings`
+    void saveSettings(QSettings* settings);
+    /// Loads port settings from a `QSettings`
+    void loadSettings(QSettings* settings);
 
 private:
     Ui::PortControl *ui;
@@ -59,6 +64,9 @@ private:
     QAction loadPortListAction;
     QComboBox tbPortList;
     PortList portList;
+
+    /// Returns the currently selected (entered) "portName" in the UI
+    QString selectedPortName();
 
 public slots:
     void loadPortList();
