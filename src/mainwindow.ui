@@ -105,6 +105,8 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionSaveSettings"/>
+    <addaction name="actionLoadSettings"/>
     <addaction name="actionExportCsv"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
@@ -195,6 +197,22 @@
    </property>
    <property name="toolTip">
     <string>Report a Bug on SerialPlot Website</string>
+   </property>
+  </action>
+  <action name="actionSaveSettings">
+   <property name="text">
+    <string>Save Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Save Settings to a File</string>
+   </property>
+  </action>
+  <action name="actionLoadSettings">
+   <property name="text">
+    <string>Load Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Load Settings from a File</string>
    </property>
   </action>
  </widget>

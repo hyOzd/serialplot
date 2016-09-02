@@ -94,15 +94,22 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // init UI signals
 
-    // menu signals
+    // Help menu signals
     QObject::connect(ui->actionHelpAbout, &QAction::triggered,
               &aboutDialog, &QWidget::show);
 
     QObject::connect(ui->actionReportBug, &QAction::triggered,
                      [](){QDesktopServices::openUrl(QUrl(BUG_REPORT_URL));});
 
+    // File menu signals
     QObject::connect(ui->actionExportCsv, &QAction::triggered,
                      this, &MainWindow::onExportCsv);
+
+    QObject::connect(ui->actionSaveSettings, &QAction::triggered,
+                     this, &MainWindow::onSaveSettings);
+
+    QObject::connect(ui->actionLoadSettings, &QAction::triggered,
+                     this, &MainWindow::onLoadSettings);
 
     ui->actionQuit->setShortcutContext(Qt::ApplicationShortcut);
 
@@ -427,4 +434,28 @@ void MainWindow::loadSettings(QSettings* settings)
     resize(settings->value("size", size()).toSize());
     move(settings->value("pos", pos()).toPoint());
     settings->endGroup();
+}
+
+void MainWindow::onSaveSettings()
+{
+    QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Save Settings"), QString(), "INI (*.ini)");
+
+    if (!fileName.isNull()) // user canceled
+    {
+        QSettings settings(fileName, QSettings::IniFormat);
+        saveSettings(&settings);
+    }
+}
+
+void MainWindow::onLoadSettings()
+{
+    QString fileName = QFileDialog::getOpenFileName(
+        this, tr("Load Settings"), QString(), "INI (*.ini)");
+
+    if (!fileName.isNull()) // user canceled
+    {
+        QSettings settings(fileName, QSettings::IniFormat);
+        loadSettings(&settings);
+    }
 }

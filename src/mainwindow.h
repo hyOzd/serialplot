@@ -98,6 +98,8 @@ private slots:
     void onSpsChanged(unsigned sps);
     void enableDemo(bool enabled);
     void onExportCsv();
+    void onSaveSettings();
+    void onLoadSettings();
 };
 
 #endif // MAINWINDOW_H
