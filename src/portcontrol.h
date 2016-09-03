@@ -48,7 +48,7 @@ public:
 
     /// Stores port settings into a `QSettings`
     void saveSettings(QSettings* settings);
-    /// Loads port settings from a `QSettings`
+    /// Loads port settings from a `QSettings`. If open serial port is closed.
     void loadSettings(QSettings* settings);
 
 private:

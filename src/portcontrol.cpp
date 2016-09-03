@@ -354,6 +354,9 @@ void PortControl::saveSettings(QSettings* settings)
 
 void PortControl::loadSettings(QSettings* settings)
 {
+    // make sure the port is closed
+    if (serialPort->isOpen()) togglePort();
+
     settings->beginGroup("Port");
 
     // set port name if it exists in the current list otherwise ignore
@@ -376,14 +379,12 @@ void PortControl::loadSettings(QSettings* settings)
     QSerialPort::Parity paritySetting = paritySettingMap.key(
         parityText, (QSerialPort::Parity) parityButtons.checkedId());
     parityButtons.button(paritySetting)->setChecked(true);
-    selectParity(paritySetting);
 
     // load number of bits
     int dataBits = settings->value("dataBits", dataBitsButtons.checkedId()).toInt();
     if (dataBits >=5 && dataBits <= 8)
     {
         dataBitsButtons.button((QSerialPort::DataBits) dataBits)->setChecked(true);
-        selectDataBits(dataBits);
     }
 
     // load stop bits
@@ -391,12 +392,10 @@ void PortControl::loadSettings(QSettings* settings)
     if (stopBits == QSerialPort::OneStop)
     {
         ui->rb1StopBit->setChecked(true);
-        selectStopBits(QSerialPort::OneStop);
     }
     else if (stopBits == QSerialPort::TwoStop)
     {
         ui->rb2StopBit->setChecked(true);
-        selectStopBits(QSerialPort::TwoStop);
     }
 
     // load flow control
@@ -414,7 +413,6 @@ void PortControl::loadSettings(QSettings* settings)
     {
         ui->rbNoFlowControl->setChecked(true);
     }
-    selectFlowControl(flowControlButtons.checkedId());
 
     settings->endGroup();
 }
