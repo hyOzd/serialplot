@@ -23,10 +23,18 @@
 #include <QSerialPortInfo>
 #include <QKeySequence>
 #include <QLabel>
+#include <QMap>
 #include <QtDebug>
 #include "utils.h"
 
 #define TBPORTLIST_MINWIDTH (200)
+
+// setting mappings
+const QMap<QSerialPort::Parity, QString> paritySettingMap({
+        {QSerialPort::NoParity, "none"},
+        {QSerialPort::OddParity, "odd"},
+        {QSerialPort::EvenParity, "even"},
+    });
 
 PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     QWidget(parent),
@@ -311,18 +319,8 @@ void PortControl::onTbPortListActivated(int index)
 
 QString PortControl::currentParityText()
 {
-    if (parityButtons.checkedId() == QSerialPort::OddParity)
-    {
-        return "odd";
-    }
-    else if (parityButtons.checkedId() == QSerialPort::EvenParity)
-    {
-        return "even";
-    }
-    else // no parity
-    {
-        return "none";
-    }
+    return paritySettingMap.value(
+        (QSerialPort::Parity) parityButtons.checkedId());
 }
 
 QString PortControl::currentFlowControlText()
@@ -373,22 +371,12 @@ void PortControl::loadSettings(QSettings* settings)
     if (baudIndex > -1) ui->cbBaudRate->setCurrentIndex(baudIndex);
 
     // load parity setting
-    QString paritySetting =
+    QString parityText =
         settings->value("parity", currentParityText()).toString();
-
-    if (paritySetting == "odd")
-    {
-        ui->rbOddParity->setChecked(true);
-    }
-    else if (paritySetting == "even")
-    {
-        ui->rbEvenParity->setChecked(true);
-    }
-    else
-    {
-        ui->rbNoParity->setChecked(true);
-    }
-    selectParity((QSerialPort::Parity) parityButtons.checkedId());
+    QSerialPort::Parity paritySetting = paritySettingMap.key(
+        parityText, (QSerialPort::Parity) parityButtons.checkedId());
+    parityButtons.button(paritySetting)->setChecked(true);
+    selectParity(paritySetting);
 
     // load number of bits
     int dataBits = settings->value("dataBits", dataBitsButtons.checkedId()).toInt();
