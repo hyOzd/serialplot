@@ -25,6 +25,8 @@
 #include <QLabel>
 #include <QMap>
 #include <QtDebug>
+
+#include "setting_defines.h"
 #include "utils.h"
 
 #define TBPORTLIST_MINWIDTH (200)
@@ -341,14 +343,13 @@ QString PortControl::currentFlowControlText()
 
 void PortControl::saveSettings(QSettings* settings)
 {
-    settings->beginGroup("Port");
-    settings->setValue("selectedPort", selectedPortName());
-    settings->setValue("baudRate", ui->cbBaudRate->currentText());
-    settings->setValue("parity", currentParityText());
-    settings->setValue("dataBits", dataBitsButtons.checkedId());
-    settings->setValue("stopBits", stopBitsButtons.checkedId());
-    settings->setValue("flowControl", currentFlowControlText());
-
+    settings->beginGroup(SettingGroup_Port);
+    settings->setValue(SG_Port_SelectedPort, selectedPortName());
+    settings->setValue(SG_Port_BaudRate, ui->cbBaudRate->currentText());
+    settings->setValue(SG_Port_Parity, currentParityText());
+    settings->setValue(SG_Port_DataBits, dataBitsButtons.checkedId());
+    settings->setValue(SG_Port_StopBits, stopBitsButtons.checkedId());
+    settings->setValue(SG_Port_FlowControl, currentFlowControlText());
     settings->endGroup();
 }
 
@@ -357,10 +358,10 @@ void PortControl::loadSettings(QSettings* settings)
     // make sure the port is closed
     if (serialPort->isOpen()) togglePort();
 
-    settings->beginGroup("Port");
+    settings->beginGroup(SettingGroup_Port);
 
     // set port name if it exists in the current list otherwise ignore
-    QString portName = settings->value("selectedPort", QString()).toString();
+    QString portName = settings->value(SG_Port_SelectedPort, QString()).toString();
     if (!portName.isEmpty())
     {
         int index = portList.indexOfName(portName);
@@ -369,26 +370,26 @@ void PortControl::loadSettings(QSettings* settings)
 
     // load baud rate setting if it exists in baud rate list
     QString baudSetting = settings->value(
-        "baudRate", ui->cbBaudRate->currentText()).toString();
+        SG_Port_BaudRate, ui->cbBaudRate->currentText()).toString();
     int baudIndex = ui->cbBaudRate->findText(baudSetting);
     if (baudIndex > -1) ui->cbBaudRate->setCurrentIndex(baudIndex);
 
     // load parity setting
     QString parityText =
-        settings->value("parity", currentParityText()).toString();
+        settings->value(SG_Port_Parity, currentParityText()).toString();
     QSerialPort::Parity paritySetting = paritySettingMap.key(
         parityText, (QSerialPort::Parity) parityButtons.checkedId());
     parityButtons.button(paritySetting)->setChecked(true);
 
     // load number of bits
-    int dataBits = settings->value("dataBits", dataBitsButtons.checkedId()).toInt();
+    int dataBits = settings->value(SG_Port_Parity, dataBitsButtons.checkedId()).toInt();
     if (dataBits >=5 && dataBits <= 8)
     {
         dataBitsButtons.button((QSerialPort::DataBits) dataBits)->setChecked(true);
     }
 
     // load stop bits
-    int stopBits = settings->value("stopBits", stopBitsButtons.checkedId()).toInt();
+    int stopBits = settings->value(SG_Port_StopBits, stopBitsButtons.checkedId()).toInt();
     if (stopBits == QSerialPort::OneStop)
     {
         ui->rb1StopBit->setChecked(true);
@@ -400,7 +401,7 @@ void PortControl::loadSettings(QSettings* settings)
 
     // load flow control
     QString flowControlSetting =
-        settings->value("flowControl", currentFlowControlText()).toString();
+        settings->value(SG_Port_FlowControl, currentFlowControlText()).toString();
     if (flowControlSetting == "hardware")
     {
         ui->rbHardwareControl->setChecked(true);

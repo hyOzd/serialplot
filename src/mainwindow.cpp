@@ -38,6 +38,7 @@
 #include "utils.h"
 #include "defines.h"
 #include "version.h"
+#include "setting_defines.h"
 
 #if defined(Q_OS_WIN) && defined(QT_STATIC)
 #include <QtPlugin>
@@ -433,18 +434,18 @@ void MainWindow::loadAllSettings(QSettings* settings)
 void MainWindow::saveMWSettings(QSettings* settings)
 {
     // save window geometry
-    settings->beginGroup("MainWindow");
-    settings->setValue("size", size());
-    settings->setValue("pos", pos());
+    settings->beginGroup(SettingGroup_MainWindow);
+    settings->setValue(SG_MainWindow_Size, size());
+    settings->setValue(SG_MainWindow_Pos, pos());
     settings->endGroup();
 }
 
 void MainWindow::loadMWSettings(QSettings* settings)
 {
     // load window geometry
-    settings->beginGroup("MainWindow");
-    resize(settings->value("size", size()).toSize());
-    move(settings->value("pos", pos()).toPoint());
+    settings->beginGroup(SettingGroup_MainWindow);
+    resize(settings->value(SG_MainWindow_Size, size()).toSize());
+    move(settings->value(SG_MainWindow_Pos, pos()).toPoint());
     settings->endGroup();
 }
 
