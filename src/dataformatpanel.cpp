@@ -169,6 +169,9 @@ void DataFormatPanel::saveSettings(QSettings* settings)
     settings->setValue(SG_DataFormat_Format, format);
 
     settings->endGroup();
+
+    // save reader settings
+    bsReader.saveSettings(settings);
 }
 
 void DataFormatPanel::loadSettings(QSettings* settings)
@@ -196,4 +199,7 @@ void DataFormatPanel::loadSettings(QSettings* settings)
     } // else current selection stays
 
     settings->endGroup();
+
+    // load reader settings
+    bsReader.loadSettings(settings);
 }

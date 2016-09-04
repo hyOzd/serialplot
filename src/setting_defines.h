@@ -23,6 +23,7 @@
 const char SettingGroup_MainWindow[] = "MainWindow";
 const char SettingGroup_Port[] = "Port";
 const char SettingGroup_DataFormat[] = "DataFormat";
+const char SettingGroup_Binary[] = "DataFormat_Binary";
 const char SettingGroup_Channels[] = "Channels";
 const char SettingGroup_Plot[] = "Plot";
 const char SettingGroup_Commands[] = "Commands";
@@ -43,5 +44,10 @@ const char SG_Port_FlowControl[] = "flowControl";
 
 // data format panel keys
 const char SG_DataFormat_Format[] = "format";
+
+// binary stream reader keys
+const char SG_Binary_NumOfChannels[] = "numOfChannels";
+const char SG_Binary_NumberFormat[] = "numberFormat";
+const char SG_Binary_Endianness[] = "endianness";
 
 #endif // SETTING_DEFINES_H

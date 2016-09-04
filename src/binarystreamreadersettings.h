@@ -21,6 +21,8 @@
 #define BINARYSTREAMREADERSETTINGS_H
 
 #include <QWidget>
+#include <QSettings>
+
 #include "numberformatbox.h"
 #include "endiannessbox.h"
 
@@ -39,6 +41,11 @@ public:
     unsigned numOfChannels();
     NumberFormat numberFormat();
     Endianness endianness();
+
+    /// Stores settings into a `QSettings`
+    void saveSettings(QSettings* settings);
+    /// Loads settings from a `QSettings`.
+    void loadSettings(QSettings* settings);
 
 signals:
     void numOfChannelsChanged(unsigned);

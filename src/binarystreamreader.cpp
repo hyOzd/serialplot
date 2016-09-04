@@ -179,7 +179,6 @@ void BinaryStreamReader::onDataReady()
     delete channelSamples;
 }
 
-
 template<typename T> double BinaryStreamReader::readSampleAs()
 {
     T data;
@@ -203,4 +202,14 @@ void BinaryStreamReader::addChannelData(unsigned int channel,
 {
     _channelMan->addChannelData(channel, data, size);
     sampleCount += size;
+}
+
+void BinaryStreamReader::saveSettings(QSettings* settings)
+{
+    _settingsWidget.saveSettings(settings);
+}
+
+void BinaryStreamReader::loadSettings(QSettings* settings)
+{
+    _settingsWidget.loadSettings(settings);
 }

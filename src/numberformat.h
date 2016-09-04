@@ -17,40 +17,27 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ENDIANNESSBOX_H
-#define ENDIANNESSBOX_H
+#ifndef NUMBERFORMAT_H
+#define NUMBERFORMAT_H
 
-#include <QWidget>
+#include <QString>
 
-namespace Ui {
-class EndiannessBox;
-}
-
-enum Endianness
+enum NumberFormat
 {
-    LittleEndian,
-    BigEndian
+    NumberFormat_uint8,
+    NumberFormat_uint16,
+    NumberFormat_uint32,
+    NumberFormat_int8,
+    NumberFormat_int16,
+    NumberFormat_int32,
+    NumberFormat_float,
+    NumberFormat_INVALID ///< used for error cases
 };
 
-class EndiannessBox : public QWidget
-{
-    Q_OBJECT
+/// Convert `NumberFormat` to string for representation
+QString numberFormatToStr(NumberFormat nf);
 
-public:
-    explicit EndiannessBox(QWidget *parent = 0);
-    ~EndiannessBox();
+/// Convert string to `NumberFormat`
+NumberFormat strToNumberFormat(QString str);
 
-    /// currently selected endianness
-    Endianness currentSelection();
-    /// change the currently selected endianness
-    void setSelection(Endianness endianness);
-
-signals:
-    /// Signaled when endianness selection is changed
-    void selectionChanged(Endianness endianness);
-
-private:
-    Ui::EndiannessBox *ui;
-};
-
-#endif // ENDIANNESSBOX_H
+#endif // NUMBERFORMAT_H

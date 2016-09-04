@@ -20,6 +20,8 @@
 #ifndef BINARYSTREAMREADER_H
 #define BINARYSTREAMREADER_H
 
+#include <QSettings>
+
 #include "abstractreader.h"
 #include "binarystreamreadersettings.h"
 
@@ -36,6 +38,10 @@ public:
     QWidget* settingsWidget();
     unsigned numOfChannels();
     void enable(bool enabled = true);
+    /// Stores settings into a `QSettings`
+    void saveSettings(QSettings* settings);
+    /// Loads settings from a `QSettings`.
+    void loadSettings(QSettings* settings);
 
 public slots:
     void pause(bool);

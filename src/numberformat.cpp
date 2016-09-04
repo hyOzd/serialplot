@@ -17,40 +17,26 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ENDIANNESSBOX_H
-#define ENDIANNESSBOX_H
+#include <QMap>
 
-#include <QWidget>
+#include "numberformat.h"
 
-namespace Ui {
-class EndiannessBox;
+QMap<NumberFormat, QString> mapping({
+        {NumberFormat_uint8, "uint8"},
+        {NumberFormat_uint16, "uint16"},
+        {NumberFormat_uint32, "uint32"},
+        {NumberFormat_int8, "int8"},
+        {NumberFormat_int16, "int16"},
+        {NumberFormat_int32, "int32"},
+        {NumberFormat_float, "float"}
+    });
+
+QString numberFormatToStr(NumberFormat nf)
+{
+    return mapping.value(nf);
 }
 
-enum Endianness
+NumberFormat strToNumberFormat(QString str)
 {
-    LittleEndian,
-    BigEndian
-};
-
-class EndiannessBox : public QWidget
-{
-    Q_OBJECT
-
-public:
-    explicit EndiannessBox(QWidget *parent = 0);
-    ~EndiannessBox();
-
-    /// currently selected endianness
-    Endianness currentSelection();
-    /// change the currently selected endianness
-    void setSelection(Endianness endianness);
-
-signals:
-    /// Signaled when endianness selection is changed
-    void selectionChanged(Endianness endianness);
-
-private:
-    Ui::EndiannessBox *ui;
-};
-
-#endif // ENDIANNESSBOX_H
+    return mapping.key(str, NumberFormat_INVALID);
+}
