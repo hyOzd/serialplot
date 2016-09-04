@@ -431,12 +431,14 @@ void MainWindow::saveAllSettings(QSettings* settings)
 {
     saveMWSettings(settings);
     portControl.saveSettings(settings);
+    dataFormatPanel.saveSettings(settings);
 }
 
 void MainWindow::loadAllSettings(QSettings* settings)
 {
     loadMWSettings(settings);
     portControl.loadSettings(settings);
+    dataFormatPanel.loadSettings(settings);
 }
 
 void MainWindow::saveMWSettings(QSettings* settings)

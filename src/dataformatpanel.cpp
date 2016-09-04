@@ -22,9 +22,11 @@
 
 #include <QRadioButton>
 #include <QtEndian>
+#include <QMap>
 #include <QtDebug>
 
 #include "utils.h"
+#include "setting_defines.h"
 #include "floatswap.h"
 
 DataFormatPanel::DataFormatPanel(QSerialPort* port,
@@ -144,4 +146,54 @@ void DataFormatPanel::selectReader(AbstractReader* reader)
     reader->pause(paused);
 
     currentReader = reader;
+}
+
+void DataFormatPanel::saveSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_DataFormat);
+
+    // save selected format
+    QString format;
+    if (currentReader == &bsReader)
+    {
+        format = "binary";
+    }
+    else if (currentReader == &asciiReader)
+    {
+        format = "ascii";
+    }
+    else // framed reader
+    {
+        format = "custom";
+    }
+    settings->setValue(SG_DataFormat_Format, format);
+
+    settings->endGroup();
+}
+
+void DataFormatPanel::loadSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_DataFormat);
+
+    // load selected format
+    QString format = settings->value(
+        SG_DataFormat_Format, QString()).toString();
+
+    if (format == "binary")
+    {
+        selectReader(&bsReader);
+        ui->rbBinary->setChecked(true);
+    }
+    else if (format == "ascii")
+    {
+        selectReader(&asciiReader);
+        ui->rbAscii->setChecked(true);
+    }
+    else if (format == "custom")
+    {
+        selectReader(&framedReader);
+        ui->rbFramed->setChecked(true);
+    } // else current selection stays
+
+    settings->endGroup();
 }
