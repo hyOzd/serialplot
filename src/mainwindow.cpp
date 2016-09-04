@@ -450,6 +450,9 @@ void MainWindow::saveMWSettings(QSettings* settings)
     // save active panel
     settings->setValue(SG_MainWindow_ActivePanel,
                        panelSettingMap.value(ui->tabWidget->currentIndex()));
+    // save panel minimization
+    settings->setValue(SG_MainWindow_HidePanels,
+                       ui->tabWidget->hideAction.isChecked());
     settings->endGroup();
 }
 
@@ -465,6 +468,11 @@ void MainWindow::loadMWSettings(QSettings* settings)
         settings->value(SG_MainWindow_ActivePanel, QString()).toString();
     ui->tabWidget->setCurrentIndex(
         panelSettingMap.key(tabSetting, ui->tabWidget->currentIndex()));
+
+    // hide panels
+    ui->tabWidget->hideAction.setChecked(
+        settings->value(SG_MainWindow_HidePanels,
+                        ui->tabWidget->hideAction.isChecked()).toBool());
 
     settings->endGroup();
 }

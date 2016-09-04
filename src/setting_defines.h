@@ -31,6 +31,7 @@ const char SettingGroup_Commands[] = "Commands";
 const char SG_MainWindow_Size[] = "size";
 const char SG_MainWindow_Pos[] = "pos";
 const char SG_MainWindow_ActivePanel[] = "activePanel";
+const char SG_MainWindow_HidePanels[] = "hidePanels";
 
 // port setting keys
 const char SG_Port_SelectedPort[] = "selectedPort";
