@@ -26,6 +26,7 @@
 #include <QTextStream>
 #include <QMenu>
 #include <QDesktopServices>
+#include <QMap>
 #include <QtDebug>
 #include <qwt_plot.h>
 #include <limits.h>
@@ -44,6 +45,13 @@
 #include <QtPlugin>
 Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
 #endif
+
+const QMap<int, QString> panelSettingMap({
+        {0, "Port"},
+        {1, "DataFormat"},
+        {2, "Plot"},
+        {3, "Commands"}
+    });
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -437,15 +445,25 @@ void MainWindow::saveMWSettings(QSettings* settings)
     settings->beginGroup(SettingGroup_MainWindow);
     settings->setValue(SG_MainWindow_Size, size());
     settings->setValue(SG_MainWindow_Pos, pos());
+    // save active panel
+    settings->setValue(SG_MainWindow_ActivePanel,
+                       panelSettingMap.value(ui->tabWidget->currentIndex()));
     settings->endGroup();
 }
 
 void MainWindow::loadMWSettings(QSettings* settings)
 {
-    // load window geometry
     settings->beginGroup(SettingGroup_MainWindow);
+    // load window geometry
     resize(settings->value(SG_MainWindow_Size, size()).toSize());
     move(settings->value(SG_MainWindow_Pos, pos()).toPoint());
+
+    // set active panel
+    QString tabSetting =
+        settings->value(SG_MainWindow_ActivePanel, QString()).toString();
+    ui->tabWidget->setCurrentIndex(
+        panelSettingMap.key(tabSetting, ui->tabWidget->currentIndex()));
+
     settings->endGroup();
 }
 
