@@ -122,6 +122,9 @@ void FramedReader::onNumberFormatChanged(NumberFormat numberFormat)
             sampleSize = 4;
             readSample = &FramedReader::readSampleAs<float>;
             break;
+        case NumberFormat_INVALID:
+            Q_ASSERT(1); // never
+            break;
     }
 
     checkSettings();

@@ -115,6 +115,9 @@ void BinaryStreamReader::onNumberFormatChanged(NumberFormat numberFormat)
             sampleSize = 4;
             readSample = &BinaryStreamReader::readSampleAs<float>;
             break;
+        case NumberFormat_INVALID:
+            Q_ASSERT(1); // never
+            break;
     }
 }
 
