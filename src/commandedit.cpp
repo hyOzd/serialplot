@@ -72,8 +72,8 @@ CommandEdit::~CommandEdit()
     delete hexValidator;
 }
 
-QString unEscape(QString str);
-QString escape(QString str);
+static QString unEscape(QString str);
+static QString escape(QString str);
 
 void CommandEdit::setMode(bool ascii)
 {
@@ -125,16 +125,52 @@ QString CommandEdit::unEscapedText()
     return unEscape(text());
 }
 
-QString unEscape(QString str)
+static QString unEscape(QString str)
 {
-    str.replace("\\n", "\n");
-    str.replace("\\r", "\r");
-    str.replace("\\t", "\t");
-    return str;
+    const QMap<QString, QString> replacements({
+            {"\\\\", "\\"},
+            {"\\n", "\n"},
+            {"\\r", "\r"},
+            {"\\t", "\t"}
+        });
+
+    QString result;
+
+    int i = 0;
+    while (i < str.size())
+    {
+        bool found = false;
+
+        for (auto k : replacements.keys())
+        {
+            // has enough text left?
+            if (str.size() - i < 1) continue;
+
+            // try matching the key at current position
+            if (k == str.midRef(i, k.size()))
+            {
+                // append replacement
+                result += replacements[k];
+                i += k.size();
+                found = true;
+                break; // skip other keys
+            }
+        }
+
+        if (!found)
+        {
+            // append unmatched character
+            result += str[i];
+            i++;
+        }
+    }
+
+    return result;
 }
 
-QString escape(QString str)
+static QString escape(QString str)
 {
+    str.replace("\\", "\\\\");
     str.replace("\n", "\\n");
     str.replace("\r", "\\r");
     str.replace("\t", "\\t");
