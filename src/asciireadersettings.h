@@ -21,6 +21,7 @@
 #define ASCIIREADERSETTINGS_H
 
 #include <QWidget>
+#include <QSettings>
 
 namespace Ui {
 class AsciiReaderSettings;
@@ -35,6 +36,10 @@ public:
     ~AsciiReaderSettings();
 
     unsigned numOfChannels();
+    /// Stores settings into a `QSettings`
+    void saveSettings(QSettings* settings);
+    /// Loads settings from a `QSettings`.
+    void loadSettings(QSettings* settings);
 
 signals:
     void numOfChannelsChanged(unsigned);

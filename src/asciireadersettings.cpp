@@ -18,9 +18,12 @@
 */
 
 #include "utils.h"
+#include "setting_defines.h"
 
 #include "asciireadersettings.h"
 #include "ui_asciireadersettings.h"
+
+#include <QtDebug>
 
 AsciiReaderSettings::AsciiReaderSettings(QWidget *parent) :
     QWidget(parent),
@@ -44,4 +47,41 @@ AsciiReaderSettings::~AsciiReaderSettings()
 unsigned AsciiReaderSettings::numOfChannels()
 {
     return ui->spNumOfChannels->value();
+}
+
+void AsciiReaderSettings::saveSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_ASCII);
+
+    // save number of channels setting
+    QString numOfChannelsSetting = QString::number(numOfChannels());
+    if (numOfChannelsSetting == "0") numOfChannelsSetting = "auto";
+    settings->setValue(SG_ASCII_NumOfChannels, numOfChannelsSetting);
+
+    settings->endGroup();
+}
+
+void AsciiReaderSettings::loadSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_ASCII);
+
+    // load number of channels
+    QString numOfChannelsSetting =
+        settings->value(SG_ASCII_NumOfChannels, numOfChannels()).toString();
+
+    if (numOfChannelsSetting == "auto")
+    {
+        ui->spNumOfChannels->setValue(0);
+    }
+    else
+    {
+        bool ok;
+        int nc = numOfChannelsSetting.toInt(&ok);
+        if (ok)
+        {
+            ui->spNumOfChannels->setValue(nc);
+        }
+    }
+
+    settings->endGroup();
 }

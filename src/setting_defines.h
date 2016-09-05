@@ -24,6 +24,7 @@ const char SettingGroup_MainWindow[] = "MainWindow";
 const char SettingGroup_Port[] = "Port";
 const char SettingGroup_DataFormat[] = "DataFormat";
 const char SettingGroup_Binary[] = "DataFormat_Binary";
+const char SettingGroup_ASCII[] = "DataFormat_ASCII";
 const char SettingGroup_Channels[] = "Channels";
 const char SettingGroup_Plot[] = "Plot";
 const char SettingGroup_Commands[] = "Commands";
@@ -49,5 +50,8 @@ const char SG_DataFormat_Format[] = "format";
 const char SG_Binary_NumOfChannels[] = "numOfChannels";
 const char SG_Binary_NumberFormat[] = "numberFormat";
 const char SG_Binary_Endianness[] = "endianness";
+
+// ascii reader keys
+const char SG_ASCII_NumOfChannels[] = "numOfChannels";
 
 #endif // SETTING_DEFINES_H

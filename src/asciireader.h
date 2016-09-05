@@ -20,6 +20,8 @@
 #ifndef ASCIIREADER_H
 #define ASCIIREADER_H
 
+#include <QSettings>
+
 #include "abstractreader.h"
 #include "asciireadersettings.h"
 
@@ -32,6 +34,10 @@ public:
     QWidget* settingsWidget();
     unsigned numOfChannels();
     void enable(bool enabled = true);
+    /// Stores settings into a `QSettings`
+    void saveSettings(QSettings* settings);
+    /// Loads settings from a `QSettings`.
+    void loadSettings(QSettings* settings);
 
 public slots:
     void pause(bool);
