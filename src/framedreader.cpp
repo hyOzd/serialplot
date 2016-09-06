@@ -353,3 +353,13 @@ template<typename T> double FramedReader::readSampleAs()
 
     return double(data);
 }
+
+void FramedReader::saveSettings(QSettings* settings)
+{
+    _settingsWidget.saveSettings(settings);
+}
+
+void FramedReader::loadSettings(QSettings* settings)
+{
+    _settingsWidget.loadSettings(settings);
+}

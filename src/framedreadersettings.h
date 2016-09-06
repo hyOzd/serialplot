@@ -22,6 +22,7 @@
 
 #include <QWidget>
 #include <QByteArray>
+#include <QSettings>
 
 #include "numberformatbox.h"
 #include "endiannessbox.h"
@@ -47,6 +48,10 @@ public:
     unsigned frameSize(); /// If frame bye is enabled `0` is returned
     bool isChecksumEnabled();
     bool isDebugModeEnabled();
+    /// Save settings into a `QSettings`
+    void saveSettings(QSettings* settings);
+    /// Loads settings from a `QSettings`.
+    void loadSettings(QSettings* settings);
 
 signals:
     /// If sync word is invalid (empty or 1 nibble missing at the end)

@@ -173,6 +173,7 @@ void DataFormatPanel::saveSettings(QSettings* settings)
     // save reader settings
     bsReader.saveSettings(settings);
     asciiReader.saveSettings(settings);
+    framedReader.saveSettings(settings);
 }
 
 void DataFormatPanel::loadSettings(QSettings* settings)
@@ -204,4 +205,5 @@ void DataFormatPanel::loadSettings(QSettings* settings)
     // load reader settings
     bsReader.loadSettings(settings);
     asciiReader.loadSettings(settings);
+    framedReader.loadSettings(settings);
 }

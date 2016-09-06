@@ -20,6 +20,7 @@
 #include <QButtonGroup>
 
 #include "utils.h"
+#include "setting_defines.h"
 #include "framedreadersettings.h"
 #include "ui_framedreadersettings.h"
 
@@ -149,4 +150,74 @@ bool FramedReaderSettings::isChecksumEnabled()
 bool FramedReaderSettings::isDebugModeEnabled()
 {
     return ui->cbDebugMode->isChecked();
+}
+
+void FramedReaderSettings::saveSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_CustomFrame);
+    settings->setValue(SG_CustomFrame_NumOfChannels, numOfChannels());
+    settings->setValue(SG_CustomFrame_NumberFormat, numberFormatToStr(numberFormat()));
+    settings->setValue(SG_CustomFrame_Endianness,
+                       endianness() == LittleEndian ? "little" : "big");
+    settings->setValue(SG_CustomFrame_FrameStart, ui->leSyncWord->text());
+    settings->setValue(SG_CustomFrame_FixedSize, ui->rbFixedSize->isChecked());
+    settings->setValue(SG_CustomFrame_FrameSize, ui->spSize->value());
+    settings->setValue(SG_CustomFrame_Checksum, ui->cbChecksum->isChecked());
+    settings->setValue(SG_CustomFrame_DebugMode, ui->cbDebugMode->isChecked());
+    settings->endGroup();
+}
+
+void FramedReaderSettings::loadSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_CustomFrame);
+
+    // load number of channels
+    ui->spNumOfChannels->setValue(
+        settings->value(SG_CustomFrame_NumOfChannels, numOfChannels()).toInt());
+
+    // load number format
+    NumberFormat nfSetting =
+        strToNumberFormat(settings->value(SG_CustomFrame_NumberFormat,
+                                          QString()).toString());
+    if (nfSetting == NumberFormat_INVALID) nfSetting = numberFormat();
+    ui->nfBox->setSelection(nfSetting);
+
+    // load endianness
+    QString endiannessSetting =
+        settings->value(SG_CustomFrame_Endianness, QString()).toString();
+    if (endiannessSetting == "little")
+    {
+        ui->endiBox->setSelection(LittleEndian);
+    }
+    else if (endiannessSetting == "big")
+    {
+        ui->endiBox->setSelection(BigEndian);
+    } // else don't change
+
+    // load frame start
+    QString frameStartSetting =
+        settings->value(SG_CustomFrame_FrameStart, ui->leSyncWord->text()).toString();
+    auto validator = ui->leSyncWord->validator();
+    validator->fixup(frameStartSetting);
+    int pos = 0;
+    if (validator->validate(frameStartSetting, pos) != QValidator::Invalid)
+    {
+        ui->leSyncWord->setText(frameStartSetting);
+    }
+
+    // load frame size
+    ui->spSize->setValue(
+        settings->value(SG_CustomFrame_FrameSize, ui->spSize->value()).toInt());
+    ui->rbFixedSize->setChecked(
+        settings->value(SG_CustomFrame_FixedSize, ui->rbFixedSize->isChecked()).toBool());
+
+    // load checksum
+    ui->cbChecksum->setChecked(
+        settings->value(SG_CustomFrame_Checksum, ui->cbChecksum->isChecked()).toBool());
+
+    // load debug mode
+    ui->cbDebugMode->setChecked(
+        settings->value(SG_CustomFrame_DebugMode, ui->cbDebugMode->isChecked()).toBool());
+
+    settings->endGroup();
 }
