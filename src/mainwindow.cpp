@@ -457,6 +457,9 @@ void MainWindow::saveMWSettings(QSettings* settings)
     // save panel minimization
     settings->setValue(SG_MainWindow_HidePanels,
                        ui->tabWidget->hideAction.isChecked());
+    // save window maximized state
+    settings->setValue(SG_MainWindow_Maximized,
+                       bool(windowState() & Qt::WindowMaximized));
     settings->endGroup();
 }
 
@@ -477,6 +480,12 @@ void MainWindow::loadMWSettings(QSettings* settings)
     ui->tabWidget->hideAction.setChecked(
         settings->value(SG_MainWindow_HidePanels,
                         ui->tabWidget->hideAction.isChecked()).toBool());
+
+    // maximize window
+    if (settings->value(SG_MainWindow_Maximized).toBool())
+    {
+        showMaximized();
+    }
 
     settings->endGroup();
 }
