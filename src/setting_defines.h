@@ -69,4 +69,10 @@ const char SG_CustomFrame_DebugMode[] = "debugMode";
 const char SG_Channels_Channel[] = "channel";
 const char SG_Channels_Name[] = "name";
 
+// plot settings keys
+const char SG_Plot_NumOfSamples[] = "numOfSamples";
+const char SG_Plot_AutoScale[] = "autoScale";
+const char SG_Plot_YMax[] = "yMax";
+const char SG_Plot_YMin[] = "yMin";
+
 #endif // SETTING_DEFINES_H

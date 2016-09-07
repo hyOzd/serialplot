@@ -22,6 +22,7 @@
 
 #include <QWidget>
 #include <QAbstractItemModel>
+#include <QSettings>
 
 namespace Ui {
 class PlotControlPanel;
@@ -41,6 +42,11 @@ public:
     double yMin();
 
     void setChannelNamesModel(QAbstractItemModel * model);
+
+    /// Stores plot settings into a `QSettings`
+    void saveSettings(QSettings* settings);
+    /// Loads plot settings from a `QSettings`.
+    void loadSettings(QSettings* settings);
 
 signals:
     void numOfSamplesChanged(int value);

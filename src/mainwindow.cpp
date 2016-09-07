@@ -433,6 +433,7 @@ void MainWindow::saveAllSettings(QSettings* settings)
     portControl.saveSettings(settings);
     dataFormatPanel.saveSettings(settings);
     channelMan.saveSettings(settings);
+    plotControlPanel.saveSettings(settings);
 }
 
 void MainWindow::loadAllSettings(QSettings* settings)
@@ -441,6 +442,7 @@ void MainWindow::loadAllSettings(QSettings* settings)
     portControl.loadSettings(settings);
     dataFormatPanel.loadSettings(settings);
     channelMan.loadSettings(settings);
+    plotControlPanel.loadSettings(settings);
 }
 
 void MainWindow::saveMWSettings(QSettings* settings)

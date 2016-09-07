@@ -23,7 +23,7 @@
 
 #include "plotcontrolpanel.h"
 #include "ui_plotcontrolpanel.h"
-
+#include "setting_defines.h"
 
 /// Used for scale range selection combobox
 struct Range
@@ -149,4 +149,26 @@ void PlotControlPanel::onRangeSelected()
 void PlotControlPanel::setChannelNamesModel(QAbstractItemModel * model)
 {
     ui->lvChannelNames->setModel(model);
+}
+
+void PlotControlPanel::saveSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_Plot);
+    settings->setValue(SG_Plot_NumOfSamples, numOfSamples());
+    settings->setValue(SG_Plot_AutoScale, autoScale());
+    settings->setValue(SG_Plot_YMax, yMax());
+    settings->setValue(SG_Plot_YMin, yMin());
+    settings->endGroup();
+}
+
+void PlotControlPanel::loadSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_Plot);
+    ui->spNumOfSamples->setValue(
+        settings->value(SG_Plot_NumOfSamples, numOfSamples()).toInt());
+    ui->cbAutoScale->setChecked(
+        settings->value(SG_Plot_AutoScale, autoScale()).toBool());
+    ui->spYmax->setValue(settings->value(SG_Plot_YMax, yMax()).toDouble());
+    ui->spYmin->setValue(settings->value(SG_Plot_YMin, yMin()).toDouble());
+    settings->endGroup();
 }
