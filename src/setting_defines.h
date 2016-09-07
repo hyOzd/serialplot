@@ -76,4 +76,10 @@ const char SG_Plot_AutoScale[] = "autoScale";
 const char SG_Plot_YMax[] = "yMax";
 const char SG_Plot_YMin[] = "yMin";
 
+// command setting keys
+const char SG_Commands_Command[] = "command";
+const char SG_Commands_Name[] = "name";
+const char SG_Commands_Type[] = "type";
+const char SG_Commands_Data[] = "data";
+
 #endif // SETTING_DEFINES_H

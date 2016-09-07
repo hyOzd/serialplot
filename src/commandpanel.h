@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2016 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -23,8 +23,10 @@
 #include <QWidget>
 #include <QSerialPort>
 #include <QByteArray>
+#include <QList>
 #include <QMenu>
 #include <QAction>
+#include <QSettings>
 
 #include "commandwidget.h"
 
@@ -41,7 +43,14 @@ public:
     ~CommandPanel();
 
     QMenu* menu();
+    /// Action for creating a new command.
     QAction* newCommandAction();
+    /// Stores commands into a `QSettings`
+    void saveSettings(QSettings* settings);
+    /// Loads commands from a `QSettings`.
+    void loadSettings(QSettings* settings);
+    /// Number of commands
+    unsigned numOfCommands();
 
 signals:
     // emitted when user tries to send an empty command
@@ -52,11 +61,12 @@ private:
     QSerialPort* serialPort;
     QMenu _menu;
     QAction _newCommandAction;
+    QList<CommandWidget*> commands;
 
     unsigned command_name_counter;
 
 private slots:
-    void newCommand();
+    CommandWidget* newCommand();
     void sendCommand(QByteArray command);
 };
 

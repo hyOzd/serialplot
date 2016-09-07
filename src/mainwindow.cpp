@@ -201,6 +201,12 @@ MainWindow::MainWindow(QWidget *parent) :
     // load default settings
     QSettings settings("serialplot", "serialplot");
     loadAllSettings(&settings);
+
+    // ensure command panel has 1 command if none loaded
+    if (!commandPanel.numOfCommands())
+    {
+        commandPanel.newCommandAction()->trigger();
+    }
 }
 
 MainWindow::~MainWindow()
@@ -434,6 +440,7 @@ void MainWindow::saveAllSettings(QSettings* settings)
     dataFormatPanel.saveSettings(settings);
     channelMan.saveSettings(settings);
     plotControlPanel.saveSettings(settings);
+    commandPanel.saveSettings(settings);
 }
 
 void MainWindow::loadAllSettings(QSettings* settings)
@@ -443,6 +450,7 @@ void MainWindow::loadAllSettings(QSettings* settings)
     dataFormatPanel.loadSettings(settings);
     channelMan.loadSettings(settings);
     plotControlPanel.loadSettings(settings);
+    commandPanel.loadSettings(settings);
 }
 
 void MainWindow::saveMWSettings(QSettings* settings)
