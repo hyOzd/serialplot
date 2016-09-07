@@ -65,4 +65,8 @@ const char SG_CustomFrame_Endianness[] = "endianness";
 const char SG_CustomFrame_Checksum[] = "checksum";
 const char SG_CustomFrame_DebugMode[] = "debugMode";
 
+// channel manager keys
+const char SG_Channels_Channel[] = "channel";
+const char SG_Channels_Name[] = "name";
+
 #endif // SETTING_DEFINES_H

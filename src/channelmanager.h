@@ -24,6 +24,7 @@
 #include <QStringListModel>
 #include <QModelIndex>
 #include <QVector>
+#include <QSettings>
 
 #include "framebuffer.h"
 
@@ -39,6 +40,10 @@ public:
     FrameBuffer* channelBuffer(unsigned channel);
     QStringListModel* channelNames();
     QString channelName(unsigned channel);
+    /// Stores channel names into a `QSettings`
+    void saveSettings(QSettings* settings);
+    /// Loads channel names from a `QSettings`.
+    void loadSettings(QSettings* settings);
 
 signals:
     void numOfChannelsChanged(unsigned value);

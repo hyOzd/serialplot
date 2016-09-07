@@ -17,10 +17,11 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "channelmanager.h"
-
 #include <QStringList>
 #include <QModelIndex>
+
+#include "channelmanager.h"
+#include "setting_defines.h"
 
 ChannelManager::ChannelManager(unsigned numberOfChannels, unsigned numberOfSamples, QObject *parent) :
     QObject(parent)
@@ -142,4 +143,30 @@ void ChannelManager::onChannelNameDataChange(const QModelIndex & topLeft,
 void ChannelManager::addChannelData(unsigned channel, double* data, unsigned size)
 {
     channelBuffer(channel)->addSamples(data, size);
+}
+
+void ChannelManager::saveSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_Channels);
+    settings->beginWriteArray(SG_Channels_Channel);
+    for (unsigned i = 0; i < numOfChannels(); i++)
+    {
+        settings->setArrayIndex(i);
+        settings->setValue(SG_Channels_Name, channelName(i));
+    }
+    settings->endArray();
+    settings->endGroup();
+}
+
+void ChannelManager::loadSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_Channels);
+    settings->beginReadArray(SG_Channels_Channel);
+    for (unsigned i = 0; i < numOfChannels(); i++)
+    {
+        settings->setArrayIndex(i);
+        setChannelName(i, settings->value(SG_Channels_Name, channelName(i)).toString());
+    }
+    settings->endArray();
+    settings->endGroup();
 }
