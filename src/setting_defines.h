@@ -75,6 +75,11 @@ const char SG_Plot_NumOfSamples[] = "numOfSamples";
 const char SG_Plot_AutoScale[] = "autoScale";
 const char SG_Plot_YMax[] = "yMax";
 const char SG_Plot_YMin[] = "yMin";
+const char SG_Plot_DarkBackground[] = "darkBackground";
+const char SG_Plot_Grid[] = "grid";
+const char SG_Plot_MinorGrid[] = "minorGrid";
+const char SG_Plot_Legend[] = "legend";
+const char SG_Plot_MultiPlot[] = "multiPlot";
 
 // command setting keys
 const char SG_Commands_Command[] = "command";

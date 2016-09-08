@@ -440,6 +440,7 @@ void MainWindow::saveAllSettings(QSettings* settings)
     dataFormatPanel.saveSettings(settings);
     channelMan.saveSettings(settings);
     plotControlPanel.saveSettings(settings);
+    plotMan->saveSettings(settings);
     commandPanel.saveSettings(settings);
 }
 
@@ -450,6 +451,7 @@ void MainWindow::loadAllSettings(QSettings* settings)
     dataFormatPanel.loadSettings(settings);
     channelMan.loadSettings(settings);
     plotControlPanel.loadSettings(settings);
+    plotMan->loadSettings(settings);
     commandPanel.loadSettings(settings);
 }
 
