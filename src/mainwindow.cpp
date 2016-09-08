@@ -72,7 +72,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tabWidget->insertTab(2, &plotControlPanel, "Plot");
     ui->tabWidget->insertTab(3, &commandPanel, "Commands");
     ui->tabWidget->setCurrentIndex(0);
-    addToolBar(portControl.toolBar());
+    auto tbPortControl = portControl.toolBar();
+    addToolBar(tbPortControl);
 
     ui->plotToolBar->addAction(snapshotMan.takeSnapshotAction());
     ui->menuBar->insertMenu(ui->menuHelp->menuAction(), snapshotMan.menu());
@@ -86,6 +87,9 @@ MainWindow::MainWindow(QWidget *parent) :
             {
                 this->ui->tabWidget->setCurrentWidget(&commandPanel);
             });
+
+    tbPortControl->setObjectName("tbPortControl");
+    ui->plotToolBar->setObjectName("tbPlot");
 
     setupAboutDialog();
 
@@ -470,6 +474,8 @@ void MainWindow::saveMWSettings(QSettings* settings)
     // save window maximized state
     settings->setValue(SG_MainWindow_Maximized,
                        bool(windowState() & Qt::WindowMaximized));
+    // save toolbar/dockwidgets state
+    settings->setValue(SG_MainWindow_State, saveState());
     settings->endGroup();
 }
 
@@ -496,6 +502,10 @@ void MainWindow::loadMWSettings(QSettings* settings)
     {
         showMaximized();
     }
+
+    // load toolbar/dockwidgets state
+    restoreState(settings->value(SG_MainWindow_State).toByteArray());
+    settings->setValue(SG_MainWindow_State, saveState());
 
     settings->endGroup();
 }
