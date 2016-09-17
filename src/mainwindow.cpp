@@ -414,6 +414,11 @@ void MainWindow::messageHandler(QtMsgType type,
 
     switch (type)
     {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
+        case QtInfoMsg:
+            logString = "[Info] " + msg;
+            break;
+#endif
         case QtDebugMsg:
             logString = "[Debug] " + msg;
             break;
