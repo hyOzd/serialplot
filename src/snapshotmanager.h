@@ -43,6 +43,8 @@ public:
     /// @note Caller is responsible for deletion of the returned `Snapshot` object.
     Snapshot* makeSnapshot();
 
+    bool isAllSaved(); ///< returns `true` if all snapshots are saved to a file
+
 private:
     QMainWindow* _mainWindow;
     ChannelManager* _channelMan;

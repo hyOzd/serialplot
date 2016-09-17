@@ -90,6 +90,9 @@ private:
     /// Loads main window settings from a `QSettings`
     void loadMWSettings(QSettings* settings);
 
+    /// `QWidget::closeEvent` handler
+    void closeEvent(QCloseEvent * event);
+
 private slots:
     void onPortToggled(bool open);
     void onPortError(QSerialPort::SerialPortError error);

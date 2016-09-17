@@ -46,7 +46,8 @@ public:
     void setChannelNames(QStringList names); // must be called when setting data!
     QString channelName(unsigned channel);
 
-    void save(QString fileName); /// save snapshot data as CSV
+    void save(QString fileName); ///< save snapshot data as CSV
+    bool isSaved(); ///< snapshot has been saved at least once
 
 signals:
     void deleteRequested(Snapshot*);
@@ -59,6 +60,7 @@ private:
     QAction _deleteAction;
     QMainWindow* mainWindow;
     SnapshotView* view;
+    bool _saved;
 
 private slots:
     void show();

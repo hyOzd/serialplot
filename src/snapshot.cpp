@@ -30,6 +30,7 @@ Snapshot::Snapshot(QMainWindow* parent, QString name) :
     _deleteAction("Delete", this)
 {
     _name = name;
+    _saved = false;
 
     view = NULL;
     mainWindow = parent;
@@ -137,9 +138,18 @@ void Snapshot::save(QString fileName)
         {
             qCritical() << "File save error during snapshot save: " << file.error();
         }
+        else
+        {
+            _saved = true;
+        }
     }
     else
     {
         qCritical() << "File open error during snapshot save: " << file.error();
     }
+}
+
+bool Snapshot::isSaved()
+{
+    return _saved;
 }

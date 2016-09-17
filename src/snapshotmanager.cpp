@@ -205,3 +205,12 @@ QAction* SnapshotManager::takeSnapshotAction()
 {
     return &_takeSnapshotAction;
 }
+
+bool SnapshotManager::isAllSaved()
+{
+    for (auto snapshot : snapshots)
+    {
+        if (!snapshot->isSaved()) return false;
+    }
+    return true;
+}

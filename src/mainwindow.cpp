@@ -22,6 +22,7 @@
 #include <QByteArray>
 #include <QApplication>
 #include <QFileDialog>
+#include <QMessageBox>
 #include <QFile>
 #include <QTextStream>
 #include <QMenu>
@@ -228,6 +229,24 @@ MainWindow::~MainWindow()
 
     delete ui;
     ui = NULL; // we check if ui is deleted in messageHandler
+}
+
+void MainWindow::closeEvent(QCloseEvent * event)
+{
+    if (!snapshotMan.isAllSaved())
+    {
+        auto clickedButton = QMessageBox::warning(
+            this, "Closing SerialPlot",
+            "There are un-saved snapshots. If you close you will loose the data.",
+            QMessageBox::Discard | QMessageBox::Discard,
+            QMessageBox::Cancel);
+        if (clickedButton == QMessageBox::Cancel)
+        {
+            event->ignore();
+            return;
+        }
+    }
+    QMainWindow::closeEvent(event);
 }
 
 void MainWindow::setupAboutDialog()
