@@ -27,7 +27,7 @@
 CommandPanel::CommandPanel(QSerialPort* port, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::CommandPanel),
-    _menu(trUtf8("Commands")), _newCommandAction(trUtf8("New Command"), this)
+    _menu(trUtf8("&Commands")), _newCommandAction(trUtf8("&New Command"), this)
 {
     serialPort = port;
 

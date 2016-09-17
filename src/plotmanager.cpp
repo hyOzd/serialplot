@@ -27,12 +27,12 @@
 PlotManager::PlotManager(QWidget* plotArea, QObject *parent) :
     QObject(parent),
     _plotArea(plotArea),
-    showGridAction("Grid", this),
-    showMinorGridAction("Minor Grid", this),
-    unzoomAction("Unzoom", this),
-    darkBackgroundAction("Dark Background", this),
-    showLegendAction("Legend", this),
-    showMultiAction("Multi Plot", this)
+    showGridAction("&Grid", this),
+    showMinorGridAction("&Minor Grid", this),
+    unzoomAction("&Unzoom", this),
+    darkBackgroundAction("&Dark Background", this),
+    showLegendAction("&Legend", this),
+    showMultiAction("Multi &Plot", this)
 {
     _autoScaled = true;
     _yMin = 0;

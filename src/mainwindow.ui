@@ -90,12 +90,12 @@
      <x>0</x>
      <y>0</y>
      <width>653</width>
-     <height>20</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string>&amp;Help</string>
     </property>
     <addaction name="actionDemoMode"/>
     <addaction name="actionReportBug"/>
@@ -103,7 +103,7 @@
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>&amp;File</string>
     </property>
     <addaction name="actionSaveSettings"/>
     <addaction name="actionLoadSettings"/>
@@ -113,7 +113,7 @@
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
-     <string>View</string>
+     <string>&amp;View</string>
     </property>
    </widget>
    <addaction name="menuFile"/>
@@ -161,7 +161,7 @@
   </action>
   <action name="actionHelpAbout">
    <property name="text">
-    <string>About</string>
+    <string>&amp;About</string>
    </property>
   </action>
   <action name="actionDemoMode">
@@ -169,7 +169,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Demo Mode</string>
+    <string>&amp;Demo Mode</string>
    </property>
    <property name="toolTip">
     <string>Toggle Demo Mode</string>
@@ -177,7 +177,7 @@
   </action>
   <action name="actionExportCsv">
    <property name="text">
-    <string>Export CSV</string>
+    <string>&amp;Export CSV</string>
    </property>
    <property name="toolTip">
     <string>Export plot data to CSV</string>
@@ -185,7 +185,7 @@
   </action>
   <action name="actionQuit">
    <property name="text">
-    <string>Quit</string>
+    <string>&amp;Quit</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
@@ -193,7 +193,7 @@
   </action>
   <action name="actionReportBug">
    <property name="text">
-    <string>Report a Bug</string>
+    <string>&amp;Report a Bug</string>
    </property>
    <property name="toolTip">
     <string>Report a Bug on SerialPlot Website</string>
@@ -201,7 +201,7 @@
   </action>
   <action name="actionSaveSettings">
    <property name="text">
-    <string>Save Settings</string>
+    <string>&amp;Save Settings</string>
    </property>
    <property name="toolTip">
     <string>Save Settings to a File</string>
@@ -209,7 +209,7 @@
   </action>
   <action name="actionLoadSettings">
    <property name="text">
-    <string>Load Settings</string>
+    <string>&amp;Load Settings</string>
    </property>
    <property name="toolTip">
     <string>Load Settings from a File</string>

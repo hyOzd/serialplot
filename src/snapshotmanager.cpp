@@ -30,10 +30,10 @@
 
 SnapshotManager::SnapshotManager(QMainWindow* mainWindow,
                                  ChannelManager* channelMan) :
-    _menu("Snapshots"),
-    _takeSnapshotAction("Take Snapshot", this),
-    loadSnapshotAction("Load Snapshots", this),
-    clearAction("Clear Snapshots", this)
+    _menu("&Snapshots"),
+    _takeSnapshotAction("&Take Snapshot", this),
+    loadSnapshotAction("&Load Snapshots", this),
+    clearAction("&Clear Snapshots", this)
 {
     _mainWindow = mainWindow;
     _channelMan = channelMan;
