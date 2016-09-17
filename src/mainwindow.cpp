@@ -26,6 +26,7 @@
 #include <QTextStream>
 #include <QMenu>
 #include <QDesktopServices>
+#include <QMap>
 #include <QtDebug>
 #include <qwt_plot.h>
 #include <limits.h>
@@ -38,11 +39,19 @@
 #include "utils.h"
 #include "defines.h"
 #include "version.h"
+#include "setting_defines.h"
 
 #if defined(Q_OS_WIN) && defined(QT_STATIC)
 #include <QtPlugin>
 Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
 #endif
+
+const QMap<int, QString> panelSettingMap({
+        {0, "Port"},
+        {1, "DataFormat"},
+        {2, "Plot"},
+        {3, "Commands"}
+    });
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -63,7 +72,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tabWidget->insertTab(2, &plotControlPanel, "Plot");
     ui->tabWidget->insertTab(3, &commandPanel, "Commands");
     ui->tabWidget->setCurrentIndex(0);
-    addToolBar(portControl.toolBar());
+    auto tbPortControl = portControl.toolBar();
+    addToolBar(tbPortControl);
 
     ui->plotToolBar->addAction(snapshotMan.takeSnapshotAction());
     ui->menuBar->insertMenu(ui->menuHelp->menuAction(), snapshotMan.menu());
@@ -77,6 +87,9 @@ MainWindow::MainWindow(QWidget *parent) :
             {
                 this->ui->tabWidget->setCurrentWidget(&commandPanel);
             });
+
+    tbPortControl->setObjectName("tbPortControl");
+    ui->plotToolBar->setObjectName("tbPlot");
 
     setupAboutDialog();
 
@@ -94,15 +107,22 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // init UI signals
 
-    // menu signals
+    // Help menu signals
     QObject::connect(ui->actionHelpAbout, &QAction::triggered,
               &aboutDialog, &QWidget::show);
 
     QObject::connect(ui->actionReportBug, &QAction::triggered,
                      [](){QDesktopServices::openUrl(QUrl(BUG_REPORT_URL));});
 
+    // File menu signals
     QObject::connect(ui->actionExportCsv, &QAction::triggered,
                      this, &MainWindow::onExportCsv);
+
+    QObject::connect(ui->actionSaveSettings, &QAction::triggered,
+                     this, &MainWindow::onSaveSettings);
+
+    QObject::connect(ui->actionLoadSettings, &QAction::triggered,
+                     this, &MainWindow::onLoadSettings);
 
     ui->actionQuit->setShortcutContext(Qt::ApplicationShortcut);
 
@@ -181,10 +201,24 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(ui->actionDemoMode, &QAction::toggled,
                      plotMan, &PlotManager::showDemoIndicator);
+
+    // load default settings
+    QSettings settings("serialplot", "serialplot");
+    loadAllSettings(&settings);
+
+    // ensure command panel has 1 command if none loaded
+    if (!commandPanel.numOfCommands())
+    {
+        commandPanel.newCommandAction()->trigger();
+    }
 }
 
 MainWindow::~MainWindow()
 {
+    // save settings
+    QSettings settings("serialplot", "serialplot");
+    saveAllSettings(&settings);
+
     if (serialPort.isOpen())
     {
         serialPort.close();
@@ -400,5 +434,102 @@ void MainWindow::messageHandler(QtMsgType type,
     if (type != QtDebugMsg && ui != NULL)
     {
         ui->statusBar->showMessage(msg, 5000);
+    }
+}
+
+void MainWindow::saveAllSettings(QSettings* settings)
+{
+    saveMWSettings(settings);
+    portControl.saveSettings(settings);
+    dataFormatPanel.saveSettings(settings);
+    channelMan.saveSettings(settings);
+    plotControlPanel.saveSettings(settings);
+    plotMan->saveSettings(settings);
+    commandPanel.saveSettings(settings);
+}
+
+void MainWindow::loadAllSettings(QSettings* settings)
+{
+    loadMWSettings(settings);
+    portControl.loadSettings(settings);
+    dataFormatPanel.loadSettings(settings);
+    channelMan.loadSettings(settings);
+    plotControlPanel.loadSettings(settings);
+    plotMan->loadSettings(settings);
+    commandPanel.loadSettings(settings);
+}
+
+void MainWindow::saveMWSettings(QSettings* settings)
+{
+    // save window geometry
+    settings->beginGroup(SettingGroup_MainWindow);
+    settings->setValue(SG_MainWindow_Size, size());
+    settings->setValue(SG_MainWindow_Pos, pos());
+    // save active panel
+    settings->setValue(SG_MainWindow_ActivePanel,
+                       panelSettingMap.value(ui->tabWidget->currentIndex()));
+    // save panel minimization
+    settings->setValue(SG_MainWindow_HidePanels,
+                       ui->tabWidget->hideAction.isChecked());
+    // save window maximized state
+    settings->setValue(SG_MainWindow_Maximized,
+                       bool(windowState() & Qt::WindowMaximized));
+    // save toolbar/dockwidgets state
+    settings->setValue(SG_MainWindow_State, saveState());
+    settings->endGroup();
+}
+
+void MainWindow::loadMWSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_MainWindow);
+    // load window geometry
+    resize(settings->value(SG_MainWindow_Size, size()).toSize());
+    move(settings->value(SG_MainWindow_Pos, pos()).toPoint());
+
+    // set active panel
+    QString tabSetting =
+        settings->value(SG_MainWindow_ActivePanel, QString()).toString();
+    ui->tabWidget->setCurrentIndex(
+        panelSettingMap.key(tabSetting, ui->tabWidget->currentIndex()));
+
+    // hide panels
+    ui->tabWidget->hideAction.setChecked(
+        settings->value(SG_MainWindow_HidePanels,
+                        ui->tabWidget->hideAction.isChecked()).toBool());
+
+    // maximize window
+    if (settings->value(SG_MainWindow_Maximized).toBool())
+    {
+        showMaximized();
+    }
+
+    // load toolbar/dockwidgets state
+    restoreState(settings->value(SG_MainWindow_State).toByteArray());
+    settings->setValue(SG_MainWindow_State, saveState());
+
+    settings->endGroup();
+}
+
+void MainWindow::onSaveSettings()
+{
+    QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Save Settings"), QString(), "INI (*.ini)");
+
+    if (!fileName.isNull()) // user canceled
+    {
+        QSettings settings(fileName, QSettings::IniFormat);
+        saveAllSettings(&settings);
+    }
+}
+
+void MainWindow::onLoadSettings()
+{
+    QString fileName = QFileDialog::getOpenFileName(
+        this, tr("Load Settings"), QString(), "INI (*.ini)");
+
+    if (!fileName.isNull()) // user canceled
+    {
+        QSettings settings(fileName, QSettings::IniFormat);
+        loadAllSettings(&settings);
     }
 }

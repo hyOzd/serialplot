@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2016 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -50,7 +50,10 @@ public:
     PortList(QObject* parent=0);
 
     void loadPortList();
+    /// Search for displayed text of the port
     int indexOf(QString portText); // return -1 if not found
+    /// Search for the actual port name
+    int indexOfName(QString portName); // return -1 if not found
 
 private:
     QStringList userEnteredPorts;

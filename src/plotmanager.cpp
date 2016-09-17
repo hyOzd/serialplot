@@ -22,7 +22,7 @@
 #include "plot.h"
 #include "plotmanager.h"
 #include "utils.h"
-
+#include "setting_defines.h"
 
 PlotManager::PlotManager(QWidget* plotArea, QObject *parent) :
     QObject(parent),
@@ -371,4 +371,37 @@ void PlotManager::onNumOfSamplesChanged(unsigned value)
     {
         plot->onNumOfSamplesChanged(value);
     }
+}
+
+void PlotManager::saveSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_Plot);
+    settings->setValue(SG_Plot_DarkBackground, darkBackgroundAction.isChecked());
+    settings->setValue(SG_Plot_Grid, showGridAction.isChecked());
+    settings->setValue(SG_Plot_MinorGrid, showMinorGridAction.isChecked());
+    settings->setValue(SG_Plot_Legend, showLegendAction.isChecked());
+    settings->setValue(SG_Plot_MultiPlot, showMultiAction.isChecked());
+    settings->endGroup();
+}
+
+void PlotManager::loadSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_Plot);
+    darkBackgroundAction.setChecked(
+        settings->value(SG_Plot_DarkBackground, darkBackgroundAction.isChecked()).toBool());
+    darkBackground(darkBackgroundAction.isChecked());
+    showGridAction.setChecked(
+        settings->value(SG_Plot_Grid, showGridAction.isChecked()).toBool());
+    showGrid(showGridAction.isChecked());
+    showMinorGridAction.setChecked(
+        settings->value(SG_Plot_MinorGrid, showMinorGridAction.isChecked()).toBool());
+    showMinorGridAction.setEnabled(showGridAction.isChecked());
+    showMinorGrid(showMinorGridAction.isChecked());
+    showLegendAction.setChecked(
+        settings->value(SG_Plot_Legend, showLegendAction.isChecked()).toBool());
+    showLegend(showLegendAction.isChecked());
+    showMultiAction.setChecked(
+        settings->value(SG_Plot_MultiPlot, showMultiAction.isChecked()).toBool());
+    setMulti(showMultiAction.isChecked());
+    settings->endGroup();
 }

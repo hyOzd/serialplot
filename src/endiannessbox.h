@@ -40,7 +40,10 @@ public:
     explicit EndiannessBox(QWidget *parent = 0);
     ~EndiannessBox();
 
-    Endianness currentSelection(); ///< currently selected endianness
+    /// currently selected endianness
+    Endianness currentSelection();
+    /// change the currently selected endianness
+    void setSelection(Endianness endianness);
 
 signals:
     /// Signaled when endianness selection is changed

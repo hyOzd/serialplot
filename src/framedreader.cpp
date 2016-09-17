@@ -122,6 +122,9 @@ void FramedReader::onNumberFormatChanged(NumberFormat numberFormat)
             sampleSize = 4;
             readSample = &FramedReader::readSampleAs<float>;
             break;
+        case NumberFormat_INVALID:
+            Q_ASSERT(1); // never
+            break;
     }
 
     checkSettings();
@@ -349,4 +352,14 @@ template<typename T> double FramedReader::readSampleAs()
     }
 
     return double(data);
+}
+
+void FramedReader::saveSettings(QSettings* settings)
+{
+    _settingsWidget.saveSettings(settings);
+}
+
+void FramedReader::loadSettings(QSettings* settings)
+{
+    _settingsWidget.loadSettings(settings);
 }

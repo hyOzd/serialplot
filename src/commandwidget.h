@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2016 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -39,25 +39,35 @@ public:
     void setName(QString name);
     QString name();
     void setFocusToEdit();
+    /// An action that triggers sending of command.
     QAction* sendAction();
+    /// true: ascii mode, false hex mode
+    bool isASCIIMode();
+    /// true: ascii mode, false hex mode
+    void setASCIIMode(bool ascii);
+        /// Returns the command data as text
+    QString commandText();
+    /// Set command data as text. Text is validated according to current mode.
+    void setCommandText(QString str);
 
 signals:
-    void deleteRequested(CommandWidget* thisWidget); // emitted when delete button is clicked
+    /// emitted when delete button is clicked
+    void deleteRequested(CommandWidget* thisWidget);
 
-    // emitted when send button is clicked
-    //
-    // in case of hex mode, command text should be a hexadecimal
-    // string containing hexadecimal characters only (not even spaces)
+    /**
+     * Emitted when send button is clicked.
+     *
+     * In case of hex mode, command text should be a hexadecimal
+     * string containing hexadecimal characters only (not even spaces)
+     */
     void sendCommand(QByteArray command);
 
-    // emitted when user tries to send an empty command
+    /// emitted when user tries to send an empty command
     void focusRequested();
 
 private:
     Ui::CommandWidget *ui;
     QAction _sendAction;
-
-    bool isASCIIMode(); // true: ascii mode, false hex mode
 
 private slots:
     void onDeleteClicked();

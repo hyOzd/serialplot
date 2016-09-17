@@ -25,6 +25,7 @@
 #include <QTimer>
 #include <QSerialPort>
 #include <QList>
+#include <QSettings>
 #include <QtGlobal>
 
 #include "framebuffer.h"
@@ -48,7 +49,12 @@ public:
                              QWidget *parent = 0);
     ~DataFormatPanel();
 
+    /// Returns currently selected number of channels
     unsigned numOfChannels();
+    /// Stores data format panel settings into a `QSettings`
+    void saveSettings(QSettings* settings);
+    /// Loads data format panel settings from a `QSettings`.
+    void loadSettings(QSettings* settings);
 
 public slots:
     void pause(bool);

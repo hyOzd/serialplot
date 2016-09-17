@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2016 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -105,6 +105,18 @@ int PortList::indexOf(QString portText)
     for (int i = 0; i < rowCount(); i++)
     {
         if (item(i)->text() == portText)
+        {
+            return i;
+        }
+    }
+    return -1; // not found
+}
+
+int PortList::indexOfName(QString portName)
+{
+    for (int i = 0; i < rowCount(); i++)
+    {
+        if (item(i)->data(PortNameRole) == portName)
         {
             return i;
         }

@@ -17,35 +17,27 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ASCIIREADERSETTINGS_H
-#define ASCIIREADERSETTINGS_H
+#ifndef NUMBERFORMAT_H
+#define NUMBERFORMAT_H
 
-#include <QWidget>
-#include <QSettings>
+#include <QString>
 
-namespace Ui {
-class AsciiReaderSettings;
-}
-
-class AsciiReaderSettings : public QWidget
+enum NumberFormat
 {
-    Q_OBJECT
-
-public:
-    explicit AsciiReaderSettings(QWidget *parent = 0);
-    ~AsciiReaderSettings();
-
-    unsigned numOfChannels();
-    /// Stores settings into a `QSettings`
-    void saveSettings(QSettings* settings);
-    /// Loads settings from a `QSettings`.
-    void loadSettings(QSettings* settings);
-
-signals:
-    void numOfChannelsChanged(unsigned);
-
-private:
-    Ui::AsciiReaderSettings *ui;
+    NumberFormat_uint8,
+    NumberFormat_uint16,
+    NumberFormat_uint32,
+    NumberFormat_int8,
+    NumberFormat_int16,
+    NumberFormat_int32,
+    NumberFormat_float,
+    NumberFormat_INVALID ///< used for error cases
 };
 
-#endif // ASCIIREADERSETTINGS_H
+/// Convert `NumberFormat` to string for representation
+QString numberFormatToStr(NumberFormat nf);
+
+/// Convert string to `NumberFormat`
+NumberFormat strToNumberFormat(QString str);
+
+#endif // NUMBERFORMAT_H

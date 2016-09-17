@@ -54,3 +54,8 @@ NumberFormat NumberFormatBox::currentSelection()
 {
     return (NumberFormat) buttonGroup.checkedId();
 }
+
+void NumberFormatBox::setSelection(NumberFormat nf)
+{
+    buttonGroup.button(nf)->setChecked(true);
+}

@@ -23,20 +23,11 @@
 #include <QWidget>
 #include <QButtonGroup>
 
+#include "numberformat.h"
+
 namespace Ui {
 class NumberFormatBox;
 }
-
-enum NumberFormat
-{
-    NumberFormat_uint8,
-    NumberFormat_uint16,
-    NumberFormat_uint32,
-    NumberFormat_int8,
-    NumberFormat_int16,
-    NumberFormat_int32,
-    NumberFormat_float,
-};
 
 class NumberFormatBox : public QWidget
 {
@@ -46,7 +37,10 @@ public:
     explicit NumberFormatBox(QWidget *parent = 0);
     ~NumberFormatBox();
 
-    NumberFormat currentSelection(); ///< returns the currently selected number format
+    /// returns the currently selected number format
+    NumberFormat currentSelection();
+    /// change the currently selected number format
+    void setSelection(NumberFormat nf);
 
 signals:
     /// Signaled when number format selection is changed

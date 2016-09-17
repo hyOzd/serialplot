@@ -21,6 +21,7 @@
 #include "ui_binarystreamreadersettings.h"
 
 #include "utils.h"
+#include "setting_defines.h"
 
 BinaryStreamReaderSettings::BinaryStreamReaderSettings(QWidget *parent) :
     QWidget(parent),
@@ -60,4 +61,44 @@ NumberFormat BinaryStreamReaderSettings::numberFormat()
 Endianness BinaryStreamReaderSettings::endianness()
 {
     return ui->endiBox->currentSelection();
+}
+
+void BinaryStreamReaderSettings::saveSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_Binary);
+    settings->setValue(SG_Binary_NumOfChannels, numOfChannels());
+    settings->setValue(SG_Binary_NumberFormat, numberFormatToStr(numberFormat()));
+    settings->setValue(SG_Binary_Endianness,
+                       endianness() == LittleEndian ? "little" : "big");
+    settings->endGroup();
+}
+
+void BinaryStreamReaderSettings::loadSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_Binary);
+
+    // load number of channels
+    ui->spNumOfChannels->setValue(
+        settings->value(SG_Binary_NumOfChannels, numOfChannels()).toInt());
+
+    // load number format
+    NumberFormat nfSetting =
+        strToNumberFormat(settings->value(SG_Binary_NumberFormat,
+                                          QString()).toString());
+    if (nfSetting == NumberFormat_INVALID) nfSetting = numberFormat();
+    ui->nfBox->setSelection(nfSetting);
+
+    // load endianness
+    QString endiannessSetting =
+        settings->value(SG_Binary_Endianness, QString()).toString();
+    if (endiannessSetting == "little")
+    {
+        ui->endiBox->setSelection(LittleEndian);
+    }
+    else if (endiannessSetting == "big")
+    {
+        ui->endiBox->setSelection(BigEndian);
+    } // else don't change
+
+    settings->endGroup();
 }

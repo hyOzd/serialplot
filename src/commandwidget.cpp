@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2016 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -101,6 +101,11 @@ bool CommandWidget::isASCIIMode()
     return ui->pbASCII->isChecked();
 }
 
+void CommandWidget::setASCIIMode(bool enabled)
+{
+    ui->pbASCII->setChecked(enabled);
+}
+
 void CommandWidget::setName(QString name)
 {
     ui->leName->setText(name);
@@ -119,4 +124,15 @@ void CommandWidget::setFocusToEdit()
 QAction* CommandWidget::sendAction()
 {
     return &_sendAction;
+}
+
+QString CommandWidget::commandText()
+{
+    return ui->leCommand->text();
+}
+
+void CommandWidget::setCommandText(QString str)
+{
+    ui->leCommand->selectAll();
+    ui->leCommand->insert(str);
 }

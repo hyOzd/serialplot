@@ -48,3 +48,15 @@ Endianness EndiannessBox::currentSelection()
         return BigEndian;
     }
 }
+
+void EndiannessBox::setSelection(Endianness endianness)
+{
+    if (endianness == LittleEndian)
+    {
+        ui->rbLittleE->setChecked(true);
+    }
+    else // big endian
+    {
+        ui->rbBigE->setChecked(true);
+    }
+}

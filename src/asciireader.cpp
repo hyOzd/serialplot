@@ -159,3 +159,13 @@ void AsciiReader::onDataReady()
         emit dataAdded();
     }
 }
+
+void AsciiReader::saveSettings(QSettings* settings)
+{
+    _settingsWidget.saveSettings(settings);
+}
+
+void AsciiReader::loadSettings(QSettings* settings)
+{
+    _settingsWidget.loadSettings(settings);
+}

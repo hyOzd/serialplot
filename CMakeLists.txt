@@ -115,6 +115,7 @@ add_executable(${PROGRAM_NAME} WIN32
   src/framedreader.cpp
   src/framedreadersettings.cpp
   src/plotmanager.cpp
+  src/numberformat.cpp
   misc/windows_icon.rc
   ${UI_FILES}
   ${RES_FILES}

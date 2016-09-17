@@ -25,6 +25,7 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QList>
+#include <QSettings>
 
 #include <qwt_plot_curve.h>
 #include "plot.h"
@@ -50,6 +51,10 @@ public:
     unsigned numOfCurves();
     /// Returns the list of actions to be inserted into the `View` menu
     QList<QAction*> menuActions();
+    /// Stores plot settings into a `QSettings`.
+    void saveSettings(QSettings* settings);
+    /// Loads plot settings from a `QSettings`.
+    void loadSettings(QSettings* settings);
 
 public slots:
     /// Enable/Disable multiple plot display

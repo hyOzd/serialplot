@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2016 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -23,10 +23,20 @@
 #include <QSerialPortInfo>
 #include <QKeySequence>
 #include <QLabel>
+#include <QMap>
 #include <QtDebug>
+
+#include "setting_defines.h"
 #include "utils.h"
 
 #define TBPORTLIST_MINWIDTH (200)
+
+// setting mappings
+const QMap<QSerialPort::Parity, QString> paritySettingMap({
+        {QSerialPort::NoParity, "none"},
+        {QSerialPort::OddParity, "odd"},
+        {QSerialPort::EvenParity, "even"},
+    });
 
 PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     QWidget(parent),
@@ -273,6 +283,22 @@ void PortControl::selectPort(QString portName)
     }
 }
 
+QString PortControl::selectedPortName()
+{
+    QString portText = ui->cbPortList->currentText();
+    int portIndex = portList.indexOf(portText);
+    if (portIndex < 0) // not in the list yet
+    {
+        // return the displayed name as port name
+        return portText;
+    }
+    else
+    {
+        // get the port name from the 'port list'
+        return static_cast<PortListItem*>(portList.item(portIndex))->portName();
+    }
+}
+
 QToolBar* PortControl::toolBar()
 {
     return &portToolBar;
@@ -291,4 +317,103 @@ void PortControl::onCbPortListActivated(int index)
 void PortControl::onTbPortListActivated(int index)
 {
     ui->cbPortList->setCurrentIndex(index);
+}
+
+QString PortControl::currentParityText()
+{
+    return paritySettingMap.value(
+        (QSerialPort::Parity) parityButtons.checkedId());
+}
+
+QString PortControl::currentFlowControlText()
+{
+    if (flowControlButtons.checkedId() == QSerialPort::HardwareControl)
+    {
+        return "hardware";
+    }
+    else if (flowControlButtons.checkedId() == QSerialPort::SoftwareControl)
+    {
+        return "software";
+    }
+    else // no parity
+    {
+        return "none";
+    }
+}
+
+void PortControl::saveSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_Port);
+    settings->setValue(SG_Port_SelectedPort, selectedPortName());
+    settings->setValue(SG_Port_BaudRate, ui->cbBaudRate->currentText());
+    settings->setValue(SG_Port_Parity, currentParityText());
+    settings->setValue(SG_Port_DataBits, dataBitsButtons.checkedId());
+    settings->setValue(SG_Port_StopBits, stopBitsButtons.checkedId());
+    settings->setValue(SG_Port_FlowControl, currentFlowControlText());
+    settings->endGroup();
+}
+
+void PortControl::loadSettings(QSettings* settings)
+{
+    // make sure the port is closed
+    if (serialPort->isOpen()) togglePort();
+
+    settings->beginGroup(SettingGroup_Port);
+
+    // set port name if it exists in the current list otherwise ignore
+    QString portName = settings->value(SG_Port_SelectedPort, QString()).toString();
+    if (!portName.isEmpty())
+    {
+        int index = portList.indexOfName(portName);
+        if (index > -1) ui->cbPortList->setCurrentIndex(index);
+    }
+
+    // load baud rate setting if it exists in baud rate list
+    QString baudSetting = settings->value(
+        SG_Port_BaudRate, ui->cbBaudRate->currentText()).toString();
+    int baudIndex = ui->cbBaudRate->findText(baudSetting);
+    if (baudIndex > -1) ui->cbBaudRate->setCurrentIndex(baudIndex);
+
+    // load parity setting
+    QString parityText =
+        settings->value(SG_Port_Parity, currentParityText()).toString();
+    QSerialPort::Parity paritySetting = paritySettingMap.key(
+        parityText, (QSerialPort::Parity) parityButtons.checkedId());
+    parityButtons.button(paritySetting)->setChecked(true);
+
+    // load number of bits
+    int dataBits = settings->value(SG_Port_Parity, dataBitsButtons.checkedId()).toInt();
+    if (dataBits >=5 && dataBits <= 8)
+    {
+        dataBitsButtons.button((QSerialPort::DataBits) dataBits)->setChecked(true);
+    }
+
+    // load stop bits
+    int stopBits = settings->value(SG_Port_StopBits, stopBitsButtons.checkedId()).toInt();
+    if (stopBits == QSerialPort::OneStop)
+    {
+        ui->rb1StopBit->setChecked(true);
+    }
+    else if (stopBits == QSerialPort::TwoStop)
+    {
+        ui->rb2StopBit->setChecked(true);
+    }
+
+    // load flow control
+    QString flowControlSetting =
+        settings->value(SG_Port_FlowControl, currentFlowControlText()).toString();
+    if (flowControlSetting == "hardware")
+    {
+        ui->rbHardwareControl->setChecked(true);
+    }
+    else if (flowControlSetting == "software")
+    {
+        ui->rbSoftwareControl->setChecked(true);
+    }
+    else
+    {
+        ui->rbNoFlowControl->setChecked(true);
+    }
+
+    settings->endGroup();
 }
