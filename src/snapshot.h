@@ -42,6 +42,7 @@ public:
     QAction* deleteAction();
 
     QString name();
+    QString displayName(); ///< `name()` plus '*' if snapshot is not saved
     void setName(QString name);
     void setChannelNames(QStringList names); // must be called when setting data!
     QString channelName(unsigned channel);

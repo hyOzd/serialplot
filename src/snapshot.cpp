@@ -26,7 +26,7 @@
 
 Snapshot::Snapshot(QMainWindow* parent, QString name) :
     QObject(parent),
-    _showAction(name, this),
+    _showAction(this),
     _deleteAction("Delete", this)
 {
     _name = name;
@@ -34,6 +34,7 @@ Snapshot::Snapshot(QMainWindow* parent, QString name) :
 
     view = NULL;
     mainWindow = parent;
+    _showAction.setText(displayName());
     connect(&_showAction, &QAction::triggered, this, &Snapshot::show);
 
     _deleteAction.setToolTip(QString("Delete ") + _name);
@@ -84,6 +85,18 @@ void Snapshot::onDeleteTriggered()
 QString Snapshot::name()
 {
     return _name;
+}
+
+QString Snapshot::displayName()
+{
+    if (_saved)
+    {
+        return name();
+    }
+    else
+    {
+        return name() + "*";
+    }
 }
 
 void Snapshot::setName(QString name)
@@ -141,6 +154,7 @@ void Snapshot::save(QString fileName)
         else
         {
             _saved = true;
+            _showAction.setText(displayName());
         }
     }
     else

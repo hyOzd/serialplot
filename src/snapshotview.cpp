@@ -32,7 +32,7 @@ SnapshotView::SnapshotView(QWidget *parent, Snapshot* snapshot) :
     plotMan = new PlotManager(ui->plotArea);
 
     ui->menuSnapshot->insertAction(ui->actionClose, snapshot->deleteAction());
-    this->setWindowTitle(snapshot->name());
+    this->setWindowTitle(snapshot->displayName());
 
     // initialize curves
     unsigned numOfChannels = snapshot->data.size();
@@ -49,6 +49,7 @@ SnapshotView::SnapshotView(QWidget *parent, Snapshot* snapshot) :
     connect(ui->actionExport, &QAction::triggered,
             this, &SnapshotView::save);
 
+    // add 'View' menu items
     for (auto a : plotMan->menuActions())
     {
         ui->menuView->addAction(a);
@@ -79,14 +80,15 @@ void SnapshotView::showRenameDialog()
 void SnapshotView::renameSnapshot(QString name)
 {
     _snapshot->setName(name);
-    setWindowTitle(name);
+    setWindowTitle(_snapshot->displayName());
 }
 
 void SnapshotView::save()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export CSV File"));
-
     if (fileName.isNull()) return; // user canceled
 
     _snapshot->save(fileName);
+
+    setWindowTitle(_snapshot->displayName());
 }
