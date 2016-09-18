@@ -27,7 +27,7 @@
 Snapshot::Snapshot(QMainWindow* parent, QString name) :
     QObject(parent),
     _showAction(this),
-    _deleteAction("Delete", this)
+    _deleteAction("&Delete", this)
 {
     _name = name;
     _saved = false;
