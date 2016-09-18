@@ -110,6 +110,7 @@ void Plot::unzoomed()
 {
     setAxisAutoScale(QwtPlot::xBottom);
     resetAxes();
+    onXScaleChanged();
 }
 
 void Plot::showGrid(bool show)
