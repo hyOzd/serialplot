@@ -69,7 +69,7 @@
         <number>2</number>
        </property>
        <property name="maximum">
-        <number>10000000</number>
+        <number>1000000</number>
        </property>
        <property name="value">
         <number>1000</number>
