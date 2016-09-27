@@ -79,10 +79,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->plotToolBar->addAction(snapshotMan.takeSnapshotAction());
     ui->menuBar->insertMenu(ui->menuHelp->menuAction(), snapshotMan.menu());
     ui->menuBar->insertMenu(ui->menuHelp->menuAction(), commandPanel.menu());
-    connect(commandPanel.newCommandAction(), &QAction::triggered, [this]()
-            {
-                this->ui->tabWidget->setCurrentWidget(&commandPanel);
-            });
 
     connect(&commandPanel, &CommandPanel::focusRequested, [this]()
             {
@@ -212,6 +208,14 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         commandPanel.newCommandAction()->trigger();
     }
+
+    // Important: This should be after newCommandAction is triggered
+    // (above) we don't want user to be greeted with command panel on
+    // the very first run.
+    connect(commandPanel.newCommandAction(), &QAction::triggered, [this]()
+            {
+                this->ui->tabWidget->setCurrentWidget(&commandPanel);
+            });
 }
 
 MainWindow::~MainWindow()
