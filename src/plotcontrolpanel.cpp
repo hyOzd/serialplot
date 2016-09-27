@@ -140,7 +140,8 @@ bool PlotControlPanel::askNSConfirmation(int value)
     QMessageBox mb(QMessageBox::Warning,
                    tr("Confirm Number of Samples"),
                    text,
-                   QMessageBox::Apply | QMessageBox::Cancel);
+                   QMessageBox::Apply | QMessageBox::Cancel,
+                   this);
 
     auto cb = new QCheckBox("Don't show this again.");
     connect(cb, &QCheckBox::stateChanged, [this](int state)
