@@ -18,12 +18,17 @@
 */
 
 #include <QVariant>
+#include <QMessageBox>
+#include <QCheckBox>
 
 #include <math.h>
 
 #include "plotcontrolpanel.h"
 #include "ui_plotcontrolpanel.h"
 #include "setting_defines.h"
+
+/// Confirm if #samples is being set to a value greater than this
+const int NUMSAMPLES_CONFIRM_AT = 10000;
 
 /// Used for scale range selection combobox
 struct Range
@@ -40,6 +45,9 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    warnNumOfSamples = true;    // TODO: load from settings
+    _numOfSamples = ui->spNumOfSamples->value();
+
     // set limits for axis limit boxes
     ui->spYmin->setRange((-1) * std::numeric_limits<double>::max(),
                          std::numeric_limits<double>::max());
@@ -49,7 +57,7 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
 
     // connect signals
     connect(ui->spNumOfSamples, SIGNAL(valueChanged(int)),
-            this, SIGNAL(numOfSamplesChanged(int)));
+            this, SLOT(onNumOfSamples(int)));
 
     connect(ui->cbAutoScale, &QCheckBox::toggled,
             this, &PlotControlPanel::onAutoScaleChecked);
@@ -94,6 +102,55 @@ PlotControlPanel::~PlotControlPanel()
 unsigned PlotControlPanel::numOfSamples()
 {
     return ui->spNumOfSamples->value();
+}
+
+void PlotControlPanel::onNumOfSamples(int value)
+{
+    if (warnNumOfSamples && value > NUMSAMPLES_CONFIRM_AT)
+    {
+        // ask confirmation
+        if (!askNSConfirmation(value))
+        {
+            // revert to old value
+            disconnect(ui->spNumOfSamples, SIGNAL(valueChanged(int)),
+                       this, SLOT(onNumOfSamples(int)));
+
+            ui->spNumOfSamples->setValue(_numOfSamples);
+
+            connect(ui->spNumOfSamples, SIGNAL(valueChanged(int)),
+                    this, SLOT(onNumOfSamples(int)));
+
+            return;
+        }
+    }
+
+    _numOfSamples = value;
+    emit numOfSamplesChanged(value);
+}
+
+bool PlotControlPanel::askNSConfirmation(int value)
+{
+    auto text = tr("Setting number of samples to a too big value "
+                   "(>%1) can seriously impact the performance of "
+                   "the application and cause freezes. Are you sure you "
+                   "want to change the number of samples to %2?")
+        .arg(QString::number(NUMSAMPLES_CONFIRM_AT), QString::number(value));
+
+    // TODO: parent the mainwindow
+    QMessageBox mb(QMessageBox::Warning,
+                   tr("Confirm Number of Samples"),
+                   text,
+                   QMessageBox::Apply | QMessageBox::Cancel);
+
+    auto cb = new QCheckBox("Don't show this again.");
+    connect(cb, &QCheckBox::stateChanged, [this](int state)
+            {
+                warnNumOfSamples = (state == Qt::Unchecked);
+            });
+
+    mb.setCheckBox(cb);
+
+    return mb.exec() == QMessageBox::Apply;
 }
 
 void PlotControlPanel::onAutoScaleChecked(bool checked)

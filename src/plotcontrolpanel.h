@@ -55,7 +55,16 @@ signals:
 private:
     Ui::PlotControlPanel *ui;
 
+    /// Holds 'number of samples' after the confirmation
+    unsigned _numOfSamples;
+    /// User can disable this setting in the checkbox
+    bool warnNumOfSamples;
+
+    /// Show a confirmation dialog before setting #samples to a big value
+    bool askNSConfirmation(int value);
+
 private slots:
+    void onNumOfSamples(int value);
     void onAutoScaleChecked(bool checked);
     void onYScaleChanged();
     void onRangeSelected();
