@@ -22,7 +22,6 @@ include(ExternalProject)
 ExternalProject_Add(QWT
   PREFIX qwt
   SVN_REPOSITORY svn://svn.code.sf.net/p/qwt/code/branches/qwt-6.1
-  # UPDATE_COMMAND ""             # disables the update at every `make` run
   # disable QwtDesigner plugin and enable static build
   PATCH_COMMAND sed -i -r -e "s/QWT_CONFIG\\s*\\+=\\s*QwtDesigner/#&/"
                           -e "s/QWT_CONFIG\\s*\\+=\\s*QwtDll/#&/"
