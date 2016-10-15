@@ -33,8 +33,7 @@ below commands to add ppa to your system and install SerialPlot.
 ### Windows
 
 You can obtain windows installation packages from
-[downloads](https://bitbucket.org/hyOzd/serialplot/downloads)
-section. As of moment there are only 64 bits packages.
+[downloads](https://bitbucket.org/hyOzd/serialplot/downloads) section.
 
 ## Dependencies
 - Qt 5, including SerialPort module
