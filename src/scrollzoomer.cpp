@@ -1,3 +1,12 @@
+/*
+  Copyright © 2014 Uwe Rathmann
+
+  This file is copied from Qwt project; you can redistribute it and/or modify it
+  under the terms of the Qwt License, Version 1.0. You can obtain the original
+  source code and the details of the Qwt License from the Qwt website:
+  http://qwt.sourceforge.net/
+*/
+
 #include <qevent.h>
 #include <qwt_plot_canvas.h>
 #include <qwt_plot_layout.h>
