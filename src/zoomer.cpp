@@ -29,15 +29,21 @@ Zoomer::Zoomer(QWidget* widget, bool doReplot) :
 
 void Zoomer::zoom(int up)
 {
-    if (up == +1)
-    {
-        this->setZoomBase(this->plot());
-    }
-
     ScrollZoomer::zoom(up);
 
     if(zoomRectIndex() == 0)
     {
         emit unzoomed();
     }
+}
+
+void Zoomer::zoom( const QRectF & rect)
+{
+    // set the zoom base when user zooms in to first level
+    if (zoomRectIndex() == 0)
+    {
+        this->setZoomBase(false);
+    }
+
+    ScrollZoomer::zoom(rect);
 }

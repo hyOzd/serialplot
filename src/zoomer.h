@@ -29,6 +29,7 @@ class Zoomer : public ScrollZoomer
 public:
     Zoomer(QWidget *, bool doReplot=true);
     void zoom(int up);
+    void zoom( const QRectF & );
 
 signals:
     void unzoomed();
