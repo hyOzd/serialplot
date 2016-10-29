@@ -22,7 +22,7 @@
 #include <QtDebug>
 
 Zoomer::Zoomer(QWidget* widget, bool doReplot) :
-    QwtPlotZoomer(widget, doReplot)
+    ScrollZoomer(widget)
 {
     // do nothing
 }
@@ -34,7 +34,7 @@ void Zoomer::zoom(int up)
         this->setZoomBase(this->plot());
     }
 
-    QwtPlotZoomer::zoom(up);
+    ScrollZoomer::zoom(up);
 
     if(zoomRectIndex() == 0)
     {

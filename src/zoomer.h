@@ -20,9 +20,9 @@
 #ifndef ZOOMER_H
 #define ZOOMER_H
 
-#include <qwt_plot_zoomer.h>
+#include <scrollzoomer.h>
 
-class Zoomer : public QwtPlotZoomer
+class Zoomer : public ScrollZoomer
 {
     Q_OBJECT
 
