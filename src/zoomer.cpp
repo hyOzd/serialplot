@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2016 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -24,7 +24,12 @@
 Zoomer::Zoomer(QWidget* widget, bool doReplot) :
     ScrollZoomer(widget)
 {
-    // do nothing
+    // set corner widget between the scrollbars with default background color
+    auto cornerWidget = new QWidget();
+    auto bgColor = cornerWidget->palette().color(QPalette::Window).name();
+    auto styleSheet = QString("background-color:%1;").arg(bgColor);
+    cornerWidget->setStyleSheet(styleSheet);
+    ScrollZoomer::setCornerWidget(cornerWidget);
 }
 
 void Zoomer::zoom(int up)
