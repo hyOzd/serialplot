@@ -24,6 +24,9 @@
 #include "tooltipfilter.h"
 #include "version.h"
 
+// test code
+#include <QTableView>
+#include "channelinfomodel.h"
 
 MainWindow* pMainWindow;
 
@@ -50,5 +53,14 @@ int main(int argc, char *argv[])
     qDebug() << "Revision" << VERSION_REVISION;
 
     w.show();
+
+    // test code
+    ChannelInfoModel cim(5, &a);
+    QTableView tv;
+
+    tv.setModel(&cim);
+
+    tv.show();
+
     return a.exec();
 }

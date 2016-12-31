@@ -103,6 +103,7 @@ add_executable(${PROGRAM_NAME} WIN32
   src/tooltipfilter.cpp
   src/sneakylineedit.cpp
   src/channelmanager.cpp
+  src/channelinfomodel.cpp
   src/framebufferseries.cpp
   src/numberformatbox.cpp
   src/endiannessbox.cpp
