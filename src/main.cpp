@@ -55,12 +55,16 @@ int main(int argc, char *argv[])
     w.show();
 
     // test code
-    ChannelInfoModel cim(5, &a);
+    ChannelInfoModel cim(10, &a);
     QTableView tv;
 
     tv.setModel(&cim);
 
     tv.show();
+
+    // cim.setNumOfChannels(3);
+    // cim.setNumOfChannels(10);
+    // cim.setNumOfChannels(7);
 
     return a.exec();
 }

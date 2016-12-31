@@ -146,6 +146,16 @@ void ChannelInfoModel::setNumOfChannels(unsigned number)
 {
     if (number == _numOfChannels) return;
 
+    bool isInserting = number > _numOfChannels;
+    if (isInserting)
+    {
+        beginInsertRows(QModelIndex(), _numOfChannels, number-1);
+    }
+    else
+    {
+        beginRemoveRows(QModelIndex(), number, _numOfChannels-1);
+    }
+
     // we create channel info but never remove channel info to
     // remember user entered info
     if ((int) number > infos.length())
@@ -168,4 +178,13 @@ void ChannelInfoModel::setNumOfChannels(unsigned number)
     }
 
     _numOfChannels = number;
+
+    if (isInserting)
+    {
+        endInsertRows();
+    }
+    else
+    {
+        endRemoveRows();
+    }
 }
