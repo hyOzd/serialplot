@@ -19,6 +19,8 @@
 
 #include "channelinfomodel.h"
 
+#include <QtDebug>
+
 /// name + visibility
 enum ChannelInfoColumn
 {
@@ -44,23 +46,49 @@ int ChannelInfoModel::columnCount(const QModelIndex & parent) const
     return COLUMN_COUNT;
 }
 
+Qt::ItemFlags ChannelInfoModel::flags(const QModelIndex &index) const
+{
+    if (index.column() == COLUMN_NAME)
+    {
+        return Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren;
+    }
+    else if (index.column() == COLUMN_VISIBILITY)
+    {
+        return Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren;
+    }
+
+    return Qt::NoItemFlags;
+}
+
 QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
 {
     // TODO: check role parameter
 
-    if (index.row() < (int) _numOfChannels)
+    if (index.row() >= (int) _numOfChannels)
     {
-        if (index.column() == COLUMN_NAME)
+        return QVariant();
+    }
+
+    if (index.column() == COLUMN_NAME)
+    {
+        if (role == Qt::DisplayRole || role == Qt::EditRole)
         {
             return QVariant(infos[index.row()].name);
         }
-        else if (index.column() == COLUMN_VISIBILITY)
+    }
+    else if (index.column() == COLUMN_VISIBILITY)
+    {
+        if (Qt::CheckStateRole)
         {
-            return QVariant(infos[index.row()].visibility);
+            bool visible = infos[index.row()].visibility;
+            return visible ? Qt::Checked : Qt::Unchecked;
+        }
+        else if (role == Qt::DisplayRole || role == Qt::EditRole)
+        {
+            return QString("");
         }
     }
 
-    // invalid index
     return QVariant();
 }
 
