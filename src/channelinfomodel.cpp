@@ -50,11 +50,11 @@ Qt::ItemFlags ChannelInfoModel::flags(const QModelIndex &index) const
 {
     if (index.column() == COLUMN_NAME)
     {
-        return Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren;
+        return Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren | Qt::ItemIsSelectable;
     }
     else if (index.column() == COLUMN_VISIBILITY)
     {
-        return Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren;
+        return Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren | Qt::ItemIsSelectable;
     }
 
     return Qt::NoItemFlags;
@@ -62,8 +62,6 @@ Qt::ItemFlags ChannelInfoModel::flags(const QModelIndex &index) const
 
 QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
 {
-    // TODO: check role parameter
-
     if (index.row() >= (int) _numOfChannels)
     {
         return QVariant();
@@ -78,14 +76,10 @@ QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
     }
     else if (index.column() == COLUMN_VISIBILITY)
     {
-        if (Qt::CheckStateRole)
+        if (role == Qt::CheckStateRole)
         {
             bool visible = infos[index.row()].visibility;
             return visible ? Qt::Checked : Qt::Unchecked;
-        }
-        else if (role == Qt::DisplayRole || role == Qt::EditRole)
-        {
-            return QString("");
         }
     }
 
@@ -94,23 +88,30 @@ QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
 
 bool ChannelInfoModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    // TODO: check role
-
-    if (index.row() < (int) _numOfChannels)
+    if (index.row() >= (int) _numOfChannels)
     {
-        if (index.column() == COLUMN_NAME)
+        return false;
+    }
+
+    if (index.column() == COLUMN_NAME)
+    {
+        if (role == Qt::DisplayRole || role == Qt::EditRole)
         {
             infos[index.row()].name = value.toString();
             return true;
         }
-        else if (index.column() == COLUMN_VISIBILITY)
+    }
+    else if (index.column() == COLUMN_VISIBILITY)
+    {
+        if (role == Qt::CheckStateRole)
         {
-            infos[index.row()].visibility = value.toBool();
+            bool checked = value.toInt() == Qt::Checked;
+            infos[index.row()].visibility = checked;
             return true;
         }
     }
 
-    // invalid index
+    // invalid index/role
     return false;
 }
 
