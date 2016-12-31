@@ -123,7 +123,7 @@ add_executable(${PROGRAM_NAME} WIN32
 
 # Use the Widgets module from Qt 5.
 target_link_libraries(${PROGRAM_NAME} ${QWT_LIBRARY})
-qt5_use_modules(${PROGRAM_NAME} Widgets SerialPort Svg)
+qt5_use_modules(${PROGRAM_NAME} Widgets SerialPort)
 
 if (BUILD_QWT)
   add_dependencies(${PROGRAM_NAME} QWT)
