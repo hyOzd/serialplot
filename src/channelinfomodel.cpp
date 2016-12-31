@@ -21,7 +21,6 @@
 
 #include <QtDebug>
 
-/// name + visibility
 enum ChannelInfoColumn
 {
     COLUMN_NAME = 0,
@@ -162,7 +161,7 @@ void ChannelInfoModel::setNumOfChannels(unsigned number)
     {
         for (unsigned ci = _numOfChannels; ci < number; ci++)
         {
-            infos.append({QString("Channel %1").arg(ci), true});
+            infos.append({QString("Channel %1").arg(ci+1), true});
         }
     }
 
