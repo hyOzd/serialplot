@@ -86,6 +86,33 @@ QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
+QVariant ChannelInfoModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (orientation == Qt::Horizontal)
+    {
+        if (role == Qt::DisplayRole)
+        {
+            if (section == COLUMN_NAME)
+            {
+                return tr("Channel");
+            }
+            else if (section == COLUMN_VISIBILITY)
+            {
+                return tr("Visible");
+            }
+        }
+    }
+    else                        // vertical
+    {
+        if (section < (int) _numOfChannels && role == Qt::DisplayRole)
+        {
+            return QString::number(section + 1);
+        }
+    }
+
+    return QVariant();
+}
+
 bool ChannelInfoModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if (index.row() >= (int) _numOfChannels)
