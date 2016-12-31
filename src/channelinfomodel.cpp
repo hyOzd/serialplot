@@ -96,7 +96,7 @@ void ChannelInfoModel::setNumOfChannels(unsigned number)
     {
         for (unsigned ci = _numOfChannels; ci < number; ci++)
         {
-            infos.append({QString("Channel %d").arg(ci), true});
+            infos.append({QString("Channel %1").arg(ci), true});
         }
     }
 
