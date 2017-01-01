@@ -28,7 +28,8 @@ ExternalProject_Add(QWT
                           -e "s/QWT_CONFIG\\s*\\+=\\s*QwtSvg/#&/"
                           -e "s/QWT_CONFIG\\s*\\+=\\s*QwtOpenGL/#&/"
 						  -e "s|QWT_INSTALL_PREFIX\\s*=.*|QWT_INSTALL_PREFIX = <INSTALL_DIR>|"
-							 <SOURCE_DIR>/qwtconfig.pri
+                             <SOURCE_DIR>/qwtconfig.pri
+  UPDATE_COMMAND ""
   CONFIGURE_COMMAND qmake <SOURCE_DIR>/qwt.pro
   )
 

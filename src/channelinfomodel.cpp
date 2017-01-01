@@ -19,14 +19,10 @@
 
 #include "channelinfomodel.h"
 
-#include <QColor>
-#include <QtDebug>
-
 enum ChannelInfoColumn
 {
     COLUMN_NAME = 0,
     COLUMN_VISIBILITY,
-    COLUMN_COLOR,
     COLUMN_COUNT
 };
 
@@ -69,46 +65,38 @@ Qt::ItemFlags ChannelInfoModel::flags(const QModelIndex &index) const
     {
         return Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren | Qt::ItemIsSelectable;
     }
-    else if (index.column() == COLUMN_COLOR)
-    {
-        return Qt::ItemIsEnabled | Qt::ItemNeverHasChildren | Qt::ItemIsSelectable;
-    }
 
     return Qt::NoItemFlags;
 }
 
 QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
 {
+    // check index
     if (index.row() >= (int) _numOfChannels)
     {
         return QVariant();
     }
 
+    // get color
+    if (role == Qt::ForegroundRole)
+    {
+        return infos[index.row()].color;
+    }
+
+    // get name
     if (index.column() == COLUMN_NAME)
     {
         if (role == Qt::DisplayRole || role == Qt::EditRole)
         {
             return QVariant(infos[index.row()].name);
         }
-        else if (role == Qt::ForegroundRole)
-        {
-            // TODO: support more colors than 8
-            return colors[index.row() % 8];
-        }
-    }
+    } // get visibility
     else if (index.column() == COLUMN_VISIBILITY)
     {
         if (role == Qt::CheckStateRole)
         {
             bool visible = infos[index.row()].visibility;
             return visible ? Qt::Checked : Qt::Unchecked;
-        }
-    }
-    else if (index.column() == COLUMN_COLOR)
-    {
-        if (role == Qt::ForegroundRole || role == Qt::BackgroundRole)
-        {
-            return colors[index.row() % 8];
         }
     }
 
@@ -129,10 +117,6 @@ QVariant ChannelInfoModel::headerData(int section, Qt::Orientation orientation, 
             {
                 return tr("Visible");
             }
-            else if (section == COLUMN_COLOR)
-            {
-                return tr("Color");
-            }
         }
     }
     else                        // vertical
@@ -148,11 +132,21 @@ QVariant ChannelInfoModel::headerData(int section, Qt::Orientation orientation, 
 
 bool ChannelInfoModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
+    // check index
     if (index.row() >= (int) _numOfChannels)
     {
         return false;
     }
 
+    // set color
+    if (role == Qt::ForegroundRole)
+    {
+        infos[index.row()].color = value.value<QColor>();
+        emit dataChanged(index, index, QVector<int>({Qt::ForegroundRole}));
+        return true;
+    }
+
+    // set name
     if (index.column() == COLUMN_NAME)
     {
         if (role == Qt::DisplayRole || role == Qt::EditRole)
@@ -160,7 +154,7 @@ bool ChannelInfoModel::setData(const QModelIndex &index, const QVariant &value, 
             infos[index.row()].name = value.toString();
             return true;
         }
-    }
+    } // set visibility
     else if (index.column() == COLUMN_VISIBILITY)
     {
         if (role == Qt::CheckStateRole)
@@ -195,7 +189,7 @@ void ChannelInfoModel::setNumOfChannels(unsigned number)
     {
         for (unsigned ci = _numOfChannels; ci < number; ci++)
         {
-            infos.append({QString("Channel %1").arg(ci+1), true});
+            infos.append({QString("Channel %1").arg(ci+1), true, colors[ci % 8]});
         }
     }
 

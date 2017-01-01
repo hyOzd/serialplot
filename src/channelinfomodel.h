@@ -21,7 +21,7 @@
 #define CHANNELINFOMODEL_H
 
 #include <QAbstractTableModel>
-#include <QStringList>
+#include <QColor>
 
 class ChannelInfoModel : public QAbstractTableModel
 {
@@ -45,6 +45,7 @@ private:
     {
         QString name;
         bool visibility;
+        QColor color;
     };
 
     unsigned _numOfChannels;     ///< @note this is not necessarily the length of `infos`
