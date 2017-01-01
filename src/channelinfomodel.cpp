@@ -19,13 +19,6 @@
 
 #include "channelinfomodel.h"
 
-enum ChannelInfoColumn
-{
-    COLUMN_NAME = 0,
-    COLUMN_VISIBILITY,
-    COLUMN_COUNT
-};
-
 const QColor colors[8] =
 {
     QColor(237,97,68),
@@ -152,6 +145,7 @@ bool ChannelInfoModel::setData(const QModelIndex &index, const QVariant &value, 
         if (role == Qt::DisplayRole || role == Qt::EditRole)
         {
             infos[index.row()].name = value.toString();
+            emit dataChanged(index, index, QVector<int>({role}));
             return true;
         }
     } // set visibility
@@ -161,6 +155,7 @@ bool ChannelInfoModel::setData(const QModelIndex &index, const QVariant &value, 
         {
             bool checked = value.toInt() == Qt::Checked;
             infos[index.row()].visibility = checked;
+            emit dataChanged(index, index, QVector<int>({role}));
             return true;
         }
     }

@@ -38,7 +38,7 @@
       </layout>
      </item>
      <item>
-      <widget class="QListView" name="lvChannelNames">
+      <widget class="QTableView" name="tvChannelInfo">
        <property name="maximumSize">
         <size>
          <width>16777215</width>

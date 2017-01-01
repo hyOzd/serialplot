@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -21,12 +21,13 @@
 #define CHANNELMANAGER_H
 
 #include <QObject>
-#include <QStringListModel>
+#include <QStringList>
 #include <QModelIndex>
 #include <QVector>
 #include <QSettings>
 
 #include "framebuffer.h"
+#include "channelinfomodel.h"
 
 class ChannelManager : public QObject
 {
@@ -38,12 +39,16 @@ public:
     unsigned numOfChannels();
     unsigned numOfSamples();
     FrameBuffer* channelBuffer(unsigned channel);
-    QStringListModel* channelNames();
+    // QStringListModel* channelNames();
     QString channelName(unsigned channel);
     /// Stores channel names into a `QSettings`
     void saveSettings(QSettings* settings);
     /// Loads channel names from a `QSettings`.
     void loadSettings(QSettings* settings);
+    /// Returns a model that manages channel information (name, color etc)
+    ChannelInfoModel* infoModel();
+    /// Returns a list of channel names
+    QStringList channelNames();
 
 signals:
     void numOfChannelsChanged(unsigned value);
@@ -53,21 +58,21 @@ signals:
 public slots:
     void setNumOfChannels(unsigned number);
     void setNumOfSamples(unsigned number);
-    void setChannelName(unsigned channel, QString name);
     void addChannelData(unsigned channel, double* data, unsigned size);
 
 private:
     unsigned _numOfChannels;
     unsigned _numOfSamples;
     QList<FrameBuffer*> channelBuffers;
-    QStringListModel _channelNames;
+    // QStringListModel _channelNames;
+    ChannelInfoModel _infoModel;
 
     void addChannelName(QString name); ///< appends a new channel name at the end of list
 
 private slots:
-    void onChannelNameDataChange(const QModelIndex & topLeft,
-                                 const QModelIndex & bottomRight,
-                                 const QVector<int> & roles = QVector<int> ());
+    void onChannelInfoChanged(const QModelIndex & topLeft,
+                              const QModelIndex & bottomRight,
+                              const QVector<int> & roles = QVector<int> ());
 };
 
 #endif // CHANNELMANAGER_H

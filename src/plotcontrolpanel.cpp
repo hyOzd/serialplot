@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -23,6 +23,7 @@
 
 #include <math.h>
 
+#include "color_selector.hpp"
 #include "plotcontrolpanel.h"
 #include "ui_plotcontrolpanel.h"
 #include "setting_defines.h"
@@ -204,9 +205,27 @@ void PlotControlPanel::onRangeSelected()
     ui->cbAutoScale->setChecked(false);
 }
 
-void PlotControlPanel::setChannelNamesModel(QAbstractItemModel * model)
+void PlotControlPanel::setChannelInfoModel(ChannelInfoModel* model)
 {
-    ui->lvChannelNames->setModel(model);
+    ui->tvChannelInfo->setModel(model);
+
+    // channel color selector
+    QObject::connect(ui->tvChannelInfo->selectionModel(), &QItemSelectionModel::currentRowChanged,
+                     [this](const QModelIndex &current, const QModelIndex &previous)
+                     {
+                         auto model = ui->tvChannelInfo->model();
+                         QColor color = model->data(current, Qt::ForegroundRole).value<QColor>();
+                         ui->colorSelector->setColor(color);
+                         // cpicker.setColor(cim.data(current, Qt::ForegroundRole).value<QColor>());
+                     });
+
+    QObject::connect(ui->colorSelector, &color_widgets::ColorSelector::colorChanged,
+                     [this](QColor color)
+                     {
+                         auto index = ui->tvChannelInfo->selectionModel()->currentIndex();
+                         // index = index.sibling(index.row(), 0);
+                         ui->tvChannelInfo->model()->setData(index, color, Qt::ForegroundRole);
+                     });
 }
 
 void PlotControlPanel::saveSettings(QSettings* settings)

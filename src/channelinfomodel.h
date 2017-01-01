@@ -28,6 +28,13 @@ class ChannelInfoModel : public QAbstractTableModel
     Q_OBJECT
 
 public:
+    enum ChannelInfoColumn
+    {
+        COLUMN_NAME = 0,
+        COLUMN_VISIBILITY,
+        COLUMN_COUNT
+    };
+
     explicit ChannelInfoModel(unsigned numberOfChannels, QObject *parent = 0);
 
     // implemented from QAbstractItemModel

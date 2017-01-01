@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -172,7 +172,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&channelMan, &ChannelManager::channelNameChanged,
             this, &MainWindow::onChannelNameChanged);
 
-    plotControlPanel.setChannelNamesModel(channelMan.channelNames());
+    plotControlPanel.setChannelInfoModel(channelMan.infoModel());
 
     // init curve list
     for (unsigned int i = 0; i < numOfChannels; i++)

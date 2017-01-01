@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -21,8 +21,9 @@
 #define PLOTCONTROLPANEL_H
 
 #include <QWidget>
-#include <QAbstractItemModel>
 #include <QSettings>
+
+#include "channelinfomodel.h"
 
 namespace Ui {
 class PlotControlPanel;
@@ -41,7 +42,7 @@ public:
     double yMax();
     double yMin();
 
-    void setChannelNamesModel(QAbstractItemModel * model);
+    void setChannelInfoModel(ChannelInfoModel* model);
 
     /// Stores plot settings into a `QSettings`
     void saveSettings(QSettings* settings);

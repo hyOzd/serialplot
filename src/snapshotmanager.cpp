@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -76,7 +76,7 @@ Snapshot* SnapshotManager::makeSnapshot()
             snapshot->data[ci][i] = QPointF(i, _channelMan->channelBuffer(ci)->sample(i));
         }
     }
-    snapshot->setChannelNames(_channelMan->channelNames()->stringList());
+    snapshot->setChannelNames(_channelMan->channelNames());
 
     return snapshot;
 }
