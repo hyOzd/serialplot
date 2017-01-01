@@ -19,6 +19,7 @@
 
 #include "channelinfomodel.h"
 
+#include <QColor>
 #include <QtDebug>
 
 enum ChannelInfoColumn
@@ -26,6 +27,18 @@ enum ChannelInfoColumn
     COLUMN_NAME = 0,
     COLUMN_VISIBILITY,
     COLUMN_COUNT
+};
+
+const QColor colors[8] =
+{
+    QColor(237,97,68),
+    QColor(92,200,96),
+    QColor(225,98,207),
+    QColor(163,195,58),
+    QColor(148,123,239),
+    QColor(212,182,52),
+    QColor(238,82,133),
+    QColor(219,136,44)
 };
 
 ChannelInfoModel::ChannelInfoModel(unsigned numberOfChannels, QObject* parent) :
@@ -71,6 +84,11 @@ QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
         if (role == Qt::DisplayRole || role == Qt::EditRole)
         {
             return QVariant(infos[index.row()].name);
+        }
+        else if (role == Qt::ForegroundRole)
+        {
+            // TODO: support more colors than 8
+            return colors[index.row() % 8];
         }
     }
     else if (index.column() == COLUMN_VISIBILITY)
