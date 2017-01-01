@@ -26,6 +26,7 @@ enum ChannelInfoColumn
 {
     COLUMN_NAME = 0,
     COLUMN_VISIBILITY,
+    COLUMN_COLOR,
     COLUMN_COUNT
 };
 
@@ -68,6 +69,10 @@ Qt::ItemFlags ChannelInfoModel::flags(const QModelIndex &index) const
     {
         return Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren | Qt::ItemIsSelectable;
     }
+    else if (index.column() == COLUMN_COLOR)
+    {
+        return Qt::ItemIsEnabled | Qt::ItemNeverHasChildren | Qt::ItemIsSelectable;
+    }
 
     return Qt::NoItemFlags;
 }
@@ -99,6 +104,13 @@ QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
             return visible ? Qt::Checked : Qt::Unchecked;
         }
     }
+    else if (index.column() == COLUMN_COLOR)
+    {
+        if (role == Qt::ForegroundRole || role == Qt::BackgroundRole)
+        {
+            return colors[index.row() % 8];
+        }
+    }
 
     return QVariant();
 }
@@ -116,6 +128,10 @@ QVariant ChannelInfoModel::headerData(int section, Qt::Orientation orientation, 
             else if (section == COLUMN_VISIBILITY)
             {
                 return tr("Visible");
+            }
+            else if (section == COLUMN_COLOR)
+            {
+                return tr("Color");
             }
         }
     }
