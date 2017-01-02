@@ -93,6 +93,11 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
 
     QObject::connect(ui->cbRangePresets, SIGNAL(activated(int)),
                      this, SLOT(onRangeSelected()));
+
+    // color selector starts disabled until a channel is selected
+    ui->colorSelector->setColor(QColor(0,0,0,0));
+    ui->colorSelector->setDisplayMode(color_widgets::ColorPreview::AllAlpha);
+    ui->colorSelector->setDisabled(true);
 }
 
 PlotControlPanel::~PlotControlPanel()
@@ -213,9 +218,24 @@ void PlotControlPanel::setChannelInfoModel(ChannelInfoModel* model)
     connect(ui->tvChannelInfo->selectionModel(), &QItemSelectionModel::currentRowChanged,
             [this](const QModelIndex &current, const QModelIndex &previous)
             {
-                auto model = ui->tvChannelInfo->model();
-                QColor color = model->data(current, Qt::ForegroundRole).value<QColor>();
+                // TODO: duplicate with below lambda
+                QColor color(0,0,0,0); // transparent
+
+                if (current.isValid())
+                {
+                    ui->colorSelector->setEnabled(true);
+                    auto model = ui->tvChannelInfo->model();
+                    color = model->data(current, Qt::ForegroundRole).value<QColor>();
+                }
+                else
+                {
+                    ui->colorSelector->setDisabled(true);
+                }
+
+                // temporarily block signals because `setColor` emits `colorChanged`
+                bool wasBlocked = ui->colorSelector->blockSignals(true);
                 ui->colorSelector->setColor(color);
+                ui->colorSelector->blockSignals(wasBlocked);
             });
 
     connect(ui->colorSelector, &color_widgets::ColorSelector::colorChanged,
