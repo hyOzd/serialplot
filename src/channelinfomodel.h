@@ -22,6 +22,7 @@
 
 #include <QAbstractTableModel>
 #include <QColor>
+#include <QSettings>
 
 class ChannelInfoModel : public QAbstractTableModel
 {
@@ -46,6 +47,10 @@ public:
     QVariant      headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
     void setNumOfChannels(unsigned number);
+    /// Stores all channel info into a `QSettings`
+    void saveSettings(QSettings* settings);
+    /// Loads all channel info from a `QSettings`.
+    void loadSettings(QSettings* settings);
 
 private:
     struct ChannelInfo

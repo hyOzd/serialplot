@@ -18,6 +18,7 @@
 */
 
 #include "channelinfomodel.h"
+#include "setting_defines.h"
 
 const QColor colors[8] =
 {
@@ -209,4 +210,56 @@ void ChannelInfoModel::setNumOfChannels(unsigned number)
     {
         endRemoveRows();
     }
+}
+
+void ChannelInfoModel::saveSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_Channels);
+    settings->beginWriteArray(SG_Channels_Channel);
+
+    // save all channel information regardless of current number of channels
+    for (unsigned ci = 0; (int) ci < infos.length(); ci++)
+    {
+        settings->setArrayIndex(ci);
+        settings->setValue(SG_Channels_Name, infos[ci].name);
+        settings->setValue(SG_Channels_Color, infos[ci].color);
+        settings->setValue(SG_Channels_Visible, infos[ci].visibility);
+    }
+
+    settings->endArray();
+    settings->endGroup();
+}
+
+void ChannelInfoModel::loadSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_Channels);
+    unsigned size = settings->beginReadArray(SG_Channels_Channel);
+
+    for (unsigned ci = 0; ci < size; ci++)
+    {
+        settings->setArrayIndex(ci);
+
+        ChannelInfo chanInfo;
+        chanInfo.name       = settings->value(SG_Channels_Name,
+                                              QString(tr("Channel %1")).arg(ci+1)).toString();
+        chanInfo.color      = settings->value(SG_Channels_Color, colors[ci % 8]).value<QColor>();
+        chanInfo.visibility = settings->value(SG_Channels_Visible, true).toBool();
+
+        if ((int) ci >= infos.size())
+        {
+            infos.append(chanInfo);
+        }
+        else
+        {
+            infos[ci] = chanInfo;
+
+            auto roles = QVector<int>({
+                    Qt::DisplayRole, Qt::EditRole, Qt::ForegroundRole, Qt::CheckStateRole});
+
+            emit dataChanged(index(ci, 0), index(ci, COLUMN_COUNT-1), roles);
+        }
+    }
+
+    settings->endArray();
+    settings->endGroup();
 }

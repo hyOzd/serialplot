@@ -169,27 +169,10 @@ void ChannelManager::addChannelData(unsigned channel, double* data, unsigned siz
 
 void ChannelManager::saveSettings(QSettings* settings)
 {
-    settings->beginGroup(SettingGroup_Channels);
-    settings->beginWriteArray(SG_Channels_Channel);
-    for (unsigned i = 0; i < numOfChannels(); i++)
-    {
-        settings->setArrayIndex(i);
-        settings->setValue(SG_Channels_Name, channelName(i));
-    }
-    settings->endArray();
-    settings->endGroup();
+    _infoModel.saveSettings(settings);
 }
 
 void ChannelManager::loadSettings(QSettings* settings)
 {
-    settings->beginGroup(SettingGroup_Channels);
-    settings->beginReadArray(SG_Channels_Channel);
-    for (unsigned i = 0; i < numOfChannels(); i++)
-    {
-        settings->setArrayIndex(i);
-        // TODO: fix load settings
-        // setChannelName(i, settings->value(SG_Channels_Name, channelName(i)).toString());
-    }
-    settings->endArray();
-    settings->endGroup();
+    _infoModel.loadSettings(settings);
 }
