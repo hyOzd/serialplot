@@ -52,6 +52,16 @@ public:
     /// Loads all channel info from a `QSettings`.
     void loadSettings(QSettings* settings);
 
+public slots:
+    /// reset all channel info (names, color etc.)
+    void resetInfos();
+    /// reset all channel names
+    void resetNames();
+    /// reset all channel colors
+    void resetColors();
+    /// reset visibility
+    void resetVisibility();
+
 private:
     struct ChannelInfo
     {

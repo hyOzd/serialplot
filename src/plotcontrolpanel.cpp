@@ -42,7 +42,12 @@ Q_DECLARE_METATYPE(Range);
 
 PlotControlPanel::PlotControlPanel(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::PlotControlPanel)
+    ui(new Ui::PlotControlPanel),
+    resetAct(tr("Reset"), this),
+    resetNamesAct(tr("Reset Names"), this),
+    resetColorsAct(tr("Reset Colors"), this),
+    showAllAct(tr("Show All"), this),
+    resetMenu(tr("Reset Menu"), this)
 {
     ui->setupUi(this);
 
@@ -98,6 +103,13 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
     ui->colorSelector->setColor(QColor(0,0,0,0));
     ui->colorSelector->setDisplayMode(color_widgets::ColorPreview::AllAlpha);
     ui->colorSelector->setDisabled(true);
+
+    // reset button
+    resetMenu.addAction(&resetNamesAct);
+    resetMenu.addAction(&resetColorsAct);
+    resetMenu.addAction(&showAllAct);
+    resetAct.setMenu(&resetMenu);
+    ui->tbReset->setDefaultAction(&resetAct);
 }
 
 PlotControlPanel::~PlotControlPanel()
@@ -275,6 +287,12 @@ void PlotControlPanel::setChannelInfoModel(ChannelInfoModel* model)
                 ui->colorSelector->setColor(color);
                 ui->colorSelector->blockSignals(wasBlocked);
             });
+
+    // reset actions
+    connect(&resetAct, &QAction::triggered, model, &ChannelInfoModel::resetInfos);
+    connect(&resetNamesAct, &QAction::triggered, model, &ChannelInfoModel::resetNames);
+    connect(&resetColorsAct, &QAction::triggered, model, &ChannelInfoModel::resetColors);
+    connect(&showAllAct, &QAction::triggered, model, &ChannelInfoModel::resetVisibility);
 }
 
 void PlotControlPanel::saveSettings(QSettings* settings)

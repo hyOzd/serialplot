@@ -212,6 +212,46 @@ void ChannelInfoModel::setNumOfChannels(unsigned number)
     }
 }
 
+void ChannelInfoModel::resetInfos()
+{
+    beginResetModel();
+    for (unsigned ci = 0; (int) ci < infos.length(); ci++)
+    {
+        infos[ci] = {QString("Channel %1").arg(ci+1), true, colors[ci % 8]};
+    }
+    endResetModel();
+}
+
+void ChannelInfoModel::resetNames()
+{
+    beginResetModel();
+    for (unsigned ci = 0; (int) ci < infos.length(); ci++)
+    {
+        infos[ci].name = QString("Channel %1").arg(ci+1);
+    }
+    endResetModel();
+}
+
+void ChannelInfoModel::resetColors()
+{
+    beginResetModel();
+    for (unsigned ci = 0; (int) ci < infos.length(); ci++)
+    {
+        infos[ci].color = colors[ci % 8];
+    }
+    endResetModel();
+}
+
+void ChannelInfoModel::resetVisibility()
+{
+    beginResetModel();
+    for (unsigned ci = 0; (int) ci < infos.length(); ci++)
+    {
+        infos[ci].visibility = true;
+    }
+    endResetModel();
+}
+
 void ChannelInfoModel::saveSettings(QSettings* settings)
 {
     settings->beginGroup(SettingGroup_Channels);

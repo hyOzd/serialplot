@@ -22,6 +22,8 @@
 
 #include <QWidget>
 #include <QSettings>
+#include <QAction>
+#include <QMenu>
 
 #include "channelinfomodel.h"
 
@@ -60,6 +62,9 @@ private:
     unsigned _numOfSamples;
     /// User can disable this setting in the checkbox
     bool warnNumOfSamples;
+
+    QAction resetAct, resetNamesAct, resetColorsAct, showAllAct;
+    QMenu resetMenu;
 
     /// Show a confirmation dialog before setting #samples to a big value
     bool askNSConfirmation(int value);
