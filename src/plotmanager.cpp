@@ -18,6 +18,7 @@
 */
 
 #include <QtDebug>
+#include "qwt_symbol.h"
 
 #include "plot.h"
 #include "plotmanager.h"
@@ -133,6 +134,7 @@ void PlotManager::onChannelInfoChanged(const QModelIndex &topLeft,
         // replot only updated widgets
         if (isMulti)
         {
+            plotWidgets[ci]->updateSymbols(); // required for color change
             plotWidgets[ci]->replot();
         }
     }
@@ -140,6 +142,7 @@ void PlotManager::onChannelInfoChanged(const QModelIndex &topLeft,
     // replot single widget
     if (!isMulti)
     {
+        plotWidgets[0]->updateSymbols();
         replot();
     }
 }

@@ -37,27 +37,13 @@ class Plot : public QwtPlot
 {
     Q_OBJECT
 
+    friend class PlotManager;
+
 public:
     Plot(QWidget* parent = 0);
     ~Plot();
 
     static QColor makeColor(unsigned int channelIndex);
-
-private:
-    bool isAutoScaled;
-    double yMin, yMax;
-    int symbolSize;
-    Zoomer zoomer;
-    ScaleZoomer sZoomer;
-    QwtPlotGrid grid;
-    PlotSnapshotOverlay* snapshotOverlay;
-    QwtPlotLegendItem legend;
-    QwtPlotTextLabel demoIndicator;
-
-    /// update the display of symbols depending on `symbolSize`
-    void updateSymbols();
-    void resetAxes();
-    void resizeEvent(QResizeEvent * event);
 
 public slots:
     void showGrid(bool show = true);
@@ -76,6 +62,24 @@ public slots:
     void flashSnapshotOverlay(bool light);
 
     void onNumOfSamplesChanged(unsigned value);
+
+protected:
+    /// update the display of symbols depending on `symbolSize`
+    void updateSymbols();
+
+private:
+    bool isAutoScaled;
+    double yMin, yMax;
+    int symbolSize;
+    Zoomer zoomer;
+    ScaleZoomer sZoomer;
+    QwtPlotGrid grid;
+    PlotSnapshotOverlay* snapshotOverlay;
+    QwtPlotLegendItem legend;
+    QwtPlotTextLabel demoIndicator;
+
+    void resetAxes();
+    void resizeEvent(QResizeEvent * event);
 
 private slots:
     void unzoomed();
