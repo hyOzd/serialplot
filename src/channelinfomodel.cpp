@@ -66,7 +66,7 @@ Qt::ItemFlags ChannelInfoModel::flags(const QModelIndex &index) const
 QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
 {
     // check index
-    if (index.row() >= (int) _numOfChannels)
+    if (index.row() >= (int) _numOfChannels || index.row() < 0)
     {
         return QVariant();
     }
@@ -127,7 +127,7 @@ QVariant ChannelInfoModel::headerData(int section, Qt::Orientation orientation, 
 bool ChannelInfoModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     // check index
-    if (index.row() >= (int) _numOfChannels)
+    if (index.row() >= (int) _numOfChannels || index.row() < 0)
     {
         return false;
     }
@@ -245,18 +245,20 @@ void ChannelInfoModel::loadSettings(QSettings* settings)
         chanInfo.color      = settings->value(SG_Channels_Color, colors[ci % 8]).value<QColor>();
         chanInfo.visibility = settings->value(SG_Channels_Visible, true).toBool();
 
-        if ((int) ci >= infos.size())
-        {
-            infos.append(chanInfo);
-        }
-        else
+        if ((int) ci < infos.size())
         {
             infos[ci] = chanInfo;
 
-            auto roles = QVector<int>({
+            if (ci < _numOfChannels)
+            {
+                auto roles = QVector<int>({
                     Qt::DisplayRole, Qt::EditRole, Qt::ForegroundRole, Qt::CheckStateRole});
-
-            emit dataChanged(index(ci, 0), index(ci, COLUMN_COUNT-1), roles);
+                emit dataChanged(index(ci, 0), index(ci, COLUMN_COUNT-1), roles);
+            }
+        }
+        else
+        {
+            infos.append(chanInfo);
         }
     }
 

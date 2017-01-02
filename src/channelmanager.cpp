@@ -140,7 +140,6 @@ void ChannelManager::onChannelInfoChanged(const QModelIndex & topLeft,
                 case Qt::EditRole:
                     if (col == ChannelInfoModel::COLUMN_NAME)
                     {
-                        qDebug() << channelName(ci);
                         emit channelNameChanged(ci, channelName(ci));
                     }
                     break;

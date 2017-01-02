@@ -210,22 +210,37 @@ void PlotControlPanel::setChannelInfoModel(ChannelInfoModel* model)
     ui->tvChannelInfo->setModel(model);
 
     // channel color selector
-    QObject::connect(ui->tvChannelInfo->selectionModel(), &QItemSelectionModel::currentRowChanged,
-                     [this](const QModelIndex &current, const QModelIndex &previous)
-                     {
-                         auto model = ui->tvChannelInfo->model();
-                         QColor color = model->data(current, Qt::ForegroundRole).value<QColor>();
-                         ui->colorSelector->setColor(color);
-                         // cpicker.setColor(cim.data(current, Qt::ForegroundRole).value<QColor>());
-                     });
+    connect(ui->tvChannelInfo->selectionModel(), &QItemSelectionModel::currentRowChanged,
+            [this](const QModelIndex &current, const QModelIndex &previous)
+            {
+                auto model = ui->tvChannelInfo->model();
+                QColor color = model->data(current, Qt::ForegroundRole).value<QColor>();
+                ui->colorSelector->setColor(color);
+            });
 
-    QObject::connect(ui->colorSelector, &color_widgets::ColorSelector::colorChanged,
-                     [this](QColor color)
-                     {
-                         auto index = ui->tvChannelInfo->selectionModel()->currentIndex();
-                         // index = index.sibling(index.row(), 0);
-                         ui->tvChannelInfo->model()->setData(index, color, Qt::ForegroundRole);
-                     });
+    connect(ui->colorSelector, &color_widgets::ColorSelector::colorChanged,
+            [this](QColor color)
+            {
+                auto index = ui->tvChannelInfo->selectionModel()->currentIndex();
+                ui->tvChannelInfo->model()->setData(index, color, Qt::ForegroundRole);
+            });
+
+    connect(model, &QAbstractItemModel::dataChanged,
+            [this](const QModelIndex & topLeft, const QModelIndex & bottomRight, const QVector<int> & roles = QVector<int> ())
+            {
+                auto current = ui->tvChannelInfo->selectionModel()->currentIndex();
+
+                // no current selection
+                if (!current.isValid()) return;
+
+                auto mod = ui->tvChannelInfo->model();
+                QColor color = mod->data(current, Qt::ForegroundRole).value<QColor>();
+
+                // temporarily block signals because `setColor` emits `colorChanged`
+                bool wasBlocked = ui->colorSelector->blockSignals(true);
+                ui->colorSelector->setColor(color);
+                ui->colorSelector->blockSignals(wasBlocked);
+            });
 }
 
 void PlotControlPanel::saveSettings(QSettings* settings)
