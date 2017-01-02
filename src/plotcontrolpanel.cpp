@@ -238,6 +238,20 @@ void PlotControlPanel::setChannelInfoModel(ChannelInfoModel* model)
                 ui->colorSelector->blockSignals(wasBlocked);
             });
 
+    connect(ui->tvChannelInfo->selectionModel(), &QItemSelectionModel::selectionChanged,
+            [this](const QItemSelection & selected, const QItemSelection & deselected)
+            {
+                if (!selected.length())
+                {
+                    ui->colorSelector->setDisabled(true);
+
+                    // temporarily block signals because `setColor` emits `colorChanged`
+                    bool wasBlocked = ui->colorSelector->blockSignals(true);
+                    ui->colorSelector->setColor(QColor(0,0,0,0));
+                    ui->colorSelector->blockSignals(wasBlocked);
+                }
+            });
+
     connect(ui->colorSelector, &color_widgets::ColorSelector::colorChanged,
             [this](QColor color)
             {
