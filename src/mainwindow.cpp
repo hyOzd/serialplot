@@ -66,7 +66,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    plotMan = new PlotManager(ui->plotArea);
+    plotMan = new PlotManager(ui->plotArea, channelMan.infoModel());
 
     ui->tabWidget->insertTab(0, &portControl, "Port");
     ui->tabWidget->insertTab(1, &dataFormatPanel, "Data Format");
@@ -376,7 +376,7 @@ void MainWindow::onChannelNameChanged(unsigned channel, QString name)
     // since `onNumOfChannelsChanged` slot will update curve list.
     if (channel < plotMan->numOfCurves()) // check if channel exists in curve list
     {
-        plotMan->setTitle(channel, name);
+        // plotMan->setTitle(channel, name);
     }
 }
 

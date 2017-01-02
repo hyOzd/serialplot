@@ -126,7 +126,6 @@ void ChannelManager::onChannelInfoChanged(const QModelIndex & topLeft,
                                           const QModelIndex & bottomRight,
                                           const QVector<int> & roles)
 {
-    Q_UNUSED(roles);
     int start = topLeft.row();
     int end = bottomRight.row();
     int col = topLeft.column();
