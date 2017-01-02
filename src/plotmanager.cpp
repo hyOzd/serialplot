@@ -93,6 +93,14 @@ PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject
     {
         connect(_infoModel, &QAbstractItemModel::dataChanged,
                 this, &PlotManager::onChannelInfoChanged);
+
+        connect(_infoModel, &QAbstractItemModel::modelReset,
+                [this]()
+                {
+                    onChannelInfoChanged(_infoModel->index(0, 0), // start
+                                         _infoModel->index(_infoModel->rowCount()-1, 0), // end
+                                         {}); // roles ignored
+                });
     }
 }
 
@@ -121,8 +129,6 @@ void PlotManager::onChannelInfoChanged(const QModelIndex &topLeft,
 
     for (int ci = start; ci <= end; ci++)
     {
-        qDebug() << "ci:" << ci << "curves.size:" << curves.size() << "plotWidgets.size:" << plotWidgets.size();
-
         QString name = topLeft.sibling(ci, ChannelInfoModel::COLUMN_NAME).data(Qt::EditRole).toString();
         QColor color = topLeft.sibling(ci, ChannelInfoModel::COLUMN_NAME).data(Qt::ForegroundRole).value<QColor>();
         bool visible = topLeft.sibling(ci, ChannelInfoModel::COLUMN_VISIBILITY).data(Qt::CheckStateRole).toBool();
