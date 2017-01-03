@@ -143,7 +143,11 @@ void PlotManager::onChannelInfoChanged(const QModelIndex &topLeft,
         {
             plotWidgets[ci]->updateSymbols(); // required for color change
             plotWidgets[ci]->updateLegend(curves[ci]);
-            plotWidgets[ci]->replot();
+            plotWidgets[ci]->setVisible(visible);
+            if (visible)
+            {
+                plotWidgets[ci]->replot();
+            }
         }
     }
 
