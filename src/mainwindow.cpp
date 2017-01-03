@@ -463,6 +463,11 @@ void MainWindow::messageHandler(QtMsgType type,
     {
         ui->statusBar->showMessage(msg, 5000);
     }
+
+    if (type == QtFatalMsg)
+    {
+        __builtin_trap();
+    }
 }
 
 void MainWindow::saveAllSettings(QSettings* settings)

@@ -79,6 +79,7 @@ void ChannelManager::setNumOfChannels(unsigned number)
         }
     }
 
+    _numOfChannels = number;
     _infoModel.setNumOfChannels(number);
 
     emit numOfChannelsChanged(number);
