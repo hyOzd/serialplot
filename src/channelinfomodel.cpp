@@ -20,16 +20,42 @@
 #include "channelinfomodel.h"
 #include "setting_defines.h"
 
-const QColor colors[8] =
+#define NUMOF_COLORS  (32)
+
+const QColor colors[NUMOF_COLORS] =
 {
-    QColor(237,97,68),
-    QColor(92,200,96),
-    QColor(225,98,207),
-    QColor(163,195,58),
-    QColor(148,123,239),
-    QColor(212,182,52),
-    QColor(238,82,133),
-    QColor(219,136,44)
+    QColor("#ff0056"),
+    QColor("#7e2dd2"),
+    QColor("#00ae7e"),
+    QColor("#fe8900"),
+    QColor("#ff937e"),
+    QColor("#6a826c"),
+    QColor("#ff029d"),
+    QColor("#00b917"),
+    QColor("#7a4782"),
+    QColor("#85a900"),
+    QColor("#a42400"),
+    QColor("#683d3b"),
+    QColor("#bdc6ff"),
+    QColor("#263400"),
+    QColor("#bdd393"),
+    QColor("#d5ff00"),
+    QColor("#9e008e"),
+    QColor("#001544"),
+    QColor("#c28c9f"),
+    QColor("#ff74a3"),
+    QColor("#01d0ff"),
+    QColor("#004754"),
+    QColor("#e56ffe"),
+    QColor("#788231"),
+    QColor("#0e4ca1"),
+    QColor("#91d0cb"),
+    QColor("#be9970"),
+    QColor("#968ae8"),
+    QColor("#bb8800"),
+    QColor("#43002c"),
+    QColor("#deff74"),
+    QColor("#00ffc6")
 };
 
 ChannelInfoModel::ChannelInfoModel(unsigned numberOfChannels, QObject* parent) :
@@ -37,6 +63,13 @@ ChannelInfoModel::ChannelInfoModel(unsigned numberOfChannels, QObject* parent) :
 {
     _numOfChannels = 0;
     setNumOfChannels(numberOfChannels);
+}
+
+ChannelInfoModel::ChannelInfo::ChannelInfo(unsigned index)
+{
+    name = tr("Channel %1").arg(index + 1);
+    visibility = true;
+    color = colors[index % NUMOF_COLORS];
 }
 
 int ChannelInfoModel::rowCount(const QModelIndex &parent) const
@@ -185,7 +218,7 @@ void ChannelInfoModel::setNumOfChannels(unsigned number)
     {
         for (unsigned ci = _numOfChannels; ci < number; ci++)
         {
-            infos.append({QString("Channel %1").arg(ci+1), true, colors[ci % 8]});
+            infos.append(ChannelInfo(ci));
         }
     }
 
@@ -217,7 +250,7 @@ void ChannelInfoModel::resetInfos()
     beginResetModel();
     for (unsigned ci = 0; (int) ci < infos.length(); ci++)
     {
-        infos[ci] = {QString("Channel %1").arg(ci+1), true, colors[ci % 8]};
+        infos[ci] = ChannelInfo(ci);
     }
     endResetModel();
 }
@@ -227,7 +260,7 @@ void ChannelInfoModel::resetNames()
     beginResetModel();
     for (unsigned ci = 0; (int) ci < infos.length(); ci++)
     {
-        infos[ci].name = QString("Channel %1").arg(ci+1);
+        infos[ci].name = ChannelInfo(ci).name;
     }
     endResetModel();
 }
@@ -237,7 +270,7 @@ void ChannelInfoModel::resetColors()
     beginResetModel();
     for (unsigned ci = 0; (int) ci < infos.length(); ci++)
     {
-        infos[ci].color = colors[ci % 8];
+        infos[ci].color = ChannelInfo(ci).color;
     }
     endResetModel();
 }
@@ -279,10 +312,9 @@ void ChannelInfoModel::loadSettings(QSettings* settings)
     {
         settings->setArrayIndex(ci);
 
-        ChannelInfo chanInfo;
-        chanInfo.name       = settings->value(SG_Channels_Name,
-                                              QString(tr("Channel %1")).arg(ci+1)).toString();
-        chanInfo.color      = settings->value(SG_Channels_Color, colors[ci % 8]).value<QColor>();
+        ChannelInfo chanInfo(ci);
+        chanInfo.name       = settings->value(SG_Channels_Name, chanInfo.name).toString();
+        chanInfo.color      = settings->value(SG_Channels_Color, chanInfo.color).value<QColor>();
         chanInfo.visibility = settings->value(SG_Channels_Visible, true).toBool();
 
         if ((int) ci < infos.size())

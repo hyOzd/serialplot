@@ -65,6 +65,8 @@ public slots:
 private:
     struct ChannelInfo
     {
+        explicit ChannelInfo(unsigned index);
+
         QString name;
         bool visibility;
         QColor color;
@@ -74,7 +76,7 @@ private:
 
     /**
      * Channel info is added here but never removed so that we can
-     * remember user entered names.
+     * remember user entered info (names, colors etc.).
      */
     QList<ChannelInfo> infos;
 };
