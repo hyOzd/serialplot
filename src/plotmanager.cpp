@@ -136,11 +136,13 @@ void PlotManager::onChannelInfoChanged(const QModelIndex &topLeft,
         curves[ci]->setTitle(name);
         curves[ci]->setPen(color);
         curves[ci]->setVisible(visible);
+        curves[ci]->setItemAttribute(QwtPlotItem::Legend, visible);
 
         // replot only updated widgets
         if (isMulti)
         {
             plotWidgets[ci]->updateSymbols(); // required for color change
+            plotWidgets[ci]->updateLegend(curves[ci]);
             plotWidgets[ci]->replot();
         }
     }
@@ -149,6 +151,7 @@ void PlotManager::onChannelInfoChanged(const QModelIndex &topLeft,
     if (!isMulti)
     {
         plotWidgets[0]->updateSymbols();
+        plotWidgets[0]->updateLegend();
         replot();
     }
 }
