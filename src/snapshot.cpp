@@ -107,6 +107,11 @@ void Snapshot::setName(QString name)
     emit nameChanged(this);
 }
 
+ChannelInfoModel* Snapshot::infoModel()
+{
+    return &cInfoModel;
+}
+
 QString Snapshot::channelName(unsigned channel)
 {
     return cInfoModel.data(cInfoModel.index(channel, ChannelInfoModel::COLUMN_NAME),

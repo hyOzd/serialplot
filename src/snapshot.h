@@ -45,6 +45,7 @@ public:
 
     QString name();
     QString displayName(); ///< `name()` plus '*' if snapshot is not saved
+    ChannelInfoModel* infoModel();
     void setName(QString name);
     QString channelName(unsigned channel);
 
