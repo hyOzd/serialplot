@@ -41,7 +41,7 @@ Plot::Plot(QWidget* parent) :
 
     QObject::connect(&zoomer, &Zoomer::unzoomed, this, &Plot::unzoomed);
 
-    zoomer.setZoomBase();
+    zoomer.setZoomBase(QRectF(0,-1,2,500));
     grid.attach(this);
     legend.attach(this);
 

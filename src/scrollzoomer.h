@@ -52,6 +52,9 @@ public:
 
     virtual void rescale();
 
+public Q_SLOTS:
+    virtual void moveTo( const QPointF & );
+
 protected:
     virtual ScrollBar *scrollBar( Qt::Orientation );
     virtual void updateScrollBars();
@@ -61,6 +64,8 @@ private Q_SLOTS:
     void scrollBarMoved( Qt::Orientation o, double min, double max );
 
 private:
+    QRectF d_limits;
+
     bool needScrollBar( Qt::Orientation ) const;
     int oppositeAxis( int ) const;
 
