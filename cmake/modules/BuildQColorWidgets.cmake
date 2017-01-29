@@ -22,6 +22,7 @@ include(ExternalProject)
 ExternalProject_Add(QCW
   PREFIX qcw
   GIT_REPOSITORY https://github.com/mbasaglia/Qt-Color-Widgets
+  PATCH_COMMAND patch -p1 -i ${CMAKE_CURRENT_LIST_DIR}/qt_5_2_moc_creation_namespace_fix.diff
   INSTALL_COMMAND "")
 
 ExternalProject_Get_Property(QCW binary_dir source_dir)
