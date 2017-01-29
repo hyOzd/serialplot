@@ -27,6 +27,8 @@
 #include <QString>
 #include <QStringList>
 
+#include "channelinfomodel.h"
+
 class SnapshotView;
 
 class Snapshot : public QObject
@@ -34,7 +36,7 @@ class Snapshot : public QObject
     Q_OBJECT
 
 public:
-    Snapshot(QMainWindow* parent, QString name);
+    Snapshot(QMainWindow* parent, QString name, ChannelInfoModel infoModel);
     ~Snapshot();
 
     QVector<QVector<QPointF>> data;
@@ -44,7 +46,6 @@ public:
     QString name();
     QString displayName(); ///< `name()` plus '*' if snapshot is not saved
     void setName(QString name);
-    void setChannelNames(QStringList names); // must be called when setting data!
     QString channelName(unsigned channel);
 
     void save(QString fileName); ///< save snapshot data as CSV
@@ -56,7 +57,7 @@ signals:
 
 private:
     QString _name;
-    QStringList _channelNames;
+    ChannelInfoModel cInfoModel;
     QAction _showAction;
     QAction _deleteAction;
     QMainWindow* mainWindow;

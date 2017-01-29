@@ -65,6 +65,32 @@ ChannelInfoModel::ChannelInfoModel(unsigned numberOfChannels, QObject* parent) :
     setNumOfChannels(numberOfChannels);
 }
 
+ChannelInfoModel::ChannelInfoModel(const ChannelInfoModel& other) :
+    ChannelInfoModel(other.rowCount(), other.parent())
+{
+    for (int i = 0; i < other.rowCount(); i++)
+    {
+        setData(index(i, COLUMN_NAME),
+                other.data(other.index(i, COLUMN_NAME), Qt::EditRole),
+                Qt::EditRole);
+        setData(index(i, COLUMN_NAME),
+                other.data(other.index(i, COLUMN_NAME), Qt::ForegroundRole),
+                Qt::ForegroundRole);
+        setData(index(i, COLUMN_VISIBILITY),
+                other.data(other.index(i, COLUMN_VISIBILITY), Qt::CheckStateRole),
+                Qt::CheckStateRole);
+    }
+}
+
+ChannelInfoModel::ChannelInfoModel(const QStringList& channelNames) :
+    ChannelInfoModel(channelNames.length(), NULL)
+{
+    for (int i = 0; i < channelNames.length(); i++)
+    {
+        setData(index(i, COLUMN_NAME), channelNames[i], Qt::EditRole);
+    }
+}
+
 ChannelInfoModel::ChannelInfo::ChannelInfo(unsigned index)
 {
     name = tr("Channel %1").arg(index + 1);

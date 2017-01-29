@@ -24,8 +24,9 @@
 #include "snapshot.h"
 #include "snapshotview.h"
 
-Snapshot::Snapshot(QMainWindow* parent, QString name) :
+Snapshot::Snapshot(QMainWindow* parent, QString name, ChannelInfoModel infoModel) :
     QObject(parent),
+    cInfoModel(infoModel),
     _showAction(this),
     _deleteAction("&Delete", this)
 {
@@ -106,14 +107,10 @@ void Snapshot::setName(QString name)
     emit nameChanged(this);
 }
 
-void Snapshot::setChannelNames(QStringList names)
-{
-    _channelNames = names;
-}
-
 QString Snapshot::channelName(unsigned channel)
 {
-    return _channelNames[channel];
+    return cInfoModel.data(cInfoModel.index(channel, ChannelInfoModel::COLUMN_NAME),
+                           Qt::DisplayRole).toString();
 }
 
 void Snapshot::save(QString fileName)

@@ -23,6 +23,7 @@
 #include <QAbstractTableModel>
 #include <QColor>
 #include <QSettings>
+#include <QStringList>
 
 class ChannelInfoModel : public QAbstractTableModel
 {
@@ -37,6 +38,8 @@ public:
     };
 
     explicit ChannelInfoModel(unsigned numberOfChannels, QObject *parent = 0);
+    ChannelInfoModel(const ChannelInfoModel& other);
+    explicit ChannelInfoModel(const QStringList& channelNames);
 
     // implemented from QAbstractItemModel
     int           rowCount(const QModelIndex &parent = QModelIndex()) const;
