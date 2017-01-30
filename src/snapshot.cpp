@@ -114,8 +114,7 @@ ChannelInfoModel* Snapshot::infoModel()
 
 QString Snapshot::channelName(unsigned channel)
 {
-    return cInfoModel.data(cInfoModel.index(channel, ChannelInfoModel::COLUMN_NAME),
-                           Qt::DisplayRole).toString();
+    return cInfoModel.name(channel);
 }
 
 void Snapshot::save(QString fileName)

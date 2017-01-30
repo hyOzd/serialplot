@@ -276,8 +276,7 @@ void PlotManager::_addCurve(QwtPlotCurve* curve)
     curves.append(curve);
 
     unsigned index = curves.size()-1;
-    auto color = _infoModel->index(index, ChannelInfoModel::COLUMN_NAME)\
-        .data(Qt::ForegroundRole).value<QColor>();
+    auto color = _infoModel->color(index);
     curve->setPen(color);
 
     // create the plot for the curve if we are on multi display
