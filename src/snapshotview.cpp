@@ -46,7 +46,7 @@ SnapshotView::SnapshotView(QWidget *parent, Snapshot* snapshot) :
     connect(ui->actionRename, &QAction::triggered,
             this, &SnapshotView::showRenameDialog);
 
-    connect(ui->actionExport, &QAction::triggered,
+    connect(ui->actionSave, &QAction::triggered,
             this, &SnapshotView::save);
 
     // add 'View' menu items
