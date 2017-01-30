@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2016 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -20,15 +20,16 @@
 #ifndef ZOOMER_H
 #define ZOOMER_H
 
-#include <qwt_plot_zoomer.h>
+#include <scrollzoomer.h>
 
-class Zoomer : public QwtPlotZoomer
+class Zoomer : public ScrollZoomer
 {
     Q_OBJECT
 
 public:
     Zoomer(QWidget *, bool doReplot=true);
     void zoom(int up);
+    void zoom( const QRectF & );
 
 signals:
     void unzoomed();

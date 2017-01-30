@@ -67,7 +67,7 @@ Plot::Plot(QWidget* parent) :
     demoText.setColor(QColor("white"));
     demoText.setBackgroundBrush(Qt::darkRed);
     demoText.setBorderRadius(4);
-    demoText.setRenderFlags(Qt::AlignLeft | Qt::AlignTop);
+    demoText.setRenderFlags(Qt::AlignLeft | Qt::AlignBottom);
     demoIndicator.setText(demoText);
     demoIndicator.hide();
     demoIndicator.attach(this);

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2016 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -22,22 +22,33 @@
 #include <QtDebug>
 
 Zoomer::Zoomer(QWidget* widget, bool doReplot) :
-    QwtPlotZoomer(widget, doReplot)
+    ScrollZoomer(widget)
 {
-    // do nothing
+    // set corner widget between the scrollbars with default background color
+    auto cornerWidget = new QWidget();
+    auto bgColor = cornerWidget->palette().color(QPalette::Window).name();
+    auto styleSheet = QString("background-color:%1;").arg(bgColor);
+    cornerWidget->setStyleSheet(styleSheet);
+    ScrollZoomer::setCornerWidget(cornerWidget);
 }
 
 void Zoomer::zoom(int up)
 {
-    if (up == +1)
-    {
-        this->setZoomBase(this->plot());
-    }
-
-    QwtPlotZoomer::zoom(up);
+    ScrollZoomer::zoom(up);
 
     if(zoomRectIndex() == 0)
     {
         emit unzoomed();
     }
+}
+
+void Zoomer::zoom( const QRectF & rect)
+{
+    // set the zoom base when user zooms in to first level
+    if (zoomRectIndex() == 0)
+    {
+        this->setZoomBase(false);
+    }
+
+    ScrollZoomer::zoom(rect);
 }

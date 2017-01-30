@@ -88,6 +88,8 @@ add_executable(${PROGRAM_NAME} WIN32
   src/portcontrol.cpp
   src/plot.cpp
   src/zoomer.cpp
+  src/scrollzoomer.cpp
+  src/scrollbar.cpp
   src/hidabletabwidget.cpp
   src/framebuffer.cpp
   src/scalepicker.cpp
