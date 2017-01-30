@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -21,8 +21,11 @@
 #define PLOTCONTROLPANEL_H
 
 #include <QWidget>
-#include <QAbstractItemModel>
 #include <QSettings>
+#include <QAction>
+#include <QMenu>
+
+#include "channelinfomodel.h"
 
 namespace Ui {
 class PlotControlPanel;
@@ -41,7 +44,7 @@ public:
     double yMax();
     double yMin();
 
-    void setChannelNamesModel(QAbstractItemModel * model);
+    void setChannelInfoModel(ChannelInfoModel* model);
 
     /// Stores plot settings into a `QSettings`
     void saveSettings(QSettings* settings);
@@ -59,6 +62,9 @@ private:
     unsigned _numOfSamples;
     /// User can disable this setting in the checkbox
     bool warnNumOfSamples;
+
+    QAction resetAct, resetNamesAct, resetColorsAct, showAllAct;
+    QMenu resetMenu;
 
     /// Show a confirmation dialog before setting #samples to a big value
     bool askNSConfirmation(int value);

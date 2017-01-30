@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -23,7 +23,6 @@
 #include "mainwindow.h"
 #include "tooltipfilter.h"
 #include "version.h"
-
 
 MainWindow* pMainWindow;
 
@@ -50,5 +49,6 @@ int main(int argc, char *argv[])
     qDebug() << "Revision" << VERSION_REVISION;
 
     w.show();
+
     return a.exec();
 }

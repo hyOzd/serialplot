@@ -70,6 +70,8 @@ const char SG_CustomFrame_DebugMode[] = "debugMode";
 // channel manager keys
 const char SG_Channels_Channel[] = "channel";
 const char SG_Channels_Name[] = "name";
+const char SG_Channels_Color[] = "color";
+const char SG_Channels_Visible[] = "visible";
 
 // plot settings keys
 const char SG_Plot_NumOfSamples[] = "numOfSamples";

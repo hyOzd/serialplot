@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -63,7 +63,7 @@ SnapshotManager::~SnapshotManager()
 Snapshot* SnapshotManager::makeSnapshot()
 {
     QString name = QTime::currentTime().toString("'Snapshot ['HH:mm:ss']'");
-    auto snapshot = new Snapshot(_mainWindow, name);
+    auto snapshot = new Snapshot(_mainWindow, name, *(_channelMan->infoModel()));
 
     unsigned numOfChannels = _channelMan->numOfChannels();
     unsigned numOfSamples = _channelMan->numOfSamples();
@@ -76,7 +76,6 @@ Snapshot* SnapshotManager::makeSnapshot()
             snapshot->data[ci][i] = QPointF(i, _channelMan->channelBuffer(ci)->sample(i));
         }
     }
-    snapshot->setChannelNames(_channelMan->channelNames()->stringList());
 
     return snapshot;
 }
@@ -189,9 +188,11 @@ void SnapshotManager::loadSnapshotFromFile(QString fileName)
         lineNum++;
     }
 
-    auto snapshot = new Snapshot(_mainWindow, QFileInfo(fileName).baseName());
+    ChannelInfoModel channelInfo(channelNames);
+
+    auto snapshot = new Snapshot(
+        _mainWindow, QFileInfo(fileName).baseName(), ChannelInfoModel(channelNames));
     snapshot->data = data;
-    snapshot->setChannelNames(channelNames);
 
     addSnapshot(snapshot, false);
 }

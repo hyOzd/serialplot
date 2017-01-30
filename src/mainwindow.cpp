@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -66,7 +66,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    plotMan = new PlotManager(ui->plotArea);
+    plotMan = new PlotManager(ui->plotArea, channelMan.infoModel());
 
     ui->tabWidget->insertTab(0, &portControl, "Port");
     ui->tabWidget->insertTab(1, &dataFormatPanel, "Data Format");
@@ -172,7 +172,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&channelMan, &ChannelManager::channelNameChanged,
             this, &MainWindow::onChannelNameChanged);
 
-    plotControlPanel.setChannelNamesModel(channelMan.channelNames());
+    plotControlPanel.setChannelInfoModel(channelMan.infoModel());
 
     // init curve list
     for (unsigned int i = 0; i < numOfChannels; i++)
@@ -376,7 +376,7 @@ void MainWindow::onChannelNameChanged(unsigned channel, QString name)
     // since `onNumOfChannelsChanged` slot will update curve list.
     if (channel < plotMan->numOfCurves()) // check if channel exists in curve list
     {
-        plotMan->setTitle(channel, name);
+        // plotMan->setTitle(channel, name);
     }
 }
 
@@ -462,6 +462,11 @@ void MainWindow::messageHandler(QtMsgType type,
     if (type != QtDebugMsg && ui != NULL)
     {
         ui->statusBar->showMessage(msg, 5000);
+    }
+
+    if (type == QtFatalMsg)
+    {
+        __builtin_trap();
     }
 }
 
