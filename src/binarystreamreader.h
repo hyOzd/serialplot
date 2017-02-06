@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -64,9 +64,6 @@ private:
      * calling this function.
      */
     template<typename T> double readSampleAs();
-
-    // `data` contains i th channels data
-    void addChannelData(unsigned int channel, double* data, unsigned size);
 
 private slots:
     void onNumberFormatChanged(NumberFormat numberFormat);

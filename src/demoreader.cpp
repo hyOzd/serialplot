@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -76,13 +76,15 @@ void DemoReader::demoTimerTimeout()
 
     if (!paused)
     {
+        double* samples = new double[_numOfChannels];
         for (unsigned ci = 0; ci < _numOfChannels; ci++)
         {
             // we are calculating the fourier components of square wave
-            double value = 4*sin(2*M_PI*double((ci+1)*count)/period)/((2*(ci+1))*M_PI);
-            _channelMan->addChannelData(ci, &value, 1);
+            samples[ci] = 4*sin(2*M_PI*double((ci+1)*count)/period)/((2*(ci+1))*M_PI);
             sampleCount++;
         }
+        _channelMan->addData(samples, _numOfChannels);
+        delete[] samples;
         emit dataAdded();
     }
 }

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -142,21 +142,24 @@ void AsciiReader::onDataReady()
         }
 
         // parse read line
+        double* channelSamples = new double[_numOfChannels]();
         for (unsigned ci = 0; ci < numReadChannels; ci++)
         {
             bool ok;
-            double channelSample = separatedValues[ci].toDouble(&ok);
-            if (ok)
-            {
-                _channelMan->addChannelData(ci, &channelSample, 1);
-                sampleCount++;
-            }
-            else
+            channelSamples[ci] = separatedValues[ci].toDouble(&ok);
+            if (!ok)
             {
                 qWarning() << "Data parsing error for channel: " << ci;
+                channelSamples[ci] = 0;
             }
         }
+
+        // commit data
+        _channelMan->addData(channelSamples, _numOfChannels);
+        sampleCount += numReadChannels;
         emit dataAdded();
+
+        delete[] channelSamples;
     }
 }
 

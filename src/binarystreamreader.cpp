@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -171,12 +171,8 @@ void BinaryStreamReader::onDataReady()
         }
     }
 
-    for (unsigned int ci = 0; ci < _numOfChannels; ci++)
-    {
-        addChannelData(ci,
-                       channelSamples + ci*numOfPackagesToRead,
-                       numOfPackagesToRead);
-    }
+    _channelMan->addData(channelSamples, numOfPackagesToRead*_numOfChannels);
+    sampleCount += numOfPackagesToRead*_numOfChannels;
     emit dataAdded();
 
     delete[] channelSamples;
@@ -198,13 +194,6 @@ template<typename T> double BinaryStreamReader::readSampleAs()
     }
 
     return double(data);
-}
-
-void BinaryStreamReader::addChannelData(unsigned int channel,
-                                        double* data, unsigned size)
-{
-    _channelMan->addChannelData(channel, data, size);
-    sampleCount += size;
 }
 
 void BinaryStreamReader::saveSettings(QSettings* settings)

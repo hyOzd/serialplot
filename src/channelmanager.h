@@ -58,7 +58,18 @@ signals:
 public slots:
     void setNumOfChannels(unsigned number);
     void setNumOfSamples(unsigned number);
-    void addChannelData(unsigned channel, double* data, unsigned size);
+    /**
+     * Add data for all channels.
+     *
+     * All channels data is provided in a single array which contains equal
+     * number of samples for all channels. Structure is as shown below:
+     *
+     * [CH0_SMP0, CH0_SMP1 ... CH0_SMPN, CH1_SMP0, CH1_SMP1, ... , CHN_SMPN]
+     *
+     * @param data samples for all channels
+     * @param size size of `data`, must be multiple of `numOfChannels`
+     */
+    void addData(double* data, unsigned size);
 
 private:
     unsigned _numOfChannels;

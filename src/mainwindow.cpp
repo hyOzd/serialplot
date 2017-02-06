@@ -149,6 +149,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&(this->serialPort), SIGNAL(error(QSerialPort::SerialPortError)),
                      this, SLOT(onPortError(QSerialPort::SerialPortError)));
 
+    // TODO: `replot` must be triggered from ChannelManager
     // init data format and reader
     QObject::connect(&dataFormatPanel, &DataFormatPanel::dataAdded,
                      plotMan, &PlotManager::replot);

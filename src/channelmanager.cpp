@@ -161,9 +161,15 @@ void ChannelManager::onChannelInfoChanged(const QModelIndex & topLeft,
     }
 }
 
-void ChannelManager::addChannelData(unsigned channel, double* data, unsigned size)
+void ChannelManager::addData(double* data, unsigned size)
 {
-    channelBuffer(channel)->addSamples(data, size);
+    Q_ASSERT(size % _numOfChannels == 0);
+
+    int n = size / _numOfChannels;
+    for (unsigned ci = 0; ci < _numOfChannels; ci++)
+    {
+        channelBuffers[ci]->addSamples(&data[ci*n], n);
+    }
 }
 
 void ChannelManager::saveSettings(QSettings* settings)
