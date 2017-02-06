@@ -99,7 +99,6 @@ private slots:
 
     void onNumOfSamplesChanged(int value);
     void onNumOfChannelsChanged(unsigned value);
-    void onChannelNameChanged(unsigned channel, QString name);
 
     void clearPlot();
     void onSpsChanged(unsigned sps);

@@ -82,9 +82,6 @@ private:
     bool paused;
 
     DemoReader demoReader;
-
-    // `data` contains i th channels data
-    void addChannelData(unsigned int channel, double* data, unsigned size);
 };
 
 #endif // DATAFORMATPANEL_H

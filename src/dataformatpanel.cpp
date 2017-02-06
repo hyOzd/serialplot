@@ -111,12 +111,6 @@ void DataFormatPanel::enableDemo(bool enabled)
     }
 }
 
-void DataFormatPanel::addChannelData(unsigned int channel,
-                                     double* data, unsigned size)
-{
-    _channelMan->addChannelData(channel, data, size);
-}
-
 void DataFormatPanel::selectReader(AbstractReader* reader)
 {
     currentReader->enable(false);

@@ -83,8 +83,6 @@ private:
     /// reads payload portion of the frame, calculates checksum and commits data
     /// @note should be called only if there are enough bytes on device
     void readFrameDataAndCheck();
-    // `data` contains i th channels data
-    void addChannelData(unsigned int channel, double* data, unsigned size);
 
 private slots:
     void onDataReady();
