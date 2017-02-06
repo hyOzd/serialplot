@@ -325,7 +325,7 @@ void FramedReader::readFrameDataAndCheck()
         qCritical() << "Checksum failed! Received:" << rChecksum << "Calculated:" << calcChecksum;
     }
 
-    delete channelSamples;
+    delete[] channelSamples;
 }
 
 template<typename T> double FramedReader::readSampleAs()

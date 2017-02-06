@@ -179,7 +179,7 @@ void BinaryStreamReader::onDataReady()
     }
     emit dataAdded();
 
-    delete channelSamples;
+    delete[] channelSamples;
 }
 
 template<typename T> double BinaryStreamReader::readSampleAs()

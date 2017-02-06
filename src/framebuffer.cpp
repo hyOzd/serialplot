@@ -30,7 +30,7 @@ FrameBuffer::FrameBuffer(size_t size)
 
 FrameBuffer::~FrameBuffer()
 {
-    delete data;
+    delete[] data;
 }
 
 void FrameBuffer::resize(size_t size)
