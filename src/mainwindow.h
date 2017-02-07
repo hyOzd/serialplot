@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -38,6 +38,7 @@
 #include "commandpanel.h"
 #include "dataformatpanel.h"
 #include "plotcontrolpanel.h"
+#include "recordpanel.h"
 #include "ui_about_dialog.h"
 #include "framebuffer.h"
 #include "channelmanager.h"
@@ -79,6 +80,7 @@ private:
     CommandPanel commandPanel;
     DataFormatPanel dataFormatPanel;
     PlotControlPanel plotControlPanel;
+    RecordPanel recordPanel;
 
     bool isDemoRunning();
     /// Stores settings for all modules

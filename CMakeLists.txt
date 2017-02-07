@@ -1,5 +1,5 @@
 #
-# Copyright © 2015-2016 Hasan Yavuz Özderya
+# Copyright © 2017 Hasan Yavuz Özderya
 #
 # This file is part of serialplot.
 #
@@ -69,6 +69,7 @@ qt5_wrap_ui(UI_FILES
   src/commandwidget.ui
   src/dataformatpanel.ui
   src/plotcontrolpanel.ui
+  src/recordpanel.ui
   src/numberformatbox.ui
   src/endiannessbox.ui
   src/binarystreamreadersettings.ui
@@ -104,6 +105,7 @@ add_executable(${PROGRAM_NAME} WIN32
   src/commandedit.cpp
   src/dataformatpanel.cpp
   src/plotcontrolpanel.cpp
+  src/recordpanel.cpp
   src/tooltipfilter.cpp
   src/sneakylineedit.cpp
   src/channelmanager.cpp

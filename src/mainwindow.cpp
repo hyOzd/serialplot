@@ -62,7 +62,8 @@ MainWindow::MainWindow(QWidget *parent) :
     channelMan(1, 1, this),
     snapshotMan(this, &channelMan),
     commandPanel(&serialPort),
-    dataFormatPanel(&serialPort, &channelMan)
+    dataFormatPanel(&serialPort, &channelMan),
+    recordPanel(this)
 {
     ui->setupUi(this);
 
@@ -72,6 +73,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tabWidget->insertTab(1, &dataFormatPanel, "Data Format");
     ui->tabWidget->insertTab(2, &plotControlPanel, "Plot");
     ui->tabWidget->insertTab(3, &commandPanel, "Commands");
+    ui->tabWidget->insertTab(4, &recordPanel, "Record");
     ui->tabWidget->setCurrentIndex(0);
     auto tbPortControl = portControl.toolBar();
     addToolBar(tbPortControl);

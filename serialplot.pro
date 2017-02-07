@@ -67,7 +67,8 @@ SOURCES += \
     src/demoreader.cpp \
     src/framedreader.cpp \
     src/plotmanager.cpp \
-    src/numberformat.cpp
+    src/numberformat.cpp \
+    src/recordpanel.cpp
 
 HEADERS += \
     src/mainwindow.h \
@@ -106,7 +107,8 @@ HEADERS += \
     src/framedreader.h \
     src/plotmanager.h \
     src/setting_defines.h \
-    src/numberformat.h
+    src/numberformat.h \
+    src/recordpanel.h
 
 FORMS += \
     src/mainwindow.ui \
@@ -121,7 +123,8 @@ FORMS += \
     src/endiannessbox.ui \
     src/framedreadersettings.ui \
     src/binarystreamreadersettings.ui \
-    src/asciireadersettings.ui
+    src/asciireadersettings.ui \
+    src/recordpanel.ui
 
 INCLUDEPATH += qmake/ src/
 
