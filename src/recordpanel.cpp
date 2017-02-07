@@ -20,14 +20,29 @@
 #include "recordpanel.h"
 #include "ui_recordpanel.h"
 
+#include <QIcon>
+
 RecordPanel::RecordPanel(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::RecordPanel)
+    ui(new Ui::RecordPanel),
+    recordToolBar(tr("Record Toolbar")),
+    recordAction(QIcon::fromTheme("media-record"), tr("Record"), this)
 {
     ui->setupUi(this);
+
+    recordAction.setCheckable(true);
+    recordToolBar.addAction(&recordAction);
+    ui->pbRecord->setDefaultAction(&recordAction);
+
+    recordToolBar.setObjectName("tbRecord");
 }
 
 RecordPanel::~RecordPanel()
 {
     delete ui;
+}
+
+QToolBar* RecordPanel::toolbar()
+{
+    return &recordToolBar;
 }

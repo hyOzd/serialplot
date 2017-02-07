@@ -21,6 +21,8 @@
 #define RECORDPANEL_H
 
 #include <QWidget>
+#include <QToolBar>
+#include <QAction>
 
 namespace Ui {
 class RecordPanel;
@@ -34,8 +36,12 @@ public:
     explicit RecordPanel(QWidget *parent = 0);
     ~RecordPanel();
 
+    QToolBar* toolbar();
+
 private:
     Ui::RecordPanel *ui;
+    QToolBar recordToolBar;
+    QAction recordAction;
 };
 
 #endif // RECORDPANEL_H

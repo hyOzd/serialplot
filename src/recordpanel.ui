@@ -29,7 +29,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="lbFileName">
          <property name="sizePolicy">
           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -87,7 +87,7 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="QToolButton" name="toolButton_2">
+      <widget class="QToolButton" name="pbRecord">
        <property name="minimumSize">
         <size>
          <width>85</width>
@@ -99,12 +99,6 @@
        </property>
        <property name="text">
         <string>Record</string>
-       </property>
-       <property name="icon">
-        <iconset theme="media-record"/>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
        </property>
       </widget>
      </item>
