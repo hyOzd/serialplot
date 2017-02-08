@@ -21,6 +21,7 @@
 #define RECORDPANEL_H
 
 #include <QWidget>
+#include <QString>
 #include <QToolBar>
 #include <QAction>
 
@@ -42,6 +43,29 @@ private:
     Ui::RecordPanel *ui;
     QToolBar recordToolBar;
     QAction recordAction;
+    QString selectedFile;
+
+    /**
+     * @brief Increments the file name.
+     *
+     * If file name doesn't have a number at the end of it, a number is appended
+     * with underscore starting from 1.
+     */
+    void incrementFileName(void);
+
+private slots:
+    /**
+     * @brief Opens up the file select dialog
+     *
+     * If you cancel the selection operation, currently selected file is not
+     * changed.
+     *
+     * @return true if file selected, false if user cancels
+     */
+    bool selectFile();
+
+    void record(bool start);
+
 };
 
 #endif // RECORDPANEL_H

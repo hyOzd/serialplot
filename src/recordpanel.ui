@@ -19,7 +19,7 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QPushButton" name="cbBrowse">
+        <widget class="QPushButton" name="pbBrowse">
          <property name="toolTip">
           <string>Select record file</string>
          </property>

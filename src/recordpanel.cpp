@@ -21,6 +21,12 @@
 #include "ui_recordpanel.h"
 
 #include <QIcon>
+#include <QFile>
+#include <QFileInfo>
+#include <QFileDialog>
+#include <QRegularExpression>
+
+#include <QtDebug>
 
 RecordPanel::RecordPanel(QWidget *parent) :
     QWidget(parent),
@@ -30,11 +36,16 @@ RecordPanel::RecordPanel(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    recordToolBar.setObjectName("tbRecord");
+
     recordAction.setCheckable(true);
     recordToolBar.addAction(&recordAction);
     ui->pbRecord->setDefaultAction(&recordAction);
 
-    recordToolBar.setObjectName("tbRecord");
+    connect(ui->pbBrowse, &QPushButton::clicked,
+            this, &RecordPanel::selectFile);
+    connect(&recordAction, &QAction::triggered,
+            this, &RecordPanel::record);
 }
 
 RecordPanel::~RecordPanel()
@@ -45,4 +56,64 @@ RecordPanel::~RecordPanel()
 QToolBar* RecordPanel::toolbar()
 {
     return &recordToolBar;
+}
+
+bool RecordPanel::selectFile()
+{
+    QString fileName = QFileDialog::getSaveFileName(
+        parentWidget(), tr("Select recording file"));
+
+    if (fileName.isEmpty())
+    {
+        return false;
+    }
+    else
+    {
+        selectedFile = fileName;
+        ui->lbFileName->setText(selectedFile);
+        return true;
+    }
+}
+
+
+void RecordPanel::record(bool start)
+{
+    if (selectedFile.isEmpty() && !selectFile())
+    {
+        return;
+    }
+
+    if (QFile::exists(selectedFile))
+    {
+        if (ui->cbAutoIncrement->isChecked())
+        {
+            // TODO: should we increment even if user selected to replace?
+            incrementFileName();
+        }
+    }
+
+    // TODO: implement recording
+}
+
+void RecordPanel::incrementFileName(void) {
+    QFileInfo fileInfo(selectedFile);
+
+    QString base = fileInfo.completeBaseName();
+    QRegularExpression regex("(.*?)(\\d+)(?!.*\\d)(.*)");
+    auto match = regex.match(base);
+
+    if (match.hasMatch())
+    {
+        bool ok;
+        int fileNum = match.captured(2).toInt(&ok);
+        base = match.captured(1) + QString::number(fileNum + 1) + match.captured(3);
+    }
+    else
+    {
+        base += "_1";
+    }
+
+    // TODO: check if new name exists as well!
+    selectedFile = fileInfo.path() + "/" + base + fileInfo.suffix();
+    ui->lbFileName->setText(selectedFile);
 }
