@@ -59,10 +59,20 @@
      <item>
       <widget class="QCheckBox" name="cbAutoIncrement">
        <property name="toolTip">
-        <string>Increments file name automatically everytime you start a new recording</string>
+        <string>Increments file name automatically everytime a new recording starts</string>
        </property>
        <property name="text">
         <string>Auto increment file name</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="cpStopOnClose">
+       <property name="text">
+        <string>Stop recording when port closed</string>
        </property>
        <property name="checked">
         <bool>true</bool>
