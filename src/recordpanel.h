@@ -44,14 +44,17 @@ private:
     QToolBar recordToolBar;
     QAction recordAction;
     QString selectedFile;
+    bool overwriteSelected;
 
     /**
      * @brief Increments the file name.
      *
      * If file name doesn't have a number at the end of it, a number is appended
      * with underscore starting from 1.
+     *
+     * @return false if user cancels
      */
-    void incrementFileName(void);
+    bool incrementFileName(void);
 
 private slots:
     /**

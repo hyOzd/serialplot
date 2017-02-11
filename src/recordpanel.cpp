@@ -23,6 +23,7 @@
 #include <QIcon>
 #include <QFile>
 #include <QFileInfo>
+#include <QMessageBox>
 #include <QFileDialog>
 #include <QRegularExpression>
 
@@ -34,6 +35,8 @@ RecordPanel::RecordPanel(QWidget *parent) :
     recordToolBar(tr("Record Toolbar")),
     recordAction(QIcon::fromTheme("media-record"), tr("Record"), this)
 {
+    overwriteSelected = false;
+
     ui->setupUi(this);
 
     recordToolBar.setObjectName("tbRecord");
@@ -71,10 +74,10 @@ bool RecordPanel::selectFile()
     {
         selectedFile = fileName;
         ui->lbFileName->setText(selectedFile);
+        overwriteSelected = QFile::exists(fileName);
         return true;
     }
 }
-
 
 void RecordPanel::record(bool start)
 {
@@ -83,19 +86,25 @@ void RecordPanel::record(bool start)
         return;
     }
 
-    if (QFile::exists(selectedFile))
+    if (!overwriteSelected && QFile::exists(selectedFile))
     {
         if (ui->cbAutoIncrement->isChecked())
         {
             // TODO: should we increment even if user selected to replace?
             incrementFileName();
         }
+        else
+        {
+            selectFile();
+        }
     }
+
+    overwriteSelected = false;
 
     // TODO: implement recording
 }
 
-void RecordPanel::incrementFileName(void) {
+bool RecordPanel::incrementFileName(void) {
     QFileInfo fileInfo(selectedFile);
 
     QString base = fileInfo.completeBaseName();
@@ -114,6 +123,48 @@ void RecordPanel::incrementFileName(void) {
     }
 
     // TODO: check if new name exists as well!
-    selectedFile = fileInfo.path() + "/" + base + fileInfo.suffix();
+    QString suffix = fileInfo.suffix();;
+    if (!suffix.isEmpty())
+    {
+        suffix = "." + suffix;
+    }
+
+    QString autoFileName = fileInfo.path() + "/" + base + suffix;
+
+    // check if auto generated file name exists, ask user another name
+    if (QFile::exists(autoFileName))
+    {
+        QMessageBox mb(parentWidget());
+        mb.setWindowTitle(tr("File Already Exists"));
+        mb.setIcon(QMessageBox::Warning);
+        mb.setText(tr("Auto generated file name (%1) already exists. How to continue?").arg(autoFileName));
+
+        auto bCancel = mb.addButton(QMessageBox::Cancel);
+        auto bOverwrite = mb.addButton(tr("Overwrite"), QMessageBox::DestructiveRole);
+        auto bSelect = mb.addButton(tr("Select Another File"), QMessageBox::YesRole);
+
+        mb.setEscapeButton(bCancel);
+
+        mb.exec();
+
+        if (mb.clickedButton() == bCancel)
+        {
+            return false;
+        }
+        else if (mb.clickedButton() == bOverwrite)
+        {
+            selectedFile = autoFileName;
+        }
+        else                    // bSelect
+        {
+            selectFile();       // TODO: return false if user cancels
+        }
+    }
+    else
+    {
+        selectedFile = autoFileName;
+    }
+
     ui->lbFileName->setText(selectedFile);
+    return true;
 }
