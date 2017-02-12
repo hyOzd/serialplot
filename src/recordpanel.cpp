@@ -122,7 +122,6 @@ bool RecordPanel::incrementFileName(void) {
         base += "_1";
     }
 
-    // TODO: check if new name exists as well!
     QString suffix = fileInfo.suffix();;
     if (!suffix.isEmpty())
     {
@@ -134,30 +133,9 @@ bool RecordPanel::incrementFileName(void) {
     // check if auto generated file name exists, ask user another name
     if (QFile::exists(autoFileName))
     {
-        QMessageBox mb(parentWidget());
-        mb.setWindowTitle(tr("File Already Exists"));
-        mb.setIcon(QMessageBox::Warning);
-        mb.setText(tr("Auto generated file name (%1) already exists. How to continue?").arg(autoFileName));
-
-        auto bCancel = mb.addButton(QMessageBox::Cancel);
-        auto bOverwrite = mb.addButton(tr("Overwrite"), QMessageBox::DestructiveRole);
-        auto bSelect = mb.addButton(tr("Select Another File"), QMessageBox::YesRole);
-
-        mb.setEscapeButton(bCancel);
-
-        mb.exec();
-
-        if (mb.clickedButton() == bCancel)
+        if (!confirmOverwrite(autoFileName))
         {
             return false;
-        }
-        else if (mb.clickedButton() == bOverwrite)
-        {
-            selectedFile = autoFileName;
-        }
-        else                    // bSelect
-        {
-            selectFile();       // TODO: return false if user cancels
         }
     }
     else
@@ -167,4 +145,36 @@ bool RecordPanel::incrementFileName(void) {
 
     ui->lbFileName->setText(selectedFile);
     return true;
+}
+
+bool RecordPanel::confirmOverwrite(QString fileName)
+{
+    // prepare message box
+    QMessageBox mb(parentWidget());
+    mb.setWindowTitle(tr("File Already Exists"));
+    mb.setIcon(QMessageBox::Warning);
+    mb.setText(tr("Auto generated file name (%1) already exists. How to continue?").arg(fileName));
+
+    auto bCancel    = mb.addButton(QMessageBox::Cancel);
+    auto bOverwrite = mb.addButton(tr("Overwrite"), QMessageBox::DestructiveRole);
+    auto bSelect    = mb.addButton(tr("Select Another File"), QMessageBox::YesRole);
+
+    mb.setEscapeButton(bCancel);
+
+    // show message box
+    mb.exec();
+
+    if (mb.clickedButton() == bCancel)
+    {
+        return false;
+    }
+    else if (mb.clickedButton() == bOverwrite)
+    {
+        selectedFile = fileName;
+        return true;
+    }
+    else                    // bSelect
+    {
+        return selectFile();
+    }
 }

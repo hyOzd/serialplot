@@ -56,6 +56,19 @@ private:
      */
     bool incrementFileName(void);
 
+    /**
+     * @brief Used to ask user confirmation if auto generated file
+     * name exists.
+     *
+     * If user confirms overwrite, `selectedFile` is set to
+     * `fileName`. User is also given option to select file and is
+     * shown a file select dialog in this case.
+     *
+     * @param fileName auto generated file name.
+     * @return false if user cancels
+     */
+    bool confirmOverwrite(QString fileName);
+
 private slots:
     /**
      * @brief Opens up the file select dialog
