@@ -106,6 +106,7 @@ add_executable(${PROGRAM_NAME} WIN32
   src/dataformatpanel.cpp
   src/plotcontrolpanel.cpp
   src/recordpanel.cpp
+  src/datarecorder.cpp
   src/tooltipfilter.cpp
   src/sneakylineedit.cpp
   src/channelmanager.cpp

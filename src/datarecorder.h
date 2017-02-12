@@ -21,6 +21,8 @@
 #define DATARECORDER_H
 
 #include <QObject>
+#include <QFile>
+#include <QTextStream>
 
 class DataRecorder : public QObject
 {
@@ -63,6 +65,8 @@ public:
 
 private:
     unsigned lastNumChannels;   ///< used for error message only
+    QFile file;
+    QTextStream fileStream;
 };
 
 #endif // DATARECORDER_H

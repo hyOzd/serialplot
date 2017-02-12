@@ -33,7 +33,8 @@ RecordPanel::RecordPanel(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::RecordPanel),
     recordToolBar(tr("Record Toolbar")),
-    recordAction(QIcon::fromTheme("media-record"), tr("Record"), this)
+    recordAction(QIcon::fromTheme("media-record"), tr("Record"), this),
+    recorder(this)
 {
     overwriteSelected = false;
 
@@ -196,12 +197,22 @@ bool RecordPanel::confirmOverwrite(QString fileName)
 
 void RecordPanel::startRecording(void)
 {
-    // TODO
     qDebug() << "start recording";
+
+    // TEST CODE
+    QStringList cn;
+    cn << "chan0" << "chan1" << "chan2";
+
+    recorder.startRecording(selectedFile, cn);
+
+    // add test data
+    double data[3] = {15., 15., 15.};
+    recorder.addData(data, 3, 3);
 }
 
 void RecordPanel::stopRecording(void)
 {
     // TODO
     qDebug() << "stop recording";
+    recorder.stopRecording();
 }

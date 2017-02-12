@@ -25,6 +25,8 @@
 #include <QToolBar>
 #include <QAction>
 
+#include "datarecorder.h"
+
 namespace Ui {
 class RecordPanel;
 }
@@ -45,6 +47,7 @@ private:
     QAction recordAction;
     QString selectedFile;
     bool overwriteSelected;
+    DataRecorder recorder;
 
     /**
      * @brief Increments the file name.

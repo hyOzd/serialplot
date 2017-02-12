@@ -19,22 +19,67 @@
 
 #include "datarecorder.h"
 
-DataRecorder::DataRecorder(QObject *parent) : QObject(parent)
-{
+#include <QtDebug>
 
+DataRecorder::DataRecorder(QObject *parent) :
+    QObject(parent),
+    fileStream(&file)
+{
+    lastNumChannels = 0;
 }
 
 bool DataRecorder::startRecording(QString fileName, QStringList channelNames)
 {
+    Q_ASSERT(!file.isOpen());
 
+    // open file
+    file.setFileName(fileName);
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        qCritical() << "Opening file " << fileName
+                    << " for recording failed with error: " << file.error();
+        return false;
+    }
+
+    // write header line
+    if (!channelNames.isEmpty())
+    {
+        fileStream << channelNames.join(",");
+        fileStream << "\n";
+        lastNumChannels = channelNames.length();
+    }
+    return true;
 }
 
 void DataRecorder::addData(double* data, unsigned length, unsigned numOfChannels)
 {
+    Q_ASSERT(length > 0);
+    Q_ASSERT(length % numOfChannels == 0);
 
+    if (lastNumChannels != 0 && numOfChannels != lastNumChannels)
+    {
+        qWarning() << "Number of channels changed from " << lastNumChannels
+                   << " to " << numOfChannels <<
+            " during recording, CSV file is corrupted but no data will be lost.";
+    }
+    lastNumChannels = numOfChannels;
+
+    unsigned numOfSamples = length / numOfChannels; // per channel
+    for (unsigned int i = 0; i < numOfSamples; i++)
+    {
+        for (unsigned ci = 0; ci < numOfChannels; ci++)
+        {
+            fileStream << data[ci * numOfSamples + i];
+            if (ci != numOfChannels-1) fileStream << ",";
+        }
+        fileStream << '\n';
+    }
 }
 
 void DataRecorder::stopRecording()
 {
+    Q_ASSERT(file.isOpen());
 
+    file.close();
+    lastNumChannels = 0;
 }
