@@ -69,6 +69,9 @@ private:
      */
     bool confirmOverwrite(QString fileName);
 
+    void startRecording(void);
+    void stopRecording(void);
+
 private slots:
     /**
      * @brief Opens up the file select dialog
@@ -80,7 +83,7 @@ private slots:
      */
     bool selectFile();
 
-    void record(bool start);
+    void onRecord(bool start);
 
 };
 

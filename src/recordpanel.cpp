@@ -48,7 +48,7 @@ RecordPanel::RecordPanel(QWidget *parent) :
     connect(ui->pbBrowse, &QPushButton::clicked,
             this, &RecordPanel::selectFile);
     connect(&recordAction, &QAction::triggered,
-            this, &RecordPanel::record);
+            this, &RecordPanel::onRecord);
 }
 
 RecordPanel::~RecordPanel()
@@ -79,11 +79,19 @@ bool RecordPanel::selectFile()
     }
 }
 
-void RecordPanel::record(bool start)
+void RecordPanel::onRecord(bool start)
 {
+    if (!start)
+    {
+        stopRecording();
+        return;
+    }
+
+    // check file name
+    bool canceled = false;
     if (selectedFile.isEmpty() && !selectFile())
     {
-        return;
+        canceled = true;
     }
 
     if (!overwriteSelected && QFile::exists(selectedFile))
@@ -91,20 +99,27 @@ void RecordPanel::record(bool start)
         if (ui->cbAutoIncrement->isChecked())
         {
             // TODO: should we increment even if user selected to replace?
-            incrementFileName();
+            canceled = !incrementFileName();
         }
         else
         {
-            selectFile();
+            canceled = !confirmOverwrite(selectedFile);
         }
     }
-
     overwriteSelected = false;
 
-    // TODO: implement recording
+    if (canceled)
+    {
+        recordAction.setChecked(false);
+    }
+    else
+    {
+        startRecording();
+    }
 }
 
-bool RecordPanel::incrementFileName(void) {
+bool RecordPanel::incrementFileName(void)
+{
     QFileInfo fileInfo(selectedFile);
 
     QString base = fileInfo.completeBaseName();
@@ -153,11 +168,11 @@ bool RecordPanel::confirmOverwrite(QString fileName)
     QMessageBox mb(parentWidget());
     mb.setWindowTitle(tr("File Already Exists"));
     mb.setIcon(QMessageBox::Warning);
-    mb.setText(tr("Auto generated file name (%1) already exists. How to continue?").arg(fileName));
+    mb.setText(tr("File (%1) already exists. How to continue?").arg(fileName));
 
     auto bCancel    = mb.addButton(QMessageBox::Cancel);
     auto bOverwrite = mb.addButton(tr("Overwrite"), QMessageBox::DestructiveRole);
-    auto bSelect    = mb.addButton(tr("Select Another File"), QMessageBox::YesRole);
+    mb.addButton(tr("Select Another File"), QMessageBox::YesRole);
 
     mb.setEscapeButton(bCancel);
 
@@ -173,8 +188,20 @@ bool RecordPanel::confirmOverwrite(QString fileName)
         selectedFile = fileName;
         return true;
     }
-    else                    // bSelect
+    else                    // select button
     {
         return selectFile();
     }
+}
+
+void RecordPanel::startRecording(void)
+{
+    // TODO
+    qDebug() << "start recording";
+}
+
+void RecordPanel::stopRecording(void)
+{
+    // TODO
+    qDebug() << "stop recording";
 }
