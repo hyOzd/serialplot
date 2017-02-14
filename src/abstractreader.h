@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -72,13 +72,14 @@ public slots:
 
 protected:
     QIODevice* _device;
-    ChannelManager* _channelMan;
 
-    /// Implementing class should simply increase this count as samples are read
-    unsigned sampleCount;
+    /// Should be called with read data
+    void addData(double* samples, unsigned length);
 
 private:
     const int SPS_UPDATE_TIMEOUT = 1;  // second
+    ChannelManager* _channelMan;
+    unsigned sampleCount;
     unsigned samplesPerSecond;
     QTimer spsTimer;
 

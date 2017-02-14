@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -43,4 +43,11 @@ void AbstractReader::spsTimerTimeout()
         emit samplesPerSecondChanged(samplesPerSecond);
     }
     sampleCount = 0;
+}
+
+void AbstractReader::addData(double* samples, unsigned length)
+{
+    _channelMan->addData(samples, length);
+    sampleCount += length;
+    emit dataAdded();
 }

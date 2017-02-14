@@ -29,7 +29,6 @@ AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan, QObject 
 {
     paused = false;
     discardFirstLine = true;
-    sampleCount = 0;
 
     _numOfChannels = _settingsWidget.numOfChannels();
     autoNumOfChannels = (_numOfChannels == NUMOFCHANNELS_AUTO);
@@ -155,9 +154,7 @@ void AsciiReader::onDataReady()
         }
 
         // commit data
-        _channelMan->addData(channelSamples, _numOfChannels);
-        sampleCount += numReadChannels;
-        emit dataAdded();
+        addData(channelSamples, _numOfChannels);
 
         delete[] channelSamples;
     }

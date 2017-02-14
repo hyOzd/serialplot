@@ -310,8 +310,7 @@ void FramedReader::readFrameDataAndCheck()
     if (!checksumEnabled || checksumPassed)
     {
         // commit data
-        _channelMan->addData(channelSamples, numOfPackagesToRead * _numOfChannels);
-        emit dataAdded();
+        addData(channelSamples, numOfPackagesToRead*_numOfChannels);
     }
     else
     {

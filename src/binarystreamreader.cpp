@@ -29,7 +29,6 @@ BinaryStreamReader::BinaryStreamReader(QIODevice* device, ChannelManager* channe
     paused = false;
     skipByteRequested = false;
     skipSampleRequested = false;
-    sampleCount = 0;
 
     _numOfChannels = _settingsWidget.numOfChannels();
     connect(&_settingsWidget, &BinaryStreamReaderSettings::numOfChannelsChanged,
@@ -171,9 +170,7 @@ void BinaryStreamReader::onDataReady()
         }
     }
 
-    _channelMan->addData(channelSamples, numOfPackagesToRead*_numOfChannels);
-    sampleCount += numOfPackagesToRead*_numOfChannels;
-    emit dataAdded();
+    addData(channelSamples, numOfPackagesToRead*_numOfChannels);
 
     delete[] channelSamples;
 }
