@@ -44,12 +44,12 @@
       </layout>
      </item>
      <item>
-      <widget class="QCheckBox" name="cbRecordPaused">
+      <widget class="QCheckBox" name="cbAutoIncrement">
        <property name="toolTip">
-        <string>Continue recording to file even when plotting is paused</string>
+        <string>Increments file name automatically everytime a new recording starts</string>
        </property>
        <property name="text">
-        <string>Record while paused</string>
+        <string>Auto increment file name</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -57,12 +57,12 @@
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="cbAutoIncrement">
+      <widget class="QCheckBox" name="cbRecordPaused">
        <property name="toolTip">
-        <string>Increments file name automatically everytime a new recording starts</string>
+        <string>Continue recording to file even when plotting is paused</string>
        </property>
        <property name="text">
-        <string>Auto increment file name</string>
+        <string>Record while paused</string>
        </property>
        <property name="checked">
         <bool>true</bool>
