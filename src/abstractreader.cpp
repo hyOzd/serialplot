@@ -19,8 +19,6 @@
 
 #include "abstractreader.h"
 
-#include <QtDebug>
-
 AbstractReader::AbstractReader(QIODevice* device, ChannelManager* channelMan,
                                DataRecorder* recorder, QObject* parent) :
     QObject(parent)
@@ -56,7 +54,6 @@ void AbstractReader::addData(double* samples, unsigned length)
     if (recording)
     {
         _recorder->addData(samples, length, numOfChannels());
-        qDebug() << "adding data";
     }
     sampleCount += length;
 }

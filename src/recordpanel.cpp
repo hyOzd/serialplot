@@ -53,6 +53,12 @@ RecordPanel::RecordPanel(DataRecorder* recorder, QWidget *parent) :
 
     connect(ui->cbRecordPaused, SIGNAL(toggled(bool)),
             this, SIGNAL(recordPausedChanged(bool)));
+
+    connect(ui->cbDisableBuffering, &QCheckBox::toggled,
+            [this](bool enabled)
+            {
+                _recorder->disableBuffering = enabled;
+            });
 }
 
 RecordPanel::~RecordPanel()

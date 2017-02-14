@@ -80,6 +80,16 @@
       </widget>
      </item>
      <item>
+      <widget class="QCheckBox" name="cbDisableBuffering">
+       <property name="toolTip">
+        <string>Do not buffer when writing to file. Check this if you are using other software to open the file during recording.</string>
+       </property>
+       <property name="text">
+        <string>Disable buffering</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="verticalSpacer">
        <property name="orientation">
         <enum>Qt::Vertical</enum>

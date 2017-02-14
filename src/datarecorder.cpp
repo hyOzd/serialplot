@@ -26,6 +26,7 @@ DataRecorder::DataRecorder(QObject *parent) :
     fileStream(&file)
 {
     lastNumChannels = 0;
+    disableBuffering = false;
 }
 
 bool DataRecorder::startRecording(QString fileName, QStringList channelNames)
@@ -74,6 +75,8 @@ void DataRecorder::addData(double* data, unsigned length, unsigned numOfChannels
         }
         fileStream << '\n';
     }
+
+    if (disableBuffering) fileStream.flush();
 }
 
 void DataRecorder::stopRecording()

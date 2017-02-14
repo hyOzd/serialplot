@@ -30,6 +30,9 @@ class DataRecorder : public QObject
 public:
     explicit DataRecorder(QObject *parent = 0);
 
+    /// Disables file buffering
+    bool disableBuffering;
+
     /**
      * @brief Starts recording data to a file in CSV format.
      *
