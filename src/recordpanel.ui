@@ -70,7 +70,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="cpStopOnClose">
+      <widget class="QCheckBox" name="cbStopOnClose">
        <property name="text">
         <string>Stop recording when port closed</string>
        </property>

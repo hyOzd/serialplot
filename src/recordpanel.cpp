@@ -216,17 +216,9 @@ bool RecordPanel::confirmOverwrite(QString fileName)
 
 void RecordPanel::startRecording(void)
 {
-    qDebug() << "start recording";
-
-    // TEST CODE
+    // TODO: channel names
     QStringList cn;
-    // cn << "chan0" << "chan1" << "chan2";
-
     _recorder->startRecording(selectedFile, cn);
-
-    // add test data
-    // double data[3] = {15., 15., 15.};
-    // _recorder.addData(data, 3, 3);
     emit recordStarted();
 }
 
@@ -234,4 +226,13 @@ void RecordPanel::stopRecording(void)
 {
     emit recordStopped();
     _recorder->stopRecording();
+}
+
+void RecordPanel::onPortClose()
+{
+    if (recordAction.isChecked() && ui->cbStopOnClose->isChecked())
+    {
+        stopRecording();
+        recordAction.setChecked(false);
+    }
 }

@@ -187,6 +187,9 @@ MainWindow::MainWindow(QWidget *parent) :
                          }
                      });
 
+    connect(&serialPort, &QIODevice::aboutToClose,
+            &recordPanel, &RecordPanel::onPortClose);
+
     // init data arrays and plot
     numOfSamples = plotControlPanel.numOfSamples();
     unsigned numOfChannels = dataFormatPanel.numOfChannels();

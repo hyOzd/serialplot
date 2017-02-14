@@ -49,6 +49,10 @@ signals:
     void recordStopped();
     void recordPausedChanged(bool enabled);
 
+public slots:
+    /// Must be called when port is closed
+    void onPortClose();
+
 private:
     Ui::RecordPanel *ui;
     QToolBar recordToolBar;
