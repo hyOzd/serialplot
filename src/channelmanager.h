@@ -72,9 +72,13 @@ public slots:
      */
     void addData(double* data, unsigned size);
 
+    /// When paused `addData` does nothing.
+    void pause(bool paused);
+
 private:
     unsigned _numOfChannels;
     unsigned _numOfSamples;
+    bool _paused;
     QList<FrameBuffer*> channelBuffers;
     // QStringListModel _channelNames;
     ChannelInfoModel _infoModel;

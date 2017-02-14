@@ -36,10 +36,18 @@ class RecordPanel : public QWidget
     Q_OBJECT
 
 public:
-    explicit RecordPanel(QWidget *parent = 0);
+    explicit RecordPanel(DataRecorder* recorder, QWidget* parent = 0);
     ~RecordPanel();
 
     QToolBar* toolbar();
+
+    bool isRecording();
+    bool recordPaused();
+
+signals:
+    void recordStarted();
+    void recordStopped();
+    void recordPausedChanged(bool enabled);
 
 private:
     Ui::RecordPanel *ui;
@@ -47,7 +55,7 @@ private:
     QAction recordAction;
     QString selectedFile;
     bool overwriteSelected;
-    DataRecorder recorder;
+    DataRecorder* _recorder;
 
     /**
      * @brief Increments the file name.

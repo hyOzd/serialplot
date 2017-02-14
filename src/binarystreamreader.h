@@ -34,7 +34,8 @@ class BinaryStreamReader : public AbstractReader
 {
     Q_OBJECT
 public:
-    explicit BinaryStreamReader(QIODevice* device, ChannelManager* channelMan, QObject *parent = 0);
+    explicit BinaryStreamReader(QIODevice* device, ChannelManager* channelMan,
+                                DataRecorder* recorder, QObject *parent = 0);
     QWidget* settingsWidget();
     unsigned numOfChannels();
     void enable(bool enabled = true);

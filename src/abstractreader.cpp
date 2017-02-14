@@ -19,11 +19,16 @@
 
 #include "abstractreader.h"
 
-AbstractReader::AbstractReader(QIODevice* device, ChannelManager* channelMan, QObject *parent) :
+#include <QtDebug>
+
+AbstractReader::AbstractReader(QIODevice* device, ChannelManager* channelMan,
+                               DataRecorder* recorder, QObject* parent) :
     QObject(parent)
 {
     _device = device;
     _channelMan = channelMan;
+    _recorder = recorder;
+    recording = false;
 
     // initialize sps counter
     sampleCount = 0;
@@ -48,5 +53,10 @@ void AbstractReader::spsTimerTimeout()
 void AbstractReader::addData(double* samples, unsigned length)
 {
     _channelMan->addData(samples, length);
+    if (recording)
+    {
+        _recorder->addData(samples, length, numOfChannels());
+        qDebug() << "adding data";
+    }
     sampleCount += length;
 }

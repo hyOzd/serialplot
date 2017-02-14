@@ -24,8 +24,9 @@
 /// If set to this value number of channels is determined from input
 #define NUMOFCHANNELS_AUTO   (0)
 
-AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan, QObject *parent) :
-    AbstractReader(device, channelMan, parent)
+AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan,
+                         DataRecorder* recorder, QObject* parent) :
+    AbstractReader(device, channelMan, recorder, parent)
 {
     paused = false;
     discardFirstLine = true;

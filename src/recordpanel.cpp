@@ -29,14 +29,14 @@
 
 #include <QtDebug>
 
-RecordPanel::RecordPanel(QWidget *parent) :
+RecordPanel::RecordPanel(DataRecorder* recorder, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::RecordPanel),
     recordToolBar(tr("Record Toolbar")),
-    recordAction(QIcon::fromTheme("media-record"), tr("Record"), this),
-    recorder(this)
+    recordAction(QIcon::fromTheme("media-record"), tr("Record"), this)
 {
     overwriteSelected = false;
+    _recorder = recorder;
 
     ui->setupUi(this);
 
@@ -50,6 +50,9 @@ RecordPanel::RecordPanel(QWidget *parent) :
             this, &RecordPanel::selectFile);
     connect(&recordAction, &QAction::triggered,
             this, &RecordPanel::onRecord);
+
+    connect(ui->cbRecordPaused, SIGNAL(toggled(bool)),
+            this, SIGNAL(recordPausedChanged(bool)));
 }
 
 RecordPanel::~RecordPanel()
@@ -60,6 +63,16 @@ RecordPanel::~RecordPanel()
 QToolBar* RecordPanel::toolbar()
 {
     return &recordToolBar;
+}
+
+bool RecordPanel::isRecording()
+{
+    return recordAction.isChecked();
+}
+
+bool RecordPanel::recordPaused()
+{
+    return ui->cbRecordPaused->isChecked();
 }
 
 bool RecordPanel::selectFile()
@@ -201,18 +214,18 @@ void RecordPanel::startRecording(void)
 
     // TEST CODE
     QStringList cn;
-    cn << "chan0" << "chan1" << "chan2";
+    // cn << "chan0" << "chan1" << "chan2";
 
-    recorder.startRecording(selectedFile, cn);
+    _recorder->startRecording(selectedFile, cn);
 
     // add test data
-    double data[3] = {15., 15., 15.};
-    recorder.addData(data, 3, 3);
+    // double data[3] = {15., 15., 15.};
+    // _recorder.addData(data, 3, 3);
+    emit recordStarted();
 }
 
 void RecordPanel::stopRecording(void)
 {
-    // TODO
-    qDebug() << "stop recording";
-    recorder.stopRecording();
+    emit recordStopped();
+    _recorder->stopRecording();
 }

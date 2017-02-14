@@ -34,6 +34,7 @@
 #include "asciireader.h"
 #include "demoreader.h"
 #include "framedreader.h"
+#include "datarecorder.h"
 
 namespace Ui {
 class DataFormatPanel;
@@ -46,7 +47,8 @@ class DataFormatPanel : public QWidget
 public:
     explicit DataFormatPanel(QSerialPort* port,
                              ChannelManager* channelMan,
-                             QWidget *parent = 0);
+                             DataRecorder* recorder,
+                             QWidget* parent = 0);
     ~DataFormatPanel();
 
     /// Returns currently selected number of channels
@@ -59,6 +61,16 @@ public:
 public slots:
     void pause(bool);
     void enableDemo(bool); // demo shouldn't be enabled when port is open
+
+    /**
+     * @brief Starts sending data to recorder.
+     *
+     * @note recorder must have been started!
+     */
+    void startRecording();
+
+    /// Stops recording.
+    void stopRecording();
 
 signals:
     void numOfChannelsChanged(unsigned);
@@ -80,6 +92,7 @@ private:
 
     bool paused;
 
+    bool demoEnabled;
     DemoReader demoReader;
 };
 

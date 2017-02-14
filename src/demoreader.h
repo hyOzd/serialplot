@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -38,7 +38,8 @@ class DemoReader : public AbstractReader
     Q_OBJECT
 
 public:
-    explicit DemoReader(QIODevice* device, ChannelManager* channelMan, QObject *parent = 0);
+    explicit DemoReader(QIODevice* device, ChannelManager* channelMan,
+                        DataRecorder* recorder, QObject* parent = 0);
 
     /// Demo reader is an exception so this function returns NULL
     QWidget* settingsWidget();

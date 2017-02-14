@@ -62,8 +62,8 @@ MainWindow::MainWindow(QWidget *parent) :
     channelMan(1, 1, this),
     snapshotMan(this, &channelMan),
     commandPanel(&serialPort),
-    dataFormatPanel(&serialPort, &channelMan),
-    recordPanel(this)
+    dataFormatPanel(&serialPort, &channelMan, &recorder),
+    recordPanel(&recorder)
 {
     ui->setupUi(this);
 
@@ -152,13 +152,40 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&(this->serialPort), SIGNAL(error(QSerialPort::SerialPortError)),
                      this, SLOT(onPortError(QSerialPort::SerialPortError)));
 
-    // TODO: `replot` must be triggered from ChannelManager
     // init data format and reader
     QObject::connect(&channelMan, &ChannelManager::dataAdded,
                      plotMan, &PlotManager::replot);
 
     QObject::connect(ui->actionPause, &QAction::triggered,
-                     &dataFormatPanel, &DataFormatPanel::pause);
+                     &channelMan, &ChannelManager::pause);
+
+    QObject::connect(&recordPanel, &RecordPanel::recordStarted,
+                     &dataFormatPanel, &DataFormatPanel::startRecording);
+
+    QObject::connect(&recordPanel, &RecordPanel::recordStopped,
+                     &dataFormatPanel, &DataFormatPanel::stopRecording);
+
+    QObject::connect(ui->actionPause, &QAction::triggered,
+                     [this](bool enabled)
+                     {
+                         if (enabled && !recordPanel.recordPaused())
+                         {
+                             dataFormatPanel.pause(true);
+                         }
+                         else
+                         {
+                             dataFormatPanel.pause(false);
+                         }
+                     });
+
+    QObject::connect(&recordPanel, &RecordPanel::recordPausedChanged,
+                     [this](bool enabled)
+                     {
+                         if (ui->actionPause->isChecked() && enabled)
+                         {
+                             dataFormatPanel.pause(false);
+                         }
+                     });
 
     // init data arrays and plot
     numOfSamples = plotControlPanel.numOfSamples();

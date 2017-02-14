@@ -23,8 +23,9 @@
 #include "binarystreamreader.h"
 #include "floatswap.h"
 
-BinaryStreamReader::BinaryStreamReader(QIODevice* device, ChannelManager* channelMan, QObject *parent) :
-    AbstractReader(device, channelMan, parent)
+BinaryStreamReader::BinaryStreamReader(QIODevice* device, ChannelManager* channelMan,
+                                       DataRecorder* recorder, QObject* parent) :
+    AbstractReader(device, channelMan, recorder, parent)
 {
     paused = false;
     skipByteRequested = false;
