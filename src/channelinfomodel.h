@@ -41,9 +41,11 @@ public:
     ChannelInfoModel(const ChannelInfoModel& other);
     explicit ChannelInfoModel(const QStringList& channelNames);
 
-    QString name     (unsigned i);
-    QColor  color    (unsigned i);
-    bool    isVisible(unsigned i);
+    QString name     (unsigned i) const;
+    QColor  color    (unsigned i) const;
+    bool    isVisible(unsigned i) const;
+    /// Returns a list of channel names
+    QStringList channelNames() const;
 
     // implemented from QAbstractItemModel
     int           rowCount(const QModelIndex &parent = QModelIndex()) const;

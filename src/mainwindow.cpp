@@ -63,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent) :
     snapshotMan(this, &channelMan),
     commandPanel(&serialPort),
     dataFormatPanel(&serialPort, &channelMan, &recorder),
-    recordPanel(&recorder)
+    recordPanel(&recorder, &channelMan)
 {
     ui->setupUi(this);
 

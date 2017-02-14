@@ -26,6 +26,7 @@
 #include <QAction>
 
 #include "datarecorder.h"
+#include "channelmanager.h"
 
 namespace Ui {
 class RecordPanel;
@@ -36,7 +37,8 @@ class RecordPanel : public QWidget
     Q_OBJECT
 
 public:
-    explicit RecordPanel(DataRecorder* recorder, QWidget* parent = 0);
+    explicit RecordPanel(DataRecorder* recorder, ChannelManager* channelMan,
+                         QWidget* parent = 0);
     ~RecordPanel();
 
     QToolBar* toolbar();
@@ -60,6 +62,7 @@ private:
     QString selectedFile;
     bool overwriteSelected;
     DataRecorder* _recorder;
+    ChannelManager* _channelMan;
 
     /**
      * @brief Increments the file name.

@@ -39,7 +39,6 @@ public:
     unsigned numOfChannels();
     unsigned numOfSamples();
     FrameBuffer* channelBuffer(unsigned channel);
-    // QStringListModel* channelNames();
     QString channelName(unsigned channel);
     /// Stores channel names into a `QSettings`
     void saveSettings(QSettings* settings);

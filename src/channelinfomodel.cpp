@@ -98,19 +98,29 @@ ChannelInfoModel::ChannelInfo::ChannelInfo(unsigned index)
     color = colors[index % NUMOF_COLORS];
 }
 
-QString ChannelInfoModel::name(unsigned i)
+QString ChannelInfoModel::name(unsigned i) const
 {
     return infos[i].name;
 }
 
-QColor ChannelInfoModel::color(unsigned i)
+QColor ChannelInfoModel::color(unsigned i) const
 {
     return infos[i].color;
 }
 
-bool ChannelInfoModel::isVisible(unsigned i)
+bool ChannelInfoModel::isVisible(unsigned i) const
 {
     return infos[i].visibility;
+}
+
+QStringList ChannelInfoModel::channelNames() const
+{
+    QStringList r;
+    for (unsigned ci = 0; ci < _numOfChannels; ci++)
+    {
+        r << name(ci);
+    }
+    return r;
 }
 
 int ChannelInfoModel::rowCount(const QModelIndex &parent) const

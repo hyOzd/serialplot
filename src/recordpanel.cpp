@@ -29,7 +29,7 @@
 
 #include <QtDebug>
 
-RecordPanel::RecordPanel(DataRecorder* recorder, QWidget *parent) :
+RecordPanel::RecordPanel(DataRecorder* recorder, ChannelManager* channelMan, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::RecordPanel),
     recordToolBar(tr("Record Toolbar")),
@@ -37,6 +37,7 @@ RecordPanel::RecordPanel(DataRecorder* recorder, QWidget *parent) :
 {
     overwriteSelected = false;
     _recorder = recorder;
+    _channelMan = channelMan;
 
     ui->setupUi(this);
 
@@ -216,9 +217,7 @@ bool RecordPanel::confirmOverwrite(QString fileName)
 
 void RecordPanel::startRecording(void)
 {
-    // TODO: channel names
-    QStringList cn;
-    _recorder->startRecording(selectedFile, cn);
+    _recorder->startRecording(selectedFile, _channelMan->infoModel()->channelNames());
     emit recordStarted();
 }
 
