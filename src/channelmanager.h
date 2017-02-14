@@ -54,6 +54,7 @@ signals:
     void numOfChannelsChanged(unsigned value);
     void numOfSamplesChanged(unsigned value);
     void channelNameChanged(unsigned channel, QString name);
+    void dataAdded(); ///< emitted when data added to channel man.
 
 public slots:
     void setNumOfChannels(unsigned number);

@@ -56,9 +56,6 @@ public:
 
 signals:
     void numOfChannelsChanged(unsigned);
-    // TODO: this must be signaled by 'channel man' for better abstraction
-    void dataAdded(); ///< emitted when data added to channel man.
-    // TODO: this should be a part of 'channel man'
     void samplesPerSecondChanged(unsigned);
 
 public slots:

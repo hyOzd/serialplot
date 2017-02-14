@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -63,7 +63,6 @@ public slots:
 signals:
     void numOfChannelsChanged(unsigned);
     void samplesPerSecondChanged(unsigned);
-    void dataAdded();
 
 private:
     Ui::DataFormatPanel *ui;

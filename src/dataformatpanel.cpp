@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -50,7 +50,6 @@ DataFormatPanel::DataFormatPanel(QSerialPort* port,
     bsReader.enable();
     ui->rbBinary->setChecked(true);
     ui->horizontalLayout->addWidget(bsReader.settingsWidget(), 1);
-    connect(&bsReader, SIGNAL(dataAdded()), this, SIGNAL(dataAdded()));
     connect(&bsReader, SIGNAL(numOfChannelsChanged(unsigned)),
             this, SIGNAL(numOfChannelsChanged(unsigned)));
     connect(&bsReader, SIGNAL(samplesPerSecondChanged(unsigned)),
@@ -99,8 +98,6 @@ void DataFormatPanel::enableDemo(bool enabled)
     if (enabled)
     {
         demoReader.enable();
-        connect(&demoReader, &DemoReader::dataAdded,
-                this, &DataFormatPanel::dataAdded);
         connect(&demoReader, &DemoReader::samplesPerSecondChanged,
                 this, &DataFormatPanel::samplesPerSecondChanged);
     }
@@ -118,7 +115,6 @@ void DataFormatPanel::selectReader(AbstractReader* reader)
 
     // re-connect signals
     disconnect(currentReader, 0, this, 0);
-    connect(reader, SIGNAL(dataAdded()), this, SIGNAL(dataAdded()));
     connect(reader, SIGNAL(numOfChannelsChanged(unsigned)),
             this, SIGNAL(numOfChannelsChanged(unsigned)));
     connect(reader, SIGNAL(samplesPerSecondChanged(unsigned)),

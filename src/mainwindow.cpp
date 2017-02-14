@@ -154,7 +154,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // TODO: `replot` must be triggered from ChannelManager
     // init data format and reader
-    QObject::connect(&dataFormatPanel, &DataFormatPanel::dataAdded,
+    QObject::connect(&channelMan, &ChannelManager::dataAdded,
                      plotMan, &PlotManager::replot);
 
     QObject::connect(ui->actionPause, &QAction::triggered,

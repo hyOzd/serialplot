@@ -49,5 +49,4 @@ void AbstractReader::addData(double* samples, unsigned length)
 {
     _channelMan->addData(samples, length);
     sampleCount += length;
-    emit dataAdded();
 }

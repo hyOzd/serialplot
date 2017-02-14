@@ -170,6 +170,8 @@ void ChannelManager::addData(double* data, unsigned size)
     {
         channelBuffers[ci]->addSamples(&data[ci*n], n);
     }
+
+    emit dataAdded();
 }
 
 void ChannelManager::saveSettings(QSettings* settings)
