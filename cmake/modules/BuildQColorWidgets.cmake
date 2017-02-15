@@ -23,9 +23,11 @@ ExternalProject_Add(QCW
   PREFIX qcw
   GIT_REPOSITORY https://github.com/mbasaglia/Qt-Color-Widgets
   PATCH_COMMAND patch -t -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/qt_5_2_moc_creation_namespace_fix.diff
+  CMAKE_CACHE_ARGS "-DCMAKE_CXX_FLAGS:string=-D QTCOLORWIDGETS_STATICALLY_LINKED"
   UPDATE_COMMAND ""
   INSTALL_COMMAND "")
 
 ExternalProject_Get_Property(QCW binary_dir source_dir)
+set(QCW_FLAGS "-D QTCOLORWIDGETS_STATICALLY_LINKED")
 set(QCW_LIBRARY ${binary_dir}/libColorWidgets-qt5.a)
 set(QCW_INCLUDE_DIR ${source_dir}/include)

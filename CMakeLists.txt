@@ -59,6 +59,9 @@ include(BuildQColorWidgets)
 # includes
 include_directories("./src" ${QWT_INCLUDE_DIR} ${QCW_INCLUDE_DIR})
 
+# flags
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${QCW_FLAGS}")
+
 # wrap UI and resource files
 qt5_wrap_ui(UI_FILES
   src/mainwindow.ui
