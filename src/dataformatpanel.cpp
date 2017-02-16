@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -31,26 +31,27 @@
 
 DataFormatPanel::DataFormatPanel(QSerialPort* port,
                                  ChannelManager* channelMan,
+                                 DataRecorder* recorder,
                                  QWidget *parent) :
     QWidget(parent),
     ui(new Ui::DataFormatPanel),
-    bsReader(port, channelMan, this),
-    asciiReader(port, channelMan, this),
-    framedReader(port, channelMan, this),
-    demoReader(port, channelMan, this)
+    bsReader(port, channelMan, recorder, this),
+    asciiReader(port, channelMan, recorder, this),
+    framedReader(port, channelMan, recorder, this),
+    demoReader(port, channelMan, recorder, this)
 {
     ui->setupUi(this);
 
     serialPort = port;
     _channelMan = channelMan;
     paused = false;
+    demoEnabled = false;
 
     // initalize default reader
     currentReader = &bsReader;
     bsReader.enable();
     ui->rbBinary->setChecked(true);
     ui->horizontalLayout->addWidget(bsReader.settingsWidget(), 1);
-    connect(&bsReader, SIGNAL(dataAdded()), this, SIGNAL(dataAdded()));
     connect(&bsReader, SIGNAL(numOfChannelsChanged(unsigned)),
             this, SIGNAL(numOfChannelsChanged(unsigned)));
     connect(&bsReader, SIGNAL(samplesPerSecondChanged(unsigned)),
@@ -99,8 +100,7 @@ void DataFormatPanel::enableDemo(bool enabled)
     if (enabled)
     {
         demoReader.enable();
-        connect(&demoReader, &DemoReader::dataAdded,
-                this, &DataFormatPanel::dataAdded);
+        demoReader.recording = currentReader->recording;
         connect(&demoReader, &DemoReader::samplesPerSecondChanged,
                 this, &DataFormatPanel::samplesPerSecondChanged);
     }
@@ -109,6 +109,19 @@ void DataFormatPanel::enableDemo(bool enabled)
         demoReader.enable(false);
         disconnect(&demoReader, 0, this, 0);
     }
+    demoEnabled = enabled;
+}
+
+void DataFormatPanel::startRecording()
+{
+    currentReader->recording = true;
+    if (demoEnabled) demoReader.recording = true;
+}
+
+void DataFormatPanel::stopRecording()
+{
+    currentReader->recording = false;
+    if (demoEnabled) demoReader.recording = false;
 }
 
 void DataFormatPanel::selectReader(AbstractReader* reader)
@@ -118,7 +131,6 @@ void DataFormatPanel::selectReader(AbstractReader* reader)
 
     // re-connect signals
     disconnect(currentReader, 0, this, 0);
-    connect(reader, SIGNAL(dataAdded()), this, SIGNAL(dataAdded()));
     connect(reader, SIGNAL(numOfChannelsChanged(unsigned)),
             this, SIGNAL(numOfChannelsChanged(unsigned)));
     connect(reader, SIGNAL(samplesPerSecondChanged(unsigned)),
@@ -136,8 +148,8 @@ void DataFormatPanel::selectReader(AbstractReader* reader)
         emit numOfChannelsChanged(reader->numOfChannels());
     }
 
-    // pause
     reader->pause(paused);
+    reader->recording = currentReader->recording;
 
     currentReader = reader;
 }

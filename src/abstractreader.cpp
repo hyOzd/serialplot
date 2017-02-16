@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -19,11 +19,14 @@
 
 #include "abstractreader.h"
 
-AbstractReader::AbstractReader(QIODevice* device, ChannelManager* channelMan, QObject *parent) :
+AbstractReader::AbstractReader(QIODevice* device, ChannelManager* channelMan,
+                               DataRecorder* recorder, QObject* parent) :
     QObject(parent)
 {
     _device = device;
     _channelMan = channelMan;
+    _recorder = recorder;
+    recording = false;
 
     // initialize sps counter
     sampleCount = 0;
@@ -43,4 +46,14 @@ void AbstractReader::spsTimerTimeout()
         emit samplesPerSecondChanged(samplesPerSecond);
     }
     sampleCount = 0;
+}
+
+void AbstractReader::addData(double* samples, unsigned length)
+{
+    _channelMan->addData(samples, length);
+    if (recording)
+    {
+        _recorder->addData(samples, length, numOfChannels());
+    }
+    sampleCount += length;
 }

@@ -62,7 +62,8 @@ MainWindow::MainWindow(QWidget *parent) :
     channelMan(1, 1, this),
     snapshotMan(this, &channelMan),
     commandPanel(&serialPort),
-    dataFormatPanel(&serialPort, &channelMan)
+    dataFormatPanel(&serialPort, &channelMan, &recorder),
+    recordPanel(&recorder, &channelMan)
 {
     ui->setupUi(this);
 
@@ -72,9 +73,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tabWidget->insertTab(1, &dataFormatPanel, "Data Format");
     ui->tabWidget->insertTab(2, &plotControlPanel, "Plot");
     ui->tabWidget->insertTab(3, &commandPanel, "Commands");
+    ui->tabWidget->insertTab(4, &recordPanel, "Record");
     ui->tabWidget->setCurrentIndex(0);
     auto tbPortControl = portControl.toolBar();
     addToolBar(tbPortControl);
+    addToolBar(recordPanel.toolbar());
 
     ui->plotToolBar->addAction(snapshotMan.takeSnapshotAction());
     ui->menuBar->insertMenu(ui->menuHelp->menuAction(), snapshotMan.menu());
@@ -149,13 +152,43 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&(this->serialPort), SIGNAL(error(QSerialPort::SerialPortError)),
                      this, SLOT(onPortError(QSerialPort::SerialPortError)));
 
-    // TODO: `replot` must be triggered from ChannelManager
     // init data format and reader
-    QObject::connect(&dataFormatPanel, &DataFormatPanel::dataAdded,
+    QObject::connect(&channelMan, &ChannelManager::dataAdded,
                      plotMan, &PlotManager::replot);
 
     QObject::connect(ui->actionPause, &QAction::triggered,
-                     &dataFormatPanel, &DataFormatPanel::pause);
+                     &channelMan, &ChannelManager::pause);
+
+    QObject::connect(&recordPanel, &RecordPanel::recordStarted,
+                     &dataFormatPanel, &DataFormatPanel::startRecording);
+
+    QObject::connect(&recordPanel, &RecordPanel::recordStopped,
+                     &dataFormatPanel, &DataFormatPanel::stopRecording);
+
+    QObject::connect(ui->actionPause, &QAction::triggered,
+                     [this](bool enabled)
+                     {
+                         if (enabled && !recordPanel.recordPaused())
+                         {
+                             dataFormatPanel.pause(true);
+                         }
+                         else
+                         {
+                             dataFormatPanel.pause(false);
+                         }
+                     });
+
+    QObject::connect(&recordPanel, &RecordPanel::recordPausedChanged,
+                     [this](bool enabled)
+                     {
+                         if (ui->actionPause->isChecked() && enabled)
+                         {
+                             dataFormatPanel.pause(false);
+                         }
+                     });
+
+    connect(&serialPort, &QIODevice::aboutToClose,
+            &recordPanel, &RecordPanel::onPortClose);
 
     // init data arrays and plot
     numOfSamples = plotControlPanel.numOfSamples();
@@ -466,6 +499,7 @@ void MainWindow::saveAllSettings(QSettings* settings)
     plotControlPanel.saveSettings(settings);
     plotMan->saveSettings(settings);
     commandPanel.saveSettings(settings);
+    recordPanel.saveSettings(settings);
 }
 
 void MainWindow::loadAllSettings(QSettings* settings)
@@ -477,6 +511,7 @@ void MainWindow::loadAllSettings(QSettings* settings)
     plotControlPanel.loadSettings(settings);
     plotMan->loadSettings(settings);
     commandPanel.loadSettings(settings);
+    recordPanel.loadSettings(settings);
 }
 
 void MainWindow::saveMWSettings(QSettings* settings)

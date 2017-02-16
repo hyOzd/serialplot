@@ -23,8 +23,9 @@
 
 #include "framedreader.h"
 
-FramedReader::FramedReader(QIODevice* device, ChannelManager* channelMan, QObject *parent) :
-    AbstractReader(device, channelMan, parent)
+FramedReader::FramedReader(QIODevice* device, ChannelManager* channelMan,
+                           DataRecorder* recorder, QObject* parent) :
+    AbstractReader(device, channelMan, recorder, parent)
 {
     paused = false;
 
@@ -310,8 +311,7 @@ void FramedReader::readFrameDataAndCheck()
     if (!checksumEnabled || checksumPassed)
     {
         // commit data
-        _channelMan->addData(channelSamples, numOfPackagesToRead * _numOfChannels);
-        emit dataAdded();
+        addData(channelSamples, numOfPackagesToRead*_numOfChannels);
     }
     else
     {

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -38,11 +38,13 @@
 #include "commandpanel.h"
 #include "dataformatpanel.h"
 #include "plotcontrolpanel.h"
+#include "recordpanel.h"
 #include "ui_about_dialog.h"
 #include "framebuffer.h"
 #include "channelmanager.h"
 #include "snapshotmanager.h"
 #include "plotmanager.h"
+#include "datarecorder.h"
 
 namespace Ui {
 class MainWindow;
@@ -74,10 +76,12 @@ private:
     ChannelManager channelMan;
     PlotManager* plotMan;
     SnapshotManager snapshotMan;
+    DataRecorder recorder;       // operated by `recordPanel`
 
     QLabel spsLabel;
     CommandPanel commandPanel;
     DataFormatPanel dataFormatPanel;
+    RecordPanel recordPanel;
     PlotControlPanel plotControlPanel;
 
     bool isDemoRunning();

@@ -25,8 +25,9 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-DemoReader::DemoReader(QIODevice* device, ChannelManager* channelMan, QObject *parent) :
-    AbstractReader(device, channelMan, parent)
+DemoReader::DemoReader(QIODevice* device, ChannelManager* channelMan,
+                       DataRecorder* recorder, QObject* parent) :
+    AbstractReader(device, channelMan, recorder, parent)
 {
     paused = false;
     _numOfChannels = 1;
@@ -81,10 +82,8 @@ void DemoReader::demoTimerTimeout()
         {
             // we are calculating the fourier components of square wave
             samples[ci] = 4*sin(2*M_PI*double((ci+1)*count)/period)/((2*(ci+1))*M_PI);
-            sampleCount++;
         }
-        _channelMan->addData(samples, _numOfChannels);
+        addData(samples, _numOfChannels);
         delete[] samples;
-        emit dataAdded();
     }
 }

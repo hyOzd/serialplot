@@ -30,6 +30,7 @@ ChannelManager::ChannelManager(unsigned numberOfChannels, unsigned numberOfSampl
 {
     _numOfChannels = numberOfChannels;
     _numOfSamples = numberOfSamples;
+    _paused = false;
 
     for (unsigned int i = 0; i < numberOfChannels; i++)
     {
@@ -95,6 +96,11 @@ void ChannelManager::setNumOfSamples(unsigned number)
     }
 
     emit numOfSamplesChanged(number);
+}
+
+void ChannelManager::pause(bool paused)
+{
+    _paused = paused;
 }
 
 FrameBuffer* ChannelManager::channelBuffer(unsigned channel)
@@ -165,11 +171,15 @@ void ChannelManager::addData(double* data, unsigned size)
 {
     Q_ASSERT(size % _numOfChannels == 0);
 
+    if (_paused) return;
+
     int n = size / _numOfChannels;
     for (unsigned ci = 0; ci < _numOfChannels; ci++)
     {
         channelBuffers[ci]->addSamples(&data[ci*n], n);
     }
+
+    emit dataAdded();
 }
 
 void ChannelManager::saveSettings(QSettings* settings)

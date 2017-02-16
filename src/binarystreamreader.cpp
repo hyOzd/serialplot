@@ -23,13 +23,13 @@
 #include "binarystreamreader.h"
 #include "floatswap.h"
 
-BinaryStreamReader::BinaryStreamReader(QIODevice* device, ChannelManager* channelMan, QObject *parent) :
-    AbstractReader(device, channelMan, parent)
+BinaryStreamReader::BinaryStreamReader(QIODevice* device, ChannelManager* channelMan,
+                                       DataRecorder* recorder, QObject* parent) :
+    AbstractReader(device, channelMan, recorder, parent)
 {
     paused = false;
     skipByteRequested = false;
     skipSampleRequested = false;
-    sampleCount = 0;
 
     _numOfChannels = _settingsWidget.numOfChannels();
     connect(&_settingsWidget, &BinaryStreamReaderSettings::numOfChannelsChanged,
@@ -171,9 +171,7 @@ void BinaryStreamReader::onDataReady()
         }
     }
 
-    _channelMan->addData(channelSamples, numOfPackagesToRead*_numOfChannels);
-    sampleCount += numOfPackagesToRead*_numOfChannels;
-    emit dataAdded();
+    addData(channelSamples, numOfPackagesToRead*_numOfChannels);
 
     delete[] channelSamples;
 }

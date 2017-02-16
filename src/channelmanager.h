@@ -39,7 +39,6 @@ public:
     unsigned numOfChannels();
     unsigned numOfSamples();
     FrameBuffer* channelBuffer(unsigned channel);
-    // QStringListModel* channelNames();
     QString channelName(unsigned channel);
     /// Stores channel names into a `QSettings`
     void saveSettings(QSettings* settings);
@@ -54,6 +53,7 @@ signals:
     void numOfChannelsChanged(unsigned value);
     void numOfSamplesChanged(unsigned value);
     void channelNameChanged(unsigned channel, QString name);
+    void dataAdded(); ///< emitted when data added to channel man.
 
 public slots:
     void setNumOfChannels(unsigned number);
@@ -71,9 +71,13 @@ public slots:
      */
     void addData(double* data, unsigned size);
 
+    /// When paused `addData` does nothing.
+    void pause(bool paused);
+
 private:
     unsigned _numOfChannels;
     unsigned _numOfSamples;
+    bool _paused;
     QList<FrameBuffer*> channelBuffers;
     // QStringListModel _channelNames;
     ChannelInfoModel _infoModel;
