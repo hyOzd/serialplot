@@ -29,9 +29,10 @@ DataRecorder::DataRecorder(QObject *parent) :
     disableBuffering = false;
 }
 
-bool DataRecorder::startRecording(QString fileName, QStringList channelNames)
+bool DataRecorder::startRecording(QString fileName, QString separator, QStringList channelNames)
 {
     Q_ASSERT(!file.isOpen());
+    _sep =  separator;
 
     // open file
     file.setFileName(fileName);
@@ -45,7 +46,7 @@ bool DataRecorder::startRecording(QString fileName, QStringList channelNames)
     // write header line
     if (!channelNames.isEmpty())
     {
-        fileStream << channelNames.join(",");
+        fileStream << channelNames.join(_sep);
         fileStream << "\n";
         lastNumChannels = channelNames.length();
     }
@@ -71,7 +72,7 @@ void DataRecorder::addData(double* data, unsigned length, unsigned numOfChannels
         for (unsigned ci = 0; ci < numOfChannels; ci++)
         {
             fileStream << data[ci * numOfSamples + i];
-            if (ci != numOfChannels-1) fileStream << ",";
+            if (ci != numOfChannels-1) fileStream << _sep;
         }
         fileStream << '\n';
     }

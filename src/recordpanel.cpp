@@ -222,7 +222,7 @@ void RecordPanel::startRecording(void)
     {
         channelNames = _channelMan->infoModel()->channelNames();
     }
-    _recorder->startRecording(selectedFile, channelNames);
+    _recorder->startRecording(selectedFile, getSeparator(), channelNames);
     emit recordStarted();
 }
 
@@ -239,4 +239,11 @@ void RecordPanel::onPortClose()
         stopRecording();
         recordAction.setChecked(false);
     }
+}
+
+QString RecordPanel::getSeparator() const
+{
+    QString sep = ui->leSeparator->text();
+    sep.replace("\\t", "\t");
+    return sep;
 }

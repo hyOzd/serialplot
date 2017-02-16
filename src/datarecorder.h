@@ -39,10 +39,11 @@ public:
      * File is opened and header line (names of channels) is written.
      *
      * @param fileName name of the recording file
+     * @param separator column separator
      * @param channelNames names of the channels for header line, if empty no header line is written
      * @return false if file operation fails (read only etc.)
      */
-    bool startRecording(QString fileName, QStringList channelNames);
+    bool startRecording(QString fileName, QString separator, QStringList channelNames);
 
     /**
      * @brief Adds data to a channel.
@@ -70,6 +71,7 @@ private:
     unsigned lastNumChannels;   ///< used for error message only
     QFile file;
     QTextStream fileStream;
+    QString _sep;
 };
 
 #endif // DATARECORDER_H

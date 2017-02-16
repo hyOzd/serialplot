@@ -90,6 +90,10 @@ private:
     void startRecording(void);
     void stopRecording(void);
 
+    /// Returns separator text from ui. "\t" is converted to TAB
+    /// character.
+    QString getSeparator() const;
+
 private slots:
     /**
      * @brief Opens up the file select dialog
