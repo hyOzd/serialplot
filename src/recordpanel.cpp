@@ -108,14 +108,22 @@ void RecordPanel::onRecord(bool start)
         return;
     }
 
-    // check file name
     bool canceled = false;
-    if (selectedFile.isEmpty() && !selectFile())
+    if (ui->leSeparator->text().isEmpty())
+    {
+        QMessageBox::critical(this, "Error",
+                              "Column separator cannot be empty! Please select a separator.");
+        ui->leSeparator->setFocus(Qt::OtherFocusReason);
+        canceled = true;
+    }
+
+    // check file name
+    if (!canceled && selectedFile.isEmpty() && !selectFile())
     {
         canceled = true;
     }
 
-    if (!overwriteSelected && QFile::exists(selectedFile))
+    if (!canceled && !overwriteSelected && QFile::exists(selectedFile))
     {
         if (ui->cbAutoIncrement->isChecked())
         {
@@ -127,7 +135,6 @@ void RecordPanel::onRecord(bool start)
             canceled = !confirmOverwrite(selectedFile);
         }
     }
-    overwriteSelected = false;
 
     if (canceled)
     {
@@ -135,6 +142,7 @@ void RecordPanel::onRecord(bool start)
     }
     else
     {
+        overwriteSelected = false;
         startRecording();
     }
 }
