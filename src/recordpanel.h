@@ -46,6 +46,11 @@ public:
     bool isRecording();
     bool recordPaused();
 
+    /// Stores settings into a `QSettings`
+    void saveSettings(QSettings* settings);
+    /// Loads settings from a `QSettings`.
+    void loadSettings(QSettings* settings);
+
 signals:
     void recordStarted();
     void recordStopped();

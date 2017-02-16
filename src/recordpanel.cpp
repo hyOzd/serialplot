@@ -17,17 +17,17 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "recordpanel.h"
-#include "ui_recordpanel.h"
-
 #include <QIcon>
 #include <QFile>
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QRegularExpression>
-
 #include <QtDebug>
+
+#include "recordpanel.h"
+#include "ui_recordpanel.h"
+#include "setting_defines.h"
 
 RecordPanel::RecordPanel(DataRecorder* recorder, ChannelManager* channelMan, QWidget *parent) :
     QWidget(parent),
@@ -254,4 +254,33 @@ QString RecordPanel::getSeparator() const
     QString sep = ui->leSeparator->text();
     sep.replace("\\t", "\t");
     return sep;
+}
+
+void RecordPanel::saveSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_Record);
+    settings->setValue(SG_Record_AutoIncrement, ui->cbAutoIncrement->isChecked());
+    settings->setValue(SG_Record_RecordPaused, ui->cbRecordPaused->isChecked());
+    settings->setValue(SG_Record_StopOnClose, ui->cbStopOnClose->isChecked());
+    settings->setValue(SG_Record_Header, ui->cbHeader->isChecked());
+    settings->setValue(SG_Record_DisableBuffering, ui->cbDisableBuffering->isChecked());
+    settings->setValue(SG_Record_Separator, ui->leSeparator->text());
+    settings->endGroup();
+}
+
+void RecordPanel::loadSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_Record);
+    ui->cbAutoIncrement->setChecked(
+        settings->value(SG_Record_AutoIncrement, ui->cbAutoIncrement->isChecked()).toBool());
+    ui->cbRecordPaused->setChecked(
+        settings->value(SG_Record_RecordPaused, ui->cbRecordPaused->isChecked()).toBool());
+    ui->cbStopOnClose->setChecked(
+        settings->value(SG_Record_StopOnClose, ui->cbStopOnClose->isChecked()).toBool());
+    ui->cbHeader->setChecked(
+        settings->value(SG_Record_Header, ui->cbHeader->isChecked()).toBool());
+    ui->cbDisableBuffering->setChecked(
+        settings->value(SG_Record_DisableBuffering, ui->cbDisableBuffering->isChecked()).toBool());
+    ui->leSeparator->setText(settings->value(SG_Record_Separator, ui->leSeparator->text()).toString());
+    settings->endGroup();
 }

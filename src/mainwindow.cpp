@@ -499,6 +499,7 @@ void MainWindow::saveAllSettings(QSettings* settings)
     plotControlPanel.saveSettings(settings);
     plotMan->saveSettings(settings);
     commandPanel.saveSettings(settings);
+    recordPanel.saveSettings(settings);
 }
 
 void MainWindow::loadAllSettings(QSettings* settings)
@@ -510,6 +511,7 @@ void MainWindow::loadAllSettings(QSettings* settings)
     plotControlPanel.loadSettings(settings);
     plotMan->loadSettings(settings);
     commandPanel.loadSettings(settings);
+    recordPanel.loadSettings(settings);
 }
 
 void MainWindow::saveMWSettings(QSettings* settings)
