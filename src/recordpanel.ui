@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>532</width>
-    <height>152</height>
+    <height>169</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -73,6 +73,19 @@
       <widget class="QCheckBox" name="cbStopOnClose">
        <property name="text">
         <string>Stop recording when port closed</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="cbHeader">
+       <property name="toolTip">
+        <string>Channel names are written to the first line of record file</string>
+       </property>
+       <property name="text">
+        <string>Write header line</string>
        </property>
        <property name="checked">
         <bool>true</bool>

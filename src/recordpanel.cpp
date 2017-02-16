@@ -217,7 +217,12 @@ bool RecordPanel::confirmOverwrite(QString fileName)
 
 void RecordPanel::startRecording(void)
 {
-    _recorder->startRecording(selectedFile, _channelMan->infoModel()->channelNames());
+    QStringList channelNames;
+    if (ui->cbHeader->isChecked())
+    {
+        channelNames = _channelMan->infoModel()->channelNames();
+    }
+    _recorder->startRecording(selectedFile, channelNames);
     emit recordStarted();
 }
 
