@@ -139,6 +139,7 @@ void AsciiReader::onDataReady()
         {
             numReadChannels = separatedValues.length();
             qWarning() << "Incoming data is missing data for some channels!";
+            qWarning() << "Read line: " << line;
         }
 
         // parse read line
@@ -150,6 +151,7 @@ void AsciiReader::onDataReady()
             if (!ok)
             {
                 qWarning() << "Data parsing error for channel: " << ci;
+                qWarning() << "Read line: " << line;
                 channelSamples[ci] = 0;
             }
         }
