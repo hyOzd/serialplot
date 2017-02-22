@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -129,6 +129,9 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     QObject::connect(&flowControlButtons,
                      SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
                      this, &PortControl::selectFlowControl);
+
+    // test code
+    connect(ui->pbDTR, &QPushButton::clicked, ui->ledDTR, &LedWidget::toggle);
 
     loadPortList();
     loadBaudRateList();

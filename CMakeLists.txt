@@ -55,9 +55,10 @@ else (BUILD_QWT)
 endif (BUILD_QWT)
 
 include(BuildQColorWidgets)
+include(BuildLedWidget)
 
 # includes
-include_directories("./src" ${QWT_INCLUDE_DIR} ${QCW_INCLUDE_DIR})
+include_directories("./src" ${QWT_INCLUDE_DIR} ${QCW_INCLUDE_DIR} ${LEDW_INCLUDE_DIR})
 
 # flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${QCW_FLAGS}")
@@ -133,11 +134,11 @@ add_executable(${PROGRAM_NAME} WIN32
   )
 
 # Use the Widgets module from Qt 5.
-target_link_libraries(${PROGRAM_NAME} ${QWT_LIBRARY} ${QCW_LIBRARY})
+target_link_libraries(${PROGRAM_NAME} ${QWT_LIBRARY} ${QCW_LIBRARY} ${LEDW_LIBRARY})
 qt5_use_modules(${PROGRAM_NAME} Widgets SerialPort)
 
 if (BUILD_QWT)
-  add_dependencies(${PROGRAM_NAME} QWT)
+  add_dependencies(${PROGRAM_NAME} QWT LEDW)
 endif (BUILD_QWT)
 
 # set compiler flags
