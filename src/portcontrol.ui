@@ -305,6 +305,25 @@
        <property name="spacing">
         <number>2</number>
        </property>
+       <item row="1" column="2">
+        <widget class="LedWidget" name="ledRTS" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>15</width>
+           <height>15</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>15</width>
+           <height>15</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Request To Send</string>
+         </property>
+        </widget>
+       </item>
        <item row="0" column="0">
         <spacer name="horizontalSpacer_2">
          <property name="orientation">
@@ -323,8 +342,11 @@
          <property name="maximumSize">
           <size>
            <width>40</width>
-           <height>16777215</height>
+           <height>20</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>Data Terminal Ready</string>
          </property>
          <property name="text">
           <string>DTR</string>
@@ -345,9 +367,60 @@
            <height>15</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>Data Terminal Ready</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="2">
+        <widget class="LedWidget" name="ledDSR" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>15</width>
+           <height>15</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>15</width>
+           <height>15</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Data Set Ready</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLabel" name="labDSR">
+         <property name="toolTip">
+          <string>Data Set Ready</string>
+         </property>
+         <property name="text">
+          <string>DSR</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
         </widget>
        </item>
        <item row="1" column="1">
+        <widget class="QPushButton" name="pbRTS">
+         <property name="maximumSize">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Request To Send</string>
+         </property>
+         <property name="text">
+          <string>RTS</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
         <widget class="QLabel" name="labDCE">
          <property name="text">
           <string>DCE</string>
@@ -357,7 +430,42 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="2">
+       <item row="2" column="2">
+        <widget class="LedWidget" name="ledRTR" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>15</width>
+           <height>15</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>15</width>
+           <height>15</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Ready To Receive</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QPushButton" name="pbRTR">
+         <property name="maximumSize">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Ready To Receive</string>
+         </property>
+         <property name="text">
+          <string>RTR</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2">
         <widget class="LedWidget" name="ledDCE" native="true">
          <property name="minimumSize">
           <size>
@@ -373,6 +481,70 @@
          </property>
         </widget>
        </item>
+       <item row="5" column="1">
+        <widget class="QLabel" name="labRI">
+         <property name="toolTip">
+          <string>Ring Indicator</string>
+         </property>
+         <property name="text">
+          <string>RI</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="2">
+        <widget class="LedWidget" name="ledRI" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>15</width>
+           <height>15</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>15</width>
+           <height>15</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Ring Indicator</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="QLabel" name="labCTS">
+         <property name="toolTip">
+          <string>Clear To Send</string>
+         </property>
+         <property name="text">
+          <string>CTS</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="2">
+        <widget class="LedWidget" name="ledCTS" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>15</width>
+           <height>15</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>15</width>
+           <height>15</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Clear To Send</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
      <item>
@@ -383,7 +555,7 @@
        <property name="sizeHint" stdset="0">
         <size>
          <width>20</width>
-         <height>40</height>
+         <height>1</height>
         </size>
        </property>
       </spacer>
