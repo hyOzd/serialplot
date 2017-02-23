@@ -372,7 +372,7 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="2">
+       <item row="3" column="2">
         <widget class="LedWidget" name="ledDSR" native="true">
          <property name="minimumSize">
           <size>
@@ -391,7 +391,7 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="3" column="1">
         <widget class="QLabel" name="labDSR">
          <property name="toolTip">
           <string>Data Set Ready</string>
@@ -420,7 +420,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="2" column="1">
         <widget class="QLabel" name="labDCE">
          <property name="text">
           <string>DCE</string>
@@ -431,41 +431,6 @@
         </widget>
        </item>
        <item row="2" column="2">
-        <widget class="LedWidget" name="ledRTR" native="true">
-         <property name="minimumSize">
-          <size>
-           <width>15</width>
-           <height>15</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>15</width>
-           <height>15</height>
-          </size>
-         </property>
-         <property name="toolTip">
-          <string>Ready To Receive</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QPushButton" name="pbRTR">
-         <property name="maximumSize">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="toolTip">
-          <string>Ready To Receive</string>
-         </property>
-         <property name="text">
-          <string>RTR</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="2">
         <widget class="LedWidget" name="ledDCE" native="true">
          <property name="minimumSize">
           <size>
@@ -481,7 +446,7 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
+       <item row="4" column="1">
         <widget class="QLabel" name="labRI">
          <property name="toolTip">
           <string>Ring Indicator</string>
@@ -494,7 +459,7 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="2">
+       <item row="4" column="2">
         <widget class="LedWidget" name="ledRI" native="true">
          <property name="minimumSize">
           <size>
@@ -513,20 +478,7 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
-        <widget class="QLabel" name="labCTS">
-         <property name="toolTip">
-          <string>Clear To Send</string>
-         </property>
-         <property name="text">
-          <string>CTS</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="2">
+       <item row="5" column="2">
         <widget class="LedWidget" name="ledCTS" native="true">
          <property name="minimumSize">
           <size>
@@ -542,6 +494,19 @@
          </property>
          <property name="toolTip">
           <string>Clear To Send</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QLabel" name="labCTS">
+         <property name="toolTip">
+          <string>Clear To Send</string>
+         </property>
+         <property name="text">
+          <string>CTS</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
