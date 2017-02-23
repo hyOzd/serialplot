@@ -130,8 +130,22 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
                      SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
                      this, &PortControl::selectFlowControl);
 
-    // test code
-    connect(ui->pbDTR, &QPushButton::clicked, ui->ledDTR, &LedWidget::toggle);
+    // connect output signals
+    connect(ui->pbDTR, &QPushButton::clicked, [this]()
+            {
+                // toggle DTR
+                serialPort->setDataTerminalReady(!serialPort->isDataTerminalReady());
+            });
+    connect(serialPort, &QSerialPort::dataTerminalReadyChanged,
+            ui->ledDTR, &LedWidget::toggle);
+
+    connect(ui->pbRTS, &QPushButton::clicked, [this]()
+            {
+                // toggle RTS
+                serialPort->setRequestToSend(!serialPort->isRequestToSend());
+            });
+    connect(serialPort, &QSerialPort::requestToSendChanged,
+            ui->ledRTS, &LedWidget::toggle);
 
     loadPortList();
     loadBaudRateList();
