@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -62,6 +62,7 @@ private:
     double position(double); // returns the axis mouse position relative to plot coordinates
     int positionPx(QMouseEvent*); // returns the axis mouse position in pixels
     double posCanvasPx(double pos); // returns the given position in canvas coordinates
+    void drawTriangle(QPainter* painter, int position);
 
 private slots:
     void updateSnapPoints();

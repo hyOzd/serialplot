@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -191,27 +191,46 @@ void ScalePicker::drawPlotOverlay(QPainter* painter)
 void ScalePicker::drawScaleOverlay(QPainter* painter)
 {
     painter->save();
-    painter->setPen(_pen);
 
-    if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale ||
-        _scaleWidget->alignment() == QwtScaleDraw::TopScale)
-    {
-        int height = painter->device()->height();
-        if (started) painter->drawLine(firstPosPx, 0, firstPosPx, height);
-        if (started || _scaleWidget->underMouse())
-        {
-            painter->drawLine(currentPosPx, 0, currentPosPx, height);
-        }
-    }
-    else // vertical
+    // rotate & adjust coordinate system for vertical drawing
+    if (_scaleWidget->alignment() == QwtScaleDraw::LeftScale ||
+        _scaleWidget->alignment() == QwtScaleDraw::RightScale) // vertical
     {
         int width = painter->device()->width();
-        if (started) painter->drawLine(0, firstPosPx, width, firstPosPx);
-        if (started || _scaleWidget->underMouse())
-        {
-            painter->drawLine(0, currentPosPx, width, currentPosPx);
-        }
+        painter->rotate(90);
+        painter->translate(0, -width);
     }
+
+    // draw the indicators
+    if (started) drawTriangle(painter, firstPosPx);
+    if (started || _scaleWidget->underMouse())
+    {
+        drawTriangle(painter, currentPosPx);
+    }
+
+    painter->restore();
+}
+
+void ScalePicker::drawTriangle(QPainter* painter, int position)
+{
+    const double tan60 = 1.732;
+    const double trsize = 10;
+    const int TRIANGLE_NUM_POINTS = 3;
+    const int MARGIN = 2;
+    const QPointF points[TRIANGLE_NUM_POINTS] =
+        {
+            {0, 0},
+            {-trsize/tan60 , trsize},
+            {trsize/tan60 , trsize}
+        };
+
+    painter->save();
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(_scaleWidget->palette().windowText());
+    painter->setRenderHint(QPainter::Antialiasing);
+
+    painter->translate(position, MARGIN);
+    painter->drawPolygon(points, TRIANGLE_NUM_POINTS);
 
     painter->restore();
 }
