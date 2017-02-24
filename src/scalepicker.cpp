@@ -166,10 +166,15 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
 
 void ScalePicker::drawPlotOverlay(QPainter* painter)
 {
+    const double FILL_ALPHA = 0.2;
+
     if (started)
     {
         painter->save();
         painter->setPen(_pen);
+        QColor color = _pen.color();
+        color.setAlphaF(FILL_ALPHA);
+        painter->setBrush(color);
 
         QRect rect;
         if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale ||
