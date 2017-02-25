@@ -182,9 +182,8 @@ void ScalePicker::drawPlotOverlay(QPainter* painter)
         painter->setBrush(color);
 
         QRect rect;
-        QwtText text(QString("%1").arg(position(currentPosPx)));
+        QwtText text = trackerText();
         auto tSize = text.textSize(painter->font());
-        QPointF tTopLeft;
 
         if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale ||
             _scaleWidget->alignment() == QwtScaleDraw::TopScale)
@@ -205,11 +204,27 @@ void ScalePicker::drawPlotOverlay(QPainter* painter)
     else if (_scaleWidget->underMouse())
     {
         // draw tracker text centered on cursor
-        QwtText text(QString("%1").arg(position(currentPosPx)));
+        QwtText text = trackerText();
         auto tsize = text.textSize(painter->font());
         text.draw(painter, trackerTextRect(painter, currentPosPx, tsize));
     }
     painter->restore();
+}
+
+QwtText ScalePicker::trackerText() const
+{
+    double pos;
+    // use stored value if snapped to restore precision
+    if (snapPointMap.contains(currentPosPx))
+    {
+        pos = snapPointMap[currentPosPx];
+    }
+    else
+    {
+        pos = position(currentPosPx);
+    }
+
+    return QwtText(QString("%1").arg(pos));
 }
 
 QRectF ScalePicker::trackerTextRect(QPainter* painter, int posPx, QSizeF textSize) const
@@ -377,7 +392,7 @@ void ScalePicker::setPen(QPen pen)
 }
 
 // convert the position of the click to the plot coordinates
-double ScalePicker::position(double posPx)
+double ScalePicker::position(double posPx) const
 {
     return _scaleWidget->scaleDraw()->scaleMap().invTransform(posPx);
 }
@@ -425,9 +440,12 @@ void ScalePicker::updateSnapPoints()
         _scaleWidget->scaleDraw()->scaleDiv().ticks(QwtScaleDiv::MinorTick);
 
     snapPoints.clear();
+    snapPointMap.clear();
     for(auto t : allTicks)
     {
         // `round` is used because `allTicks` is double but `snapPoints` is int
-        snapPoints << round(_scaleWidget->scaleDraw()->scaleMap().transform(t));
+        int p = round(_scaleWidget->scaleDraw()->scaleMap().transform(t));
+        snapPoints << p;
+        snapPointMap[p] = t;
     }
 }
