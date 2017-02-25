@@ -23,6 +23,7 @@
 #include <qwt_scale_widget.h>
 #include <qwt_scale_map.h>
 #include <qwt_scale_div.h>
+#include <qwt_text.h>
 #include <math.h>
 
 #include "scalepicker.h"
@@ -107,7 +108,7 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
         {
             for (auto sp : snapPoints)
             {
-                if (fabs(posPx-sp) <= SNAP_DISTANCE)
+                if (std::abs(posPx-sp) <= SNAP_DISTANCE)
                 {
                     posPx = sp;
                     break;
@@ -136,9 +137,9 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
             }
             else if (started)
             {
-                pickerOverlay->updateOverlay();
                 emit picking(firstPos, pos);
             }
+            pickerOverlay->updateOverlay();
             scaleOverlay->updateOverlay();
         }
         else // event->type() == QEvent::MouseButtonRelease
@@ -156,6 +157,7 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
     else if (event->type() == QEvent::Leave)
     {
         scaleOverlay->updateOverlay();
+        pickerOverlay->updateOverlay();
         return true;
     }
     else
@@ -167,11 +169,13 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
 void ScalePicker::drawPlotOverlay(QPainter* painter)
 {
     const double FILL_ALPHA = 0.2;
+    const int TEXT_MARGIN = 4;
+
+    painter->save();
+    painter->setPen(_pen);
 
     if (started)
     {
-        painter->save();
-        painter->setPen(_pen);
         QColor color = _pen.color();
         color.setAlphaF(FILL_ALPHA);
         painter->setBrush(color);
@@ -189,8 +193,35 @@ void ScalePicker::drawPlotOverlay(QPainter* painter)
             rect = QRect(0, posCanvasPx(firstPosPx), width, currentPosPx-firstPosPx);
         }
         painter->drawRect(rect);
-        painter->restore();
     }
+    else if (_scaleWidget->underMouse())
+    {
+        QwtText text(QString("%1").arg(position(currentPosPx)));
+        int canvasPosPx = posCanvasPx(currentPosPx);
+        auto tsize = text.textSize(painter->font());
+        QPointF topLeft;
+
+        if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale)
+        {
+            int height = painter->device()->height();
+            topLeft = QPointF(canvasPosPx-tsize.width()/2, height-tsize.height());
+        }
+        else if (_scaleWidget->alignment() == QwtScaleDraw::TopScale)
+        {
+            topLeft = QPointF(canvasPosPx-tsize.width()/2, 0);
+        }
+        else if (_scaleWidget->alignment() == QwtScaleDraw::LeftScale)
+        {
+            topLeft = QPointF(TEXT_MARGIN, canvasPosPx-tsize.height()/2);
+        }
+        else                    // right scale
+        {
+            int width = painter->device()->width();
+            topLeft = QPointF(width-tsize.width()-TEXT_MARGIN, canvasPosPx-tsize.height()/2);
+        }
+        text.draw(painter, QRectF(topLeft, tsize));
+    }
+    painter->restore();
 }
 
 void ScalePicker::drawScaleOverlay(QPainter* painter)
