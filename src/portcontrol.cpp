@@ -130,22 +130,30 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
                      SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
                      this, &PortControl::selectFlowControl);
 
+    // initialize signal leds
+    ui->ledDTR->setOn(true);
+    ui->ledRTS->setOn(true);
+
     // connect output signals
     connect(ui->pbDTR, &QPushButton::clicked, [this]()
             {
                 // toggle DTR
-                serialPort->setDataTerminalReady(!serialPort->isDataTerminalReady());
+                ui->ledDTR->toggle();
+                if (serialPort->isOpen())
+                {
+                    serialPort->setDataTerminalReady(ui->ledDTR->isOn());
+                }
             });
-    connect(serialPort, &QSerialPort::dataTerminalReadyChanged,
-            ui->ledDTR, &LedWidget::toggle);
 
     connect(ui->pbRTS, &QPushButton::clicked, [this]()
             {
                 // toggle RTS
-                serialPort->setRequestToSend(!serialPort->isRequestToSend());
+                ui->ledRTS->toggle();
+                if (serialPort->isOpen())
+                {
+                    serialPort->setRequestToSend(ui->ledRTS->isOn());
+                }
             });
-    connect(serialPort, &QSerialPort::requestToSendChanged,
-            ui->ledRTS, &LedWidget::toggle);
 
     loadPortList();
     loadBaudRateList();
@@ -274,6 +282,10 @@ void PortControl::togglePort()
             selectDataBits((QSerialPort::DataBits) dataBitsButtons.checkedId());
             selectStopBits((QSerialPort::StopBits) stopBitsButtons.checkedId());
             selectFlowControl((QSerialPort::FlowControl) flowControlButtons.checkedId());
+
+            // set output signals
+            serialPort->setDataTerminalReady(ui->ledDTR->isOn());
+            serialPort->setRequestToSend(ui->ledRTS->isOn());
 
             qDebug() << "Opened port:" << serialPort->portName();
             emit portToggled(true);
