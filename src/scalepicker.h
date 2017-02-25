@@ -65,6 +65,8 @@ private:
     void drawTriangle(QPainter* painter, int position);
 
 private slots:
+    /// Returns the text position for tracker text shown during picking
+    QRectF pickTrackerTextRect(QPainter* painter, QRect pickRect, QSizeF textSize);
     void updateSnapPoints();
 };
 

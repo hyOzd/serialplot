@@ -166,10 +166,11 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
     }
 }
 
+const int TEXT_MARGIN = 4;
+
 void ScalePicker::drawPlotOverlay(QPainter* painter)
 {
     const double FILL_ALPHA = 0.2;
-    const int TEXT_MARGIN = 4;
 
     painter->save();
     painter->setPen(_pen);
@@ -181,23 +182,31 @@ void ScalePicker::drawPlotOverlay(QPainter* painter)
         painter->setBrush(color);
 
         QRect rect;
+        QwtText text(QString("%1").arg(position(currentPosPx)));
+        auto tSize = text.textSize(painter->font());
+        QPointF tTopLeft;
+
         if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale ||
             _scaleWidget->alignment() == QwtScaleDraw::TopScale)
         {
-            int height = painter->device()->height();
-            rect = QRect(posCanvasPx(firstPosPx), 0, currentPosPx-firstPosPx, height);
+            int canvasHeight = painter->device()->height();
+            int pickWidth = currentPosPx-firstPosPx;
+            rect = QRect(posCanvasPx(firstPosPx), 0, pickWidth, canvasHeight);
         }
         else // vertical
         {
-            int width = painter->device()->width();
-            rect = QRect(0, posCanvasPx(firstPosPx), width, currentPosPx-firstPosPx);
+            int canvasWidth = painter->device()->width();
+            int pickHeight = currentPosPx-firstPosPx;
+            rect = QRect(0, posCanvasPx(firstPosPx), canvasWidth, pickHeight);
         }
         painter->drawRect(rect);
+        text.draw(painter, pickTrackerTextRect(painter, rect, tSize));
     }
     else if (_scaleWidget->underMouse())
     {
-        QwtText text(QString("%1").arg(position(currentPosPx)));
+        // draw tracker text centered on cursor
         int canvasPosPx = posCanvasPx(currentPosPx);
+        QwtText text(QString("%1").arg(position(currentPosPx)));
         auto tsize = text.textSize(painter->font());
         QPointF topLeft;
 
@@ -222,6 +231,83 @@ void ScalePicker::drawPlotOverlay(QPainter* painter)
         text.draw(painter, QRectF(topLeft, tsize));
     }
     painter->restore();
+}
+
+QRectF ScalePicker::pickTrackerTextRect(QPainter* painter, QRect pickRect, QSizeF textSize)
+{
+    qreal left = 0;
+    int pickLength = currentPosPx - firstPosPx;
+    QPointF topLeft;
+
+    if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale ||
+        _scaleWidget->alignment() == QwtScaleDraw::TopScale)
+    {
+        int canvasWidth = painter->device()->width();
+
+        if (pickLength > 0)
+        {
+            left = pickRect.right() + TEXT_MARGIN;
+        }
+        else
+        {
+            left = pickRect.right() - (textSize.width() + TEXT_MARGIN);
+        }
+
+        // make sure text is not off the canvas
+        if (left < TEXT_MARGIN)
+        {
+            left = std::max(0, pickRect.right()) + TEXT_MARGIN;
+        }
+        else if (left + textSize.width() + TEXT_MARGIN > canvasWidth)
+        {
+            left = std::min(pickRect.right(), canvasWidth) - (textSize.width() + TEXT_MARGIN);
+        }
+
+        if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale)
+        {
+            int canvasHeight = painter->device()->height();
+            topLeft = QPointF(left, canvasHeight - textSize.height());
+        }
+        else                // top scale
+        {
+            topLeft = QPointF(left, 0);
+        }
+    }
+    else                        // left/right scale
+    {
+        int canvasHeight = painter->device()->height();
+
+        int top = 0;
+        if (pickLength > 0)
+        {
+            top = pickRect.bottom();
+        }
+        else
+        {
+            top = pickRect.bottom() - textSize.height();
+        }
+
+        // make sure text is not off the canvas
+        if (top < 0)
+        {
+            top = std::max(0, pickRect.bottom());
+        }
+        else if (top + textSize.height() > canvasHeight)
+        {
+            top = std::min(canvasHeight, pickRect.bottom()) - textSize.height();
+        }
+
+        if (_scaleWidget->alignment() == QwtScaleDraw::LeftScale)
+        {
+            topLeft = QPointF(TEXT_MARGIN, top);
+        }
+        else                    // right scale
+        {
+            int canvasWidth = painter->device()->width();
+            topLeft = QPointF(canvasWidth - textSize.width() - TEXT_MARGIN, top);
+        }
+    }
+    return QRectF(topLeft, textSize);
 }
 
 void ScalePicker::drawScaleOverlay(QPainter* painter)
