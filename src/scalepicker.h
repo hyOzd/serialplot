@@ -61,12 +61,14 @@ private:
 
     double position(double); // returns the axis mouse position relative to plot coordinates
     int positionPx(QMouseEvent*); // returns the axis mouse position in pixels
-    double posCanvasPx(double pos); // returns the given position in canvas coordinates
+    double posCanvasPx(double pos) const; // returns the given position in canvas coordinates
     void drawTriangle(QPainter* painter, int position);
 
 private slots:
+    /// Returns tracker text position
+    QRectF trackerTextRect(QPainter* painter, int posPx, QSizeF textSize) const;
     /// Returns the text position for tracker text shown during picking
-    QRectF pickTrackerTextRect(QPainter* painter, QRect pickRect, QSizeF textSize);
+    QRectF pickTrackerTextRect(QPainter* painter, QRect pickRect, QSizeF textSize) const;
     void updateSnapPoints();
 };
 

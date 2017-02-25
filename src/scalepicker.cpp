@@ -205,35 +205,49 @@ void ScalePicker::drawPlotOverlay(QPainter* painter)
     else if (_scaleWidget->underMouse())
     {
         // draw tracker text centered on cursor
-        int canvasPosPx = posCanvasPx(currentPosPx);
         QwtText text(QString("%1").arg(position(currentPosPx)));
         auto tsize = text.textSize(painter->font());
-        QPointF topLeft;
-
-        if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale)
-        {
-            int height = painter->device()->height();
-            topLeft = QPointF(canvasPosPx-tsize.width()/2, height-tsize.height());
-        }
-        else if (_scaleWidget->alignment() == QwtScaleDraw::TopScale)
-        {
-            topLeft = QPointF(canvasPosPx-tsize.width()/2, 0);
-        }
-        else if (_scaleWidget->alignment() == QwtScaleDraw::LeftScale)
-        {
-            topLeft = QPointF(TEXT_MARGIN, canvasPosPx-tsize.height()/2);
-        }
-        else                    // right scale
-        {
-            int width = painter->device()->width();
-            topLeft = QPointF(width-tsize.width()-TEXT_MARGIN, canvasPosPx-tsize.height()/2);
-        }
-        text.draw(painter, QRectF(topLeft, tsize));
+        text.draw(painter, trackerTextRect(painter, currentPosPx, tsize));
     }
     painter->restore();
 }
 
-QRectF ScalePicker::pickTrackerTextRect(QPainter* painter, QRect pickRect, QSizeF textSize)
+QRectF ScalePicker::trackerTextRect(QPainter* painter, int posPx, QSizeF textSize) const
+{
+    int canvasPosPx = posCanvasPx(posPx);
+    QPointF topLeft;
+
+    if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale ||
+        _scaleWidget->alignment() == QwtScaleDraw::TopScale)
+    {
+        int left = canvasPosPx - textSize.width() / 2;
+        int canvasWidth = painter->device()->width();
+        left = std::max(TEXT_MARGIN, left);
+        left = std::min(double(left), canvasWidth - textSize.width() - TEXT_MARGIN);
+        int top = 0;
+        if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale)
+        {
+            top = painter->device()->height() - textSize.height();
+        }
+        topLeft = QPointF(left, top);
+    }
+    else                        // left/right scales
+    {
+        int top = canvasPosPx-textSize.height() / 2;
+        int canvasHeight = painter->device()->height();
+        top = std::max(0, top);
+        top = std::min(double(top), canvasHeight - textSize.height());
+        int left = TEXT_MARGIN;
+        if (_scaleWidget->alignment() == QwtScaleDraw::RightScale)
+        {
+            left = painter->device()->width() - textSize.width();
+        }
+        topLeft = QPointF(left, top);
+    }
+    return QRectF(topLeft, textSize);
+}
+
+QRectF ScalePicker::pickTrackerTextRect(QPainter* painter, QRect pickRect, QSizeF textSize) const
 {
     qreal left = 0;
     int pickLength = currentPosPx - firstPosPx;
@@ -389,7 +403,7 @@ int ScalePicker::positionPx(QMouseEvent* mouseEvent)
  * when drawing the tracker lines. This function maps scale widgets
  * pixel coordinate to canvas' coordinate.
  */
-double ScalePicker::posCanvasPx(double pos)
+double ScalePicker::posCanvasPx(double pos) const
 {
     // assumption: scale.width < canvas.width && scale.x > canvas.x
     if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale ||
