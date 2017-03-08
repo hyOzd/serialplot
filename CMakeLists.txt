@@ -56,6 +56,7 @@ endif (BUILD_QWT)
 
 include(BuildQColorWidgets)
 
+
 # includes
 include_directories("./src" ${QWT_INCLUDE_DIR} ${QCW_INCLUDE_DIR})
 
@@ -132,6 +133,7 @@ add_executable(${PROGRAM_NAME} WIN32
   ${RES_FILES}
   )
 
+add_dependencies(${PROGRAM_NAME} QCW)
 # Use the Widgets module from Qt 5.
 target_link_libraries(${PROGRAM_NAME} ${QWT_LIBRARY} ${QCW_LIBRARY})
 qt5_use_modules(${PROGRAM_NAME} Widgets SerialPort)
