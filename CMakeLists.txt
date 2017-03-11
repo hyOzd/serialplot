@@ -55,10 +55,16 @@ else (BUILD_QWT)
 endif (BUILD_QWT)
 
 include(BuildQColorWidgets)
-include(BuildLedWidget)
+
+set(BUILD_LEDWIDGET true CACHE BOOL "Download and build LedWidget automatically.")
+if (BUILD_LEDWIDGET)
+  include(BuildLedWidget)
+else (BUILD_LEDWIDGET)
+  include(FindLedWidget)
+endif (BUILD_LEDWIDGET)
 
 # includes
-include_directories("./src" ${QWT_INCLUDE_DIR} ${QCW_INCLUDE_DIR} ${LEDW_INCLUDE_DIR})
+include_directories("./src" ${QWT_INCLUDE_DIR} ${QCW_INCLUDE_DIR} ${LEDWIDGET_INCLUDE_DIR})
 
 # flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${QCW_FLAGS}")
@@ -134,12 +140,17 @@ add_executable(${PROGRAM_NAME} WIN32
   )
 
 # Use the Widgets module from Qt 5.
-target_link_libraries(${PROGRAM_NAME} ${QWT_LIBRARY} ${QCW_LIBRARY} ${LEDW_LIBRARY})
+target_link_libraries(${PROGRAM_NAME} ${QWT_LIBRARY} ${QCW_LIBRARY} ${LEDWIDGET_LIBRARY})
 qt5_use_modules(${PROGRAM_NAME} Widgets SerialPort)
 
+# external project dependencies
 if (BUILD_QWT)
-  add_dependencies(${PROGRAM_NAME} QWT LEDW)
+  add_dependencies(${PROGRAM_NAME} QWT)
 endif (BUILD_QWT)
+
+if (BUILD_LEDWIDGET)
+  add_dependencies(${PROGRAM_NAME} LEDW)
+endif (BUILD_LEDWIDGET)
 
 # set compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")

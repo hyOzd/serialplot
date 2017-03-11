@@ -17,14 +17,9 @@
 # along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-include(ExternalProject)
+find_library(LEDWIDGET_LIBRARY "ledwidget")
+find_path(LEDWIDGET_INCLUDE_DIR "ledwidget.h" PATH_SUFFIXES "ledwidget")
 
-ExternalProject_Add(LEDW
-  PREFIX ledw
-  HG_REPOSITORY https://bitbucket.org/hyOzd/ledwidget
-  UPDATE_COMMAND ""
-  INSTALL_COMMAND "")
+mark_as_advanced(LEDWIDGET_LIBRARY LEDWIDGET_INCLUDE_DIR)
 
-ExternalProject_Get_Property(LEDW binary_dir source_dir)
-set(LEDWIDGET_INCLUDE_DIR ${source_dir}/src)
-set(LEDWIDGET_LIBRARY ${binary_dir}/libledwidget.a)
+find_package_handle_standard_args(LedWidget DEFAULT_MSG LEDWIDGET_LIBRARY LEDWIDGET_INCLUDE_DIR)
