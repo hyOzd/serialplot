@@ -88,6 +88,7 @@ private:
     bool _xAxisAsIndex;
     double _xMin;
     double _xMax;
+    unsigned _numOfSamples;
 
     // menu actions
     QAction showGridAction;

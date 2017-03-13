@@ -215,9 +215,12 @@ MainWindow::MainWindow(QWidget *parent) :
         plotMan->addCurve(channelMan.channelName(i), channelMan.channelBuffer(i));
     }
 
-    // init auto scale
+    // init scales
     plotMan->setYAxis(plotControlPanel.autoScale(),
                       plotControlPanel.yMin(), plotControlPanel.yMax());
+    plotMan->setXAxis(plotControlPanel.xAxisAsIndex(),
+                      plotControlPanel.xMin(), plotControlPanel.xMax());
+    plotMan->onNumOfSamplesChanged(numOfSamples);
 
     // Init sps (sample per second) counter
     spsLabel.setText("0sps");

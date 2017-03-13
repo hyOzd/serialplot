@@ -214,19 +214,34 @@ void PlotControlPanel::onYScaleChanged()
     emit yScaleChanged(false, ui->spYmin->value(), ui->spYmax->value());
 }
 
-bool PlotControlPanel::autoScale()
+bool PlotControlPanel::autoScale() const
 {
     return ui->cbAutoScale->isChecked();
 }
 
-double PlotControlPanel::yMax()
+double PlotControlPanel::yMax() const
 {
     return ui->spYmax->value();
 }
 
-double PlotControlPanel::yMin()
+double PlotControlPanel::yMin() const
 {
     return ui->spYmin->value();
+}
+
+bool PlotControlPanel::xAxisAsIndex() const
+{
+    return ui->cbIndex->isChecked();
+}
+
+double PlotControlPanel::xMax() const
+{
+    return ui->spXmax->value();
+}
+
+double PlotControlPanel::xMin() const
+{
+    return ui->spXmin->value();
 }
 
 void PlotControlPanel::onRangeSelected()

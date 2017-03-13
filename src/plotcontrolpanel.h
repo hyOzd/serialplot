@@ -40,9 +40,12 @@ public:
     ~PlotControlPanel();
 
     unsigned numOfSamples();
-    bool autoScale();
-    double yMax();
-    double yMin();
+    bool   autoScale() const;
+    double yMax() const;
+    double yMin() const;
+    bool   xAxisAsIndex() const;
+    double xMax() const;
+    double xMin() const;
 
     void setChannelInfoModel(ChannelInfoModel* model);
 

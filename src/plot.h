@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -52,7 +52,8 @@ public slots:
     void showDemoIndicator(bool show = true);
     void unzoom();
     void darkBackground(bool enabled = true);
-    void setAxis(bool autoScaled, double yMin = 0, double yMax = 1);
+    void setYAxis(bool autoScaled, double yMin = 0, double yMax = 1);
+    void setXAxis(double xMin, double xMax);
 
     /**
      * Displays an animation for snapshot.
@@ -70,6 +71,7 @@ protected:
 private:
     bool isAutoScaled;
     double yMin, yMax;
+    double _xMin, _xMax;
     int symbolSize;
     Zoomer zoomer;
     ScaleZoomer sZoomer;

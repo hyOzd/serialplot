@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -27,6 +27,8 @@
 
 #include "plot.h"
 #include "utils.h"
+
+#include <QtDebug>
 
 static const int SYMBOL_SHOW_AT_WIDTH = 5;
 static const int SYMBOL_SIZE_MAX = 7;
@@ -78,7 +80,7 @@ Plot::~Plot()
     if (snapshotOverlay != NULL) delete snapshotOverlay;
 }
 
-void Plot::setAxis(bool autoScaled, double yAxisMin, double yAxisMax)
+void Plot::setYAxis(bool autoScaled, double yAxisMin, double yAxisMax)
 {
     this->isAutoScaled = autoScaled;
 
@@ -92,8 +94,32 @@ void Plot::setAxis(bool autoScaled, double yAxisMin, double yAxisMax)
     resetAxes();
 }
 
+void Plot::setXAxis(double xMin, double xMax)
+{
+    qDebug() << "setXAxis:" << xMin << xMax;
+    _xMin = xMin;
+    _xMax = xMax;
+
+    zoomer.zoom(0); // unzoom
+
+    // set axis
+    setAxisScale(QwtPlot::xBottom, xMin, xMax);
+
+    // reset zoom base
+    auto base = zoomer.zoomBase();
+    base.setLeft(xMin);
+    base.setRight(xMax);
+    zoomer.setZoomBase(base);
+
+    qDebug() << "base:" << base;
+
+    onXScaleChanged();
+    replot();
+}
+
 void Plot::resetAxes()
 {
+    // reset y axis
     if (isAutoScaled)
     {
         setAxisAutoScale(QwtPlot::yLeft);
@@ -108,7 +134,7 @@ void Plot::resetAxes()
 
 void Plot::unzoomed()
 {
-    setAxisAutoScale(QwtPlot::xBottom);
+    // setAxisAutoScale(QwtPlot::xBottom);
     resetAxes();
     onXScaleChanged();
 }
@@ -273,8 +299,8 @@ void Plot::resizeEvent(QResizeEvent * event)
 
 void Plot::onNumOfSamplesChanged(unsigned value)
 {
-    auto currentBase = zoomer.zoomBase();
-    currentBase.setWidth(value);
-    zoomer.setZoomBase(currentBase);
-    onXScaleChanged();
+    // auto currentBase = zoomer.zoomBase();
+    // currentBase.setWidth(value);
+    // zoomer.setZoomBase(currentBase);
+    // onXScaleChanged();
 }

@@ -40,6 +40,7 @@ PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject
     _yMax = 1;
     isDemoShown = false;
     _infoModel = infoModel;
+    _numOfSamples = 1;
 
     // initalize layout and single widget
     isMulti = false;
@@ -251,7 +252,7 @@ Plot* PlotManager::addPlotWidget()
     plot->showMinorGrid(showMinorGridAction.isChecked());
     plot->showLegend(showLegendAction.isChecked());
     plot->showDemoIndicator(isDemoShown);
-    plot->setAxis(_autoScaled, _yMin, _yMax);
+    plot->setYAxis(_autoScaled, _yMin, _yMax);
 
     return plot;
 }
@@ -413,7 +414,7 @@ void PlotManager::setYAxis(bool autoScaled, double yAxisMin, double yAxisMax)
     _yMax = yAxisMax;
     for (auto plot : plotWidgets)
     {
-        plot->setAxis(autoScaled, yAxisMin, yAxisMax);
+        plot->setYAxis(autoScaled, yAxisMin, yAxisMax);
     }
 }
 
@@ -428,6 +429,17 @@ void PlotManager::setXAxis(bool asIndex, double xMin, double xMax)
         FrameBufferSeries* series = static_cast<FrameBufferSeries*>(curve->data());
         series->setXAxis(asIndex, xMin, xMax);
     }
+    for (auto plot : plotWidgets)
+    {
+        if (asIndex)
+        {
+            plot->setXAxis(0, _numOfSamples);
+        }
+        else
+        {
+            plot->setXAxis(xMin, xMax);
+        }
+    }
     replot();
 }
 
@@ -441,9 +453,15 @@ void PlotManager::flashSnapshotOverlay()
 
 void PlotManager::onNumOfSamplesChanged(unsigned value)
 {
-    for (auto plot : plotWidgets)
+    _numOfSamples = value;
+    if (_xAxisAsIndex)
     {
-        plot->onNumOfSamplesChanged(value);
+        for (auto plot : plotWidgets)
+        {
+            // plot->onNumOfSamplesChanged(value);
+            plot->setXAxis(0, value);
+        }
+        qDebug() << "_xAxisAsIndex" << value;
     }
 }
 
