@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -21,7 +21,17 @@
 
 FrameBufferSeries::FrameBufferSeries(FrameBuffer* buffer)
 {
+    xAsIndex = true;
+    _xmin = 0;
+    _xmax = 1;
     _buffer = buffer;
+}
+
+void FrameBufferSeries::setXAxis(bool asIndex, double xmin, double xmax)
+{
+    xAsIndex = asIndex;
+    _xmin = xmin;
+    _xmax = xmax;
 }
 
 size_t FrameBufferSeries::size() const
@@ -31,7 +41,14 @@ size_t FrameBufferSeries::size() const
 
 QPointF FrameBufferSeries::sample(size_t i) const
 {
-    return QPointF(i, _buffer->sample(i));
+    if (xAsIndex)
+    {
+        return QPointF(i, _buffer->sample(i));
+    }
+    else
+    {
+        return QPointF(i * (_xmax - _xmin) / size() + _xmin, _buffer->sample(i));
+    }
 }
 
 QRectF FrameBufferSeries::boundingRect() const

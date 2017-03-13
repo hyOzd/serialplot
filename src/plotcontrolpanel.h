@@ -53,7 +53,7 @@ public:
 
 signals:
     void numOfSamplesChanged(int value);
-    void scaleChanged(bool autoScaled, double yMin = 0, double yMax = 1);
+    void yScaleChanged(bool autoScaled, double yMin = 0, double yMax = 1);
 
 private:
     Ui::PlotControlPanel *ui;

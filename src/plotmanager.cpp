@@ -259,7 +259,9 @@ Plot* PlotManager::addPlotWidget()
 void PlotManager::addCurve(QString title, FrameBuffer* buffer)
 {
     auto curve = new QwtPlotCurve(title);
-    curve->setSamples(new FrameBufferSeries(buffer));
+    auto series = new FrameBufferSeries(buffer);
+    series->setXAxis(false, 100, 500);
+    curve->setSamples(series);
     _addCurve(curve);
 }
 

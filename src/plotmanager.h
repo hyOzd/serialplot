@@ -65,7 +65,7 @@ public slots:
     /// Enable display of a "DEMO" label on each plot
     void showDemoIndicator(bool show = true);
     /// Set the Y axis
-    void setAxis(bool autoScaled, double yMin = 0, double yMax = 1);
+    void setYAxis(bool autoScaled, double yMin = 0, double yMax = 1);
     /// Display an animation for snapshot
     void flashSnapshotOverlay();
     /// Should be called to update zoom base

@@ -181,7 +181,7 @@ void PlotControlPanel::onAutoScaleChecked(bool checked)
         ui->spYmin->setEnabled(false);
         ui->spYmax->setEnabled(false);
 
-        emit scaleChanged(true); // autoscale
+        emit yScaleChanged(true); // autoscale
     }
     else
     {
@@ -190,13 +190,13 @@ void PlotControlPanel::onAutoScaleChecked(bool checked)
         ui->spYmin->setEnabled(true);
         ui->spYmax->setEnabled(true);
 
-        emit scaleChanged(false, ui->spYmin->value(), ui->spYmax->value());
+        emit yScaleChanged(false, ui->spYmin->value(), ui->spYmax->value());
     }
 }
 
 void PlotControlPanel::onYScaleChanged()
 {
-    emit scaleChanged(false, ui->spYmin->value(), ui->spYmax->value());
+    emit yScaleChanged(false, ui->spYmin->value(), ui->spYmax->value());
 }
 
 bool PlotControlPanel::autoScale()

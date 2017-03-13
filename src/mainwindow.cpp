@@ -139,7 +139,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&plotControlPanel, &PlotControlPanel::numOfSamplesChanged,
             plotMan, &PlotManager::onNumOfSamplesChanged);
 
-    connect(&plotControlPanel, &PlotControlPanel::scaleChanged,
+    connect(&plotControlPanel, &PlotControlPanel::yScaleChanged,
             plotMan, &PlotManager::setAxis);
 
     QObject::connect(ui->actionClear, SIGNAL(triggered(bool)),
