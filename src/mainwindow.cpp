@@ -140,7 +140,7 @@ MainWindow::MainWindow(QWidget *parent) :
             plotMan, &PlotManager::onNumOfSamplesChanged);
 
     connect(&plotControlPanel, &PlotControlPanel::yScaleChanged,
-            plotMan, &PlotManager::setAxis);
+            plotMan, &PlotManager::setYAxis);
 
     QObject::connect(ui->actionClear, SIGNAL(triggered(bool)),
                      this, SLOT(clearPlot()));
@@ -212,8 +212,8 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     // init auto scale
-    plotMan->setAxis(plotControlPanel.autoScale(),
-                     plotControlPanel.yMin(), plotControlPanel.yMax());
+    plotMan->setYAxis(plotControlPanel.autoScale(),
+                      plotControlPanel.yMin(), plotControlPanel.yMax());
 
     // Init sps (sample per second) counter
     spsLabel.setText("0sps");

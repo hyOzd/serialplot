@@ -406,7 +406,7 @@ void PlotManager::darkBackground(bool enabled)
     }
 }
 
-void PlotManager::setAxis(bool autoScaled, double yAxisMin, double yAxisMax)
+void PlotManager::setYAxis(bool autoScaled, double yAxisMin, double yAxisMax)
 {
     _autoScaled = autoScaled;
     _yMin = yAxisMin;
