@@ -53,5 +53,15 @@ QPointF FrameBufferSeries::sample(size_t i) const
 
 QRectF FrameBufferSeries::boundingRect() const
 {
-    return _buffer->boundingRect();
+    if (xAsIndex)
+    {
+        return _buffer->boundingRect();
+    }
+    else
+    {
+        auto rect = _buffer->boundingRect();
+        rect.setLeft(_xmin);
+        rect.setRight(_xmax);
+        return rect;
+    }
 }
