@@ -28,8 +28,6 @@
 #include "plot.h"
 #include "utils.h"
 
-#include <QtDebug>
-
 static const int SYMBOL_SHOW_AT_WIDTH = 5;
 static const int SYMBOL_SIZE_MAX = 7;
 
@@ -96,7 +94,6 @@ void Plot::setYAxis(bool autoScaled, double yAxisMin, double yAxisMax)
 
 void Plot::setXAxis(double xMin, double xMax)
 {
-    qDebug() << "setXAxis:" << xMin << xMax;
     _xMin = xMin;
     _xMax = xMax;
 
@@ -104,6 +101,7 @@ void Plot::setXAxis(double xMin, double xMax)
 
     // set axis
     setAxisScale(QwtPlot::xBottom, xMin, xMax);
+    replot(); // Note: if we don't replot here scale at startup isn't set correctly
 
     // reset zoom base
     auto base = zoomer.zoomBase();
@@ -111,10 +109,7 @@ void Plot::setXAxis(double xMin, double xMax)
     base.setRight(xMax);
     zoomer.setZoomBase(base);
 
-    qDebug() << "base:" << base;
-
     onXScaleChanged();
-    replot();
 }
 
 void Plot::resetAxes()

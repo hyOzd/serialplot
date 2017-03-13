@@ -17,7 +17,6 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QtDebug>
 #include "qwt_symbol.h"
 
 #include "plot.h"
@@ -254,6 +253,15 @@ Plot* PlotManager::addPlotWidget()
     plot->showDemoIndicator(isDemoShown);
     plot->setYAxis(_autoScaled, _yMin, _yMax);
 
+    if (_xAxisAsIndex)
+    {
+        plot->setXAxis(0, _numOfSamples);
+    }
+    else
+    {
+        plot->setXAxis(_xMin, _xMax);
+    }
+
     return plot;
 }
 
@@ -458,10 +466,8 @@ void PlotManager::onNumOfSamplesChanged(unsigned value)
     {
         for (auto plot : plotWidgets)
         {
-            // plot->onNumOfSamplesChanged(value);
             plot->setXAxis(0, value);
         }
-        qDebug() << "_xAxisAsIndex" << value;
     }
 }
 
