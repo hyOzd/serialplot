@@ -133,6 +133,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&portControl, &PortControl::portToggled,
                      this, &MainWindow::onPortToggled);
 
+    // plot control signals
     connect(&plotControlPanel, &PlotControlPanel::numOfSamplesChanged,
             this, &MainWindow::onNumOfSamplesChanged);
 
@@ -141,6 +142,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(&plotControlPanel, &PlotControlPanel::yScaleChanged,
             plotMan, &PlotManager::setYAxis);
+
+    connect(&plotControlPanel, &PlotControlPanel::xScaleChanged,
+            plotMan, &PlotManager::setXAxis);
 
     QObject::connect(ui->actionClear, SIGNAL(triggered(bool)),
                      this, SLOT(clearPlot()));

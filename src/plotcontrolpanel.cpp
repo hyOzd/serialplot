@@ -61,6 +61,12 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
     ui->spYmax->setRange((-1) * std::numeric_limits<double>::max(),
                          std::numeric_limits<double>::max());
 
+    ui->spXmin->setRange((-1) * std::numeric_limits<double>::max(),
+                         std::numeric_limits<double>::max());
+
+    ui->spXmax->setRange((-1) * std::numeric_limits<double>::max(),
+                         std::numeric_limits<double>::max());
+
     // connect signals
     connect(ui->spNumOfSamples, SIGNAL(valueChanged(int)),
             this, SLOT(onNumOfSamples(int)));
@@ -73,6 +79,15 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
 
     connect(ui->spYmin, SIGNAL(valueChanged(double)),
             this, SLOT(onYScaleChanged()));
+
+    connect(ui->cbIndex, &QCheckBox::toggled,
+            this, &PlotControlPanel::onIndexChecked);
+
+    connect(ui->spXmax, SIGNAL(valueChanged(double)),
+            this, SLOT(onXScaleChanged()));
+
+    connect(ui->spXmin, SIGNAL(valueChanged(double)),
+            this, SLOT(onXScaleChanged()));
 
     // init scale range preset list
     for (int nbits = 8; nbits <= 24; nbits++) // signed binary formats
@@ -220,6 +235,33 @@ void PlotControlPanel::onRangeSelected()
     ui->spYmin->setValue(r.rmin);
     ui->spYmax->setValue(r.rmax);
     ui->cbAutoScale->setChecked(false);
+}
+
+void PlotControlPanel::onIndexChecked(bool checked)
+{
+    if (checked)
+    {
+        ui->lXmin->setEnabled(false);
+        ui->lXmax->setEnabled(false);
+        ui->spXmin->setEnabled(false);
+        ui->spXmax->setEnabled(false);
+
+        emit xScaleChanged(true); // use index
+    }
+    else
+    {
+        ui->lXmin->setEnabled(true);
+        ui->lXmax->setEnabled(true);
+        ui->spXmin->setEnabled(true);
+        ui->spXmax->setEnabled(true);
+
+        emit xScaleChanged(false, ui->spXmin->value(), ui->spXmax->value());
+    }
+}
+
+void PlotControlPanel::onXScaleChanged()
+{
+    emit xScaleChanged(false, ui->spXmin->value(), ui->spXmax->value());
 }
 
 void PlotControlPanel::setChannelInfoModel(ChannelInfoModel* model)

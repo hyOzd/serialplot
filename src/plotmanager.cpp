@@ -260,7 +260,7 @@ void PlotManager::addCurve(QString title, FrameBuffer* buffer)
 {
     auto curve = new QwtPlotCurve(title);
     auto series = new FrameBufferSeries(buffer);
-    series->setXAxis(false, 100, 500);
+    series->setXAxis(_xAxisAsIndex, _xMin, _xMax);
     curve->setSamples(series);
     _addCurve(curve);
 }
@@ -415,6 +415,20 @@ void PlotManager::setYAxis(bool autoScaled, double yAxisMin, double yAxisMax)
     {
         plot->setAxis(autoScaled, yAxisMin, yAxisMax);
     }
+}
+
+void PlotManager::setXAxis(bool asIndex, double xMin, double xMax)
+{
+    _xAxisAsIndex = asIndex;
+    _xMin = xMin;
+    _xMax = xMax;
+    for (auto curve : curves)
+    {
+        // TODO: what happens when addCurve(QVector) is used?
+        FrameBufferSeries* series = static_cast<FrameBufferSeries*>(curve->data());
+        series->setXAxis(asIndex, xMin, xMax);
+    }
+    replot();
 }
 
 void PlotManager::flashSnapshotOverlay()

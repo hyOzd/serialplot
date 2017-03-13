@@ -54,6 +54,7 @@ public:
 signals:
     void numOfSamplesChanged(int value);
     void yScaleChanged(bool autoScaled, double yMin = 0, double yMax = 1);
+    void xScaleChanged(bool asIndex, double xMin = 0, double xMax = 1);
 
 private:
     Ui::PlotControlPanel *ui;
@@ -74,6 +75,8 @@ private slots:
     void onAutoScaleChecked(bool checked);
     void onYScaleChanged();
     void onRangeSelected();
+    void onIndexChecked(bool checked);
+    void onXScaleChanged();
 };
 
 #endif // PLOTCONTROLPANEL_H
