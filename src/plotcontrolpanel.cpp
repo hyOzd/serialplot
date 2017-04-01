@@ -211,7 +211,10 @@ void PlotControlPanel::onAutoScaleChecked(bool checked)
 
 void PlotControlPanel::onYScaleChanged()
 {
-    emit yScaleChanged(false, ui->spYmin->value(), ui->spYmax->value());
+    if (!autoScale())
+    {
+        emit yScaleChanged(false, ui->spYmin->value(), ui->spYmax->value());
+    }
 }
 
 bool PlotControlPanel::autoScale() const
@@ -276,7 +279,10 @@ void PlotControlPanel::onIndexChecked(bool checked)
 
 void PlotControlPanel::onXScaleChanged()
 {
-    emit xScaleChanged(false, ui->spXmin->value(), ui->spXmax->value());
+    if (!xAxisAsIndex())
+    {
+        emit xScaleChanged(false, ui->spXmin->value(), ui->spXmax->value());
+    }
 }
 
 void PlotControlPanel::setChannelInfoModel(ChannelInfoModel* model)
