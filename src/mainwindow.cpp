@@ -251,10 +251,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    // save settings
-    QSettings settings("serialplot", "serialplot");
-    saveAllSettings(&settings);
-
     if (serialPort.isOpen())
     {
         serialPort.close();
@@ -268,6 +264,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent * event)
 {
+    // save snapshots
     if (!snapshotMan.isAllSaved())
     {
         auto clickedButton = QMessageBox::warning(
@@ -281,6 +278,41 @@ void MainWindow::closeEvent(QCloseEvent * event)
             return;
         }
     }
+
+    // save settings
+    QSettings settings("serialplot", "serialplot");
+    saveAllSettings(&settings);
+    settings.sync();
+
+    if (settings.status() != QSettings::NoError)
+    {
+        QString errorText;
+
+        if (settings.status() == QSettings::AccessError)
+        {
+            QString file = settings.fileName();
+            errorText = QString("Serialplot cannot save settings due to access error. \
+This happens if you have run serialplot as root (with sudo for ex.) previously. \
+Try fixing the permissions of file: %1, or just delete it.").arg(file);
+        }
+        else
+        {
+            errorText = QString("Serialplot cannot save settings due to unknown error: %1").\
+                arg(settings.status());
+        }
+
+        auto button = QMessageBox::critical(
+            NULL,
+            "Failed to save settings!", errorText,
+            QMessageBox::Cancel | QMessageBox::Ok);
+
+        if (button == QMessageBox::Cancel)
+        {
+            event->ignore();
+            return;
+        }
+    }
+
     QMainWindow::closeEvent(event);
 }
 
