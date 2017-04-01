@@ -356,6 +356,9 @@ void PlotControlPanel::saveSettings(QSettings* settings)
 {
     settings->beginGroup(SettingGroup_Plot);
     settings->setValue(SG_Plot_NumOfSamples, numOfSamples());
+    settings->setValue(SG_Plot_IndexAsX, xAxisAsIndex());
+    settings->setValue(SG_Plot_XMax, xMax());
+    settings->setValue(SG_Plot_XMin, xMin());
     settings->setValue(SG_Plot_AutoScale, autoScale());
     settings->setValue(SG_Plot_YMax, yMax());
     settings->setValue(SG_Plot_YMin, yMin());
@@ -367,6 +370,10 @@ void PlotControlPanel::loadSettings(QSettings* settings)
     settings->beginGroup(SettingGroup_Plot);
     ui->spNumOfSamples->setValue(
         settings->value(SG_Plot_NumOfSamples, numOfSamples()).toInt());
+    ui->cbIndex->setChecked(
+        settings->value(SG_Plot_IndexAsX, xAxisAsIndex()).toBool());
+    ui->spXmax->setValue(settings->value(SG_Plot_XMax, xMax()).toDouble());
+    ui->spXmin->setValue(settings->value(SG_Plot_XMin, xMin()).toDouble());
     ui->cbAutoScale->setChecked(
         settings->value(SG_Plot_AutoScale, autoScale()).toBool());
     ui->spYmax->setValue(settings->value(SG_Plot_YMax, yMax()).toDouble());
