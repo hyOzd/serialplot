@@ -42,8 +42,6 @@ public:
     void setPen(QPen pen);
 
 signals:
-    void pickStarted(double pos);
-    void picking(double firstPos, double lastPos);
     void picked(double firstPos, double lastPos);
 
 private:
