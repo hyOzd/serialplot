@@ -125,6 +125,8 @@ void Plot::resetAxes()
         setAxisScale(QwtPlot::yLeft, yMin, yMax);
     }
 
+    zoomer.setZoomBase();
+
     replot();
 }
 
