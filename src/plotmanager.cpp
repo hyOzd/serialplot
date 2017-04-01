@@ -17,7 +17,6 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QtDebug>
 #include "qwt_symbol.h"
 
 #include "plot.h"
@@ -40,6 +39,7 @@ PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject
     _yMax = 1;
     isDemoShown = false;
     _infoModel = infoModel;
+    _numOfSamples = 1;
 
     // initalize layout and single widget
     isMulti = false;
@@ -251,7 +251,16 @@ Plot* PlotManager::addPlotWidget()
     plot->showMinorGrid(showMinorGridAction.isChecked());
     plot->showLegend(showLegendAction.isChecked());
     plot->showDemoIndicator(isDemoShown);
-    plot->setAxis(_autoScaled, _yMin, _yMax);
+    plot->setYAxis(_autoScaled, _yMin, _yMax);
+
+    if (_xAxisAsIndex)
+    {
+        plot->setXAxis(0, _numOfSamples);
+    }
+    else
+    {
+        plot->setXAxis(_xMin, _xMax);
+    }
 
     return plot;
 }
@@ -259,7 +268,9 @@ Plot* PlotManager::addPlotWidget()
 void PlotManager::addCurve(QString title, FrameBuffer* buffer)
 {
     auto curve = new QwtPlotCurve(title);
-    curve->setSamples(new FrameBufferSeries(buffer));
+    auto series = new FrameBufferSeries(buffer);
+    series->setXAxis(_xAxisAsIndex, _xMin, _xMax);
+    curve->setSamples(series);
     _addCurve(curve);
 }
 
@@ -404,15 +415,40 @@ void PlotManager::darkBackground(bool enabled)
     }
 }
 
-void PlotManager::setAxis(bool autoScaled, double yAxisMin, double yAxisMax)
+void PlotManager::setYAxis(bool autoScaled, double yAxisMin, double yAxisMax)
 {
     _autoScaled = autoScaled;
     _yMin = yAxisMin;
     _yMax = yAxisMax;
     for (auto plot : plotWidgets)
     {
-        plot->setAxis(autoScaled, yAxisMin, yAxisMax);
+        plot->setYAxis(autoScaled, yAxisMin, yAxisMax);
     }
+}
+
+void PlotManager::setXAxis(bool asIndex, double xMin, double xMax)
+{
+    _xAxisAsIndex = asIndex;
+    _xMin = xMin;
+    _xMax = xMax;
+    for (auto curve : curves)
+    {
+        // TODO: what happens when addCurve(QVector) is used?
+        FrameBufferSeries* series = static_cast<FrameBufferSeries*>(curve->data());
+        series->setXAxis(asIndex, xMin, xMax);
+    }
+    for (auto plot : plotWidgets)
+    {
+        if (asIndex)
+        {
+            plot->setXAxis(0, _numOfSamples);
+        }
+        else
+        {
+            plot->setXAxis(xMin, xMax);
+        }
+    }
+    replot();
 }
 
 void PlotManager::flashSnapshotOverlay()
@@ -425,9 +461,11 @@ void PlotManager::flashSnapshotOverlay()
 
 void PlotManager::onNumOfSamplesChanged(unsigned value)
 {
+    _numOfSamples = value;
     for (auto plot : plotWidgets)
     {
         plot->onNumOfSamplesChanged(value);
+        if (_xAxisAsIndex) plot->setXAxis(0, value);
     }
 }
 

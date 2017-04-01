@@ -133,14 +133,18 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&portControl, &PortControl::portToggled,
                      this, &MainWindow::onPortToggled);
 
+    // plot control signals
     connect(&plotControlPanel, &PlotControlPanel::numOfSamplesChanged,
             this, &MainWindow::onNumOfSamplesChanged);
 
     connect(&plotControlPanel, &PlotControlPanel::numOfSamplesChanged,
             plotMan, &PlotManager::onNumOfSamplesChanged);
 
-    connect(&plotControlPanel, &PlotControlPanel::scaleChanged,
-            plotMan, &PlotManager::setAxis);
+    connect(&plotControlPanel, &PlotControlPanel::yScaleChanged,
+            plotMan, &PlotManager::setYAxis);
+
+    connect(&plotControlPanel, &PlotControlPanel::xScaleChanged,
+            plotMan, &PlotManager::setXAxis);
 
     QObject::connect(ui->actionClear, SIGNAL(triggered(bool)),
                      this, SLOT(clearPlot()));
@@ -211,9 +215,12 @@ MainWindow::MainWindow(QWidget *parent) :
         plotMan->addCurve(channelMan.channelName(i), channelMan.channelBuffer(i));
     }
 
-    // init auto scale
-    plotMan->setAxis(plotControlPanel.autoScale(),
-                     plotControlPanel.yMin(), plotControlPanel.yMax());
+    // init scales
+    plotMan->setYAxis(plotControlPanel.autoScale(),
+                      plotControlPanel.yMin(), plotControlPanel.yMax());
+    plotMan->setXAxis(plotControlPanel.xAxisAsIndex(),
+                      plotControlPanel.xMin(), plotControlPanel.xMax());
+    plotMan->onNumOfSamplesChanged(numOfSamples);
 
     // Init sps (sample per second) counter
     spsLabel.setText("0sps");

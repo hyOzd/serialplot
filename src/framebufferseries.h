@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -37,6 +37,9 @@ class FrameBufferSeries : public QwtSeriesData<QPointF>
 public:
     FrameBufferSeries(FrameBuffer* buffer);
 
+    /// Behavior of X axis
+    void setXAxis(bool asIndex, double xmin, double xmax);
+
     // QwtSeriesData implementations
     size_t size() const;
     QPointF sample(size_t i) const;
@@ -44,6 +47,9 @@ public:
 
 private:
     FrameBuffer* _buffer;
+    bool xAsIndex;
+    double _xmin;
+    double _xmax;
 };
 
 #endif // FRAMEBUFFERSERIES_H

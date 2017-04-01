@@ -65,7 +65,9 @@ public slots:
     /// Enable display of a "DEMO" label on each plot
     void showDemoIndicator(bool show = true);
     /// Set the Y axis
-    void setAxis(bool autoScaled, double yMin = 0, double yMax = 1);
+    void setYAxis(bool autoScaled, double yMin = 0, double yMax = 1);
+    /// Set the X axis
+    void setXAxis(bool asIndex, double xMin = 0 , double xMax = 1);
     /// Display an animation for snapshot
     void flashSnapshotOverlay();
     /// Should be called to update zoom base
@@ -83,6 +85,10 @@ private:
     bool _autoScaled;
     double _yMin;
     double _yMax;
+    bool _xAxisAsIndex;
+    double _xMin;
+    double _xMax;
+    unsigned _numOfSamples;
 
     // menu actions
     QAction showGridAction;

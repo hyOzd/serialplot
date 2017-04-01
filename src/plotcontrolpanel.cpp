@@ -61,6 +61,12 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
     ui->spYmax->setRange((-1) * std::numeric_limits<double>::max(),
                          std::numeric_limits<double>::max());
 
+    ui->spXmin->setRange((-1) * std::numeric_limits<double>::max(),
+                         std::numeric_limits<double>::max());
+
+    ui->spXmax->setRange((-1) * std::numeric_limits<double>::max(),
+                         std::numeric_limits<double>::max());
+
     // connect signals
     connect(ui->spNumOfSamples, SIGNAL(valueChanged(int)),
             this, SLOT(onNumOfSamples(int)));
@@ -73,6 +79,15 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
 
     connect(ui->spYmin, SIGNAL(valueChanged(double)),
             this, SLOT(onYScaleChanged()));
+
+    connect(ui->cbIndex, &QCheckBox::toggled,
+            this, &PlotControlPanel::onIndexChecked);
+
+    connect(ui->spXmax, SIGNAL(valueChanged(double)),
+            this, SLOT(onXScaleChanged()));
+
+    connect(ui->spXmin, SIGNAL(valueChanged(double)),
+            this, SLOT(onXScaleChanged()));
 
     // init scale range preset list
     for (int nbits = 8; nbits <= 24; nbits++) // signed binary formats
@@ -181,7 +196,7 @@ void PlotControlPanel::onAutoScaleChecked(bool checked)
         ui->spYmin->setEnabled(false);
         ui->spYmax->setEnabled(false);
 
-        emit scaleChanged(true); // autoscale
+        emit yScaleChanged(true); // autoscale
     }
     else
     {
@@ -190,28 +205,43 @@ void PlotControlPanel::onAutoScaleChecked(bool checked)
         ui->spYmin->setEnabled(true);
         ui->spYmax->setEnabled(true);
 
-        emit scaleChanged(false, ui->spYmin->value(), ui->spYmax->value());
+        emit yScaleChanged(false, ui->spYmin->value(), ui->spYmax->value());
     }
 }
 
 void PlotControlPanel::onYScaleChanged()
 {
-    emit scaleChanged(false, ui->spYmin->value(), ui->spYmax->value());
+    emit yScaleChanged(false, ui->spYmin->value(), ui->spYmax->value());
 }
 
-bool PlotControlPanel::autoScale()
+bool PlotControlPanel::autoScale() const
 {
     return ui->cbAutoScale->isChecked();
 }
 
-double PlotControlPanel::yMax()
+double PlotControlPanel::yMax() const
 {
     return ui->spYmax->value();
 }
 
-double PlotControlPanel::yMin()
+double PlotControlPanel::yMin() const
 {
     return ui->spYmin->value();
+}
+
+bool PlotControlPanel::xAxisAsIndex() const
+{
+    return ui->cbIndex->isChecked();
+}
+
+double PlotControlPanel::xMax() const
+{
+    return ui->spXmax->value();
+}
+
+double PlotControlPanel::xMin() const
+{
+    return ui->spXmin->value();
 }
 
 void PlotControlPanel::onRangeSelected()
@@ -220,6 +250,33 @@ void PlotControlPanel::onRangeSelected()
     ui->spYmin->setValue(r.rmin);
     ui->spYmax->setValue(r.rmax);
     ui->cbAutoScale->setChecked(false);
+}
+
+void PlotControlPanel::onIndexChecked(bool checked)
+{
+    if (checked)
+    {
+        ui->lXmin->setEnabled(false);
+        ui->lXmax->setEnabled(false);
+        ui->spXmin->setEnabled(false);
+        ui->spXmax->setEnabled(false);
+
+        emit xScaleChanged(true); // use index
+    }
+    else
+    {
+        ui->lXmin->setEnabled(true);
+        ui->lXmax->setEnabled(true);
+        ui->spXmin->setEnabled(true);
+        ui->spXmax->setEnabled(true);
+
+        emit xScaleChanged(false, ui->spXmin->value(), ui->spXmax->value());
+    }
+}
+
+void PlotControlPanel::onXScaleChanged()
+{
+    emit xScaleChanged(false, ui->spXmin->value(), ui->spXmax->value());
 }
 
 void PlotControlPanel::setChannelInfoModel(ChannelInfoModel* model)
@@ -299,6 +356,9 @@ void PlotControlPanel::saveSettings(QSettings* settings)
 {
     settings->beginGroup(SettingGroup_Plot);
     settings->setValue(SG_Plot_NumOfSamples, numOfSamples());
+    settings->setValue(SG_Plot_IndexAsX, xAxisAsIndex());
+    settings->setValue(SG_Plot_XMax, xMax());
+    settings->setValue(SG_Plot_XMin, xMin());
     settings->setValue(SG_Plot_AutoScale, autoScale());
     settings->setValue(SG_Plot_YMax, yMax());
     settings->setValue(SG_Plot_YMin, yMin());
@@ -310,6 +370,10 @@ void PlotControlPanel::loadSettings(QSettings* settings)
     settings->beginGroup(SettingGroup_Plot);
     ui->spNumOfSamples->setValue(
         settings->value(SG_Plot_NumOfSamples, numOfSamples()).toInt());
+    ui->cbIndex->setChecked(
+        settings->value(SG_Plot_IndexAsX, xAxisAsIndex()).toBool());
+    ui->spXmax->setValue(settings->value(SG_Plot_XMax, xMax()).toDouble());
+    ui->spXmin->setValue(settings->value(SG_Plot_XMin, xMin()).toDouble());
     ui->cbAutoScale->setChecked(
         settings->value(SG_Plot_AutoScale, autoScale()).toBool());
     ui->spYmax->setValue(settings->value(SG_Plot_YMax, yMax()).toDouble());

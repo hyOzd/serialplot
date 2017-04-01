@@ -76,6 +76,9 @@ const char SG_Channels_Visible[] = "visible";
 
 // plot settings keys
 const char SG_Plot_NumOfSamples[] = "numOfSamples";
+const char SG_Plot_IndexAsX[] = "indexAsX";
+const char SG_Plot_XMax[] = "xMax";
+const char SG_Plot_XMin[] = "xMin";
 const char SG_Plot_AutoScale[] = "autoScale";
 const char SG_Plot_YMax[] = "yMax";
 const char SG_Plot_YMin[] = "yMin";
