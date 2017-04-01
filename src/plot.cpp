@@ -130,7 +130,6 @@ void Plot::resetAxes()
 
 void Plot::unzoomed()
 {
-    // setAxisAutoScale(QwtPlot::xBottom);
     resetAxes();
     onXScaleChanged();
 }
@@ -300,11 +299,4 @@ void Plot::onNumOfSamplesChanged(unsigned value)
 {
     numOfSamples = value;
     onXScaleChanged();
-
-    // TODO: what to do with this?
-
-    // auto currentBase = zoomer.zoomBase();
-    // currentBase.setWidth(value);
-    // zoomer.setZoomBase(currentBase);
-    // onXScaleChanged();
 }
