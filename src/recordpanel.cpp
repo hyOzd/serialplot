@@ -60,6 +60,14 @@ RecordPanel::RecordPanel(DataRecorder* recorder, ChannelManager* channelMan, QWi
             {
                 _recorder->disableBuffering = enabled;
             });
+
+    connect(ui->cbWindowsLE, &QCheckBox::toggled,
+            [this](bool enabled)
+            {
+                _recorder->windowsLE = enabled;
+            });
+
+    connect(&recordAction, &QAction::toggled, ui->cbWindowsLE, &QWidget::setDisabled);
 }
 
 RecordPanel::~RecordPanel()

@@ -27,6 +27,7 @@ DataRecorder::DataRecorder(QObject *parent) :
 {
     lastNumChannels = 0;
     disableBuffering = false;
+    windowsLE = false;
 }
 
 bool DataRecorder::startRecording(QString fileName, QString separator, QStringList channelNames)
@@ -47,7 +48,7 @@ bool DataRecorder::startRecording(QString fileName, QString separator, QStringLi
     if (!channelNames.isEmpty())
     {
         fileStream << channelNames.join(_sep);
-        fileStream << "\n";
+        fileStream << le();
         lastNumChannels = channelNames.length();
     }
     return true;
@@ -74,7 +75,7 @@ void DataRecorder::addData(double* data, unsigned length, unsigned numOfChannels
             fileStream << data[ci * numOfSamples + i];
             if (ci != numOfChannels-1) fileStream << _sep;
         }
-        fileStream << '\n';
+        fileStream << le();
     }
 
     if (disableBuffering) fileStream.flush();
@@ -86,4 +87,9 @@ void DataRecorder::stopRecording()
 
     file.close();
     lastNumChannels = 0;
+}
+
+const char* DataRecorder::le() const
+{
+    return windowsLE ? "\r\n" : "\n";
 }
