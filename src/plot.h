@@ -72,6 +72,7 @@ private:
     bool isAutoScaled;
     double yMin, yMax;
     double _xMin, _xMax;
+    unsigned numOfSamples;
     int symbolSize;
     Zoomer zoomer;
     ScaleZoomer sZoomer;

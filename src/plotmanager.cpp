@@ -462,12 +462,10 @@ void PlotManager::flashSnapshotOverlay()
 void PlotManager::onNumOfSamplesChanged(unsigned value)
 {
     _numOfSamples = value;
-    if (_xAxisAsIndex)
+    for (auto plot : plotWidgets)
     {
-        for (auto plot : plotWidgets)
-        {
-            plot->setXAxis(0, value);
-        }
+        plot->onNumOfSamplesChanged(value);
+        if (_xAxisAsIndex) plot->setXAxis(0, value);
     }
 }
 

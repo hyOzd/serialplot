@@ -38,6 +38,7 @@ Plot::Plot(QWidget* parent) :
 {
     isAutoScaled = true;
     symbolSize = 0;
+    numOfSamples = 1;
 
     QObject::connect(&zoomer, &Zoomer::unzoomed, this, &Plot::unzoomed);
 
@@ -250,7 +251,10 @@ void Plot::onXScaleChanged()
     auto sw = axisWidget(QwtPlot::xBottom);
     auto paintDist = sw->scaleDraw()->scaleMap().pDist();
     auto scaleDist = sw->scaleDraw()->scaleMap().sDist();
-    int symDisPx = round(paintDist / scaleDist);
+    auto fullScaleDist = zoomer.zoomBase().width();
+    auto zoomRate = fullScaleDist / scaleDist;
+    float samplesInView = numOfSamples / zoomRate;
+    int symDisPx = round(paintDist / samplesInView);
 
     if (symDisPx < SYMBOL_SHOW_AT_WIDTH)
     {
@@ -294,6 +298,11 @@ void Plot::resizeEvent(QResizeEvent * event)
 
 void Plot::onNumOfSamplesChanged(unsigned value)
 {
+    numOfSamples = value;
+    onXScaleChanged();
+
+    // TODO: what to do with this?
+
     // auto currentBase = zoomer.zoomBase();
     // currentBase.setWidth(value);
     // zoomer.setZoomBase(currentBase);
