@@ -144,8 +144,13 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
             {
                 // finalize
                 started = false;
-                emit picked(firstPos, pos);
+                if (firstPos != pos) // ignore 0 width zoom
+                {
+                    emit picked(firstPos, pos);
+                }
             }
+            pickerOverlay->updateOverlay();
+            scaleOverlay->updateOverlay();
         }
         return true;
     }
