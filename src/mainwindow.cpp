@@ -86,6 +86,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&commandPanel, &CommandPanel::focusRequested, [this]()
             {
                 this->ui->tabWidget->setCurrentWidget(&commandPanel);
+                this->ui->tabWidget->showTabs();
             });
 
     tbPortControl->setObjectName("tbPortControl");
@@ -253,6 +254,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(commandPanel.newCommandAction(), &QAction::triggered, [this]()
             {
                 this->ui->tabWidget->setCurrentWidget(&commandPanel);
+                this->ui->tabWidget->showTabs();
             });
 }
 
