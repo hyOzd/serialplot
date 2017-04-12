@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -51,4 +51,20 @@ void Zoomer::zoom( const QRectF & rect)
     }
 
     ScrollZoomer::zoom(rect);
+}
+
+QwtText Zoomer::trackerTextF(const QPointF& pos) const
+{
+    QwtText b = ScrollZoomer::trackerTextF(pos);
+
+    const QPolygon pa = selection();
+    const QRectF rect = invTransform(QRect(pa.first(), pa.last()).normalized());
+
+    QString sizeText = QString(" [%1, %2]").\
+        arg(rect.width(), 0, 'g', 4).\
+        arg(rect.height(), 0, 'g', 4);
+
+    b.setText(b.text() + sizeText);
+
+    return b;
 }
