@@ -58,6 +58,11 @@ QwtText Zoomer::trackerTextF(const QPointF& pos) const
     QwtText b = ScrollZoomer::trackerTextF(pos);
 
     const QPolygon pa = selection();
+    if (pa.count() < 2)
+    {
+        return b;
+    }
+
     const QRectF rect = invTransform(QRect(pa.first(), pa.last()).normalized());
 
     QString sizeText = QString(" [%1, %2]").\
