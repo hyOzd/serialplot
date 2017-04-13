@@ -73,3 +73,25 @@ QwtText Zoomer::trackerTextF(const QPointF& pos) const
 
     return b;
 }
+
+void Zoomer::drawRubberBand(QPainter* painter) const
+{
+    const double FILL_ALPHA = 0.2;
+
+    QColor color = painter->pen().color();
+    color.setAlphaF(FILL_ALPHA);
+    painter->setBrush(color);
+
+    ScrollZoomer::drawRubberBand(painter);
+}
+
+QRegion Zoomer::rubberBandMask() const
+{
+    const QPolygon pa = selection();
+    if (pa.count() < 2)
+    {
+        return QRegion();
+    }
+    const QRect r = QRect(pa.first(), pa.last()).normalized().adjusted(0, 0, 1, 1);
+    return QRegion(r);
+}

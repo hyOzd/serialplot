@@ -37,6 +37,10 @@ signals:
 protected:
     /// Re-implemented to display selection size in the tracker text.
     QwtText trackerTextF(const QPointF &pos) const;
+    /// Re-implemented for alpha background
+    void drawRubberBand(QPainter* painter) const;
+    /// Re-implemented for alpha background (masking is basically disabled)
+    QRegion rubberBandMask() const;
 };
 
 #endif // ZOOMER_H
