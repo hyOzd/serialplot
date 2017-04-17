@@ -24,6 +24,7 @@ find_path(QTCOLORWIDGETS_INCLUDE_DIR "color_preview.hpp" PATHS "/usr/include/qtc
 
 mark_as_advanced(QTCOLORWIDGETS_LIBRARY QTCOLORWIDGETS_INCLUDE_DIR)
 
+include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(QtColorWidgets DEFAULT_MSG QTCOLORWIDGETS_LIBRARY QTCOLORWIDGETS_INCLUDE_DIR)
 
 if (QTCOLORWIDGETS_FOUND)
