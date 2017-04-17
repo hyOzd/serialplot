@@ -54,14 +54,21 @@ else (BUILD_QWT)
   endif (QWT_USE_STATIC)
 endif (BUILD_QWT)
 
-include(BuildQColorWidgets)
-
+set(BUILD_QTCOLORWIDGETS true CACHE BOOL "Download and build QtColorWidgets library automatically.")
+if (BUILD_QTCOLORWIDGETS)
+  include(BuildQColorWidgets)
+else ()
+  find_package(QtColorWidgets REQUIRED)
+endif ()
 
 # includes
-include_directories("./src" ${QWT_INCLUDE_DIR} ${QCW_INCLUDE_DIR})
+include_directories("./src"
+  ${QWT_INCLUDE_DIR}
+  ${QTCOLORWIDGETS_INCLUDE_DIRS}
+  )
 
 # flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${QCW_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${QTCOLORWIDGETS_FLAGS}")
 
 # wrap UI and resource files
 qt5_wrap_ui(UI_FILES
@@ -133,14 +140,20 @@ add_executable(${PROGRAM_NAME} WIN32
   ${RES_FILES}
   )
 
-add_dependencies(${PROGRAM_NAME} QCW)
 # Use the Widgets module from Qt 5.
-target_link_libraries(${PROGRAM_NAME} ${QWT_LIBRARY} ${QCW_LIBRARY})
+target_link_libraries(${PROGRAM_NAME}
+  ${QWT_LIBRARY}
+  ${QTCOLORWIDGETS_LIBRARIES}
+  )
 qt5_use_modules(${PROGRAM_NAME} Widgets SerialPort)
 
 if (BUILD_QWT)
   add_dependencies(${PROGRAM_NAME} QWT)
-endif (BUILD_QWT)
+endif ()
+
+if (BUILD_QTCOLORWIDGETS)
+  add_dependencies(${PROGRAM_NAME} QCW)
+endif ()
 
 # set compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")

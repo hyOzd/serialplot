@@ -28,6 +28,9 @@ ExternalProject_Add(QCW
   INSTALL_COMMAND "")
 
 ExternalProject_Get_Property(QCW binary_dir source_dir)
-set(QCW_FLAGS "-D QTCOLORWIDGETS_STATICALLY_LINKED")
-set(QCW_LIBRARY ${binary_dir}/libColorWidgets-qt5.a)
-set(QCW_INCLUDE_DIR ${source_dir}/include)
+set(QTCOLORWIDGETS_FLAGS "-D QTCOLORWIDGETS_STATICALLY_LINKED")
+set(QTCOLORWIDGETS_LIBRARY ${binary_dir}/libColorWidgets-qt5.a)
+set(QTCOLORWIDGETS_INCLUDE_DIR ${source_dir}/include)
+
+set(QTCOLORWIDGETS_LIBRARIES ${QTCOLORWIDGETS_LIBRARY})
+set(QTCOLORWIDGETS_INCLUDE_DIRS ${QTCOLORWIDGETS_INCLUDE_DIR})
