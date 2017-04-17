@@ -161,9 +161,6 @@ else()
   message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
-# version number
-set(VERSION_STRING "0.8.1" CACHE STRING "Program version number.")
-
 # get revision number from mercurial
 find_program(MERCURIAL hg)
 
@@ -183,9 +180,7 @@ if (NOT VERSION_REVISION)
 endif (NOT VERSION_REVISION)
 
 message("SCM revision: ${VERSION_REVISION}")
-
-# configure version file
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/version.h.in" "${CMAKE_CURRENT_BINARY_DIR}/version.h")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_REVISION=\\\"${VERSION_REVISION}\\\" ")
 
 # add make run target
 add_custom_target(run
