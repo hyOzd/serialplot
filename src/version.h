@@ -21,7 +21,7 @@
 #define VERSION_H
 
 #ifndef VERSION_STRING
-#define VERSION_STRING   "0.8.1"
+#define VERSION_STRING   "0.9.0"
 #endif
 
 #ifndef VERSION_REVISION
