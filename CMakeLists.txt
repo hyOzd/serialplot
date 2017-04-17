@@ -38,22 +38,13 @@ find_package(Qt5Widgets)
 
 # If set, cmake will download Qwt over SVN, build and use it as a static library.
 set(BUILD_QWT true CACHE BOOL "Download and build Qwt automatically.")
-# Find QWT or use static manually provided by user
-set(QWT_USE_STATIC false CACHE BOOL "Use a static version of Qwt provided by user.")
-set(QWT_STATIC_LIBRARY "" CACHE FILEPATH "Path to the static Qwt library, libqwt.a.")
-set(QWT_STATIC_INCLUDE "" CACHE PATH "Path to the Qwt include directory when building Qwt static.")
-
 if (BUILD_QWT)
   include(BuildQwt)
 else (BUILD_QWT)
-  if (QWT_USE_STATIC)
-	set(QWT_LIBRARY ${QWT_STATIC_LIBRARY})
-	set(QWT_INCLUDE_DIR ${QWT_STATIC_INCLUDE})
-  else (QWT_USE_STATIC)
-	find_package(Qwt 6.1 REQUIRED)
-  endif (QWT_USE_STATIC)
+    find_package(Qwt 6.1 REQUIRED)
 endif (BUILD_QWT)
 
+# If set, cmake will download QtColorWidgets over git, build and use it as a static library.
 set(BUILD_QTCOLORWIDGETS true CACHE BOOL "Download and build QtColorWidgets library automatically.")
 if (BUILD_QTCOLORWIDGETS)
   include(BuildQColorWidgets)
