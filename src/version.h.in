@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -20,9 +20,6 @@
 #ifndef VERSION_H
 #define VERSION_H
 
-#define MAJOR_VERSION    @MAJOR_VERSION@
-#define MINOR_VERSION    @MINOR_VERSION@
-#define PATCH_VERSION    @PATCH_VERSION@
 #define VERSION_STRING   "@VERSION_STRING@"
 #define VERSION_REVISION "@VERSION_REVISION@"
 
