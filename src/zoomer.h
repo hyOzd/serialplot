@@ -41,6 +41,16 @@ protected:
     void drawRubberBand(QPainter* painter) const;
     /// Re-implemented for alpha background (masking is basically disabled)
     QRegion rubberBandMask() const;
+    /// Overloaded for panning
+    void widgetMousePressEvent(QMouseEvent* mouseEvent);
+    /// Overloaded for panning
+    void widgetMouseReleaseEvent(QMouseEvent* mouseEvent);
+    /// Overloaded for panning
+    void widgetMouseMoveEvent(QMouseEvent* mouseEvent);
+
+private:
+    bool is_panning;
+    QPointF pan_point;
 };
 
 #endif // ZOOMER_H

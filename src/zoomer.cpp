@@ -21,9 +21,13 @@
 #include <qwt_plot.h>
 #include <QtDebug>
 
+#include <QMouseEvent>
+
 Zoomer::Zoomer(QWidget* widget, bool doReplot) :
     ScrollZoomer(widget)
 {
+    is_panning = false;
+
     // set corner widget between the scrollbars with default background color
     auto cornerWidget = new QWidget();
     auto bgColor = cornerWidget->palette().color(QPalette::Window).name();
@@ -94,4 +98,44 @@ QRegion Zoomer::rubberBandMask() const
     }
     const QRect r = QRect(pa.first(), pa.last()).normalized().adjusted(0, 0, 1, 1);
     return QRegion(r);
+}
+
+void Zoomer::widgetMousePressEvent(QMouseEvent* mouseEvent)
+{
+    if (mouseEvent->modifiers() & Qt::ControlModifier)
+    {
+        is_panning = true;
+        pan_point = invTransform(mouseEvent->pos());
+    }
+    else
+    {
+        ScrollZoomer::widgetMousePressEvent(mouseEvent);
+    }
+}
+
+void Zoomer::widgetMouseMoveEvent(QMouseEvent* mouseEvent)
+{
+    if (is_panning)
+    {
+        auto cur_point = invTransform(mouseEvent->pos());
+        auto delta = cur_point - pan_point;
+        moveBy(-delta.x(), -delta.y());
+        pan_point = invTransform(mouseEvent->pos());
+    }
+    else
+    {
+        ScrollZoomer::widgetMouseMoveEvent(mouseEvent);
+    }
+}
+
+void Zoomer::widgetMouseReleaseEvent(QMouseEvent* mouseEvent)
+{
+    if (is_panning)
+    {
+        is_panning = false;
+    }
+    else
+    {
+        ScrollZoomer::widgetMouseReleaseEvent(mouseEvent);
+    }
 }
