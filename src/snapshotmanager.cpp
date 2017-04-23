@@ -24,6 +24,7 @@
 #include <QFile>
 #include <QVector>
 #include <QPointF>
+#include <QIcon>
 #include <QtDebug>
 
 #include "snapshotmanager.h"
@@ -40,6 +41,7 @@ SnapshotManager::SnapshotManager(QMainWindow* mainWindow,
 
     _takeSnapshotAction.setToolTip("Take a snapshot of current plot");
     _takeSnapshotAction.setShortcut(QKeySequence("F5"));
+    _takeSnapshotAction.setIcon(QIcon::fromTheme("camera"));
     loadSnapshotAction.setToolTip("Load snapshots from CSV files");
     clearAction.setToolTip("Delete all snapshots");
     connect(&_takeSnapshotAction, SIGNAL(triggered(bool)),
