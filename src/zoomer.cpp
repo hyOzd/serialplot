@@ -105,6 +105,7 @@ void Zoomer::widgetMousePressEvent(QMouseEvent* mouseEvent)
     if (mouseEvent->modifiers() & Qt::ControlModifier)
     {
         is_panning = true;
+        parentWidget()->setCursor(Qt::ClosedHandCursor);
         pan_point = invTransform(mouseEvent->pos());
     }
     else
@@ -133,6 +134,7 @@ void Zoomer::widgetMouseReleaseEvent(QMouseEvent* mouseEvent)
     if (is_panning)
     {
         is_panning = false;
+        parentWidget()->setCursor(Qt::CrossCursor);
     }
     else
     {
