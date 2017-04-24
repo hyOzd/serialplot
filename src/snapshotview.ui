@@ -26,7 +26,7 @@
      <x>0</x>
      <y>0</y>
      <width>544</width>
-     <height>20</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSnapshot">
@@ -34,7 +34,7 @@
      <string>&amp;Snapshot</string>
     </property>
     <addaction name="actionRename"/>
-    <addaction name="actionExport"/>
+    <addaction name="actionSave"/>
     <addaction name="actionClose"/>
    </widget>
    <widget class="QMenu" name="menuView">
@@ -45,9 +45,9 @@
    <addaction name="menuSnapshot"/>
    <addaction name="menuView"/>
   </widget>
-  <action name="actionExport">
+  <action name="actionSave">
    <property name="text">
-    <string>&amp;Export CSV</string>
+    <string>&amp;Save as CSV</string>
    </property>
    <property name="toolTip">
     <string>Save snapshot as CSV file</string>

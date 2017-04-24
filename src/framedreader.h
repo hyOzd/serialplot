@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -33,7 +33,8 @@ class FramedReader : public AbstractReader
     Q_OBJECT
 
 public:
-    explicit FramedReader(QIODevice* device, ChannelManager* channelMan, QObject *parent = 0);
+    explicit FramedReader(QIODevice* device, ChannelManager* channelMan,
+                          DataRecorder* recorder, QObject *parent = 0);
     QWidget* settingsWidget();
     unsigned numOfChannels();
     void enable(bool enabled = true);
@@ -83,8 +84,6 @@ private:
     /// reads payload portion of the frame, calculates checksum and commits data
     /// @note should be called only if there are enough bytes on device
     void readFrameDataAndCheck();
-    // `data` contains i th channels data
-    void addChannelData(unsigned int channel, double* data, unsigned size);
 
 private slots:
     void onDataReady();

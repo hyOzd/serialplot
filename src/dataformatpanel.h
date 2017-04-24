@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -34,6 +34,7 @@
 #include "asciireader.h"
 #include "demoreader.h"
 #include "framedreader.h"
+#include "datarecorder.h"
 
 namespace Ui {
 class DataFormatPanel;
@@ -46,7 +47,8 @@ class DataFormatPanel : public QWidget
 public:
     explicit DataFormatPanel(QSerialPort* port,
                              ChannelManager* channelMan,
-                             QWidget *parent = 0);
+                             DataRecorder* recorder,
+                             QWidget* parent = 0);
     ~DataFormatPanel();
 
     /// Returns currently selected number of channels
@@ -60,10 +62,19 @@ public slots:
     void pause(bool);
     void enableDemo(bool); // demo shouldn't be enabled when port is open
 
+    /**
+     * @brief Starts sending data to recorder.
+     *
+     * @note recorder must have been started!
+     */
+    void startRecording();
+
+    /// Stops recording.
+    void stopRecording();
+
 signals:
     void numOfChannelsChanged(unsigned);
     void samplesPerSecondChanged(unsigned);
-    void dataAdded();
 
 private:
     Ui::DataFormatPanel *ui;
@@ -81,10 +92,8 @@ private:
 
     bool paused;
 
+    bool demoEnabled;
     DemoReader demoReader;
-
-    // `data` contains i th channels data
-    void addChannelData(unsigned int channel, double* data, unsigned size);
 };
 
 #endif // DATAFORMATPANEL_H

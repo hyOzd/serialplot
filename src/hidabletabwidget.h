@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -29,6 +29,9 @@ class HidableTabWidget : public QTabWidget
 public:
     explicit HidableTabWidget(QWidget *parent = 0);
     QAction hideAction;
+
+public slots:
+    void showTabs();
 
 private slots:
     void onHideAction(bool checked);

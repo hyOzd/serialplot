@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -23,8 +23,9 @@
 
 #include "framedreader.h"
 
-FramedReader::FramedReader(QIODevice* device, ChannelManager* channelMan, QObject *parent) :
-    AbstractReader(device, channelMan, parent)
+FramedReader::FramedReader(QIODevice* device, ChannelManager* channelMan,
+                           DataRecorder* recorder, QObject* parent) :
+    AbstractReader(device, channelMan, recorder, parent)
 {
     paused = false;
 
@@ -310,22 +311,14 @@ void FramedReader::readFrameDataAndCheck()
     if (!checksumEnabled || checksumPassed)
     {
         // commit data
-        for (unsigned int ci = 0; ci < _numOfChannels; ci++)
-        {
-            _channelMan->addChannelData(
-                ci,
-                channelSamples + ci*numOfPackagesToRead,
-                numOfPackagesToRead);
-            sampleCount += numOfPackagesToRead;
-        }
-        emit dataAdded();
+        addData(channelSamples, numOfPackagesToRead*_numOfChannels);
     }
     else
     {
         qCritical() << "Checksum failed! Received:" << rChecksum << "Calculated:" << calcChecksum;
     }
 
-    delete channelSamples;
+    delete[] channelSamples;
 }
 
 template<typename T> double FramedReader::readSampleAs()

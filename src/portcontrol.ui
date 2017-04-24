@@ -317,6 +317,24 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>cbPortList</tabstop>
+  <tabstop>pbReloadPorts</tabstop>
+  <tabstop>pbOpenPort</tabstop>
+  <tabstop>cbBaudRate</tabstop>
+  <tabstop>rbNoParity</tabstop>
+  <tabstop>rbOddParity</tabstop>
+  <tabstop>rbEvenParity</tabstop>
+  <tabstop>rb8Bits</tabstop>
+  <tabstop>rb7Bits</tabstop>
+  <tabstop>rb6Bits</tabstop>
+  <tabstop>rb5Bits</tabstop>
+  <tabstop>rb1StopBit</tabstop>
+  <tabstop>rb2StopBit</tabstop>
+  <tabstop>rbNoFlowControl</tabstop>
+  <tabstop>rbHardwareControl</tabstop>
+  <tabstop>rbSoftwareControl</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

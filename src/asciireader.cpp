@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -24,12 +24,12 @@
 /// If set to this value number of channels is determined from input
 #define NUMOFCHANNELS_AUTO   (0)
 
-AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan, QObject *parent) :
-    AbstractReader(device, channelMan, parent)
+AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan,
+                         DataRecorder* recorder, QObject* parent) :
+    AbstractReader(device, channelMan, recorder, parent)
 {
     paused = false;
     discardFirstLine = true;
-    sampleCount = 0;
 
     _numOfChannels = _settingsWidget.numOfChannels();
     autoNumOfChannels = (_numOfChannels == NUMOFCHANNELS_AUTO);
@@ -139,24 +139,27 @@ void AsciiReader::onDataReady()
         {
             numReadChannels = separatedValues.length();
             qWarning() << "Incoming data is missing data for some channels!";
+            qWarning() << "Read line: " << line;
         }
 
         // parse read line
+        double* channelSamples = new double[_numOfChannels]();
         for (unsigned ci = 0; ci < numReadChannels; ci++)
         {
             bool ok;
-            double channelSample = separatedValues[ci].toDouble(&ok);
-            if (ok)
-            {
-                _channelMan->addChannelData(ci, &channelSample, 1);
-                sampleCount++;
-            }
-            else
+            channelSamples[ci] = separatedValues[ci].toDouble(&ok);
+            if (!ok)
             {
                 qWarning() << "Data parsing error for channel: " << ci;
+                qWarning() << "Read line: " << line;
+                channelSamples[ci] = 0;
             }
         }
-        emit dataAdded();
+
+        // commit data
+        addData(channelSamples, _numOfChannels);
+
+        delete[] channelSamples;
     }
 }
 

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -62,19 +62,22 @@ MainWindow::MainWindow(QWidget *parent) :
     channelMan(1, 1, this),
     snapshotMan(this, &channelMan),
     commandPanel(&serialPort),
-    dataFormatPanel(&serialPort, &channelMan)
+    dataFormatPanel(&serialPort, &channelMan, &recorder),
+    recordPanel(&recorder, &channelMan)
 {
     ui->setupUi(this);
 
-    plotMan = new PlotManager(ui->plotArea);
+    plotMan = new PlotManager(ui->plotArea, channelMan.infoModel());
 
     ui->tabWidget->insertTab(0, &portControl, "Port");
     ui->tabWidget->insertTab(1, &dataFormatPanel, "Data Format");
     ui->tabWidget->insertTab(2, &plotControlPanel, "Plot");
     ui->tabWidget->insertTab(3, &commandPanel, "Commands");
+    ui->tabWidget->insertTab(4, &recordPanel, "Record");
     ui->tabWidget->setCurrentIndex(0);
     auto tbPortControl = portControl.toolBar();
     addToolBar(tbPortControl);
+    addToolBar(recordPanel.toolbar());
 
     ui->plotToolBar->addAction(snapshotMan.takeSnapshotAction());
     ui->menuBar->insertMenu(ui->menuHelp->menuAction(), snapshotMan.menu());
@@ -83,6 +86,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&commandPanel, &CommandPanel::focusRequested, [this]()
             {
                 this->ui->tabWidget->setCurrentWidget(&commandPanel);
+                this->ui->tabWidget->showTabs();
             });
 
     tbPortControl->setObjectName("tbPortControl");
@@ -130,14 +134,18 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&portControl, &PortControl::portToggled,
                      this, &MainWindow::onPortToggled);
 
+    // plot control signals
     connect(&plotControlPanel, &PlotControlPanel::numOfSamplesChanged,
             this, &MainWindow::onNumOfSamplesChanged);
 
     connect(&plotControlPanel, &PlotControlPanel::numOfSamplesChanged,
             plotMan, &PlotManager::onNumOfSamplesChanged);
 
-    connect(&plotControlPanel, &PlotControlPanel::scaleChanged,
-            plotMan, &PlotManager::setAxis);
+    connect(&plotControlPanel, &PlotControlPanel::yScaleChanged,
+            plotMan, &PlotManager::setYAxis);
+
+    connect(&plotControlPanel, &PlotControlPanel::xScaleChanged,
+            plotMan, &PlotManager::setXAxis);
 
     QObject::connect(ui->actionClear, SIGNAL(triggered(bool)),
                      this, SLOT(clearPlot()));
@@ -150,11 +158,42 @@ MainWindow::MainWindow(QWidget *parent) :
                      this, SLOT(onPortError(QSerialPort::SerialPortError)));
 
     // init data format and reader
-    QObject::connect(&dataFormatPanel, &DataFormatPanel::dataAdded,
+    QObject::connect(&channelMan, &ChannelManager::dataAdded,
                      plotMan, &PlotManager::replot);
 
     QObject::connect(ui->actionPause, &QAction::triggered,
-                     &dataFormatPanel, &DataFormatPanel::pause);
+                     &channelMan, &ChannelManager::pause);
+
+    QObject::connect(&recordPanel, &RecordPanel::recordStarted,
+                     &dataFormatPanel, &DataFormatPanel::startRecording);
+
+    QObject::connect(&recordPanel, &RecordPanel::recordStopped,
+                     &dataFormatPanel, &DataFormatPanel::stopRecording);
+
+    QObject::connect(ui->actionPause, &QAction::triggered,
+                     [this](bool enabled)
+                     {
+                         if (enabled && !recordPanel.recordPaused())
+                         {
+                             dataFormatPanel.pause(true);
+                         }
+                         else
+                         {
+                             dataFormatPanel.pause(false);
+                         }
+                     });
+
+    QObject::connect(&recordPanel, &RecordPanel::recordPausedChanged,
+                     [this](bool enabled)
+                     {
+                         if (ui->actionPause->isChecked() && enabled)
+                         {
+                             dataFormatPanel.pause(false);
+                         }
+                     });
+
+    connect(&serialPort, &QIODevice::aboutToClose,
+            &recordPanel, &RecordPanel::onPortClose);
 
     // init data arrays and plot
     numOfSamples = plotControlPanel.numOfSamples();
@@ -169,10 +208,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&channelMan, &ChannelManager::numOfChannelsChanged,
             this, &MainWindow::onNumOfChannelsChanged);
 
-    connect(&channelMan, &ChannelManager::channelNameChanged,
-            this, &MainWindow::onChannelNameChanged);
-
-    plotControlPanel.setChannelNamesModel(channelMan.channelNames());
+    plotControlPanel.setChannelInfoModel(channelMan.infoModel());
 
     // init curve list
     for (unsigned int i = 0; i < numOfChannels; i++)
@@ -180,9 +216,12 @@ MainWindow::MainWindow(QWidget *parent) :
         plotMan->addCurve(channelMan.channelName(i), channelMan.channelBuffer(i));
     }
 
-    // init auto scale
-    plotMan->setAxis(plotControlPanel.autoScale(),
-                     plotControlPanel.yMin(), plotControlPanel.yMax());
+    // init scales
+    plotMan->setYAxis(plotControlPanel.autoScale(),
+                      plotControlPanel.yMin(), plotControlPanel.yMax());
+    plotMan->setXAxis(plotControlPanel.xAxisAsIndex(),
+                      plotControlPanel.xMin(), plotControlPanel.xMax());
+    plotMan->onNumOfSamplesChanged(numOfSamples);
 
     // Init sps (sample per second) counter
     spsLabel.setText("0sps");
@@ -215,15 +254,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(commandPanel.newCommandAction(), &QAction::triggered, [this]()
             {
                 this->ui->tabWidget->setCurrentWidget(&commandPanel);
+                this->ui->tabWidget->showTabs();
             });
 }
 
 MainWindow::~MainWindow()
 {
-    // save settings
-    QSettings settings("serialplot", "serialplot");
-    saveAllSettings(&settings);
-
     if (serialPort.isOpen())
     {
         serialPort.close();
@@ -237,6 +273,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent * event)
 {
+    // save snapshots
     if (!snapshotMan.isAllSaved())
     {
         auto clickedButton = QMessageBox::warning(
@@ -250,6 +287,41 @@ void MainWindow::closeEvent(QCloseEvent * event)
             return;
         }
     }
+
+    // save settings
+    QSettings settings("serialplot", "serialplot");
+    saveAllSettings(&settings);
+    settings.sync();
+
+    if (settings.status() != QSettings::NoError)
+    {
+        QString errorText;
+
+        if (settings.status() == QSettings::AccessError)
+        {
+            QString file = settings.fileName();
+            errorText = QString("Serialplot cannot save settings due to access error. \
+This happens if you have run serialplot as root (with sudo for ex.) previously. \
+Try fixing the permissions of file: %1, or just delete it.").arg(file);
+        }
+        else
+        {
+            errorText = QString("Serialplot cannot save settings due to unknown error: %1").\
+                arg(settings.status());
+        }
+
+        auto button = QMessageBox::critical(
+            NULL,
+            "Failed to save settings!", errorText,
+            QMessageBox::Cancel | QMessageBox::Ok);
+
+        if (button == QMessageBox::Cancel)
+        {
+            event->ignore();
+            return;
+        }
+    }
+
     QMainWindow::closeEvent(event);
 }
 
@@ -369,17 +441,6 @@ void MainWindow::onNumOfChannelsChanged(unsigned value)
     plotMan->replot();
 }
 
-void MainWindow::onChannelNameChanged(unsigned channel, QString name)
-{
-    // This slot is triggered also when a new channel is added, in
-    // this case curve list doesn't contain said channel. No worries,
-    // since `onNumOfChannelsChanged` slot will update curve list.
-    if (channel < plotMan->numOfCurves()) // check if channel exists in curve list
-    {
-        plotMan->setTitle(channel, name);
-    }
-}
-
 void MainWindow::onSpsChanged(unsigned sps)
 {
     spsLabel.setText(QString::number(sps) + "sps");
@@ -463,6 +524,11 @@ void MainWindow::messageHandler(QtMsgType type,
     {
         ui->statusBar->showMessage(msg, 5000);
     }
+
+    if (type == QtFatalMsg)
+    {
+        __builtin_trap();
+    }
 }
 
 void MainWindow::saveAllSettings(QSettings* settings)
@@ -474,6 +540,7 @@ void MainWindow::saveAllSettings(QSettings* settings)
     plotControlPanel.saveSettings(settings);
     plotMan->saveSettings(settings);
     commandPanel.saveSettings(settings);
+    recordPanel.saveSettings(settings);
 }
 
 void MainWindow::loadAllSettings(QSettings* settings)
@@ -485,6 +552,7 @@ void MainWindow::loadAllSettings(QSettings* settings)
     plotControlPanel.loadSettings(settings);
     plotMan->loadSettings(settings);
     commandPanel.loadSettings(settings);
+    recordPanel.loadSettings(settings);
 }
 
 void MainWindow::saveMWSettings(QSettings* settings)

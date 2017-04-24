@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -23,6 +23,7 @@
 
 #include <math.h>
 
+#include "color_selector.hpp"
 #include "plotcontrolpanel.h"
 #include "ui_plotcontrolpanel.h"
 #include "setting_defines.h"
@@ -41,7 +42,12 @@ Q_DECLARE_METATYPE(Range);
 
 PlotControlPanel::PlotControlPanel(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::PlotControlPanel)
+    ui(new Ui::PlotControlPanel),
+    resetAct(tr("Reset"), this),
+    resetNamesAct(tr("Reset Names"), this),
+    resetColorsAct(tr("Reset Colors"), this),
+    showAllAct(tr("Show All"), this),
+    resetMenu(tr("Reset Menu"), this)
 {
     ui->setupUi(this);
 
@@ -53,6 +59,12 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
                          std::numeric_limits<double>::max());
 
     ui->spYmax->setRange((-1) * std::numeric_limits<double>::max(),
+                         std::numeric_limits<double>::max());
+
+    ui->spXmin->setRange((-1) * std::numeric_limits<double>::max(),
+                         std::numeric_limits<double>::max());
+
+    ui->spXmax->setRange((-1) * std::numeric_limits<double>::max(),
                          std::numeric_limits<double>::max());
 
     // connect signals
@@ -67,6 +79,15 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
 
     connect(ui->spYmin, SIGNAL(valueChanged(double)),
             this, SLOT(onYScaleChanged()));
+
+    connect(ui->cbIndex, &QCheckBox::toggled,
+            this, &PlotControlPanel::onIndexChecked);
+
+    connect(ui->spXmax, SIGNAL(valueChanged(double)),
+            this, SLOT(onXScaleChanged()));
+
+    connect(ui->spXmin, SIGNAL(valueChanged(double)),
+            this, SLOT(onXScaleChanged()));
 
     // init scale range preset list
     for (int nbits = 8; nbits <= 24; nbits++) // signed binary formats
@@ -92,6 +113,18 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
 
     QObject::connect(ui->cbRangePresets, SIGNAL(activated(int)),
                      this, SLOT(onRangeSelected()));
+
+    // color selector starts disabled until a channel is selected
+    ui->colorSelector->setColor(QColor(0,0,0,0));
+    ui->colorSelector->setDisplayMode(color_widgets::ColorPreview::AllAlpha);
+    ui->colorSelector->setDisabled(true);
+
+    // reset button
+    resetMenu.addAction(&resetNamesAct);
+    resetMenu.addAction(&resetColorsAct);
+    resetMenu.addAction(&showAllAct);
+    resetAct.setMenu(&resetMenu);
+    ui->tbReset->setDefaultAction(&resetAct);
 }
 
 PlotControlPanel::~PlotControlPanel()
@@ -163,7 +196,7 @@ void PlotControlPanel::onAutoScaleChecked(bool checked)
         ui->spYmin->setEnabled(false);
         ui->spYmax->setEnabled(false);
 
-        emit scaleChanged(true); // autoscale
+        emit yScaleChanged(true); // autoscale
     }
     else
     {
@@ -172,28 +205,46 @@ void PlotControlPanel::onAutoScaleChecked(bool checked)
         ui->spYmin->setEnabled(true);
         ui->spYmax->setEnabled(true);
 
-        emit scaleChanged(false, ui->spYmin->value(), ui->spYmax->value());
+        emit yScaleChanged(false, ui->spYmin->value(), ui->spYmax->value());
     }
 }
 
 void PlotControlPanel::onYScaleChanged()
 {
-    emit scaleChanged(false, ui->spYmin->value(), ui->spYmax->value());
+    if (!autoScale())
+    {
+        emit yScaleChanged(false, ui->spYmin->value(), ui->spYmax->value());
+    }
 }
 
-bool PlotControlPanel::autoScale()
+bool PlotControlPanel::autoScale() const
 {
     return ui->cbAutoScale->isChecked();
 }
 
-double PlotControlPanel::yMax()
+double PlotControlPanel::yMax() const
 {
     return ui->spYmax->value();
 }
 
-double PlotControlPanel::yMin()
+double PlotControlPanel::yMin() const
 {
     return ui->spYmin->value();
+}
+
+bool PlotControlPanel::xAxisAsIndex() const
+{
+    return ui->cbIndex->isChecked();
+}
+
+double PlotControlPanel::xMax() const
+{
+    return ui->spXmax->value();
+}
+
+double PlotControlPanel::xMin() const
+{
+    return ui->spXmin->value();
 }
 
 void PlotControlPanel::onRangeSelected()
@@ -204,15 +255,116 @@ void PlotControlPanel::onRangeSelected()
     ui->cbAutoScale->setChecked(false);
 }
 
-void PlotControlPanel::setChannelNamesModel(QAbstractItemModel * model)
+void PlotControlPanel::onIndexChecked(bool checked)
 {
-    ui->lvChannelNames->setModel(model);
+    if (checked)
+    {
+        ui->lXmin->setEnabled(false);
+        ui->lXmax->setEnabled(false);
+        ui->spXmin->setEnabled(false);
+        ui->spXmax->setEnabled(false);
+
+        emit xScaleChanged(true); // use index
+    }
+    else
+    {
+        ui->lXmin->setEnabled(true);
+        ui->lXmax->setEnabled(true);
+        ui->spXmin->setEnabled(true);
+        ui->spXmax->setEnabled(true);
+
+        emit xScaleChanged(false, ui->spXmin->value(), ui->spXmax->value());
+    }
+}
+
+void PlotControlPanel::onXScaleChanged()
+{
+    if (!xAxisAsIndex())
+    {
+        emit xScaleChanged(false, ui->spXmin->value(), ui->spXmax->value());
+    }
+}
+
+void PlotControlPanel::setChannelInfoModel(ChannelInfoModel* model)
+{
+    ui->tvChannelInfo->setModel(model);
+
+    // channel color selector
+    connect(ui->tvChannelInfo->selectionModel(), &QItemSelectionModel::currentRowChanged,
+            [this](const QModelIndex &current, const QModelIndex &previous)
+            {
+                // TODO: duplicate with below lambda
+                QColor color(0,0,0,0); // transparent
+
+                if (current.isValid())
+                {
+                    ui->colorSelector->setEnabled(true);
+                    auto model = ui->tvChannelInfo->model();
+                    color = model->data(current, Qt::ForegroundRole).value<QColor>();
+                }
+                else
+                {
+                    ui->colorSelector->setDisabled(true);
+                }
+
+                // temporarily block signals because `setColor` emits `colorChanged`
+                bool wasBlocked = ui->colorSelector->blockSignals(true);
+                ui->colorSelector->setColor(color);
+                ui->colorSelector->blockSignals(wasBlocked);
+            });
+
+    connect(ui->tvChannelInfo->selectionModel(), &QItemSelectionModel::selectionChanged,
+            [this](const QItemSelection & selected, const QItemSelection & deselected)
+            {
+                if (!selected.length())
+                {
+                    ui->colorSelector->setDisabled(true);
+
+                    // temporarily block signals because `setColor` emits `colorChanged`
+                    bool wasBlocked = ui->colorSelector->blockSignals(true);
+                    ui->colorSelector->setColor(QColor(0,0,0,0));
+                    ui->colorSelector->blockSignals(wasBlocked);
+                }
+            });
+
+    connect(ui->colorSelector, &color_widgets::ColorSelector::colorChanged,
+            [this](QColor color)
+            {
+                auto index = ui->tvChannelInfo->selectionModel()->currentIndex();
+                ui->tvChannelInfo->model()->setData(index, color, Qt::ForegroundRole);
+            });
+
+    connect(model, &QAbstractItemModel::dataChanged,
+            [this](const QModelIndex & topLeft, const QModelIndex & bottomRight, const QVector<int> & roles = QVector<int> ())
+            {
+                auto current = ui->tvChannelInfo->selectionModel()->currentIndex();
+
+                // no current selection
+                if (!current.isValid()) return;
+
+                auto mod = ui->tvChannelInfo->model();
+                QColor color = mod->data(current, Qt::ForegroundRole).value<QColor>();
+
+                // temporarily block signals because `setColor` emits `colorChanged`
+                bool wasBlocked = ui->colorSelector->blockSignals(true);
+                ui->colorSelector->setColor(color);
+                ui->colorSelector->blockSignals(wasBlocked);
+            });
+
+    // reset actions
+    connect(&resetAct, &QAction::triggered, model, &ChannelInfoModel::resetInfos);
+    connect(&resetNamesAct, &QAction::triggered, model, &ChannelInfoModel::resetNames);
+    connect(&resetColorsAct, &QAction::triggered, model, &ChannelInfoModel::resetColors);
+    connect(&showAllAct, &QAction::triggered, model, &ChannelInfoModel::resetVisibility);
 }
 
 void PlotControlPanel::saveSettings(QSettings* settings)
 {
     settings->beginGroup(SettingGroup_Plot);
     settings->setValue(SG_Plot_NumOfSamples, numOfSamples());
+    settings->setValue(SG_Plot_IndexAsX, xAxisAsIndex());
+    settings->setValue(SG_Plot_XMax, xMax());
+    settings->setValue(SG_Plot_XMin, xMin());
     settings->setValue(SG_Plot_AutoScale, autoScale());
     settings->setValue(SG_Plot_YMax, yMax());
     settings->setValue(SG_Plot_YMin, yMin());
@@ -224,6 +376,10 @@ void PlotControlPanel::loadSettings(QSettings* settings)
     settings->beginGroup(SettingGroup_Plot);
     ui->spNumOfSamples->setValue(
         settings->value(SG_Plot_NumOfSamples, numOfSamples()).toInt());
+    ui->cbIndex->setChecked(
+        settings->value(SG_Plot_IndexAsX, xAxisAsIndex()).toBool());
+    ui->spXmax->setValue(settings->value(SG_Plot_XMax, xMax()).toDouble());
+    ui->spXmin->setValue(settings->value(SG_Plot_XMin, xMin()).toDouble());
     ui->cbAutoScale->setChecked(
         settings->value(SG_Plot_AutoScale, autoScale()).toBool());
     ui->spYmax->setValue(settings->value(SG_Plot_YMax, yMax()).toDouble());

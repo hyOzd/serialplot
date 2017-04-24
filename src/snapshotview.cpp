@@ -29,7 +29,7 @@ SnapshotView::SnapshotView(QWidget *parent, Snapshot* snapshot) :
 
     ui->setupUi(this);
 
-    plotMan = new PlotManager(ui->plotArea);
+    plotMan = new PlotManager(ui->plotArea, snapshot->infoModel());
 
     ui->menuSnapshot->insertAction(ui->actionClose, snapshot->deleteAction());
     this->setWindowTitle(snapshot->displayName());
@@ -46,7 +46,7 @@ SnapshotView::SnapshotView(QWidget *parent, Snapshot* snapshot) :
     connect(ui->actionRename, &QAction::triggered,
             this, &SnapshotView::showRenameDialog);
 
-    connect(ui->actionExport, &QAction::triggered,
+    connect(ui->actionSave, &QAction::triggered,
             this, &SnapshotView::save);
 
     // add 'View' menu items

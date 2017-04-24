@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -26,6 +26,7 @@
 #include <QTimer>
 
 #include "channelmanager.h"
+#include "datarecorder.h"
 
 /**
  * All reader classes must inherit this class.
@@ -34,7 +35,10 @@ class AbstractReader : public QObject
 {
     Q_OBJECT
 public:
-    explicit AbstractReader(QIODevice* device, ChannelManager* channelMan, QObject *parent = 0);
+    explicit AbstractReader(QIODevice* device, ChannelManager* channelMan,
+                            DataRecorder* recorder, QObject* parent = 0);
+
+    bool recording;                 /// is recording started
 
     /**
      * Returns a widget to be shown in data format panel when reader
@@ -54,11 +58,18 @@ public:
     /// 'disabled'.
     virtual void enable(bool enabled = true) = 0;
 
+    /**
+     * @brief Starts sending data to recorder.
+     *
+     * @note recorder must have been started!
+     */
+    void startRecording();
+
+    /// Stops recording.
+    void stopRecording();
+
 signals:
     void numOfChannelsChanged(unsigned);
-    // TODO: this must be signaled by 'channel man' for better abstraction
-    void dataAdded(); ///< emitted when data added to channel man.
-    // TODO: this should be a part of 'channel man'
     void samplesPerSecondChanged(unsigned);
 
 public slots:
@@ -72,14 +83,18 @@ public slots:
 
 protected:
     QIODevice* _device;
-    ChannelManager* _channelMan;
 
-    /// Implementing class should simply increase this count as samples are read
-    unsigned sampleCount;
+    /// Should be called with read data
+    void addData(double* samples, unsigned length);
 
 private:
     const int SPS_UPDATE_TIMEOUT = 1;  // second
+
+    unsigned sampleCount;
     unsigned samplesPerSecond;
+
+    ChannelManager* _channelMan;
+    DataRecorder* _recorder;
     QTimer spsTimer;
 
 private slots:

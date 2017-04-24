@@ -1,5 +1,5 @@
 #
-# Copyright © 2015 Hasan Yavuz Özderya
+# Copyright © 2017 Hasan Yavuz Özderya
 #
 # This file is part of serialplot.
 #
@@ -66,7 +66,7 @@ endif(qwt_roots)
 
 if(QWT_ROOT)
   set(QWT_INCLUDE_DIR "${QWT_ROOT}/include")
-  find_library(QWT_LIBRARY "qwt"
+  find_library(QWT_LIBRARY "qwt-qt5"
 	PATHS "${QWT_ROOT}/lib")
 else (QWT_ROOT)
   ## Look into system locations
@@ -90,7 +90,7 @@ else (QWT_ROOT)
 	endif(qwt_version_string)
   endif (QWT_INCLUDE_DIR)
   # look into system locations for lib file
-  find_library(QWT_LIBRARY "qwt" PATHS /usr/lib)
+  find_library(QWT_LIBRARY "qwt-qt5" PATHS /usr/lib)
 endif(QWT_ROOT)
 
 # set version variables

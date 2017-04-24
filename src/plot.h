@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -37,27 +37,13 @@ class Plot : public QwtPlot
 {
     Q_OBJECT
 
+    friend class PlotManager;
+
 public:
     Plot(QWidget* parent = 0);
     ~Plot();
 
     static QColor makeColor(unsigned int channelIndex);
-
-private:
-    bool isAutoScaled;
-    double yMin, yMax;
-    int symbolSize;
-    Zoomer zoomer;
-    ScaleZoomer sZoomer;
-    QwtPlotGrid grid;
-    PlotSnapshotOverlay* snapshotOverlay;
-    QwtPlotLegendItem legend;
-    QwtPlotTextLabel demoIndicator;
-
-    /// update the display of symbols depending on `symbolSize`
-    void updateSymbols();
-    void resetAxes();
-    void resizeEvent(QResizeEvent * event);
 
 public slots:
     void showGrid(bool show = true);
@@ -66,7 +52,8 @@ public slots:
     void showDemoIndicator(bool show = true);
     void unzoom();
     void darkBackground(bool enabled = true);
-    void setAxis(bool autoScaled, double yMin = 0, double yMax = 1);
+    void setYAxis(bool autoScaled, double yMin = 0, double yMax = 1);
+    void setXAxis(double xMin, double xMax);
 
     /**
      * Displays an animation for snapshot.
@@ -76,6 +63,26 @@ public slots:
     void flashSnapshotOverlay(bool light);
 
     void onNumOfSamplesChanged(unsigned value);
+
+protected:
+    /// update the display of symbols depending on `symbolSize`
+    void updateSymbols();
+
+private:
+    bool isAutoScaled;
+    double yMin, yMax;
+    double _xMin, _xMax;
+    unsigned numOfSamples;
+    int symbolSize;
+    Zoomer zoomer;
+    ScaleZoomer sZoomer;
+    QwtPlotGrid grid;
+    PlotSnapshotOverlay* snapshotOverlay;
+    QwtPlotLegendItem legend;
+    QwtPlotTextLabel demoIndicator;
+
+    void resetAxes();
+    void resizeEvent(QResizeEvent * event);
 
 private slots:
     void unzoomed();

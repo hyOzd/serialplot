@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -34,7 +34,8 @@ class BinaryStreamReader : public AbstractReader
 {
     Q_OBJECT
 public:
-    explicit BinaryStreamReader(QIODevice* device, ChannelManager* channelMan, QObject *parent = 0);
+    explicit BinaryStreamReader(QIODevice* device, ChannelManager* channelMan,
+                                DataRecorder* recorder, QObject *parent = 0);
     QWidget* settingsWidget();
     unsigned numOfChannels();
     void enable(bool enabled = true);
@@ -64,9 +65,6 @@ private:
      * calling this function.
      */
     template<typename T> double readSampleAs();
-
-    // `data` contains i th channels data
-    void addChannelData(unsigned int channel, double* data, unsigned size);
 
 private slots:
     void onNumberFormatChanged(NumberFormat numberFormat);

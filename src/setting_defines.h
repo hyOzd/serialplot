@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -29,6 +29,7 @@ const char SettingGroup_CustomFrame[] = "DataFormat_CustomFrame";
 const char SettingGroup_Channels[] = "Channels";
 const char SettingGroup_Plot[] = "Plot";
 const char SettingGroup_Commands[] = "Commands";
+const char SettingGroup_Record[] = "Record";
 
 // mainwindow setting keys
 const char SG_MainWindow_Size[] = "size";
@@ -70,9 +71,14 @@ const char SG_CustomFrame_DebugMode[] = "debugMode";
 // channel manager keys
 const char SG_Channels_Channel[] = "channel";
 const char SG_Channels_Name[] = "name";
+const char SG_Channels_Color[] = "color";
+const char SG_Channels_Visible[] = "visible";
 
 // plot settings keys
 const char SG_Plot_NumOfSamples[] = "numOfSamples";
+const char SG_Plot_IndexAsX[] = "indexAsX";
+const char SG_Plot_XMax[] = "xMax";
+const char SG_Plot_XMin[] = "xMin";
 const char SG_Plot_AutoScale[] = "autoScale";
 const char SG_Plot_YMax[] = "yMax";
 const char SG_Plot_YMin[] = "yMin";
@@ -87,5 +93,13 @@ const char SG_Commands_Command[] = "command";
 const char SG_Commands_Name[] = "name";
 const char SG_Commands_Type[] = "type";
 const char SG_Commands_Data[] = "data";
+
+// record panel settings keys
+const char SG_Record_AutoIncrement[]    = "autoIncrement";
+const char SG_Record_RecordPaused[]     = "recordPaused";
+const char SG_Record_StopOnClose[]      = "stopOnClose";
+const char SG_Record_Header[]           = "header";
+const char SG_Record_Separator[]        = "separator";
+const char SG_Record_DisableBuffering[] = "disableBuffering";
 
 #endif // SETTING_DEFINES_H

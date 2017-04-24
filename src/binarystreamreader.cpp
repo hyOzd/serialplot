@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -23,13 +23,13 @@
 #include "binarystreamreader.h"
 #include "floatswap.h"
 
-BinaryStreamReader::BinaryStreamReader(QIODevice* device, ChannelManager* channelMan, QObject *parent) :
-    AbstractReader(device, channelMan, parent)
+BinaryStreamReader::BinaryStreamReader(QIODevice* device, ChannelManager* channelMan,
+                                       DataRecorder* recorder, QObject* parent) :
+    AbstractReader(device, channelMan, recorder, parent)
 {
     paused = false;
     skipByteRequested = false;
     skipSampleRequested = false;
-    sampleCount = 0;
 
     _numOfChannels = _settingsWidget.numOfChannels();
     connect(&_settingsWidget, &BinaryStreamReaderSettings::numOfChannelsChanged,
@@ -171,15 +171,9 @@ void BinaryStreamReader::onDataReady()
         }
     }
 
-    for (unsigned int ci = 0; ci < _numOfChannels; ci++)
-    {
-        addChannelData(ci,
-                       channelSamples + ci*numOfPackagesToRead,
-                       numOfPackagesToRead);
-    }
-    emit dataAdded();
+    addData(channelSamples, numOfPackagesToRead*_numOfChannels);
 
-    delete channelSamples;
+    delete[] channelSamples;
 }
 
 template<typename T> double BinaryStreamReader::readSampleAs()
@@ -198,13 +192,6 @@ template<typename T> double BinaryStreamReader::readSampleAs()
     }
 
     return double(data);
-}
-
-void BinaryStreamReader::addChannelData(unsigned int channel,
-                                        double* data, unsigned size)
-{
-    _channelMan->addChannelData(channel, data, size);
-    sampleCount += size;
 }
 
 void BinaryStreamReader::saveSettings(QSettings* settings)

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -30,13 +30,14 @@
 #include <qwt_plot_curve.h>
 #include "plot.h"
 #include "framebufferseries.h"
+#include "channelinfomodel.h"
 
 class PlotManager : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit PlotManager(QWidget* plotArea, QObject *parent = 0);
+    explicit PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel = NULL, QObject *parent = 0);
     ~PlotManager();
     /// Add a new curve with title and buffer. A color is
     /// automatically chosen for curve.
@@ -64,7 +65,9 @@ public slots:
     /// Enable display of a "DEMO" label on each plot
     void showDemoIndicator(bool show = true);
     /// Set the Y axis
-    void setAxis(bool autoScaled, double yMin = 0, double yMax = 1);
+    void setYAxis(bool autoScaled, double yMin = 0, double yMax = 1);
+    /// Set the X axis
+    void setXAxis(bool asIndex, double xMin = 0 , double xMax = 1);
     /// Display an animation for snapshot
     void flashSnapshotOverlay();
     /// Should be called to update zoom base
@@ -77,10 +80,15 @@ private:
     QScrollArea* scrollArea;
     QList<QwtPlotCurve*> curves;
     QList<Plot*> plotWidgets;
+    ChannelInfoModel* _infoModel;
     bool isDemoShown;
     bool _autoScaled;
     double _yMin;
     double _yMax;
+    bool _xAxisAsIndex;
+    double _xMin;
+    double _xMax;
+    unsigned _numOfSamples;
 
     // menu actions
     QAction showGridAction;
@@ -104,6 +112,10 @@ private slots:
     void showLegend(bool show = true);
     void unzoom();
     void darkBackground(bool enabled = true);
+
+    void onChannelInfoChanged(const QModelIndex & topLeft,
+                              const QModelIndex & bottomRight,
+                              const QVector<int> & roles = QVector<int> ());
 };
 
 #endif // PLOTMANAGER_H

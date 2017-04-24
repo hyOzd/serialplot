@@ -1,5 +1,5 @@
 #
-# Copyright © 2015-2016 Hasan Yavuz Özderya
+# Copyright © 2017 Hasan Yavuz Özderya
 #
 # This file is part of serialplot.
 #
@@ -38,24 +38,28 @@ find_package(Qt5Widgets)
 
 # If set, cmake will download Qwt over SVN, build and use it as a static library.
 set(BUILD_QWT true CACHE BOOL "Download and build Qwt automatically.")
-# Find QWT or use static manually provided by user
-set(QWT_USE_STATIC false CACHE BOOL "Use a static version of Qwt provided by user.")
-set(QWT_STATIC_LIBRARY "" CACHE FILEPATH "Path to the static Qwt library, libqwt.a.")
-set(QWT_STATIC_INCLUDE "" CACHE PATH "Path to the Qwt include directory when building Qwt static.")
-
 if (BUILD_QWT)
   include(BuildQwt)
 else (BUILD_QWT)
-  if (QWT_USE_STATIC)
-	set(QWT_LIBRARY ${QWT_STATIC_LIBRARY})
-	set(QWT_INCLUDE_DIR ${QWT_STATIC_INCLUDE})
-  else (QWT_USE_STATIC)
-	find_package(Qwt 6.1 REQUIRED)
-  endif (QWT_USE_STATIC)
+    find_package(Qwt 6.1 REQUIRED)
 endif (BUILD_QWT)
 
+# If set, cmake will download QtColorWidgets over git, build and use it as a static library.
+set(BUILD_QTCOLORWIDGETS true CACHE BOOL "Download and build QtColorWidgets library automatically.")
+if (BUILD_QTCOLORWIDGETS)
+  include(BuildQColorWidgets)
+else ()
+  find_package(QtColorWidgets REQUIRED)
+endif ()
+
 # includes
-include_directories("./src" ${QWT_INCLUDE_DIR})
+include_directories("./src"
+  ${QWT_INCLUDE_DIR}
+  ${QTCOLORWIDGETS_INCLUDE_DIRS}
+  )
+
+# flags
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${QTCOLORWIDGETS_FLAGS}")
 
 # wrap UI and resource files
 qt5_wrap_ui(UI_FILES
@@ -67,6 +71,7 @@ qt5_wrap_ui(UI_FILES
   src/commandwidget.ui
   src/dataformatpanel.ui
   src/plotcontrolpanel.ui
+  src/recordpanel.ui
   src/numberformatbox.ui
   src/endiannessbox.ui
   src/binarystreamreadersettings.ui
@@ -102,9 +107,12 @@ add_executable(${PROGRAM_NAME} WIN32
   src/commandedit.cpp
   src/dataformatpanel.cpp
   src/plotcontrolpanel.cpp
+  src/recordpanel.cpp
+  src/datarecorder.cpp
   src/tooltipfilter.cpp
   src/sneakylineedit.cpp
   src/channelmanager.cpp
+  src/channelinfomodel.cpp
   src/framebufferseries.cpp
   src/numberformatbox.cpp
   src/endiannessbox.cpp
@@ -124,12 +132,19 @@ add_executable(${PROGRAM_NAME} WIN32
   )
 
 # Use the Widgets module from Qt 5.
-target_link_libraries(${PROGRAM_NAME} ${QWT_LIBRARY})
-qt5_use_modules(${PROGRAM_NAME} Widgets SerialPort Svg)
+target_link_libraries(${PROGRAM_NAME}
+  ${QWT_LIBRARY}
+  ${QTCOLORWIDGETS_LIBRARIES}
+  )
+qt5_use_modules(${PROGRAM_NAME} Widgets SerialPort)
 
 if (BUILD_QWT)
   add_dependencies(${PROGRAM_NAME} QWT)
-endif (BUILD_QWT)
+endif ()
+
+if (BUILD_QTCOLORWIDGETS)
+  add_dependencies(${PROGRAM_NAME} QCW)
+endif ()
 
 # set compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
@@ -145,12 +160,6 @@ elseif(COMPILER_SUPPORTS_CXX0X)
 else()
   message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
-
-# version number
-set(MAJOR_VERSION 0 CACHE INT "Program major version number.")
-set(MINOR_VERSION 8 CACHE INT "Program minor version number.")
-set(PATCH_VERSION 1 CACHE INT "Program patch version number.")
-set(VERSION_STRING "${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}")
 
 # get revision number from mercurial
 find_program(MERCURIAL hg)
@@ -171,9 +180,7 @@ if (NOT VERSION_REVISION)
 endif (NOT VERSION_REVISION)
 
 message("SCM revision: ${VERSION_REVISION}")
-
-# configure version file
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/version.h.in" "${CMAKE_CURRENT_BINARY_DIR}/version.h")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_REVISION=\\\"${VERSION_REVISION}\\\" ")
 
 # add make run target
 add_custom_target(run

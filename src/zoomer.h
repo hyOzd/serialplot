@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -33,6 +33,24 @@ public:
 
 signals:
     void unzoomed();
+
+protected:
+    /// Re-implemented to display selection size in the tracker text.
+    QwtText trackerTextF(const QPointF &pos) const;
+    /// Re-implemented for alpha background
+    void drawRubberBand(QPainter* painter) const;
+    /// Re-implemented for alpha background (masking is basically disabled)
+    QRegion rubberBandMask() const;
+    /// Overloaded for panning
+    void widgetMousePressEvent(QMouseEvent* mouseEvent);
+    /// Overloaded for panning
+    void widgetMouseReleaseEvent(QMouseEvent* mouseEvent);
+    /// Overloaded for panning
+    void widgetMouseMoveEvent(QMouseEvent* mouseEvent);
+
+private:
+    bool is_panning;
+    QPointF pan_point;
 };
 
 #endif // ZOOMER_H

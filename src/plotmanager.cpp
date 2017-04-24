@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -17,14 +17,14 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QtDebug>
+#include "qwt_symbol.h"
 
 #include "plot.h"
 #include "plotmanager.h"
 #include "utils.h"
 #include "setting_defines.h"
 
-PlotManager::PlotManager(QWidget* plotArea, QObject *parent) :
+PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject *parent) :
     QObject(parent),
     _plotArea(plotArea),
     showGridAction("&Grid", this),
@@ -38,6 +38,8 @@ PlotManager::PlotManager(QWidget* plotArea, QObject *parent) :
     _yMin = 0;
     _yMax = 1;
     isDemoShown = false;
+    _infoModel = infoModel;
+    _numOfSamples = 1;
 
     // initalize layout and single widget
     isMulti = false;
@@ -85,6 +87,21 @@ PlotManager::PlotManager(QWidget* plotArea, QObject *parent) :
             this, &PlotManager::showLegend);
     connect(&showMultiAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
             this, &PlotManager::setMulti);
+
+    // connect to channel info model
+    if (_infoModel != NULL)     // TODO: remove when snapshots have infomodel
+    {
+        connect(_infoModel, &QAbstractItemModel::dataChanged,
+                this, &PlotManager::onChannelInfoChanged);
+
+        connect(_infoModel, &QAbstractItemModel::modelReset,
+                [this]()
+                {
+                    onChannelInfoChanged(_infoModel->index(0, 0), // start
+                                         _infoModel->index(_infoModel->rowCount()-1, 0), // end
+                                         {}); // roles ignored
+                });
+    }
 }
 
 PlotManager::~PlotManager()
@@ -101,6 +118,46 @@ PlotManager::~PlotManager()
     }
 
     if (scrollArea != NULL) delete scrollArea;
+}
+
+void PlotManager::onChannelInfoChanged(const QModelIndex &topLeft,
+                                       const QModelIndex &bottomRight,
+                                       const QVector<int> &roles)
+{
+    int start = topLeft.row();
+    int end = bottomRight.row();
+
+    for (int ci = start; ci <= end; ci++)
+    {
+        QString name = topLeft.sibling(ci, ChannelInfoModel::COLUMN_NAME).data(Qt::EditRole).toString();
+        QColor color = topLeft.sibling(ci, ChannelInfoModel::COLUMN_NAME).data(Qt::ForegroundRole).value<QColor>();
+        bool visible = topLeft.sibling(ci, ChannelInfoModel::COLUMN_VISIBILITY).data(Qt::CheckStateRole).toBool();
+
+        curves[ci]->setTitle(name);
+        curves[ci]->setPen(color);
+        curves[ci]->setVisible(visible);
+        curves[ci]->setItemAttribute(QwtPlotItem::Legend, visible);
+
+        // replot only updated widgets
+        if (isMulti)
+        {
+            plotWidgets[ci]->updateSymbols(); // required for color change
+            plotWidgets[ci]->updateLegend(curves[ci]);
+            plotWidgets[ci]->setVisible(visible);
+            if (visible)
+            {
+                plotWidgets[ci]->replot();
+            }
+        }
+    }
+
+    // replot single widget
+    if (!isMulti)
+    {
+        plotWidgets[0]->updateSymbols();
+        plotWidgets[0]->updateLegend();
+        replot();
+    }
 }
 
 void PlotManager::setMulti(bool enabled)
@@ -194,7 +251,16 @@ Plot* PlotManager::addPlotWidget()
     plot->showMinorGrid(showMinorGridAction.isChecked());
     plot->showLegend(showLegendAction.isChecked());
     plot->showDemoIndicator(isDemoShown);
-    plot->setAxis(_autoScaled, _yMin, _yMax);
+    plot->setYAxis(_autoScaled, _yMin, _yMax);
+
+    if (_xAxisAsIndex)
+    {
+        plot->setXAxis(0, _numOfSamples);
+    }
+    else
+    {
+        plot->setXAxis(_xMin, _xMax);
+    }
 
     return plot;
 }
@@ -202,7 +268,9 @@ Plot* PlotManager::addPlotWidget()
 void PlotManager::addCurve(QString title, FrameBuffer* buffer)
 {
     auto curve = new QwtPlotCurve(title);
-    curve->setSamples(new FrameBufferSeries(buffer));
+    auto series = new FrameBufferSeries(buffer);
+    series->setXAxis(_xAxisAsIndex, _xMin, _xMax);
+    curve->setSamples(series);
     _addCurve(curve);
 }
 
@@ -219,7 +287,8 @@ void PlotManager::_addCurve(QwtPlotCurve* curve)
     curves.append(curve);
 
     unsigned index = curves.size()-1;
-    curve->setPen(Plot::makeColor(index));
+    auto color = _infoModel->color(index);
+    curve->setPen(color);
 
     // create the plot for the curve if we are on multi display
     Plot* plot;
@@ -346,15 +415,40 @@ void PlotManager::darkBackground(bool enabled)
     }
 }
 
-void PlotManager::setAxis(bool autoScaled, double yAxisMin, double yAxisMax)
+void PlotManager::setYAxis(bool autoScaled, double yAxisMin, double yAxisMax)
 {
     _autoScaled = autoScaled;
     _yMin = yAxisMin;
     _yMax = yAxisMax;
     for (auto plot : plotWidgets)
     {
-        plot->setAxis(autoScaled, yAxisMin, yAxisMax);
+        plot->setYAxis(autoScaled, yAxisMin, yAxisMax);
     }
+}
+
+void PlotManager::setXAxis(bool asIndex, double xMin, double xMax)
+{
+    _xAxisAsIndex = asIndex;
+    _xMin = xMin;
+    _xMax = xMax;
+    for (auto curve : curves)
+    {
+        // TODO: what happens when addCurve(QVector) is used?
+        FrameBufferSeries* series = static_cast<FrameBufferSeries*>(curve->data());
+        series->setXAxis(asIndex, xMin, xMax);
+    }
+    for (auto plot : plotWidgets)
+    {
+        if (asIndex)
+        {
+            plot->setXAxis(0, _numOfSamples);
+        }
+        else
+        {
+            plot->setXAxis(xMin, xMax);
+        }
+    }
+    replot();
 }
 
 void PlotManager::flashSnapshotOverlay()
@@ -367,9 +461,11 @@ void PlotManager::flashSnapshotOverlay()
 
 void PlotManager::onNumOfSamplesChanged(unsigned value)
 {
+    _numOfSamples = value;
     for (auto plot : plotWidgets)
     {
         plot->onNumOfSamplesChanged(value);
+        if (_xAxisAsIndex) plot->setXAxis(0, value);
     }
 }
 

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -17,30 +17,28 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QStringList>
 #include <QModelIndex>
+
+#include <QtDebug>
 
 #include "channelmanager.h"
 #include "setting_defines.h"
 
 ChannelManager::ChannelManager(unsigned numberOfChannels, unsigned numberOfSamples, QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    _infoModel(numberOfChannels)
 {
     _numOfChannels = numberOfChannels;
     _numOfSamples = numberOfSamples;
-
-    QStringList channelNamesList;
+    _paused = false;
 
     for (unsigned int i = 0; i < numberOfChannels; i++)
     {
         channelBuffers.append(new FrameBuffer(numberOfSamples));
-        channelNamesList << QString("Channel %1").arg(i+1);
     }
 
-    _channelNames.setStringList(channelNamesList);
-
-    connect(&_channelNames, &QStringListModel::dataChanged,
-            this, &ChannelManager::onChannelNameDataChange);
+    connect(&_infoModel, &ChannelInfoModel::dataChanged,
+            this, &ChannelManager::onChannelInfoChanged);
 }
 
 ChannelManager::~ChannelManager()
@@ -71,7 +69,6 @@ void ChannelManager::setNumOfChannels(unsigned number)
         for (unsigned int i = 0; i < number - oldNum; i++)
         {
             channelBuffers.append(new FrameBuffer(_numOfSamples));
-            addChannelName(QString("Channel %1").arg(oldNum+i+1));
         }
     }
     else if(number < oldNum)
@@ -80,9 +77,11 @@ void ChannelManager::setNumOfChannels(unsigned number)
         for (unsigned int i = oldNum-1; i > number-1; i--)
         {
             delete channelBuffers.takeLast();
-            _channelNames.removeRow(i);
         }
     }
+
+    _numOfChannels = number;
+    _infoModel.setNumOfChannels(number);
 
     emit numOfChannelsChanged(number);
 }
@@ -99,74 +98,96 @@ void ChannelManager::setNumOfSamples(unsigned number)
     emit numOfSamplesChanged(number);
 }
 
+void ChannelManager::pause(bool paused)
+{
+    _paused = paused;
+}
+
 FrameBuffer* ChannelManager::channelBuffer(unsigned channel)
 {
     return channelBuffers[channel];
 }
 
-QStringListModel* ChannelManager::channelNames()
+ChannelInfoModel* ChannelManager::infoModel()
 {
-    return &_channelNames;
+    return &_infoModel;
 }
 
 QString ChannelManager::channelName(unsigned channel)
 {
-    return _channelNames.data(_channelNames.index(channel, 0), Qt::DisplayRole).toString();
+    return _infoModel.data(_infoModel.index(channel, ChannelInfoModel::COLUMN_NAME),
+                           Qt::DisplayRole).toString();
 }
 
-void ChannelManager::setChannelName(unsigned channel, QString name)
+QStringList ChannelManager::channelNames()
 {
-    _channelNames.setData(_channelNames.index(channel, 0), QVariant(name), Qt::DisplayRole);
+    QStringList list;
+    for (unsigned ci = 0; ci < _numOfChannels; ci++)
+    {
+        list << channelName(ci);
+    }
+    return list;
 }
 
-void ChannelManager::addChannelName(QString name)
+void ChannelManager::onChannelInfoChanged(const QModelIndex & topLeft,
+                                          const QModelIndex & bottomRight,
+                                          const QVector<int> & roles)
 {
-    _channelNames.insertRow(_channelNames.rowCount());
-    setChannelName(_channelNames.rowCount()-1, name);
-}
-
-void ChannelManager::onChannelNameDataChange(const QModelIndex & topLeft,
-                                             const QModelIndex & bottomRight,
-                                             const QVector<int> & roles)
-{
-    Q_UNUSED(roles);
     int start = topLeft.row();
     int end = bottomRight.row();
+    int col = topLeft.column();
 
-    // TODO: maybe check `roles` parameter, can't think of a reason for current use case
-    for (int i = start; i <= end; i++)
+    for (int ci = start; ci <= end; ci++)
     {
-        emit channelNameChanged(i, channelName(i));
+        for (auto role : roles)
+        {
+            switch (role)
+            {
+                case Qt::EditRole:
+                    if (col == ChannelInfoModel::COLUMN_NAME)
+                    {
+                        emit channelNameChanged(ci, channelName(ci));
+                    }
+                    break;
+                case Qt::ForegroundRole:
+                    if (col == ChannelInfoModel::COLUMN_NAME)
+                    {
+                        // TODO: emit channel color changed
+                    }
+                    break;
+                case Qt::CheckStateRole:
+                    if (col == ChannelInfoModel::COLUMN_VISIBILITY)
+                    {
+                        // TODO: emit visibility
+                    }
+                    break;
+            }
+        }
+        // emit channelNameChanged(i, channelName(i));
     }
 }
 
-void ChannelManager::addChannelData(unsigned channel, double* data, unsigned size)
+void ChannelManager::addData(double* data, unsigned size)
 {
-    channelBuffer(channel)->addSamples(data, size);
+    Q_ASSERT(size % _numOfChannels == 0);
+
+    if (_paused) return;
+
+    int n = size / _numOfChannels;
+    for (unsigned ci = 0; ci < _numOfChannels; ci++)
+    {
+        channelBuffers[ci]->addSamples(&data[ci*n], n);
+    }
+
+    emit dataAdded();
 }
 
 void ChannelManager::saveSettings(QSettings* settings)
 {
-    settings->beginGroup(SettingGroup_Channels);
-    settings->beginWriteArray(SG_Channels_Channel);
-    for (unsigned i = 0; i < numOfChannels(); i++)
-    {
-        settings->setArrayIndex(i);
-        settings->setValue(SG_Channels_Name, channelName(i));
-    }
-    settings->endArray();
-    settings->endGroup();
+    _infoModel.saveSettings(settings);
 }
 
 void ChannelManager::loadSettings(QSettings* settings)
 {
-    settings->beginGroup(SettingGroup_Channels);
-    settings->beginReadArray(SG_Channels_Channel);
-    for (unsigned i = 0; i < numOfChannels(); i++)
-    {
-        settings->setArrayIndex(i);
-        setChannelName(i, settings->value(SG_Channels_Name, channelName(i)).toString());
-    }
-    settings->endArray();
-    settings->endGroup();
+    _infoModel.loadSettings(settings);
 }
