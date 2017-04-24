@@ -241,6 +241,11 @@ bool ScrollZoomer::eventFilter( QObject *object, QEvent *event )
                 layoutScrollBars( rect );
                 break;
             }
+            case QEvent::Show:
+            {
+                layoutScrollBars( canvas()->contentsRect() );
+                break;
+            }
             case QEvent::ChildRemoved:
             {
                 const QObject *child =
@@ -403,6 +408,8 @@ void ScrollZoomer::updateScrollBars()
 
 void ScrollZoomer::layoutScrollBars( const QRect &rect )
 {
+    qDebug() << "layoutScrollBars" << rect;
+
     int hPos = xAxis();
     if ( hScrollBarPosition() == OppositeToScale )
         hPos = oppositeAxis( hPos );
