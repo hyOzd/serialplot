@@ -43,6 +43,8 @@ ScrollZoomer::ScrollZoomer( QWidget *canvas ):
     d_inZoom( false )
 {
     d_limits = QRectF(0, -10, 10000, 20);
+    xMin = 0.;
+    xMax = 10000.;
 
     for ( int axis = 0; axis < QwtPlot::axisCnt; axis++ )
         d_alignCanvasToScales[ axis ] = false;
@@ -274,20 +276,16 @@ bool ScrollZoomer::needScrollBar( Qt::Orientation orientation ) const
     if ( orientation == Qt::Horizontal )
     {
         mode = d_hScrollData->mode;
-        // baseMin = zoomBase().left();
-        // baseMax = zoomBase().right();
-        baseMin = d_limits.left();
-        baseMax = d_limits.right();
+        baseMin = xMin;
+        baseMax = xMax;
         zoomMin = zoomRect().left();
         zoomMax = zoomRect().right();
     }
     else
     {
         mode = d_vScrollData->mode;
-        // baseMin = zoomBase().top();
-        // baseMax = zoomBase().bottom();
-        baseMin = d_limits.top();
-        baseMax = d_limits.bottom();
+        baseMin = zoomBase().top();
+        baseMax = zoomBase().bottom();
         zoomMin = zoomRect().top();
         zoomMax = zoomRect().bottom();
     }
@@ -338,8 +336,7 @@ void ScrollZoomer::updateScrollBars()
         ScrollBar *sb = scrollBar( Qt::Horizontal );
         sb->setPalette( plot()->palette() );
         sb->setInverted( !plot()->axisScaleDiv( xAxis ).isIncreasing() );
-        // sb->setBase( zoomBase().left(), zoomBase().right() );
-        sb->setBase( d_limits.left(), d_limits.right() );
+        sb->setBase( xMin, xMax );
         sb->moveSlider( zoomRect().left(), zoomRect().right() );
         qDebug() << "moveSlider" << zoomRect().left() << zoomRect().right();
 
@@ -366,7 +363,7 @@ void ScrollZoomer::updateScrollBars()
         ScrollBar *sb = scrollBar( Qt::Vertical );
         sb->setPalette( plot()->palette() );
         sb->setInverted( plot()->axisScaleDiv( yAxis ).isIncreasing() );
-        sb->setBase( d_limits.top(), d_limits.bottom() );
+        sb->setBase( zoomRect().top(), zoomRect().bottom() );
         sb->moveSlider( zoomRect().top(), zoomRect().bottom() );
 
         if ( !sb->isVisibleTo( canvas() ) )
@@ -515,23 +512,20 @@ void ScrollZoomer::moveTo( const QPointF &pos )
     double x = pos.x();
     double y = pos.y();
 
-    if ( x < d_limits.left() )
-        x = d_limits.left();
-    if ( x > d_limits.right() - zoomRect().width() )
-        x = d_limits.right() - zoomRect().width();
+    if ( x < xMin )
+        x = xMin;
+    if ( x > xMax - zoomRect().width() )
+        x = xMax - zoomRect().width();
 
-    if ( y < d_limits.top() )
-        y = d_limits.top();
-    if ( y > d_limits.bottom() - zoomRect().height() )
-        y = d_limits.bottom() - zoomRect().height();
-
-    qDebug() << "x,y: "<<x<<y;
+    if ( y < zoomBase().top() )
+        y = zoomBase().top();
+    if ( y > zoomBase().bottom() - zoomRect().height() )
+        y = zoomBase().bottom() - zoomRect().height();
 
     if ( x != zoomRect().left() || y != zoomRect().top() )
     {
         auto zs = zoomStack();
         zs[zoomRectIndex()].moveTo( x, y );
-        // d_data->zoomStack[d_data->zoomRectIndex].moveTo( x, y );
         setZoomStack(zs, zoomRectIndex());
         rescale();
     }
