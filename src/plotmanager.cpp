@@ -18,6 +18,8 @@
 */
 
 #include <QActionGroup>
+#include <QMetaEnum>
+#include <QtDebug>
 #include "qwt_symbol.h"
 
 #include "plot.h"
@@ -42,7 +44,7 @@ PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject
     isDemoShown = false;
     _infoModel = infoModel;
     _numOfSamples = 1;
-    showSymbols = ShowSymbolsAuto;
+    showSymbols = Plot::Auto;
 
     // initalize layout and single widget
     isMulti = false;
@@ -77,27 +79,27 @@ PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject
     showMinorGridAction.setEnabled(false);
 
     // setup symbols menu
-    auto setSymbolAutoAct = setSymbolsMenu.addAction("Show When Zoomed");
+    setSymbolAutoAct = setSymbolsMenu.addAction("Show When Zoomed");
     setSymbolAutoAct->setCheckable(true);
     setSymbolAutoAct->setChecked(true);
     connect(setSymbolAutoAct, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
             [this](bool checked)
             {
-                if (checked) setSymbols(ShowSymbolsAuto);
+                if (checked) setSymbols(Plot::Auto);
             });
-    auto setSymbolAlwaysAct = setSymbolsMenu.addAction("Always Show");
+    setSymbolAlwaysAct = setSymbolsMenu.addAction("Always Show");
     setSymbolAlwaysAct->setCheckable(true);
     connect(setSymbolAlwaysAct, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
             [this](bool checked)
             {
-                if (checked) setSymbols(ShowSymbolsAlways);
+                if (checked) setSymbols(Plot::Show);
             });
-    auto setSymbolHideAct = setSymbolsMenu.addAction("Always Hide");
+    setSymbolHideAct = setSymbolsMenu.addAction("Always Hide");
     setSymbolHideAct->setCheckable(true);
     connect(setSymbolHideAct, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
             [this](bool checked)
             {
-                if (checked) setSymbols(ShowSymbolsNever);
+                if (checked) setSymbols(Plot::Hide);
             });
     setSymbolsAction.setMenu(&setSymbolsMenu);
 
@@ -453,7 +455,7 @@ void PlotManager::darkBackground(bool enabled)
     }
 }
 
-void PlotManager::setSymbols(ShowSymbols shown)
+void PlotManager::setSymbols(Plot::ShowSymbols shown)
 {
     showSymbols = shown;
     for (auto plot : plotWidgets)
@@ -524,6 +526,8 @@ void PlotManager::saveSettings(QSettings* settings)
     settings->setValue(SG_Plot_MinorGrid, showMinorGridAction.isChecked());
     settings->setValue(SG_Plot_Legend, showLegendAction.isChecked());
     settings->setValue(SG_Plot_MultiPlot, showMultiAction.isChecked());
+    settings->setValue(SG_Plot_Symbols,
+                       QMetaEnum::fromType<Plot::ShowSymbols>().valueToKey(showSymbols));
     settings->endGroup();
 }
 
@@ -546,5 +550,36 @@ void PlotManager::loadSettings(QSettings* settings)
     showMultiAction.setChecked(
         settings->value(SG_Plot_MultiPlot, showMultiAction.isChecked()).toBool());
     setMulti(showMultiAction.isChecked());
+
+    // symbol setting
+    {
+        bool ok = false;
+        QString curStr = QMetaEnum::fromType<Plot::ShowSymbols>().valueToKey(showSymbols);
+        QString settStr = settings->value(SG_Plot_Symbols, curStr).toString();
+        Plot::ShowSymbols settValue =
+            (Plot::ShowSymbols) QMetaEnum::fromType<Plot::ShowSymbols>().\
+            keyToValue(settStr.toLatin1().constData(), &ok);
+        if (ok)
+        {
+            if (settValue == Plot::Auto)
+            {
+                setSymbolAutoAct->setChecked(true);
+            }
+            else if (settValue == Plot::Show)
+            {
+                setSymbolAlwaysAct->setChecked(true);
+            }
+            else
+            {
+                setSymbolHideAct->setChecked(true);
+            }
+            setSymbols(settValue);
+        }
+        else
+        {
+            qCritical() << "Invalid symbol setting:" << settStr;
+        }
+    }
+
     settings->endGroup();
 }

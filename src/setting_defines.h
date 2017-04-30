@@ -87,6 +87,7 @@ const char SG_Plot_Grid[] = "grid";
 const char SG_Plot_MinorGrid[] = "minorGrid";
 const char SG_Plot_Legend[] = "legend";
 const char SG_Plot_MultiPlot[] = "multiPlot";
+const char SG_Plot_Symbols[] = "symbols";
 
 // command setting keys
 const char SG_Commands_Command[] = "command";

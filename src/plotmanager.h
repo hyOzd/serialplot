@@ -91,7 +91,7 @@ private:
     double _xMin;
     double _xMax;
     unsigned _numOfSamples;
-    ShowSymbols showSymbols;
+    Plot::ShowSymbols showSymbols;
 
     // menu actions
     QAction showGridAction;
@@ -101,7 +101,10 @@ private:
     QAction showLegendAction;
     QAction showMultiAction;
     QAction setSymbolsAction;
-    QMenu   setSymbolsMenu;
+    QMenu setSymbolsMenu;
+    QAction* setSymbolAutoAct;
+    QAction* setSymbolAlwaysAct;
+    QAction* setSymbolHideAct;
 
     void setupLayout(bool multiPlot);
     /// Inserts a new plot widget to the current layout.
@@ -110,7 +113,7 @@ private:
     Plot* plotWidget(unsigned curveIndex);
     /// Common part of overloaded `addCurve` functions
     void _addCurve(QwtPlotCurve* curve);
-    void setSymbols(ShowSymbols shown);
+    void setSymbols(Plot::ShowSymbols shown);
 
 private slots:
     void showGrid(bool show = true);

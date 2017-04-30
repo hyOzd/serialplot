@@ -39,7 +39,7 @@ Plot::Plot(QWidget* parent) :
     isAutoScaled = true;
     symbolSize = 0;
     numOfSamples = 1;
-    showSymbols = ShowSymbolsAuto;
+    showSymbols = Plot::Auto;
 
     QObject::connect(&zoomer, &Zoomer::unzoomed, this, &Plot::unzoomed);
 
@@ -252,11 +252,11 @@ void Plot::setSymbols(ShowSymbols shown)
 {
     showSymbols = shown;
 
-    if (showSymbols == ShowSymbolsAuto)
+    if (showSymbols == Plot::Auto)
     {
         calcSymbolSize();
     }
-    else if (showSymbols == ShowSymbolsAlways)
+    else if (showSymbols == Plot::Show)
     {
         symbolSize = SYMBOL_SIZE_MAX;
     }
@@ -271,7 +271,7 @@ void Plot::setSymbols(ShowSymbols shown)
 
 void Plot::onXScaleChanged()
 {
-    if (showSymbols == ShowSymbolsAuto)
+    if (showSymbols == Plot::Auto)
     {
         calcSymbolSize();
         updateSymbols();

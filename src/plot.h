@@ -33,13 +33,6 @@
 #include "scalezoomer.h"
 #include "plotsnapshotoverlay.h"
 
-enum ShowSymbols
-{
-    ShowSymbolsAuto,
-    ShowSymbolsAlways,
-    ShowSymbolsNever
-};
-
 class Plot : public QwtPlot
 {
     Q_OBJECT
@@ -47,6 +40,15 @@ class Plot : public QwtPlot
     friend class PlotManager;
 
 public:
+    // Note: this naming is also used as setting values
+    enum ShowSymbols
+    {
+        Auto,
+        Show,
+        Hide
+    };
+    Q_ENUM(ShowSymbols);
+
     Plot(QWidget* parent = 0);
     ~Plot();
 
