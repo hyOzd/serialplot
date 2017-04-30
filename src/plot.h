@@ -40,14 +40,12 @@ class Plot : public QwtPlot
     friend class PlotManager;
 
 public:
-    // Note: this naming is also used as setting values
     enum ShowSymbols
     {
-        Auto,
-        Show,
-        Hide
+        ShowSymbolsAuto,
+        ShowSymbolsShow,
+        ShowSymbolsHide
     };
-    Q_ENUM(ShowSymbols);
 
     Plot(QWidget* parent = 0);
     ~Plot();

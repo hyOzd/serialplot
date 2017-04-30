@@ -102,9 +102,9 @@ private:
     QAction showMultiAction;
     QAction setSymbolsAction;
     QMenu setSymbolsMenu;
-    QAction* setSymbolAutoAct;
-    QAction* setSymbolAlwaysAct;
-    QAction* setSymbolHideAct;
+    QAction* setSymbolsAutoAct;
+    QAction* setSymbolsShowAct;
+    QAction* setSymbolsHideAct;
 
     void setupLayout(bool multiPlot);
     /// Inserts a new plot widget to the current layout.

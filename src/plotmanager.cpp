@@ -44,7 +44,7 @@ PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject
     isDemoShown = false;
     _infoModel = infoModel;
     _numOfSamples = 1;
-    showSymbols = Plot::Auto;
+    showSymbols = Plot::ShowSymbolsAuto;
 
     // initalize layout and single widget
     isMulti = false;
@@ -79,35 +79,35 @@ PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject
     showMinorGridAction.setEnabled(false);
 
     // setup symbols menu
-    setSymbolAutoAct = setSymbolsMenu.addAction("Show When Zoomed");
-    setSymbolAutoAct->setCheckable(true);
-    setSymbolAutoAct->setChecked(true);
-    connect(setSymbolAutoAct, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+    setSymbolsAutoAct = setSymbolsMenu.addAction("Show When Zoomed");
+    setSymbolsAutoAct->setCheckable(true);
+    setSymbolsAutoAct->setChecked(true);
+    connect(setSymbolsAutoAct, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
             [this](bool checked)
             {
-                if (checked) setSymbols(Plot::Auto);
+                if (checked) setSymbols(Plot::ShowSymbolsAuto);
             });
-    setSymbolAlwaysAct = setSymbolsMenu.addAction("Always Show");
-    setSymbolAlwaysAct->setCheckable(true);
-    connect(setSymbolAlwaysAct, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+    setSymbolsShowAct = setSymbolsMenu.addAction("Always Show");
+    setSymbolsShowAct->setCheckable(true);
+    connect(setSymbolsShowAct, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
             [this](bool checked)
             {
-                if (checked) setSymbols(Plot::Show);
+                if (checked) setSymbols(Plot::ShowSymbolsShow);
             });
-    setSymbolHideAct = setSymbolsMenu.addAction("Always Hide");
-    setSymbolHideAct->setCheckable(true);
-    connect(setSymbolHideAct, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+    setSymbolsHideAct = setSymbolsMenu.addAction("Always Hide");
+    setSymbolsHideAct->setCheckable(true);
+    connect(setSymbolsHideAct, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
             [this](bool checked)
             {
-                if (checked) setSymbols(Plot::Hide);
+                if (checked) setSymbols(Plot::ShowSymbolsHide);
             });
     setSymbolsAction.setMenu(&setSymbolsMenu);
 
     // add symbol actions to same group so that they appear as radio buttons
     auto group = new QActionGroup(this);
-    group->addAction(setSymbolAutoAct);
-    group->addAction(setSymbolAlwaysAct);
-    group->addAction(setSymbolHideAct);
+    group->addAction(setSymbolsAutoAct);
+    group->addAction(setSymbolsShowAct);
+    group->addAction(setSymbolsHideAct);
 
     connect(&showGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
             this, &PlotManager::showGrid);
@@ -526,8 +526,22 @@ void PlotManager::saveSettings(QSettings* settings)
     settings->setValue(SG_Plot_MinorGrid, showMinorGridAction.isChecked());
     settings->setValue(SG_Plot_Legend, showLegendAction.isChecked());
     settings->setValue(SG_Plot_MultiPlot, showMultiAction.isChecked());
-    settings->setValue(SG_Plot_Symbols,
-                       QMetaEnum::fromType<Plot::ShowSymbols>().valueToKey(showSymbols));
+
+    QString showSymbolsStr;
+    if (showSymbols == Plot::ShowSymbolsAuto)
+    {
+        showSymbolsStr = "auto";
+    }
+    else if (showSymbols == Plot::ShowSymbolsShow)
+    {
+        showSymbolsStr = "show";
+    }
+    else
+    {
+        showSymbolsStr = "hide";
+    }
+    settings->setValue(SG_Plot_Symbols, showSymbolsStr);
+
     settings->endGroup();
 }
 
@@ -551,34 +565,25 @@ void PlotManager::loadSettings(QSettings* settings)
         settings->value(SG_Plot_MultiPlot, showMultiAction.isChecked()).toBool());
     setMulti(showMultiAction.isChecked());
 
-    // symbol setting
+    QString showSymbolsStr = settings->value(SG_Plot_Symbols, QString()).toString();
+    if (showSymbolsStr == "auto")
     {
-        bool ok = false;
-        QString curStr = QMetaEnum::fromType<Plot::ShowSymbols>().valueToKey(showSymbols);
-        QString settStr = settings->value(SG_Plot_Symbols, curStr).toString();
-        Plot::ShowSymbols settValue =
-            (Plot::ShowSymbols) QMetaEnum::fromType<Plot::ShowSymbols>().\
-            keyToValue(settStr.toLatin1().constData(), &ok);
-        if (ok)
-        {
-            if (settValue == Plot::Auto)
-            {
-                setSymbolAutoAct->setChecked(true);
-            }
-            else if (settValue == Plot::Show)
-            {
-                setSymbolAlwaysAct->setChecked(true);
-            }
-            else
-            {
-                setSymbolHideAct->setChecked(true);
-            }
-            setSymbols(settValue);
-        }
-        else
-        {
-            qCritical() << "Invalid symbol setting:" << settStr;
-        }
+        setSymbols(Plot::ShowSymbolsAuto);
+        setSymbolsAutoAct->setChecked(true);
+    }
+    else if (showSymbolsStr == "show")
+    {
+        setSymbols(Plot::ShowSymbolsShow);
+        setSymbolsShowAct->setChecked(true);
+    }
+    else if (showSymbolsStr == "hide")
+    {
+        setSymbols(Plot::ShowSymbolsHide);
+        setSymbolsHideAct->setChecked(true);
+    }
+    else
+    {
+        qCritical() << "Invalid symbol setting:" << showSymbolsStr;
     }
 
     settings->endGroup();
