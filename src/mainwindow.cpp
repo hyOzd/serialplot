@@ -139,7 +139,7 @@ MainWindow::MainWindow(QWidget *parent) :
             this, &MainWindow::onNumOfSamplesChanged);
 
     connect(&plotControlPanel, &PlotControlPanel::numOfSamplesChanged,
-            plotMan, &PlotManager::onNumOfSamplesChanged);
+            plotMan, &PlotManager::setNumOfSamples);
 
     connect(&plotControlPanel, &PlotControlPanel::yScaleChanged,
             plotMan, &PlotManager::setYAxis);
@@ -221,7 +221,7 @@ MainWindow::MainWindow(QWidget *parent) :
                       plotControlPanel.yMin(), plotControlPanel.yMax());
     plotMan->setXAxis(plotControlPanel.xAxisAsIndex(),
                       plotControlPanel.xMin(), plotControlPanel.xMax());
-    plotMan->onNumOfSamplesChanged(numOfSamples);
+    plotMan->setNumOfSamples(numOfSamples);
 
     // Init sps (sample per second) counter
     spsLabel.setText("0sps");

@@ -508,7 +508,7 @@ void PlotManager::flashSnapshotOverlay()
     }
 }
 
-void PlotManager::onNumOfSamplesChanged(unsigned value)
+void PlotManager::setNumOfSamples(unsigned value)
 {
     _numOfSamples = value;
     for (auto plot : plotWidgets)

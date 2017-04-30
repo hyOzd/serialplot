@@ -73,7 +73,7 @@ public slots:
     /// Display an animation for snapshot
     void flashSnapshotOverlay();
     /// Should be called to update zoom base
-    void onNumOfSamplesChanged(unsigned value);
+    void setNumOfSamples(unsigned value);
 
 private:
     bool isMulti;
