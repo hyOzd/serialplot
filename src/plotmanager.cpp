@@ -518,6 +518,47 @@ void PlotManager::setNumOfSamples(unsigned value)
     }
 }
 
+PlotViewSettings PlotManager::viewSettings() const
+{
+    return PlotViewSettings(
+        {
+            showGridAction.isChecked(),
+            showMinorGridAction.isChecked(),
+            darkBackgroundAction.isChecked(),
+            showLegendAction.isChecked(),
+            showMultiAction.isChecked(),
+            showSymbols
+        });
+}
+
+void PlotManager::setViewSettings(const PlotViewSettings& settings)
+{
+    showGridAction.setChecked(settings.showGrid);
+    showGrid(settings.showGrid);
+    showMinorGridAction.setChecked(settings.showMinorGrid);
+    showMinorGrid(settings.showMinorGrid);
+    darkBackgroundAction.setChecked(settings.darkBackground);
+    darkBackground(settings.darkBackground);
+    showLegendAction.setChecked(settings.showLegend);
+    showLegend(settings.showLegend);
+    showMultiAction.setChecked(settings.showMulti);
+    setMulti(settings.showMulti);
+
+    setSymbols(settings.showSymbols);
+    if (showSymbols == Plot::ShowSymbolsAuto)
+    {
+        setSymbolsAutoAct->setChecked(true);
+    }
+    else if (showSymbols == Plot::ShowSymbolsShow)
+    {
+        setSymbolsShowAct->setChecked(true);
+    }
+    else
+    {
+        setSymbolsHideAct->setChecked(true);
+    }
+}
+
 void PlotManager::saveSettings(QSettings* settings)
 {
     settings->beginGroup(SettingGroup_Plot);

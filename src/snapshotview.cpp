@@ -20,7 +20,7 @@
 #include "snapshotview.h"
 #include "ui_snapshotview.h"
 
-SnapshotView::SnapshotView(QWidget *parent, Snapshot* snapshot) :
+SnapshotView::SnapshotView(MainWindow* parent, Snapshot* snapshot) :
     QMainWindow(parent),
     ui(new Ui::SnapshotView),
     renameDialog(this)
@@ -30,6 +30,7 @@ SnapshotView::SnapshotView(QWidget *parent, Snapshot* snapshot) :
     ui->setupUi(this);
 
     plotMan = new PlotManager(ui->plotArea, snapshot->infoModel(), this);
+    plotMan->setViewSettings(parent->viewSettings());
 
     ui->menuSnapshot->insertAction(ui->actionClose, snapshot->deleteAction());
     this->setWindowTitle(snapshot->displayName());

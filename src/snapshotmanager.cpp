@@ -27,9 +27,10 @@
 #include <QIcon>
 #include <QtDebug>
 
+#include "mainwindow.h"
 #include "snapshotmanager.h"
 
-SnapshotManager::SnapshotManager(QMainWindow* mainWindow,
+SnapshotManager::SnapshotManager(MainWindow* mainWindow,
                                  ChannelManager* channelMan) :
     _menu("&Snapshots"),
     _takeSnapshotAction("&Take Snapshot", this),

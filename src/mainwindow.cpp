@@ -490,6 +490,11 @@ void MainWindow::onExportCsv()
     }
 }
 
+PlotViewSettings MainWindow::viewSettings() const
+{
+    return plotMan->viewSettings();
+}
+
 void MainWindow::messageHandler(QtMsgType type,
                                 const QMessageLogContext &context,
                                 const QString &msg)

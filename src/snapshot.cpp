@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -21,10 +21,11 @@
 #include <QSaveFile>
 #include <QTextStream>
 
+#include "mainwindow.h"
 #include "snapshot.h"
 #include "snapshotview.h"
 
-Snapshot::Snapshot(QMainWindow* parent, QString name, ChannelInfoModel infoModel) :
+Snapshot::Snapshot(MainWindow* parent, QString name, ChannelInfoModel infoModel) :
     QObject(parent),
     cInfoModel(infoModel),
     _showAction(this),
