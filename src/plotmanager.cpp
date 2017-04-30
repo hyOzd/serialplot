@@ -17,6 +17,7 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QActionGroup>
 #include "qwt_symbol.h"
 
 #include "plot.h"
@@ -32,7 +33,8 @@ PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject
     unzoomAction("&Unzoom", this),
     darkBackgroundAction("&Dark Background", this),
     showLegendAction("&Legend", this),
-    showMultiAction("Multi &Plot", this)
+    showMultiAction("Multi &Plot", this),
+    setSymbolsAction("Symbols", this)
 {
     _autoScaled = true;
     _yMin = 0;
@@ -40,6 +42,7 @@ PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject
     isDemoShown = false;
     _infoModel = infoModel;
     _numOfSamples = 1;
+    showSymbols = ShowSymbolsAuto;
 
     // initalize layout and single widget
     isMulti = false;
@@ -54,6 +57,7 @@ PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject
     darkBackgroundAction.setToolTip("Enable Dark Plot Background");
     showLegendAction.setToolTip("Display the Legend on Plot");
     showMultiAction.setToolTip("Display All Channels Separately");
+    setSymbolsAction.setToolTip("Show/Hide symbols");
 
     showGridAction.setShortcut(QKeySequence("G"));
     showMinorGridAction.setShortcut(QKeySequence("M"));
@@ -71,6 +75,37 @@ PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject
     showMultiAction.setChecked(false);
 
     showMinorGridAction.setEnabled(false);
+
+    // setup symbols menu
+    auto setSymbolAutoAct = setSymbolsMenu.addAction("Show When Zoomed");
+    setSymbolAutoAct->setCheckable(true);
+    setSymbolAutoAct->setChecked(true);
+    connect(setSymbolAutoAct, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+            [this](bool checked)
+            {
+                if (checked) setSymbols(ShowSymbolsAuto);
+            });
+    auto setSymbolAlwaysAct = setSymbolsMenu.addAction("Always Show");
+    setSymbolAlwaysAct->setCheckable(true);
+    connect(setSymbolAlwaysAct, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+            [this](bool checked)
+            {
+                if (checked) setSymbols(ShowSymbolsAlways);
+            });
+    auto setSymbolHideAct = setSymbolsMenu.addAction("Always Hide");
+    setSymbolHideAct->setCheckable(true);
+    connect(setSymbolHideAct, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+            [this](bool checked)
+            {
+                if (checked) setSymbols(ShowSymbolsNever);
+            });
+    setSymbolsAction.setMenu(&setSymbolsMenu);
+
+    // add symbol actions to same group so that they appear as radio buttons
+    auto group = new QActionGroup(this);
+    group->addAction(setSymbolAutoAct);
+    group->addAction(setSymbolAlwaysAct);
+    group->addAction(setSymbolHideAct);
 
     connect(&showGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
             this, &PlotManager::showGrid);
@@ -252,6 +287,8 @@ Plot* PlotManager::addPlotWidget()
     plot->showLegend(showLegendAction.isChecked());
     plot->showDemoIndicator(isDemoShown);
     plot->setYAxis(_autoScaled, _yMin, _yMax);
+    plot->setNumOfSamples(_numOfSamples);
+    plot->setSymbols(showSymbols);
 
     if (_xAxisAsIndex)
     {
@@ -363,6 +400,7 @@ QList<QAction*> PlotManager::menuActions()
     actions << &darkBackgroundAction;
     actions << &showLegendAction;
     actions << &showMultiAction;
+    actions << &setSymbolsAction;
     return actions;
 }
 
@@ -415,6 +453,15 @@ void PlotManager::darkBackground(bool enabled)
     }
 }
 
+void PlotManager::setSymbols(ShowSymbols shown)
+{
+    showSymbols = shown;
+    for (auto plot : plotWidgets)
+    {
+        plot->setSymbols(shown);
+    }
+}
+
 void PlotManager::setYAxis(bool autoScaled, double yAxisMin, double yAxisMax)
 {
     _autoScaled = autoScaled;
@@ -464,7 +511,7 @@ void PlotManager::onNumOfSamplesChanged(unsigned value)
     _numOfSamples = value;
     for (auto plot : plotWidgets)
     {
-        plot->onNumOfSamplesChanged(value);
+        plot->setNumOfSamples(value);
         if (_xAxisAsIndex) plot->setXAxis(0, value);
     }
 }

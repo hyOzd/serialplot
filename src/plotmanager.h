@@ -26,6 +26,8 @@
 #include <QVBoxLayout>
 #include <QList>
 #include <QSettings>
+#include <QAction>
+#include <QMenu>
 
 #include <qwt_plot_curve.h>
 #include "plot.h"
@@ -89,6 +91,7 @@ private:
     double _xMin;
     double _xMax;
     unsigned _numOfSamples;
+    ShowSymbols showSymbols;
 
     // menu actions
     QAction showGridAction;
@@ -97,6 +100,8 @@ private:
     QAction darkBackgroundAction;
     QAction showLegendAction;
     QAction showMultiAction;
+    QAction setSymbolsAction;
+    QMenu   setSymbolsMenu;
 
     void setupLayout(bool multiPlot);
     /// Inserts a new plot widget to the current layout.
@@ -105,6 +110,7 @@ private:
     Plot* plotWidget(unsigned curveIndex);
     /// Common part of overloaded `addCurve` functions
     void _addCurve(QwtPlotCurve* curve);
+    void setSymbols(ShowSymbols shown);
 
 private slots:
     void showGrid(bool show = true);

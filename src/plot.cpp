@@ -39,6 +39,7 @@ Plot::Plot(QWidget* parent) :
     isAutoScaled = true;
     symbolSize = 0;
     numOfSamples = 1;
+    showSymbols = ShowSymbolsAuto;
 
     QObject::connect(&zoomer, &Zoomer::unzoomed, this, &Plot::unzoomed);
 
@@ -247,7 +248,37 @@ void Plot::flashSnapshotOverlay(bool light)
             });
 }
 
+void Plot::setSymbols(ShowSymbols shown)
+{
+    showSymbols = shown;
+
+    if (showSymbols == ShowSymbolsAuto)
+    {
+        calcSymbolSize();
+    }
+    else if (showSymbols == ShowSymbolsAlways)
+    {
+        symbolSize = SYMBOL_SIZE_MAX;
+    }
+    else
+    {
+        symbolSize = 0;
+    }
+
+    updateSymbols();
+    replot();
+}
+
 void Plot::onXScaleChanged()
+{
+    if (showSymbols == ShowSymbolsAuto)
+    {
+        calcSymbolSize();
+        updateSymbols();
+    }
+}
+
+void Plot::calcSymbolSize()
 {
     auto sw = axisWidget(QwtPlot::xBottom);
     auto paintDist = sw->scaleDraw()->scaleMap().pDist();
@@ -265,8 +296,6 @@ void Plot::onXScaleChanged()
     {
         symbolSize = std::min(SYMBOL_SIZE_MAX, symDisPx-SYMBOL_SHOW_AT_WIDTH+1);
     }
-
-    updateSymbols();
 }
 
 void Plot::updateSymbols()
@@ -297,7 +326,7 @@ void Plot::resizeEvent(QResizeEvent * event)
     onXScaleChanged();
 }
 
-void Plot::onNumOfSamplesChanged(unsigned value)
+void Plot::setNumOfSamples(unsigned value)
 {
     numOfSamples = value;
     onXScaleChanged();
