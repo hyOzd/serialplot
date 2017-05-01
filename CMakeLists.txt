@@ -227,6 +227,8 @@ if (UNIX)
 endif (UNIX)
 
 # packaging
+include(BuildLinuxAppImage)
+
 if (UNIX)
   set(CPACK_GENERATOR "DEB")
 elseif (WIN32)
