@@ -28,7 +28,7 @@ if (HG)
     OUTPUT_VARIABLE HG_LATEST_TAG
     OUTPUT_STRIP_TRAILING_WHITESPACE)
   if(NOT HG_RESULT EQUAL 0)
-    set(HG_LATEST_TAG "")
+    unset(HG_LATEST_TAG)
   endif(NOT HG_RESULT EQUAL 0)
 
   # get revision
@@ -38,12 +38,12 @@ if (HG)
     OUTPUT_VARIABLE HG_REVISION
     OUTPUT_STRIP_TRAILING_WHITESPACE)
   if(NOT HG_RESULT EQUAL 0)
-    set(HG_REVISION "")
+    unset(HG_REVISION)
   endif(NOT HG_RESULT EQUAL 0)
 endif (HG)
 
 # Try to get version from .hg_archival file
-if (${HG_LATEST_TAG} STREQUAL "" OR NOT ${HG_LATEST_TAG})
+if (NOT HG_LATEST_TAG)
   set(HG_ARCHIVAL_FILE ${CMAKE_CURRENT_SOURCE_DIR}/.hg_archival.txt)
   if (EXISTS ${HG_ARCHIVAL_FILE})
     # get latest tag
