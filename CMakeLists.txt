@@ -17,7 +17,7 @@
 # along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.2.2)
 
 project(serialplot)
 
