@@ -4,8 +4,7 @@ set(LINUXDEPLOYQT_URL "https://github.com/probonopd/linuxdeployqt/releases/downl
 set(LINUXDEPLOYQT_TOOL ${CMAKE_CURRENT_BINARY_DIR}/linuxdeployqt-1-x86_64.AppImage)
 
 set(APPIMAGE ${CMAKE_CURRENT_BINARY_DIR}/app/SerialPlot.AppImage)
-# TODO: VERSION number
-set(APPIMAGE_DIR ${CMAKE_CURRENT_BINARY_DIR}/SerialPlot-VERSION)
+set(APPIMAGE_DIR ${CMAKE_CURRENT_BINARY_DIR}/SerialPlot-${VERSION_STRING})
 
 add_custom_command(
     OUTPUT
