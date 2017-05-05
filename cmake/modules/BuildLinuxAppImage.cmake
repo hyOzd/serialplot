@@ -3,8 +3,7 @@
 set(LINUXDEPLOYQT_URL "https://github.com/probonopd/linuxdeployqt/releases/download/1/linuxdeployqt-1-x86_64.AppImage")
 set(LINUXDEPLOYQT_TOOL ${CMAKE_CURRENT_BINARY_DIR}/linuxdeployqt-1-x86_64.AppImage)
 
-set(APPIMAGE ${CMAKE_CURRENT_BINARY_DIR}/app/SerialPlot.AppImage)
-set(APPIMAGE_DIR ${CMAKE_CURRENT_BINARY_DIR}/SerialPlot-${VERSION_STRING})
+set(APPIMAGE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${PROGRAM_NAME}-${VERSION_STRING})
 
 add_custom_command(
     OUTPUT
@@ -25,6 +24,10 @@ add_custom_target(
         ${CMAKE_COMMAND} -E make_directory ${APPIMAGE_DIR}
     COMMAND
         ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROGRAM_NAME}> ${APPIMAGE_DIR}
+    COMMAND
+        ${CMAKE_COMMAND} -E copy ${DESKTOP_FILE} ${APPIMAGE_DIR}
+    COMMAND
+        ${CMAKE_COMMAND} -E copy ${ICON_FILE} ${APPIMAGE_DIR}
     COMMAND
         ${CMAKE_COMMAND} -E env PATH=${QT_INSTALL_PREFIX}/bin:$ENV{PATH} ${LINUXDEPLOYQT_TOOL}
             ${APPIMAGE_DIR}/${PROGRAM_NAME} -appimage

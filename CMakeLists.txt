@@ -188,20 +188,19 @@ if (WIN32)
   install(FILES ${WINDOWS_INSTALL_LIBRARIES} DESTINATION bin)
 endif (WIN32)
 
-# install menu item and icon
+# prepare menu item and icon
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/misc/program_name.desktop.in"
   "${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.desktop")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/misc/program_name.png"
   "${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.png" COPYONLY)
 
+set(DESKTOP_FILE ${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.desktop)
+set(ICON_FILE ${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.png)
+
+# install menu item and icon
 if (UNIX)
-  # first copy files to share/serialplot/
-  install(FILES
-    ${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.desktop
-    DESTINATION share/applications/)
-  install(FILES
-    ${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.png
-	DESTINATION share/icons/hicolor/256x256/apps/)
+  install(FILES ${DESKTOP_FILE} DESTINATION share/applications/)
+  install(FILES ${ICON_FILE} DESTINATION share/icons/hicolor/256x256/apps/)
 endif (UNIX)
 
 # uninstalling
