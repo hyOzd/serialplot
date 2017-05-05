@@ -27,9 +27,13 @@ if (HG)
     RESULT_VARIABLE HG_RESULT
     OUTPUT_VARIABLE HG_LATEST_TAG
     OUTPUT_STRIP_TRAILING_WHITESPACE)
-  if(NOT HG_RESULT EQUAL 0)
+  if(HG_RESULT EQUAL 0)
+    if (NOT HG_LATEST_TAG MATCHES "v[0-9.]+")
+      unset(HG_LATEST_TAG)
+    endif()
+  else()
     unset(HG_LATEST_TAG)
-  endif(NOT HG_RESULT EQUAL 0)
+  endif()
 
   # get revision
   execute_process(COMMAND ${HG} id -i
@@ -58,7 +62,7 @@ if (NOT HG_LATEST_TAG)
 endif ()
 
 # extract version information from tag (remove 'v' prefix)
-if (NOT ${HG_LATEST_TAG} STREQUAL "")
+if (HG_LATEST_TAG)
   string(REPLACE "v" "" HG_VERSION ${HG_LATEST_TAG})
   message("Version from mercurial: ${HG_VERSION} (${HG_REVISION})")
 
