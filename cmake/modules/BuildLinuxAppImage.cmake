@@ -3,7 +3,7 @@
 set(LINUXDEPLOYQT_URL "https://github.com/probonopd/linuxdeployqt/releases/download/1/linuxdeployqt-1-x86_64.AppImage")
 set(LINUXDEPLOYQT_TOOL ${CMAKE_CURRENT_BINARY_DIR}/linuxdeployqt-1-x86_64.AppImage)
 
-set(APPIMAGE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${PROGRAM_NAME}-${VERSION_STRING})
+set(APPIMAGE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${PROGRAM_NAME}-${VERSION_STRING}-${CMAKE_HOST_SYSTEM_PROCESSOR})
 
 add_custom_command(
     OUTPUT
