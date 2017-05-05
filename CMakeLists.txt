@@ -161,14 +161,15 @@ else()
   message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
-# get revision number from mercurial
+# default version
+set(VERSION_STRING "0.9.0")
+set(VERSION_REVISION "0")
+
+# get revision number from mercurial and parse version string
 include(GetVersion)
-if (NOT ${HG_VERSION} STREQUAL "")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_STRING=\\\"${HG_VERSION}\\\" ")
-endif()
-if (NOT ${HG_REVISION} STREQUAL "")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_REVISION=\\\"${HG_REVISION}\\\" ")
-endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_STRING=\\\"${VERSION_STRING}\\\" ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_REVISION=\\\"${VERSION_REVISION}\\\" ")
 
 # add make run target
 add_custom_target(run
@@ -228,9 +229,9 @@ include(InstallRequiredSystemLibraries)
 set(CPACK_PACKAGE_NAME "${PROGRAM_NAME}")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Small and simple software for plotting data from serial port")
 set(CPACK_PACKAGE_CONTACT "Hasan Yavuz Özderya <hy@ozderya.net>")
-set(CPACK_PACKAGE_VERSION_MAJOR ${MAJOR_VERSION})
-set(CPACK_PACKAGE_VERSION_MINOR ${MINOR_VERSION})
-set(CPACK_PACKAGE_VERSION_PATCH ${PATCH_VERSION})
+set(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH})
 set(CPACK_STRIP_FILES TRUE)
 set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5widgets5 (>= 5.2.1), libqt5svg5 (>= 5.2.1), libqt5serialport5 (>= 5.2.1), libc6 (>= 2.19)")
 set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Small and simple software for plotting data from serial port

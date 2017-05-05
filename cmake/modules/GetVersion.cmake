@@ -60,7 +60,17 @@ endif ()
 # extract version information from tag (remove 'v' prefix)
 if (NOT ${HG_LATEST_TAG} STREQUAL "")
   string(REPLACE "v" "" HG_VERSION ${HG_LATEST_TAG})
-  message("Version: ${HG_VERSION} (${HG_REVISION})")
+  message("Version from mercurial: ${HG_VERSION} (${HG_REVISION})")
+
+  # replace version string
+  set(VERSION_STRING ${HG_VERSION})
+  set(VERSION_REVISION ${HG_REVISION})
 else ()
-  message("Failed to find version information.")
+  message("Failed to find version information from mercurial.")
 endif ()
+
+# parse version numbers
+string(REPLACE "." ";" VERSION_LIST ${VERSION_STRING})
+list(GET VERSION_LIST 0 VERSION_MAJOR)
+list(GET VERSION_LIST 1 VERSION_MINOR)
+list(GET VERSION_LIST 2 VERSION_PATCH)
