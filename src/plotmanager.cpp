@@ -41,6 +41,7 @@ PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject
     _autoScaled = true;
     _yMin = 0;
     _yMax = 1;
+    _xAxisAsIndex = true;
     isDemoShown = false;
     _infoModel = infoModel;
     _numOfSamples = 1;
