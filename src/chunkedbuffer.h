@@ -24,6 +24,8 @@
 #include <QRectF>
 #include <QVector>
 
+#include "datachunk.h"
+
 #define CHUNK_SIZE (1024)
 
 class ChunkedBuffer
@@ -45,6 +47,7 @@ private:
     size_t numChunks;
 
     QList<DataChunk*> chunks;
+    DataChunk* addNewChunk();
 };
 
 

@@ -21,6 +21,7 @@
 #include "catch.hpp"
 
 #include "datachunk.h"
+#include "chunkedbuffer.h"
 
 TEST_CASE("DataChunk created empty", "[memory]")
 {
@@ -76,4 +77,23 @@ TEST_CASE("filling data chunk", "[memory]")
     REQUIRE(c.max() == 1000);
     REQUIRE(c.avg() == Approx(500.5));
     REQUIRE(c.meanSquare() == Approx(333833.5));
+}
+
+TEST_CASE("ChunkedBuffer created empty", "[memory]")
+{
+    ChunkedBuffer b;
+
+    REQUIRE(b.size() == 0);
+    REQUIRE(b.boundingRect() == QRectF(0,0,0,0));
+}
+
+TEST_CASE("ChunkedBuffer adding data", "[memory]")
+{
+    ChunkedBuffer b;
+
+    // add some small data
+    double samples[10] = {1,2,3,4,5,6,7,8,9,10};
+    b.addSamples(samples, 10);
+
+    REQUIRE(b.size() == 10);
 }

@@ -25,10 +25,10 @@ ChunkedBuffer::ChunkedBuffer()
     _size = 0;
 
     // create first chunk
-    addChunk();
+    addNewChunk();
 }
 
-~ChunkedBuffer::ChunkedBuffer()
+ChunkedBuffer::~ChunkedBuffer()
 {
     for (auto chunk : chunks)
     {
@@ -43,10 +43,10 @@ void ChunkedBuffer::addSamples(double* samples, size_t size)
     while (i < size)
     {
         // select chunk to add data
-        auto chunk = chunk->last();
+        auto chunk = chunks.last();
         if (chunk->isFull())
         {
-            chunk = addChunk(); // create a new chunk
+            chunk = addNewChunk(); // create a new chunk
         }
 
         // add data to chunk
@@ -58,7 +58,7 @@ void ChunkedBuffer::addSamples(double* samples, size_t size)
     _size += size;
 }
 
-DataChunk* ChunkedBuffer::addChunk()
+DataChunk* ChunkedBuffer::addNewChunk()
 {
     auto chunk = new DataChunk(_size, CHUNK_SIZE);
     chunks.append(chunk);
@@ -76,8 +76,8 @@ QRectF ChunkedBuffer::boundingRect() const
     // update on 'addSamples' and when dropping chunks
 
     // find ymin and ymax
-    ymin = chunks->first().min();
-    ymax = chunks->first().max();
+    double ymin = chunks.first()->min();
+    double ymax = chunks.first()->max();
     for (auto c : chunks)
     {
         ymin = std::min(ymin, c->min());
