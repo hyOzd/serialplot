@@ -214,6 +214,13 @@ if (UNIX)
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 endif (UNIX)
 
+# testing
+set(ENABLE_TESTS false CACHE BOOL "Build tests.")
+if (ENABLE_TESTS)
+  enable_testing()
+  add_subdirectory(tests)
+endif ()
+
 # packaging
 include(BuildLinuxAppImage)
 
