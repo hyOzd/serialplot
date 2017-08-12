@@ -86,3 +86,10 @@ QRectF ChunkedBuffer::boundingRect() const
 
     return QRectF(0, ymax, _size, (ymax-ymin));
 }
+
+double ChunkedBuffer::sample(size_t i) const
+{
+    int chunk_index = i / CHUNK_SIZE;
+    int chunk_offset = i % CHUNK_SIZE;
+    return chunks[chunk_index]->sample(chunk_offset);
+}

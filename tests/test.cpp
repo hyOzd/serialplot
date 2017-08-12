@@ -87,13 +87,63 @@ TEST_CASE("ChunkedBuffer created empty", "[memory]")
     REQUIRE(b.boundingRect() == QRectF(0,0,0,0));
 }
 
-TEST_CASE("ChunkedBuffer adding data", "[memory]")
+TEST_CASE("ChunkedBuffer adding data and clearing", "[memory]")
 {
     ChunkedBuffer b;
 
     // add some small data
-    double samples[10] = {1,2,3,4,5,6,7,8,9,10};
-    b.addSamples(samples, 10);
+    const int N = 10;
+    double samples[N] = {1,2,3,4,5,6,7,8,9,10};
+    b.addSamples(samples, N);
 
-    REQUIRE(b.size() == 10);
+    REQUIRE(b.size() == N);
+    REQUIRE(b.boundingRect() == QRectF(0,10,N,9));
+
+    // add data to fill the chunk
+    double samples2[CHUNK_SIZE-N] = {0};
+    b.addSamples(samples2, CHUNK_SIZE-N);
+    REQUIRE(b.size() == CHUNK_SIZE);
+    REQUIRE(b.boundingRect() == QRectF(0,10,CHUNK_SIZE,10));
+
+    // add data for second chunk
+    b.addSamples(samples, N);
+    REQUIRE(b.size() == CHUNK_SIZE+N);
+    REQUIRE(b.boundingRect() == QRectF(0,10,CHUNK_SIZE+N,10));
+
+    // add more data to make it 4 chunks
+    double samples3[CHUNK_SIZE*3-N] = {0};
+    b.addSamples(samples3, CHUNK_SIZE*3-N);
+    REQUIRE(b.size() == CHUNK_SIZE*4);
+    REQUIRE(b.boundingRect() == QRectF(0,10,CHUNK_SIZE*4,10));
+
+    // TODO: clear
+    // b.clear();
+    // REQUIRE(b.size() == 0);
+}
+
+TEST_CASE("ChunkedBuffer accessing data", "[memory]")
+{
+    ChunkedBuffer b;
+
+    // prepare data
+    double samples[CHUNK_SIZE*3];
+    samples[0] = 10;
+    samples[10] = 20;
+    samples[CHUNK_SIZE-1] = 30;
+    samples[CHUNK_SIZE] = 40;
+    samples[CHUNK_SIZE+1] = 50;
+    samples[CHUNK_SIZE*2-1] = 60;
+    samples[CHUNK_SIZE*3-1] = 70;
+
+    // test
+    b.addSamples(samples, CHUNK_SIZE*3);
+
+    REQUIRE(b.size() == CHUNK_SIZE*3);
+    REQUIRE(b.sample(0) == 10);
+    REQUIRE(b.sample(10) == 20);
+    REQUIRE(b.sample(CHUNK_SIZE-1) == 30);
+    REQUIRE(b.sample(CHUNK_SIZE) == 40);
+    REQUIRE(b.sample(CHUNK_SIZE+1) == 50);
+    REQUIRE(b.sample(CHUNK_SIZE*2-1) == 60);
+    REQUIRE(b.sample(CHUNK_SIZE*3-1) == 70);
 }
