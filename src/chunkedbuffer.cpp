@@ -58,6 +58,22 @@ void ChunkedBuffer::addSamples(double* samples, size_t size)
     _size += size;
 }
 
+void ChunkedBuffer::clear()
+{
+    // delete all chunks
+    for (auto chunk : chunks)
+    {
+        delete chunk;
+    }
+    chunks.clear();
+
+    numChunks = 0;
+    _size = 0;
+
+    // create first chunk
+    addNewChunk();
+}
+
 DataChunk* ChunkedBuffer::addNewChunk()
 {
     auto chunk = new DataChunk(_size, CHUNK_SIZE);

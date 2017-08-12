@@ -116,9 +116,9 @@ TEST_CASE("ChunkedBuffer adding data and clearing", "[memory]")
     REQUIRE(b.size() == CHUNK_SIZE*4);
     REQUIRE(b.boundingRect() == QRectF(0,10,CHUNK_SIZE*4,10));
 
-    // TODO: clear
-    // b.clear();
-    // REQUIRE(b.size() == 0);
+    // clear
+    b.clear();
+    REQUIRE(b.size() == 0);
 }
 
 TEST_CASE("ChunkedBuffer accessing data", "[memory]")
