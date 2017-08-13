@@ -45,13 +45,14 @@ public:
     ScrollBarPosition hScrollBarPosition() const;
     ScrollBarPosition vScrollBarPosition() const;
 
-    void setXLimits(double min, double max);
-
     QWidget* cornerWidget() const;
     virtual void setCornerWidget( QWidget * );
 
     virtual bool eventFilter( QObject *, QEvent * );
 
+    void setXLimits(double min, double max);
+    void setHViewSize(double size);
+    virtual void setZoomBase(bool doReplot = true);
     virtual void rescale();
 
 public Q_SLOTS:
@@ -68,6 +69,7 @@ private Q_SLOTS:
 private:
     QRectF d_limits;
     double xMin, xMax;
+    double hViewSize;
 
     bool needScrollBar( Qt::Orientation ) const;
     int oppositeAxis( int ) const;

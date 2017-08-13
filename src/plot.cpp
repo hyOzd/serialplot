@@ -99,6 +99,7 @@ void Plot::setXAxis(double xMin, double xMax)
     _xMin = xMin;
     _xMax = xMax;
 
+    zoomer.setXLimits(xMin, xMax);
     zoomer.zoom(0); // unzoom
 
     // set axis
