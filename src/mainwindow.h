@@ -58,6 +58,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    PlotViewSettings viewSettings() const;
+
     void messageHandler(QtMsgType type, const QMessageLogContext &context,
                         const QString &msg);
 

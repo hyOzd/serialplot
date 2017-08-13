@@ -40,6 +40,13 @@ class Plot : public QwtPlot
     friend class PlotManager;
 
 public:
+    enum ShowSymbols
+    {
+        ShowSymbolsAuto,
+        ShowSymbolsShow,
+        ShowSymbolsHide
+    };
+
     Plot(QWidget* parent = 0);
     ~Plot();
 
@@ -54,6 +61,7 @@ public slots:
     void darkBackground(bool enabled = true);
     void setYAxis(bool autoScaled, double yMin = 0, double yMax = 1);
     void setXAxis(double xMin, double xMax);
+    void setSymbols(ShowSymbols shown);
 
     /**
      * Displays an animation for snapshot.
@@ -62,7 +70,7 @@ public slots:
      */
     void flashSnapshotOverlay(bool light);
 
-    void onNumOfSamplesChanged(unsigned value);
+    void setNumOfSamples(unsigned value);
 
 protected:
     /// update the display of symbols depending on `symbolSize`
@@ -80,9 +88,11 @@ private:
     PlotSnapshotOverlay* snapshotOverlay;
     QwtPlotLegendItem legend;
     QwtPlotTextLabel demoIndicator;
+    ShowSymbols showSymbols;
 
     void resetAxes();
     void resizeEvent(QResizeEvent * event);
+    void calcSymbolSize();
 
 private slots:
     void unzoomed();

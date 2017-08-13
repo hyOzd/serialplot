@@ -17,6 +17,9 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QActionGroup>
+#include <QMetaEnum>
+#include <QtDebug>
 #include "qwt_symbol.h"
 
 #include "plot.h"
@@ -32,14 +35,17 @@ PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject
     unzoomAction("&Unzoom", this),
     darkBackgroundAction("&Dark Background", this),
     showLegendAction("&Legend", this),
-    showMultiAction("Multi &Plot", this)
+    showMultiAction("Multi &Plot", this),
+    setSymbolsAction("Symbols", this)
 {
     _autoScaled = true;
     _yMin = 0;
     _yMax = 1;
+    _xAxisAsIndex = true;
     isDemoShown = false;
     _infoModel = infoModel;
     _numOfSamples = 1;
+    showSymbols = Plot::ShowSymbolsAuto;
 
     // initalize layout and single widget
     isMulti = false;
@@ -54,6 +60,7 @@ PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject
     darkBackgroundAction.setToolTip("Enable Dark Plot Background");
     showLegendAction.setToolTip("Display the Legend on Plot");
     showMultiAction.setToolTip("Display All Channels Separately");
+    setSymbolsAction.setToolTip("Show/Hide symbols");
 
     showGridAction.setShortcut(QKeySequence("G"));
     showMinorGridAction.setShortcut(QKeySequence("M"));
@@ -71,6 +78,37 @@ PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject
     showMultiAction.setChecked(false);
 
     showMinorGridAction.setEnabled(false);
+
+    // setup symbols menu
+    setSymbolsAutoAct = setSymbolsMenu.addAction("Show When Zoomed");
+    setSymbolsAutoAct->setCheckable(true);
+    setSymbolsAutoAct->setChecked(true);
+    connect(setSymbolsAutoAct, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+            [this](bool checked)
+            {
+                if (checked) setSymbols(Plot::ShowSymbolsAuto);
+            });
+    setSymbolsShowAct = setSymbolsMenu.addAction("Always Show");
+    setSymbolsShowAct->setCheckable(true);
+    connect(setSymbolsShowAct, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+            [this](bool checked)
+            {
+                if (checked) setSymbols(Plot::ShowSymbolsShow);
+            });
+    setSymbolsHideAct = setSymbolsMenu.addAction("Always Hide");
+    setSymbolsHideAct->setCheckable(true);
+    connect(setSymbolsHideAct, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+            [this](bool checked)
+            {
+                if (checked) setSymbols(Plot::ShowSymbolsHide);
+            });
+    setSymbolsAction.setMenu(&setSymbolsMenu);
+
+    // add symbol actions to same group so that they appear as radio buttons
+    auto group = new QActionGroup(this);
+    group->addAction(setSymbolsAutoAct);
+    group->addAction(setSymbolsShowAct);
+    group->addAction(setSymbolsHideAct);
 
     connect(&showGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
             this, &PlotManager::showGrid);
@@ -252,6 +290,8 @@ Plot* PlotManager::addPlotWidget()
     plot->showLegend(showLegendAction.isChecked());
     plot->showDemoIndicator(isDemoShown);
     plot->setYAxis(_autoScaled, _yMin, _yMax);
+    plot->setNumOfSamples(_numOfSamples);
+    plot->setSymbols(showSymbols);
 
     if (_xAxisAsIndex)
     {
@@ -363,6 +403,7 @@ QList<QAction*> PlotManager::menuActions()
     actions << &darkBackgroundAction;
     actions << &showLegendAction;
     actions << &showMultiAction;
+    actions << &setSymbolsAction;
     return actions;
 }
 
@@ -415,6 +456,15 @@ void PlotManager::darkBackground(bool enabled)
     }
 }
 
+void PlotManager::setSymbols(Plot::ShowSymbols shown)
+{
+    showSymbols = shown;
+    for (auto plot : plotWidgets)
+    {
+        plot->setSymbols(shown);
+    }
+}
+
 void PlotManager::setYAxis(bool autoScaled, double yAxisMin, double yAxisMax)
 {
     _autoScaled = autoScaled;
@@ -459,13 +509,54 @@ void PlotManager::flashSnapshotOverlay()
     }
 }
 
-void PlotManager::onNumOfSamplesChanged(unsigned value)
+void PlotManager::setNumOfSamples(unsigned value)
 {
     _numOfSamples = value;
     for (auto plot : plotWidgets)
     {
-        plot->onNumOfSamplesChanged(value);
+        plot->setNumOfSamples(value);
         if (_xAxisAsIndex) plot->setXAxis(0, value);
+    }
+}
+
+PlotViewSettings PlotManager::viewSettings() const
+{
+    return PlotViewSettings(
+        {
+            showGridAction.isChecked(),
+            showMinorGridAction.isChecked(),
+            darkBackgroundAction.isChecked(),
+            showLegendAction.isChecked(),
+            showMultiAction.isChecked(),
+            showSymbols
+        });
+}
+
+void PlotManager::setViewSettings(const PlotViewSettings& settings)
+{
+    showGridAction.setChecked(settings.showGrid);
+    showGrid(settings.showGrid);
+    showMinorGridAction.setChecked(settings.showMinorGrid);
+    showMinorGrid(settings.showMinorGrid);
+    darkBackgroundAction.setChecked(settings.darkBackground);
+    darkBackground(settings.darkBackground);
+    showLegendAction.setChecked(settings.showLegend);
+    showLegend(settings.showLegend);
+    showMultiAction.setChecked(settings.showMulti);
+    setMulti(settings.showMulti);
+
+    setSymbols(settings.showSymbols);
+    if (showSymbols == Plot::ShowSymbolsAuto)
+    {
+        setSymbolsAutoAct->setChecked(true);
+    }
+    else if (showSymbols == Plot::ShowSymbolsShow)
+    {
+        setSymbolsShowAct->setChecked(true);
+    }
+    else
+    {
+        setSymbolsHideAct->setChecked(true);
     }
 }
 
@@ -477,6 +568,22 @@ void PlotManager::saveSettings(QSettings* settings)
     settings->setValue(SG_Plot_MinorGrid, showMinorGridAction.isChecked());
     settings->setValue(SG_Plot_Legend, showLegendAction.isChecked());
     settings->setValue(SG_Plot_MultiPlot, showMultiAction.isChecked());
+
+    QString showSymbolsStr;
+    if (showSymbols == Plot::ShowSymbolsAuto)
+    {
+        showSymbolsStr = "auto";
+    }
+    else if (showSymbols == Plot::ShowSymbolsShow)
+    {
+        showSymbolsStr = "show";
+    }
+    else
+    {
+        showSymbolsStr = "hide";
+    }
+    settings->setValue(SG_Plot_Symbols, showSymbolsStr);
+
     settings->endGroup();
 }
 
@@ -499,5 +606,27 @@ void PlotManager::loadSettings(QSettings* settings)
     showMultiAction.setChecked(
         settings->value(SG_Plot_MultiPlot, showMultiAction.isChecked()).toBool());
     setMulti(showMultiAction.isChecked());
+
+    QString showSymbolsStr = settings->value(SG_Plot_Symbols, QString()).toString();
+    if (showSymbolsStr == "auto")
+    {
+        setSymbols(Plot::ShowSymbolsAuto);
+        setSymbolsAutoAct->setChecked(true);
+    }
+    else if (showSymbolsStr == "show")
+    {
+        setSymbols(Plot::ShowSymbolsShow);
+        setSymbolsShowAct->setChecked(true);
+    }
+    else if (showSymbolsStr == "hide")
+    {
+        setSymbols(Plot::ShowSymbolsHide);
+        setSymbolsHideAct->setChecked(true);
+    }
+    else
+    {
+        qCritical() << "Invalid symbol setting:" << showSymbolsStr;
+    }
+
     settings->endGroup();
 }

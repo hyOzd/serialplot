@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -29,6 +29,7 @@
 #include <QCloseEvent>
 #include <qwt_plot_curve.h>
 
+#include "mainwindow.h"
 #include "plotmanager.h"
 #include "snapshot.h"
 
@@ -41,7 +42,7 @@ class SnapshotView : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit SnapshotView(QWidget *parent, Snapshot* snapshot);
+    explicit SnapshotView(MainWindow* parent, Snapshot* snapshot);
     ~SnapshotView();
 
 signals:

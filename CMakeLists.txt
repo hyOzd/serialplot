@@ -17,7 +17,7 @@
 # along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.2.2)
 
 project(serialplot)
 
@@ -161,25 +161,14 @@ else()
   message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
-# get revision number from mercurial
-find_program(MERCURIAL hg)
+# default version
+set(VERSION_STRING "0.9.1")
+set(VERSION_REVISION "0")
 
-if (MERCURIAL)
-  execute_process(COMMAND ${MERCURIAL} id -i
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    RESULT_VARIABLE MERCURIAL_RESULT
-    OUTPUT_VARIABLE VERSION_REVISION
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
-  if(NOT MERCURIAL_RESULT EQUAL 0)
-    set(VERSION_SCM_REVISION false)
-  endif(NOT MERCURIAL_RESULT EQUAL 0)
-endif (MERCURIAL)
+# get revision number from mercurial and parse version string
+include(GetVersion)
 
-if (NOT VERSION_REVISION)
-  set(VERSION_REVISION "0")
-endif (NOT VERSION_REVISION)
-
-message("SCM revision: ${VERSION_REVISION}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_STRING=\\\"${VERSION_STRING}\\\" ")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_REVISION=\\\"${VERSION_REVISION}\\\" ")
 
 # add make run target
@@ -199,20 +188,19 @@ if (WIN32)
   install(FILES ${WINDOWS_INSTALL_LIBRARIES} DESTINATION bin)
 endif (WIN32)
 
-# install menu item and icon
+# prepare menu item and icon
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/misc/program_name.desktop.in"
   "${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.desktop")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/misc/program_name.png"
   "${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.png" COPYONLY)
 
+set(DESKTOP_FILE ${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.desktop)
+set(ICON_FILE ${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.png)
+
+# install menu item and icon
 if (UNIX)
-  # first copy files to share/serialplot/
-  install(FILES
-    ${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.desktop
-    DESTINATION share/applications/)
-  install(FILES
-    ${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.png
-	DESTINATION share/icons/hicolor/256x256/apps/)
+  install(FILES ${DESKTOP_FILE} DESTINATION share/applications/)
+  install(FILES ${ICON_FILE} DESTINATION share/icons/hicolor/256x256/apps/)
 endif (UNIX)
 
 # uninstalling
@@ -227,6 +215,8 @@ if (UNIX)
 endif (UNIX)
 
 # packaging
+include(BuildLinuxAppImage)
+
 if (UNIX)
   set(CPACK_GENERATOR "DEB")
 elseif (WIN32)
@@ -238,9 +228,9 @@ include(InstallRequiredSystemLibraries)
 set(CPACK_PACKAGE_NAME "${PROGRAM_NAME}")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Small and simple software for plotting data from serial port")
 set(CPACK_PACKAGE_CONTACT "Hasan Yavuz Özderya <hy@ozderya.net>")
-set(CPACK_PACKAGE_VERSION_MAJOR ${MAJOR_VERSION})
-set(CPACK_PACKAGE_VERSION_MINOR ${MINOR_VERSION})
-set(CPACK_PACKAGE_VERSION_PATCH ${PATCH_VERSION})
+set(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH})
 set(CPACK_STRIP_FILES TRUE)
 set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5widgets5 (>= 5.2.1), libqt5svg5 (>= 5.2.1), libqt5serialport5 (>= 5.2.1), libc6 (>= 2.19)")
 set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Small and simple software for plotting data from serial port
