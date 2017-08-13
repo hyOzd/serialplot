@@ -25,6 +25,8 @@ FrameBufferSeries::FrameBufferSeries(FrameBuffer* buffer)
     _xmin = 0;
     _xmax = 1;
     _buffer = buffer;
+    int_index_start = 0;
+    int_index_end = 0;
 }
 
 void FrameBufferSeries::setXAxis(bool asIndex, double xmin, double xmax)
@@ -36,18 +38,19 @@ void FrameBufferSeries::setXAxis(bool asIndex, double xmin, double xmax)
 
 size_t FrameBufferSeries::size() const
 {
-    return _buffer->size();
+    return int_index_end - int_index_start;
 }
 
 QPointF FrameBufferSeries::sample(size_t i) const
 {
+    i += int_index_start;
     if (xAsIndex)
     {
         return QPointF(i, _buffer->sample(i));
     }
     else
     {
-        return QPointF(i * (_xmax - _xmin) / size() + _xmin, _buffer->sample(i));
+        return QPointF(i * (_xmax - _xmin) / _buffer->size() + _xmin, _buffer->sample(i));
     }
 }
 
@@ -64,4 +67,23 @@ QRectF FrameBufferSeries::boundingRect() const
         rect.setRight(_xmax);
         return rect;
     }
+}
+
+void FrameBufferSeries::setRectOfInterest(const QRectF& rect)
+{
+    if (xAsIndex)
+    {
+        int_index_start = rect.left();
+        int_index_end = rect.right();
+    }
+    else
+    {
+        double xsize = _xmax - _xmin;
+        size_t bsize = _buffer->size();
+        int_index_start =  bsize * (rect.left()-_xmin) / xsize;
+        int_index_end = bsize * (rect.right()-_xmin) / xsize;
+    }
+
+    int_index_start = std::max(int_index_start, (size_t) 0);
+    int_index_end = std::min(_buffer->size(), int_index_end);
 }
