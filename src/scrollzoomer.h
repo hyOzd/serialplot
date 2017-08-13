@@ -79,6 +79,7 @@ private:
 
     bool d_inZoom;
     bool d_alignCanvasToScales[ QwtPlot::axisCnt ];
+    bool hscrollmove;
 };
 
 #endif
