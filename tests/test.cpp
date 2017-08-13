@@ -17,6 +17,7 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <time.h>
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
 
@@ -146,4 +147,26 @@ TEST_CASE("ChunkedBuffer accessing data", "[memory]")
     REQUIRE(b.sample(CHUNK_SIZE+1) == 50);
     REQUIRE(b.sample(CHUNK_SIZE*2-1) == 60);
     REQUIRE(b.sample(CHUNK_SIZE*3-1) == 70);
+}
+
+TEST_CASE("ChunkedBuffer time measurement", "[.][timing][memory]")
+{
+    const int N = CHUNK_SIZE*10;
+    clock_t start, end;
+    double samples[N];
+    ChunkedBuffer b;
+    start = clock();
+    b.addSamples(samples, N);
+    end = clock();
+    REQUIRE(b.size() == N);
+    WARN("addSamples(" << N << ") took: " << ((end-start) / ((double) CLOCKS_PER_SEC)));
+
+    // access
+    start = clock();
+    for (int i =0; i < N; i++)
+    {
+        samples[i] = b.sample(i);
+    }
+    end = clock();
+    WARN("sample()*"<< N <<" took: " << ((end-start) / ((double) CLOCKS_PER_SEC)));
 }
