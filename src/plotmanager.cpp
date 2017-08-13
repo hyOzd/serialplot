@@ -224,7 +224,9 @@ void PlotManager::setMulti(bool enabled)
         // add new widgets and attach
         for (auto curve : curves)
         {
-            curve->attach(addPlotWidget());
+            auto plot = addPlotWidget();
+            plot->setVisible(curve->isVisible());
+            curve->attach(plot);
         }
     }
     else
