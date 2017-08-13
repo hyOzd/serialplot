@@ -73,6 +73,16 @@ Plot::Plot(QWidget* parent) :
     demoIndicator.setText(demoText);
     demoIndicator.hide();
     demoIndicator.attach(this);
+
+    // init no channels are visible indicator
+    QwtText noChannelText(" No Visible Channels ");
+    noChannelText.setColor(QColor("white"));
+    noChannelText.setBackgroundBrush(Qt::darkBlue);
+    noChannelText.setBorderRadius(4);
+    noChannelText.setRenderFlags(Qt::AlignHCenter | Qt::AlignVCenter);
+    noChannelIndicator.setText(noChannelText);
+    noChannelIndicator.hide();
+    noChannelIndicator.attach(this);
 }
 
 Plot::~Plot()
@@ -160,6 +170,12 @@ void Plot::showLegend(bool show)
 void Plot::showDemoIndicator(bool show)
 {
     demoIndicator.setVisible(show);
+    replot();
+}
+
+void Plot::showNoChannel(bool show)
+{
+    noChannelIndicator.setVisible(show);
     replot();
 }
 

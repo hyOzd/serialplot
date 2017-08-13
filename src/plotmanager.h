@@ -96,6 +96,7 @@ private:
     QScrollArea* scrollArea;
     QList<QwtPlotCurve*> curves;
     QList<Plot*> plotWidgets;
+    Plot* emptyPlot;  ///< for displaying when all channels are hidden
     ChannelInfoModel* _infoModel;
     bool isDemoShown;
     bool _autoScaled;
@@ -128,6 +129,8 @@ private:
     /// Common part of overloaded `addCurve` functions
     void _addCurve(QwtPlotCurve* curve);
     void setSymbols(Plot::ShowSymbols shown);
+    /// Check and make sure "no visible channels" text is shown
+    void checkNoVisChannels();
 
 private slots:
     void showGrid(bool show = true);

@@ -17,6 +17,7 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
 #include <QActionGroup>
 #include <QMetaEnum>
 #include <QtDebug>
@@ -46,6 +47,7 @@ PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject
     _infoModel = infoModel;
     _numOfSamples = 1;
     showSymbols = Plot::ShowSymbolsAuto;
+    emptyPlot = NULL;
 
     // initalize layout and single widget
     isMulti = false;
@@ -156,6 +158,7 @@ PlotManager::~PlotManager()
     }
 
     if (scrollArea != NULL) delete scrollArea;
+    if (emptyPlot != NULL) delete emptyPlot;
 }
 
 void PlotManager::onChannelInfoChanged(const QModelIndex &topLeft,
@@ -189,12 +192,28 @@ void PlotManager::onChannelInfoChanged(const QModelIndex &topLeft,
         }
     }
 
+    checkNoVisChannels();
+
     // replot single widget
     if (!isMulti)
     {
         plotWidgets[0]->updateSymbols();
         plotWidgets[0]->updateLegend();
         replot();
+    }
+}
+
+void PlotManager::checkNoVisChannels()
+{
+    // if all channels are hidden show indicator
+    bool allhidden = std::none_of(curves.cbegin(), curves.cend(),
+                                  [](QwtPlotCurve* c) {return c->isVisible();});
+
+    plotWidgets[0]->showNoChannel(allhidden);
+    if (isMulti)
+    {
+        plotWidgets[0]->showNoChannel(allhidden);
+        plotWidgets[0]->setVisible(true);
     }
 }
 
@@ -240,6 +259,8 @@ void PlotManager::setMulti(bool enabled)
             curve->attach(plot);
         }
     }
+
+    checkNoVisChannels();
 }
 
 void PlotManager::setupLayout(bool multiPlot)
