@@ -57,6 +57,7 @@ public slots:
     void showMinorGrid(bool show = true);
     void showLegend(bool show = true);
     void showDemoIndicator(bool show = true);
+    void showNoChannel(bool show = true);
     void unzoom();
     void darkBackground(bool enabled = true);
     void setYAxis(bool autoScaled, double yMin = 0, double yMax = 1);
@@ -88,6 +89,7 @@ private:
     PlotSnapshotOverlay* snapshotOverlay;
     QwtPlotLegendItem legend;
     QwtPlotTextLabel demoIndicator;
+    QwtPlotTextLabel noChannelIndicator;
     ShowSymbols showSymbols;
 
     void resetAxes();

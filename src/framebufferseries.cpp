@@ -17,6 +17,7 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "framebufferseries.h"
 
 FrameBufferSeries::FrameBufferSeries(FrameBuffer* buffer)
@@ -73,15 +74,15 @@ void FrameBufferSeries::setRectOfInterest(const QRectF& rect)
 {
     if (xAsIndex)
     {
-        int_index_start = rect.left();
-        int_index_end = rect.right();
+        int_index_start = floor(rect.left())-1;
+        int_index_end = ceil(rect.right())+1;
     }
     else
     {
         double xsize = _xmax - _xmin;
         size_t bsize = _buffer->size();
-        int_index_start =  bsize * (rect.left()-_xmin) / xsize;
-        int_index_end = bsize * (rect.right()-_xmin) / xsize;
+        int_index_start =  floor(bsize * (rect.left()-_xmin) / xsize)-1;
+        int_index_end = ceil(bsize * (rect.right()-_xmin) / xsize)+1;
     }
 
     int_index_start = std::max(int_index_start, (size_t) 0);
