@@ -39,6 +39,7 @@ Plot::Plot(QWidget* parent) :
     isAutoScaled = true;
     symbolSize = 0;
     numOfSamples = 1;
+    plotWidth = 1;
     showSymbols = Plot::ShowSymbolsAuto;
 
     QObject::connect(&zoomer, &Zoomer::unzoomed, this, &Plot::unzoomed);
@@ -302,7 +303,8 @@ void Plot::calcSymbolSize()
     auto scaleDist = sw->scaleDraw()->scaleMap().sDist();
     auto fullScaleDist = zoomer.zoomBase().width();
     auto zoomRate = fullScaleDist / scaleDist;
-    float samplesInView = numOfSamples / zoomRate;
+    float plotWidthNumSamp = abs(numOfSamples * plotWidth / (_xMax - _xMin));
+    float samplesInView = plotWidthNumSamp / zoomRate;
     int symDisPx = round(paintDist / samplesInView);
 
     if (symDisPx < SYMBOL_SHOW_AT_WIDTH)
@@ -351,5 +353,6 @@ void Plot::setNumOfSamples(unsigned value)
 
 void Plot::setPlotWidth(double width)
 {
+    plotWidth = width;
     zoomer.setHViewSize(width);
 }

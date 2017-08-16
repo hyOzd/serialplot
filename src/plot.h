@@ -84,6 +84,7 @@ private:
     double yMin, yMax;
     double _xMin, _xMax;
     unsigned numOfSamples;
+    double plotWidth;
     int symbolSize;
     Zoomer zoomer;
     ScaleZoomer sZoomer;
