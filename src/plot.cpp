@@ -348,3 +348,8 @@ void Plot::setNumOfSamples(unsigned value)
     numOfSamples = value;
     onXScaleChanged();
 }
+
+void Plot::setPlotWidth(double width)
+{
+    zoomer.setHViewSize(width);
+}

@@ -73,6 +73,8 @@ public slots:
 
     void setNumOfSamples(unsigned value);
 
+    void setPlotWidth(double width);
+
 protected:
     /// update the display of symbols depending on `symbolSize`
     void updateSymbols();

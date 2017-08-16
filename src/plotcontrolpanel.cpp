@@ -89,6 +89,9 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
     connect(ui->spXmin, SIGNAL(valueChanged(double)),
             this, SLOT(onXScaleChanged()));
 
+    connect(ui->spPlotWidth, SIGNAL(valueChanged(int)),
+            this, SLOT(onPlotWidthChanged()));
+
     // init scale range preset list
     for (int nbits = 8; nbits <= 24; nbits++) // signed binary formats
     {
@@ -275,6 +278,7 @@ void PlotControlPanel::onIndexChecked(bool checked)
 
         emit xScaleChanged(false, ui->spXmin->value(), ui->spXmax->value());
     }
+    emit plotWidthChanged(plotWidth());
 }
 
 void PlotControlPanel::onXScaleChanged()
@@ -282,7 +286,27 @@ void PlotControlPanel::onXScaleChanged()
     if (!xAxisAsIndex())
     {
         emit xScaleChanged(false, ui->spXmin->value(), ui->spXmax->value());
+        emit plotWidthChanged(plotWidth());
     }
+}
+
+double PlotControlPanel::plotWidth() const
+{
+    double value = ui->spPlotWidth->value();
+    if (!xAxisAsIndex())
+    {
+        // scale by xmin and xmax
+        auto xmax = ui->spXmax->value();
+        auto xmin = ui->spXmin->value();
+        double scale = (xmax - xmin) / _numOfSamples;
+        value *= scale;
+    }
+    return value;
+}
+
+void PlotControlPanel::onPlotWidthChanged()
+{
+    emit plotWidthChanged(plotWidth());
 }
 
 void PlotControlPanel::setChannelInfoModel(ChannelInfoModel* model)

@@ -542,6 +542,15 @@ void PlotManager::setNumOfSamples(unsigned value)
     }
 }
 
+void PlotManager::setPlotWidth(double width)
+{
+    _plotWidth = width;
+    for (auto plot : plotWidgets)
+    {
+        plot->setPlotWidth(width);
+    }
+}
+
 PlotViewSettings PlotManager::viewSettings() const
 {
     return PlotViewSettings(

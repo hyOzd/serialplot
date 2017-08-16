@@ -88,6 +88,8 @@ public slots:
     void flashSnapshotOverlay();
     /// Should be called to update zoom base
     void setNumOfSamples(unsigned value);
+    /// Maximum width of X axis (limit of hscroll)
+    void setPlotWidth(double width);
 
 private:
     bool isMulti;
@@ -106,6 +108,7 @@ private:
     double _xMin;
     double _xMax;
     unsigned _numOfSamples;
+    double _plotWidth;
     Plot::ShowSymbols showSymbols;
 
     // menu actions
