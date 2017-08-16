@@ -82,13 +82,14 @@ void ScrollZoomer::setZoomBase(bool doReplot)
     QwtPlotZoomer::setZoomBase(doReplot);
     auto zb = zoomBase();
     auto zs = zoomStack();
+    zb.setRight(xMax);
     if ((xMax - xMin) < hViewSize)
     {
-        zb.setWidth(xMax - xMin);
+        zb.setLeft(xMin);
     }
     else
     {
-        zb.setWidth(hViewSize);
+        zb.setLeft(xMax-hViewSize);
     }
     zs[0] = zb;
     setZoomStack(zs);
