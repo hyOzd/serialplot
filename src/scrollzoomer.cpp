@@ -55,6 +55,7 @@ ScrollZoomer::ScrollZoomer( QWidget *canvas ):
     d_hScrollData = new ScrollData;
     d_vScrollData = new ScrollData;
     hscrollmove = false;
+    vscrollmove = false;
 }
 
 ScrollZoomer::~ScrollZoomer()
@@ -150,7 +151,8 @@ void ScrollZoomer::rescale()
 
     // NOTE: Below snippet is copied from QwtPlotZoomer::rescale() just so that
     // we can refrain from updating y axis when moving horizontal scrollbar, so
-    // that auto-scale isn't disrupted.
+    // that auto-scale isn't disrupted. Also we don't want to jump around in
+    // x-axis when moving vertical scroll.
     {
         QwtPlot *plt = plot();
         if ( !plt )
@@ -162,12 +164,15 @@ void ScrollZoomer::rescale()
             const bool doReplot = plt->autoReplot();
             plt->setAutoReplot( false );
 
-            double x1 = rect.left();
-            double x2 = rect.right();
-            if ( !plt->axisScaleDiv( xAxis() ).isIncreasing() )
-                qSwap( x1, x2 );
+            if (!vscrollmove)
+            {
+                double x1 = rect.left();
+                double x2 = rect.right();
+                if ( !plt->axisScaleDiv( xAxis() ).isIncreasing() )
+                    qSwap( x1, x2 );
 
-            plt->setAxisScale( xAxis(), x1, x2 );
+                plt->setAxisScale( xAxis(), x1, x2 );
+            }
 
             if (!hscrollmove)
             {
@@ -544,7 +549,9 @@ void ScrollZoomer::scrollBarMoved(
     }
     else
     {
+        vscrollmove = true;
         moveTo( QPointF( zoomRect().left(), min ) );
+        vscrollmove = false;
     }
 
     Q_EMIT zoomed( zoomRect() );
