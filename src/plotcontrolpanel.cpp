@@ -29,7 +29,7 @@
 #include "setting_defines.h"
 
 /// Confirm if #samples is being set to a value greater than this
-const int NUMSAMPLES_CONFIRM_AT = 10000;
+const int NUMSAMPLES_CONFIRM_AT = 1000000;
 
 /// Used for scale range selection combobox
 struct Range
