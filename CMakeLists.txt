@@ -126,6 +126,7 @@ add_executable(${PROGRAM_NAME} WIN32
   src/framedreadersettings.cpp
   src/plotmanager.cpp
   src/numberformat.cpp
+  src/updatechecker.cpp
   misc/windows_icon.rc
   ${UI_FILES}
   ${RES_FILES}
@@ -136,7 +137,7 @@ target_link_libraries(${PROGRAM_NAME}
   ${QWT_LIBRARY}
   ${QTCOLORWIDGETS_LIBRARIES}
   )
-qt5_use_modules(${PROGRAM_NAME} Widgets SerialPort)
+qt5_use_modules(${PROGRAM_NAME} Widgets SerialPort Network)
 
 if (BUILD_QWT)
   add_dependencies(${PROGRAM_NAME} QWT)

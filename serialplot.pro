@@ -68,7 +68,8 @@ SOURCES += \
     src/framedreader.cpp \
     src/plotmanager.cpp \
     src/numberformat.cpp \
-    src/recordpanel.cpp
+    src/recordpanel.cpp \
+    src/updatechecker.cpp
 
 HEADERS += \
     src/mainwindow.h \
@@ -108,7 +109,8 @@ HEADERS += \
     src/plotmanager.h \
     src/setting_defines.h \
     src/numberformat.h \
-    src/recordpanel.h
+    src/recordpanel.h \
+    src/updatechecker.h
 
 FORMS += \
     src/mainwindow.ui \

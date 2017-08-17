@@ -60,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent) :
     aboutDialog(this),
     portControl(&serialPort),
     channelMan(1, 1, this),
+    updateChecker(this),
     snapshotMan(this, &channelMan),
     commandPanel(&serialPort),
     dataFormatPanel(&serialPort, &channelMan, &recorder),
@@ -237,6 +238,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(ui->actionDemoMode, &QAction::toggled,
                      plotMan, &PlotManager::showDemoIndicator);
+
+    // TEST UPDATE CHECKER
+    updateChecker.checkUpdate();
 
     // load default settings
     QSettings settings("serialplot", "serialplot");
