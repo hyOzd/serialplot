@@ -46,6 +46,7 @@ public:
     bool   xAxisAsIndex() const;
     double xMax() const;
     double xMin() const;
+    /// Returns the plot width adjusted for x axis scaling.
     double plotWidth() const;
 
     void setChannelInfoModel(ChannelInfoModel* model);
