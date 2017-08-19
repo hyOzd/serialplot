@@ -77,6 +77,7 @@ qt5_wrap_ui(UI_FILES
   src/binarystreamreadersettings.ui
   src/asciireadersettings.ui
   src/framedreadersettings.ui
+  src/updatecheckdialog.ui
   )
 
 if (WIN32)
@@ -128,6 +129,7 @@ add_executable(${PROGRAM_NAME} WIN32
   src/numberformat.cpp
   src/updatechecker.cpp
   src/versionnumber.cpp
+  src/updatecheckdialog.cpp
   misc/windows_icon.rc
   ${UI_FILES}
   ${RES_FILES}

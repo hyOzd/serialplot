@@ -33,12 +33,15 @@ class UpdateChecker : public QObject
 public:
     explicit UpdateChecker(QObject *parent = 0);
 
+    bool isChecking() const;
+
 signals:
     void checkFinished(bool found, QString newVersion, QString downloadUrl);
     void checkFailed(QString errorMessage);
 
 public slots:
     void checkUpdate();
+    void cancelCheck();
 
 private:
     enum class FileArch
@@ -59,6 +62,8 @@ private:
     };
 
     QNetworkAccessManager nam;
+    QNetworkReply* activeReply;
+
     /// Parses json and creates a list of files
     bool parseData(const QJsonDocument& data, QList<FileInfo>& files) const;
     /// Finds the update file in the file list. Returns `-1` if no new version

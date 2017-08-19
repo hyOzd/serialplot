@@ -34,14 +34,26 @@ const char BB_DOWNLOADS_URL[] = "https://api.bitbucket.org/2.0/repositories/hyoz
 UpdateChecker::UpdateChecker(QObject *parent) :
     QObject(parent), nam(this)
 {
+    activeReply = NULL;
+
     connect(&nam, &QNetworkAccessManager::finished,
             this, &UpdateChecker::onReqFinished);
+}
+
+bool UpdateChecker::isChecking() const
+{
+    return activeReply != NULL && !activeReply->isFinished();
 }
 
 void UpdateChecker::checkUpdate()
 {
     auto req = QNetworkRequest(QUrl(BB_DOWNLOADS_URL));
-    nam.get(req);
+    activeReply = nam.get(req);
+}
+
+void UpdateChecker::cancelCheck()
+{
+    if (activeReply != NULL) activeReply->abort();
 }
 
 void UpdateChecker::onReqFinished(QNetworkReply* reply)
@@ -82,6 +94,7 @@ void UpdateChecker::onReqFinished(QNetworkReply* reply)
         }
     }
     reply->deleteLater();
+    activeReply = NULL;
 }
 
 bool UpdateChecker::parseData(const QJsonDocument& data, QList<FileInfo>& files) const

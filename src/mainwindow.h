@@ -45,7 +45,7 @@
 #include "snapshotmanager.h"
 #include "plotmanager.h"
 #include "datarecorder.h"
-#include "updatechecker.h"
+#include "updatecheckdialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -80,13 +80,13 @@ private:
     PlotManager* plotMan;
     SnapshotManager snapshotMan;
     DataRecorder recorder;       // operated by `recordPanel`
-    UpdateChecker updateChecker;
 
     QLabel spsLabel;
     CommandPanel commandPanel;
     DataFormatPanel dataFormatPanel;
     RecordPanel recordPanel;
     PlotControlPanel plotControlPanel;
+    UpdateCheckDialog updateCheckDialog;
 
     bool isDemoRunning();
     /// Stores settings for all modules

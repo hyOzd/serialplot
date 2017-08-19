@@ -60,11 +60,11 @@ MainWindow::MainWindow(QWidget *parent) :
     aboutDialog(this),
     portControl(&serialPort),
     channelMan(1, 1, this),
-    updateChecker(this),
     snapshotMan(this, &channelMan),
     commandPanel(&serialPort),
     dataFormatPanel(&serialPort, &channelMan, &recorder),
-    recordPanel(&recorder, &channelMan)
+    recordPanel(&recorder, &channelMan),
+    updateCheckDialog(this)
 {
     ui->setupUi(this);
 
@@ -112,6 +112,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // Help menu signals
     QObject::connect(ui->actionHelpAbout, &QAction::triggered,
               &aboutDialog, &QWidget::show);
+
+    QObject::connect(ui->actionCheckUpdate, &QAction::triggered,
+              &updateCheckDialog, &QWidget::show);
 
     QObject::connect(ui->actionReportBug, &QAction::triggered,
                      [](){QDesktopServices::openUrl(QUrl(BUG_REPORT_URL));});
@@ -238,9 +241,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(ui->actionDemoMode, &QAction::toggled,
                      plotMan, &PlotManager::showDemoIndicator);
-
-    // TEST UPDATE CHECKER
-    updateChecker.checkUpdate();
 
     // load default settings
     QSettings settings("serialplot", "serialplot");
