@@ -36,7 +36,7 @@ QString VersionNumber::toString() const
 bool VersionNumber::extract(const QString& str, VersionNumber& number)
 {
     QRegularExpression regexp("(?:[-_vV \\t]|^)(?<major>\\d+)"
-                              "(?:\\.(?<minor>\\d+))?(?:\\.(?<patch>\\d+))?[-_ \\t]?");
+                              "(?:\\.(?<minor>\\d+))(?:\\.(?<patch>\\d+))?[-_ \\t]?");
     auto match = regexp.match(str, 0, QRegularExpression::PartialPreferCompleteMatch);
 
     if (!(match.hasMatch() || match.hasPartialMatch())) return false;
