@@ -127,6 +127,7 @@ add_executable(${PROGRAM_NAME} WIN32
   src/plotmanager.cpp
   src/numberformat.cpp
   src/updatechecker.cpp
+  src/versionnumber.cpp
   misc/windows_icon.rc
   ${UI_FILES}
   ${RES_FILES}
@@ -170,6 +171,9 @@ set(VERSION_REVISION "0")
 include(GetVersion)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_STRING=\\\"${VERSION_STRING}\\\" ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_MAJOR=${VERSION_MAJOR} ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_MINOR=${VERSION_MINOR} ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_PATCH=${VERSION_PATCH} ")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_REVISION=\\\"${VERSION_REVISION}\\\" ")
 
 # add make run target
