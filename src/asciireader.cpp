@@ -165,8 +165,11 @@ void AsciiReader::onDataReady()
             }
         }
 
-        // commit data
-        addData(channelSamples, _numOfChannels);
+        if (numReadChannels > numDataBroken)
+        {
+            // commit data
+            addData(channelSamples, _numOfChannels);
+        }
 
         delete[] channelSamples;
     }
