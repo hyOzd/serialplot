@@ -21,6 +21,7 @@
 #define UPDATECHECKDIALOG_H
 
 #include <QDialog>
+#include <QSettings>
 #include "updatechecker.h"
 
 namespace Ui {
@@ -34,6 +35,11 @@ class UpdateCheckDialog : public QDialog
 public:
     explicit UpdateCheckDialog(QWidget *parent = 0);
     ~UpdateCheckDialog();
+
+    /// Stores update settings into a `QSettings`.
+    void saveSettings(QSettings* settings);
+    /// Loads update settings from a `QSettings`.
+    void loadSettings(QSettings* settings);
 
 private:
     Ui::UpdateCheckDialog *ui;

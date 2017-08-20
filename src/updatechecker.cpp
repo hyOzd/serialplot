@@ -47,6 +47,8 @@ bool UpdateChecker::isChecking() const
 
 void UpdateChecker::checkUpdate()
 {
+    if (isChecking()) return;
+
     auto req = QNetworkRequest(QUrl(BB_DOWNLOADS_URL));
     activeReply = nam.get(req);
 }

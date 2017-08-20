@@ -17,6 +17,7 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "setting_defines.h"
 #include "updatecheckdialog.h"
 #include "ui_updatecheckdialog.h"
 
@@ -42,9 +43,9 @@ UpdateCheckDialog::UpdateCheckDialog(QWidget *parent) :
                 }
                 else
                 {
+                    show();
                     text = QString("Found update to version %1. Click to <a href=\"%2\">download</a>.")\
                         .arg(newVersion).arg(downloadUrl);
-                    qDebug() << text;
                 }
 
                 ui->label->setText(text);
@@ -65,4 +66,23 @@ void UpdateCheckDialog::showEvent(QShowEvent *event)
 void UpdateCheckDialog::closeEvent(QShowEvent *event)
 {
     if (updateChecker.isChecking()) updateChecker.cancelCheck();
+}
+
+void UpdateCheckDialog::saveSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_UpdateCheck);
+    settings->setValue(SG_UpdateCheck_Periodic, ui->cbPeriodic->isChecked());
+    settings->endGroup();
+}
+
+void UpdateCheckDialog::loadSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_UpdateCheck);
+    ui->cbPeriodic->setChecked(settings->value(SG_UpdateCheck_Periodic).toBool());
+    settings->endGroup();
+
+    if (ui->cbPeriodic->isChecked())
+    {
+        updateChecker.checkUpdate();
+    }
 }

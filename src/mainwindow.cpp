@@ -550,6 +550,7 @@ void MainWindow::saveAllSettings(QSettings* settings)
     plotMan->saveSettings(settings);
     commandPanel.saveSettings(settings);
     recordPanel.saveSettings(settings);
+    updateCheckDialog.saveSettings(settings);
 }
 
 void MainWindow::loadAllSettings(QSettings* settings)
@@ -562,6 +563,7 @@ void MainWindow::loadAllSettings(QSettings* settings)
     plotMan->loadSettings(settings);
     commandPanel.loadSettings(settings);
     recordPanel.loadSettings(settings);
+    updateCheckDialog.loadSettings(settings);
 }
 
 void MainWindow::saveMWSettings(QSettings* settings)
