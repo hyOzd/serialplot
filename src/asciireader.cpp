@@ -33,6 +33,7 @@ AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan,
 
     _numOfChannels = _settingsWidget.numOfChannels();
     autoNumOfChannels = (_numOfChannels == NUMOFCHANNELS_AUTO);
+    delimiter = _settingsWidget.delimiter();
 
     connect(&_settingsWidget, &AsciiReaderSettings::numOfChannelsChanged,
             [this](unsigned value)
@@ -43,6 +44,12 @@ AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan,
                 {
                     emit numOfChannelsChanged(value);
                 }
+            });
+
+    connect(&_settingsWidget, &AsciiReaderSettings::delimiterChanged,
+            [this](QChar d)
+            {
+                delimiter = d;
             });
 
     connect(device, &QIODevice::aboutToClose, [this](){discardFirstLine=true;});
@@ -90,7 +97,7 @@ void AsciiReader::onDataReady()
 {
     while(_device->canReadLine())
     {
-        QByteArray line = _device->readLine();
+        QString line = QString(_device->readLine());
 
         // discard only once when we just started reading
         if (discardFirstLine)
@@ -116,7 +123,7 @@ void AsciiReader::onDataReady()
             continue;
         }
 
-        auto separatedValues = line.split(',');
+        auto separatedValues = line.split(delimiter, QString::SkipEmptyParts);
 
         unsigned numReadChannels; // effective number of channels to read
         unsigned numComingChannels = separatedValues.length();
@@ -143,6 +150,7 @@ void AsciiReader::onDataReady()
         }
 
         // parse read line
+        unsigned numDataBroken = 0;
         double* channelSamples = new double[_numOfChannels]();
         for (unsigned ci = 0; ci < numReadChannels; ci++)
         {
@@ -153,6 +161,7 @@ void AsciiReader::onDataReady()
                 qWarning() << "Data parsing error for channel: " << ci;
                 qWarning() << "Read line: " << line;
                 channelSamples[ci] = 0;
+                numDataBroken++;
             }
         }
 

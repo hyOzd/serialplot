@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -17,19 +17,34 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QRegularExpressionValidator>
+#include <QRegularExpression>
+
 #include "utils.h"
 #include "setting_defines.h"
 
 #include "asciireadersettings.h"
 #include "ui_asciireadersettings.h"
 
-#include <QtDebug>
-
 AsciiReaderSettings::AsciiReaderSettings(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::AsciiReaderSettings)
 {
     ui->setupUi(this);
+
+    auto validator = new QRegularExpressionValidator(QRegularExpression("[^\\d]?"), this);
+    ui->leDelimiter->setValidator(validator);
+
+    connect(ui->rbComma, &QAbstractButton::toggled,
+            this, &AsciiReaderSettings::delimiterToggled);
+    connect(ui->rbSpace, &QAbstractButton::toggled,
+            this, &AsciiReaderSettings::delimiterToggled);
+    connect(ui->rbTab, &QAbstractButton::toggled,
+            this, &AsciiReaderSettings::delimiterToggled);
+    connect(ui->rbOtherDelimiter, &QAbstractButton::toggled,
+            this, &AsciiReaderSettings::delimiterToggled);
+    connect(ui->leDelimiter, &QLineEdit::textChanged,
+            this, &AsciiReaderSettings::customDelimiterChanged);
 
     // Note: if directly connected we get a runtime warning on incompatible signal arguments
     connect(ui->spNumOfChannels, SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
@@ -44,9 +59,49 @@ AsciiReaderSettings::~AsciiReaderSettings()
     delete ui;
 }
 
-unsigned AsciiReaderSettings::numOfChannels()
+unsigned AsciiReaderSettings::numOfChannels() const
 {
     return ui->spNumOfChannels->value();
+}
+
+QChar AsciiReaderSettings::delimiter() const
+{
+    if (ui->rbComma->isChecked())
+    {
+        return QChar(',');
+    }
+    else if (ui->rbSpace->isChecked())
+    {
+        return QChar(' ');
+    }
+    else if (ui->rbTab->isChecked())
+    {
+        return QChar('\t');
+    }
+    else                        // rbOther
+    {
+        auto t = ui->leDelimiter->text();
+        return t.isEmpty() ? QChar() : t.at(0);
+    }
+}
+
+void AsciiReaderSettings::delimiterToggled(bool checked)
+{
+    if (!checked) return;
+
+    auto d = delimiter();
+    if (!d.isNull())
+    {
+        emit delimiterChanged(d);
+    }
+}
+
+void AsciiReaderSettings::customDelimiterChanged(const QString text)
+{
+    if (ui->rbOtherDelimiter->isChecked())
+    {
+        if (!text.isEmpty()) emit delimiterChanged(text.at(0));
+    }
 }
 
 void AsciiReaderSettings::saveSettings(QSettings* settings)
