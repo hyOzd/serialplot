@@ -21,6 +21,7 @@
 #define UPDATECHECKDIALOG_H
 
 #include <QDialog>
+#include <QDate>
 #include <QSettings>
 #include "updatechecker.h"
 
@@ -44,6 +45,7 @@ public:
 private:
     Ui::UpdateCheckDialog *ui;
     UpdateChecker updateChecker;
+    QDate lastCheck;
 
     void showEvent(QShowEvent *event);
     void closeEvent(QShowEvent *event);

@@ -27,9 +27,13 @@ UpdateCheckDialog::UpdateCheckDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // by default start from yesterday, so that we check at first run
+    lastCheck = QDate::currentDate().addDays(-1);
+
     connect(&updateChecker, &UpdateChecker::checkFailed,
             [this](QString errorMessage)
             {
+                lastCheck = QDate::currentDate();
                 ui->label->setText(QString("Update check failed.\n") + errorMessage);
             });
 
@@ -48,6 +52,7 @@ UpdateCheckDialog::UpdateCheckDialog(QWidget *parent) :
                         .arg(newVersion).arg(downloadUrl);
                 }
 
+                lastCheck = QDate::currentDate();
                 ui->label->setText(text);
             });
 }
@@ -72,16 +77,21 @@ void UpdateCheckDialog::saveSettings(QSettings* settings)
 {
     settings->beginGroup(SettingGroup_UpdateCheck);
     settings->setValue(SG_UpdateCheck_Periodic, ui->cbPeriodic->isChecked());
+    settings->setValue(SG_UpdateCheck_LastCheck, lastCheck.toString(Qt::ISODate));
     settings->endGroup();
 }
 
 void UpdateCheckDialog::loadSettings(QSettings* settings)
 {
     settings->beginGroup(SettingGroup_UpdateCheck);
-    ui->cbPeriodic->setChecked(settings->value(SG_UpdateCheck_Periodic).toBool());
+    ui->cbPeriodic->setChecked(settings->value(SG_UpdateCheck_Periodic,
+                                               ui->cbPeriodic->isChecked()).toBool());
+    auto lastCheckS = settings->value(SG_UpdateCheck_LastCheck, lastCheck.toString(Qt::ISODate)).toString();
+    lastCheck = QDate::fromString(lastCheckS, Qt::ISODate);
     settings->endGroup();
 
-    if (ui->cbPeriodic->isChecked())
+    // start the periodic update if required
+    if (ui->cbPeriodic->isChecked() && lastCheck < QDate::currentDate())
     {
         updateChecker.checkUpdate();
     }

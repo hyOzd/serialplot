@@ -26,6 +26,9 @@
    </item>
    <item>
     <widget class="QCheckBox" name="cbPeriodic">
+     <property name="toolTip">
+      <string>Updates will be checked only once a day at first start of the application</string>
+     </property>
      <property name="text">
       <string>Check updates periodically</string>
      </property>
