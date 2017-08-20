@@ -63,7 +63,8 @@ MainWindow::MainWindow(QWidget *parent) :
     snapshotMan(this, &channelMan),
     commandPanel(&serialPort),
     dataFormatPanel(&serialPort, &channelMan, &recorder),
-    recordPanel(&recorder, &channelMan)
+    recordPanel(&recorder, &channelMan),
+    updateCheckDialog(this)
 {
     ui->setupUi(this);
 
@@ -111,6 +112,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // Help menu signals
     QObject::connect(ui->actionHelpAbout, &QAction::triggered,
               &aboutDialog, &QWidget::show);
+
+    QObject::connect(ui->actionCheckUpdate, &QAction::triggered,
+              &updateCheckDialog, &QWidget::show);
 
     QObject::connect(ui->actionReportBug, &QAction::triggered,
                      [](){QDesktopServices::openUrl(QUrl(BUG_REPORT_URL));});
@@ -546,6 +550,7 @@ void MainWindow::saveAllSettings(QSettings* settings)
     plotMan->saveSettings(settings);
     commandPanel.saveSettings(settings);
     recordPanel.saveSettings(settings);
+    updateCheckDialog.saveSettings(settings);
 }
 
 void MainWindow::loadAllSettings(QSettings* settings)
@@ -558,6 +563,7 @@ void MainWindow::loadAllSettings(QSettings* settings)
     plotMan->loadSettings(settings);
     commandPanel.loadSettings(settings);
     recordPanel.loadSettings(settings);
+    updateCheckDialog.loadSettings(settings);
 }
 
 void MainWindow::saveMWSettings(QSettings* settings)

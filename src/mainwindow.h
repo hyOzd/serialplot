@@ -45,6 +45,7 @@
 #include "snapshotmanager.h"
 #include "plotmanager.h"
 #include "datarecorder.h"
+#include "updatecheckdialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -85,6 +86,7 @@ private:
     DataFormatPanel dataFormatPanel;
     RecordPanel recordPanel;
     PlotControlPanel plotControlPanel;
+    UpdateCheckDialog updateCheckDialog;
 
     bool isDemoRunning();
     /// Stores settings for all modules
