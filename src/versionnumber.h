@@ -41,4 +41,6 @@ bool operator==(const VersionNumber& lhs, const VersionNumber& rhs);
 bool operator<(const VersionNumber& lhs, const VersionNumber& rhs);
 bool operator>(const VersionNumber& lhs, const VersionNumber& rhs);
 
+const VersionNumber CurrentVersion(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+
 #endif // VERSIONNUMBER_H
