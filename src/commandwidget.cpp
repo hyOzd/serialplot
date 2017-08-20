@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -103,7 +103,14 @@ bool CommandWidget::isASCIIMode()
 
 void CommandWidget::setASCIIMode(bool enabled)
 {
-    ui->pbASCII->setChecked(enabled);
+    if (enabled)
+    {
+        ui->pbASCII->setChecked(true);
+    }
+    else
+    {
+        ui->pbHEX->setChecked(true);
+    }
 }
 
 void CommandWidget::setName(QString name)
