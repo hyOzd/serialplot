@@ -283,8 +283,7 @@ void MainWindow::closeEvent(QCloseEvent * event)
         auto clickedButton = QMessageBox::warning(
             this, "Closing SerialPlot",
             "There are un-saved snapshots. If you close you will loose the data.",
-            QMessageBox::Discard | QMessageBox::Discard,
-            QMessageBox::Cancel);
+            QMessageBox::Discard, QMessageBox::Cancel);
         if (clickedButton == QMessageBox::Cancel)
         {
             event->ignore();
