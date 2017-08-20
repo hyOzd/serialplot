@@ -48,8 +48,15 @@ UpdateCheckDialog::UpdateCheckDialog(QWidget *parent) :
                 else
                 {
                     show();
+#ifdef UPDATE_TYPE_PKGMAN
+                    text = QString("There is a new version: %1. "
+                                   "Use your package manager to update"
+                                   " or click to <a href=\"%2\">download</a>.")\
+                        .arg(newVersion).arg(downloadUrl);
+#else
                     text = QString("Found update to version %1. Click to <a href=\"%2\">download</a>.")\
                         .arg(newVersion).arg(downloadUrl);
+#endif
                 }
 
                 lastCheck = QDate::currentDate();
