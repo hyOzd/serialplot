@@ -36,7 +36,7 @@ class Snapshot : public QObject
     Q_OBJECT
 
 public:
-    Snapshot(MainWindow* parent, QString name, ChannelInfoModel infoModel);
+    Snapshot(MainWindow* parent, QString name, ChannelInfoModel infoModel, bool saved = false);
     ~Snapshot();
 
     QVector<QVector<QPointF>> data;

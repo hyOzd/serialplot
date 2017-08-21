@@ -194,7 +194,8 @@ void SnapshotManager::loadSnapshotFromFile(QString fileName)
     ChannelInfoModel channelInfo(channelNames);
 
     auto snapshot = new Snapshot(
-        _mainWindow, QFileInfo(fileName).baseName(), ChannelInfoModel(channelNames));
+        _mainWindow, QFileInfo(fileName).baseName(),
+        ChannelInfoModel(channelNames), true);
     snapshot->data = data;
 
     addSnapshot(snapshot, false);

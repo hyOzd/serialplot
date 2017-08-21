@@ -25,14 +25,14 @@
 #include "snapshot.h"
 #include "snapshotview.h"
 
-Snapshot::Snapshot(MainWindow* parent, QString name, ChannelInfoModel infoModel) :
+Snapshot::Snapshot(MainWindow* parent, QString name, ChannelInfoModel infoModel, bool saved) :
     QObject(parent),
     cInfoModel(infoModel),
     _showAction(this),
     _deleteAction("&Delete", this)
 {
     _name = name;
-    _saved = false;
+    _saved = saved;
 
     view = NULL;
     mainWindow = parent;
