@@ -113,6 +113,25 @@ void AsciiReaderSettings::saveSettings(QSettings* settings)
     if (numOfChannelsSetting == "0") numOfChannelsSetting = "auto";
     settings->setValue(SG_ASCII_NumOfChannels, numOfChannelsSetting);
 
+    // save delimiter
+    QString delimiterS;
+    if (ui->rbOtherDelimiter->isChecked())
+    {
+        delimiterS = "other";
+    }
+    else if (ui->rbTab->isChecked())
+    {
+        // Note: \t is not correctly loaded
+        delimiterS = "TAB";
+    }
+    else
+    {
+        delimiterS = delimiter();
+    }
+
+    settings->setValue(SG_ASCII_Delimiter, delimiterS);
+    settings->setValue(SG_ASCII_CustomDelimiter, ui->leDelimiter->text());
+
     settings->endGroup();
 }
 
@@ -136,6 +155,27 @@ void AsciiReaderSettings::loadSettings(QSettings* settings)
         {
             ui->spNumOfChannels->setValue(nc);
         }
+    }
+
+    // load delimiter
+    auto delimiterS = settings->value(SG_ASCII_Delimiter, delimiter()).toString();
+    auto customDelimiter = settings->value(SG_ASCII_CustomDelimiter, delimiter()).toString();
+    if (!customDelimiter.isEmpty()) ui->leDelimiter->setText(customDelimiter);
+    if (delimiterS == ",")
+    {
+        ui->rbComma->setChecked(true);
+    }
+    else if (delimiterS == " ")
+    {
+        ui->rbSpace->setChecked(true);
+    }
+    else if (delimiterS == "TAB")
+    {
+        ui->rbTab->setChecked(true);
+    }
+    else
+    {
+        ui->rbOtherDelimiter->setChecked(true);
     }
 
     settings->endGroup();

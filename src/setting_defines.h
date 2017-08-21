@@ -58,6 +58,8 @@ const char SG_Binary_Endianness[] = "endianness";
 
 // ascii reader keys
 const char SG_ASCII_NumOfChannels[] = "numOfChannels";
+const char SG_ASCII_Delimiter[] = "delimiter";
+const char SG_ASCII_CustomDelimiter[] = "customDelimiter";
 
 // framed reader keys
 const char SG_CustomFrame_NumOfChannels[] = "numOfChannels";
