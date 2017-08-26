@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -38,6 +38,8 @@ Plot::Plot(QWidget* parent) :
 {
     isAutoScaled = true;
     symbolSize = 0;
+    numOfSamples = 1;
+    showSymbols = Plot::ShowSymbolsAuto;
 
     QObject::connect(&zoomer, &Zoomer::unzoomed, this, &Plot::unzoomed);
 
@@ -71,6 +73,16 @@ Plot::Plot(QWidget* parent) :
     demoIndicator.setText(demoText);
     demoIndicator.hide();
     demoIndicator.attach(this);
+
+    // init no channels are visible indicator
+    QwtText noChannelText(" No Visible Channels ");
+    noChannelText.setColor(QColor("white"));
+    noChannelText.setBackgroundBrush(Qt::darkBlue);
+    noChannelText.setBorderRadius(4);
+    noChannelText.setRenderFlags(Qt::AlignHCenter | Qt::AlignVCenter);
+    noChannelIndicator.setText(noChannelText);
+    noChannelIndicator.hide();
+    noChannelIndicator.attach(this);
 }
 
 Plot::~Plot()
@@ -78,7 +90,7 @@ Plot::~Plot()
     if (snapshotOverlay != NULL) delete snapshotOverlay;
 }
 
-void Plot::setAxis(bool autoScaled, double yAxisMin, double yAxisMax)
+void Plot::setYAxis(bool autoScaled, double yAxisMin, double yAxisMax)
 {
     this->isAutoScaled = autoScaled;
 
@@ -92,8 +104,29 @@ void Plot::setAxis(bool autoScaled, double yAxisMin, double yAxisMax)
     resetAxes();
 }
 
+void Plot::setXAxis(double xMin, double xMax)
+{
+    _xMin = xMin;
+    _xMax = xMax;
+
+    zoomer.zoom(0); // unzoom
+
+    // set axis
+    setAxisScale(QwtPlot::xBottom, xMin, xMax);
+    replot(); // Note: if we don't replot here scale at startup isn't set correctly
+
+    // reset zoom base
+    auto base = zoomer.zoomBase();
+    base.setLeft(xMin);
+    base.setRight(xMax);
+    zoomer.setZoomBase(base);
+
+    onXScaleChanged();
+}
+
 void Plot::resetAxes()
 {
+    // reset y axis
     if (isAutoScaled)
     {
         setAxisAutoScale(QwtPlot::yLeft);
@@ -103,12 +136,13 @@ void Plot::resetAxes()
         setAxisScale(QwtPlot::yLeft, yMin, yMax);
     }
 
+    zoomer.setZoomBase();
+
     replot();
 }
 
 void Plot::unzoomed()
 {
-    setAxisAutoScale(QwtPlot::xBottom);
     resetAxes();
     onXScaleChanged();
 }
@@ -136,6 +170,12 @@ void Plot::showLegend(bool show)
 void Plot::showDemoIndicator(bool show)
 {
     demoIndicator.setVisible(show);
+    replot();
+}
+
+void Plot::showNoChannel(bool show)
+{
+    noChannelIndicator.setVisible(show);
     replot();
 }
 
@@ -224,12 +264,45 @@ void Plot::flashSnapshotOverlay(bool light)
             });
 }
 
+void Plot::setSymbols(ShowSymbols shown)
+{
+    showSymbols = shown;
+
+    if (showSymbols == Plot::ShowSymbolsAuto)
+    {
+        calcSymbolSize();
+    }
+    else if (showSymbols == Plot::ShowSymbolsShow)
+    {
+        symbolSize = SYMBOL_SIZE_MAX;
+    }
+    else
+    {
+        symbolSize = 0;
+    }
+
+    updateSymbols();
+    replot();
+}
+
 void Plot::onXScaleChanged()
+{
+    if (showSymbols == Plot::ShowSymbolsAuto)
+    {
+        calcSymbolSize();
+        updateSymbols();
+    }
+}
+
+void Plot::calcSymbolSize()
 {
     auto sw = axisWidget(QwtPlot::xBottom);
     auto paintDist = sw->scaleDraw()->scaleMap().pDist();
     auto scaleDist = sw->scaleDraw()->scaleMap().sDist();
-    int symDisPx = round(paintDist / scaleDist);
+    auto fullScaleDist = zoomer.zoomBase().width();
+    auto zoomRate = fullScaleDist / scaleDist;
+    float samplesInView = numOfSamples / zoomRate;
+    int symDisPx = round(paintDist / samplesInView);
 
     if (symDisPx < SYMBOL_SHOW_AT_WIDTH)
     {
@@ -239,8 +312,6 @@ void Plot::onXScaleChanged()
     {
         symbolSize = std::min(SYMBOL_SIZE_MAX, symDisPx-SYMBOL_SHOW_AT_WIDTH+1);
     }
-
-    updateSymbols();
 }
 
 void Plot::updateSymbols()
@@ -271,10 +342,8 @@ void Plot::resizeEvent(QResizeEvent * event)
     onXScaleChanged();
 }
 
-void Plot::onNumOfSamplesChanged(unsigned value)
+void Plot::setNumOfSamples(unsigned value)
 {
-    auto currentBase = zoomer.zoomBase();
-    currentBase.setWidth(value);
-    zoomer.setZoomBase(currentBase);
+    numOfSamples = value;
     onXScaleChanged();
 }

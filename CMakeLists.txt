@@ -17,7 +17,7 @@
 # along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.2.2)
 
 project(serialplot)
 
@@ -38,23 +38,19 @@ find_package(Qt5Widgets)
 
 # If set, cmake will download Qwt over SVN, build and use it as a static library.
 set(BUILD_QWT true CACHE BOOL "Download and build Qwt automatically.")
-# Find QWT or use static manually provided by user
-set(QWT_USE_STATIC false CACHE BOOL "Use a static version of Qwt provided by user.")
-set(QWT_STATIC_LIBRARY "" CACHE FILEPATH "Path to the static Qwt library, libqwt.a.")
-set(QWT_STATIC_INCLUDE "" CACHE PATH "Path to the Qwt include directory when building Qwt static.")
-
 if (BUILD_QWT)
   include(BuildQwt)
 else (BUILD_QWT)
-  if (QWT_USE_STATIC)
-	set(QWT_LIBRARY ${QWT_STATIC_LIBRARY})
-	set(QWT_INCLUDE_DIR ${QWT_STATIC_INCLUDE})
-  else (QWT_USE_STATIC)
-	find_package(Qwt 6.1 REQUIRED)
-  endif (QWT_USE_STATIC)
+    find_package(Qwt 6.1 REQUIRED)
 endif (BUILD_QWT)
 
-include(BuildQColorWidgets)
+# If set, cmake will download QtColorWidgets over git, build and use it as a static library.
+set(BUILD_QTCOLORWIDGETS true CACHE BOOL "Download and build QtColorWidgets library automatically.")
+if (BUILD_QTCOLORWIDGETS)
+  include(BuildQColorWidgets)
+else ()
+  find_package(QtColorWidgets REQUIRED)
+endif ()
 
 set(BUILD_LEDWIDGET true CACHE BOOL "Download and build LedWidget automatically.")
 if (BUILD_LEDWIDGET)
@@ -64,10 +60,14 @@ else (BUILD_LEDWIDGET)
 endif (BUILD_LEDWIDGET)
 
 # includes
-include_directories("./src" ${QWT_INCLUDE_DIR} ${QCW_INCLUDE_DIR} ${LEDWIDGET_INCLUDE_DIR})
+include_directories("./src"
+  ${QWT_INCLUDE_DIR}
+  ${QTCOLORWIDGETS_INCLUDE_DIRS}
+  ${LEDWIDGET_INCLUDE_DIR}
+  )
 
 # flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${QCW_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${QTCOLORWIDGETS_FLAGS}")
 
 # wrap UI and resource files
 qt5_wrap_ui(UI_FILES
@@ -85,6 +85,7 @@ qt5_wrap_ui(UI_FILES
   src/binarystreamreadersettings.ui
   src/asciireadersettings.ui
   src/framedreadersettings.ui
+  src/updatecheckdialog.ui
   )
 
 if (WIN32)
@@ -134,23 +135,34 @@ add_executable(${PROGRAM_NAME} WIN32
   src/framedreadersettings.cpp
   src/plotmanager.cpp
   src/numberformat.cpp
+  src/updatechecker.cpp
+  src/versionnumber.cpp
+  src/updatecheckdialog.cpp
   misc/windows_icon.rc
   ${UI_FILES}
   ${RES_FILES}
   )
 
 # Use the Widgets module from Qt 5.
-target_link_libraries(${PROGRAM_NAME} ${QWT_LIBRARY} ${QCW_LIBRARY} ${LEDWIDGET_LIBRARY})
-qt5_use_modules(${PROGRAM_NAME} Widgets SerialPort)
+target_link_libraries(${PROGRAM_NAME}
+  ${QWT_LIBRARY}
+  ${QTCOLORWIDGETS_LIBRARIES}
+  ${LEDWIDGET_LIBRARY}
+  )
+qt5_use_modules(${PROGRAM_NAME} Widgets SerialPort Network)
 
-# external project dependencies
 if (BUILD_QWT)
   add_dependencies(${PROGRAM_NAME} QWT)
-endif (BUILD_QWT)
+endif ()
+
+if (BUILD_QTCOLORWIDGETS)
+  add_dependencies(${PROGRAM_NAME} QCW)
+endif ()
 
 if (BUILD_LEDWIDGET)
   add_dependencies(${PROGRAM_NAME} LEDW)
 endif (BUILD_LEDWIDGET)
+
 
 # set compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
@@ -167,34 +179,18 @@ else()
   message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
-# version number
-set(MAJOR_VERSION 0 CACHE INT "Program major version number.")
-set(MINOR_VERSION 8 CACHE INT "Program minor version number.")
-set(PATCH_VERSION 1 CACHE INT "Program patch version number.")
-set(VERSION_STRING "${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}")
+# default version
+set(VERSION_STRING "0.9.1")
+set(VERSION_REVISION "0")
 
-# get revision number from mercurial
-find_program(MERCURIAL hg)
+# get revision number from mercurial and parse version string
+include(GetVersion)
 
-if (MERCURIAL)
-  execute_process(COMMAND ${MERCURIAL} id -i
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    RESULT_VARIABLE MERCURIAL_RESULT
-    OUTPUT_VARIABLE VERSION_REVISION
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
-  if(NOT MERCURIAL_RESULT EQUAL 0)
-    set(VERSION_SCM_REVISION false)
-  endif(NOT MERCURIAL_RESULT EQUAL 0)
-endif (MERCURIAL)
-
-if (NOT VERSION_REVISION)
-  set(VERSION_REVISION "0")
-endif (NOT VERSION_REVISION)
-
-message("SCM revision: ${VERSION_REVISION}")
-
-# configure version file
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/version.h.in" "${CMAKE_CURRENT_BINARY_DIR}/version.h")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_STRING=\\\"${VERSION_STRING}\\\" ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_MAJOR=${VERSION_MAJOR} ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_MINOR=${VERSION_MINOR} ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_PATCH=${VERSION_PATCH} ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_REVISION=\\\"${VERSION_REVISION}\\\" ")
 
 # add make run target
 add_custom_target(run
@@ -213,20 +209,19 @@ if (WIN32)
   install(FILES ${WINDOWS_INSTALL_LIBRARIES} DESTINATION bin)
 endif (WIN32)
 
-# install menu item and icon
+# prepare menu item and icon
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/misc/program_name.desktop.in"
   "${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.desktop")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/misc/program_name.png"
   "${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.png" COPYONLY)
 
+set(DESKTOP_FILE ${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.desktop)
+set(ICON_FILE ${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.png)
+
+# install menu item and icon
 if (UNIX)
-  # first copy files to share/serialplot/
-  install(FILES
-    ${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.desktop
-    DESTINATION share/applications/)
-  install(FILES
-    ${CMAKE_BINARY_DIR}/${PROGRAM_NAME}.png
-	DESTINATION share/icons/hicolor/256x256/apps/)
+  install(FILES ${DESKTOP_FILE} DESTINATION share/applications/)
+  install(FILES ${ICON_FILE} DESTINATION share/icons/hicolor/256x256/apps/)
 endif (UNIX)
 
 # uninstalling
@@ -241,6 +236,8 @@ if (UNIX)
 endif (UNIX)
 
 # packaging
+include(BuildLinuxAppImage)
+
 if (UNIX)
   set(CPACK_GENERATOR "DEB")
 elseif (WIN32)
@@ -252,9 +249,9 @@ include(InstallRequiredSystemLibraries)
 set(CPACK_PACKAGE_NAME "${PROGRAM_NAME}")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Small and simple software for plotting data from serial port")
 set(CPACK_PACKAGE_CONTACT "Hasan Yavuz Özderya <hy@ozderya.net>")
-set(CPACK_PACKAGE_VERSION_MAJOR ${MAJOR_VERSION})
-set(CPACK_PACKAGE_VERSION_MINOR ${MINOR_VERSION})
-set(CPACK_PACKAGE_VERSION_PATCH ${PATCH_VERSION})
+set(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH})
 set(CPACK_STRIP_FILES TRUE)
 set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5widgets5 (>= 5.2.1), libqt5svg5 (>= 5.2.1), libqt5serialport5 (>= 5.2.1), libc6 (>= 2.19)")
 set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Small and simple software for plotting data from serial port

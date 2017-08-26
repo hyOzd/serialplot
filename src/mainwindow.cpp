@@ -63,7 +63,8 @@ MainWindow::MainWindow(QWidget *parent) :
     snapshotMan(this, &channelMan),
     commandPanel(&serialPort),
     dataFormatPanel(&serialPort, &channelMan, &recorder),
-    recordPanel(&recorder, &channelMan)
+    recordPanel(&recorder, &channelMan),
+    updateCheckDialog(this)
 {
     ui->setupUi(this);
 
@@ -86,6 +87,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&commandPanel, &CommandPanel::focusRequested, [this]()
             {
                 this->ui->tabWidget->setCurrentWidget(&commandPanel);
+                this->ui->tabWidget->showTabs();
             });
 
     tbPortControl->setObjectName("tbPortControl");
@@ -111,6 +113,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionHelpAbout, &QAction::triggered,
               &aboutDialog, &QWidget::show);
 
+    QObject::connect(ui->actionCheckUpdate, &QAction::triggered,
+              &updateCheckDialog, &QWidget::show);
+
     QObject::connect(ui->actionReportBug, &QAction::triggered,
                      [](){QDesktopServices::openUrl(QUrl(BUG_REPORT_URL));});
 
@@ -133,14 +138,18 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&portControl, &PortControl::portToggled,
                      this, &MainWindow::onPortToggled);
 
+    // plot control signals
     connect(&plotControlPanel, &PlotControlPanel::numOfSamplesChanged,
             this, &MainWindow::onNumOfSamplesChanged);
 
     connect(&plotControlPanel, &PlotControlPanel::numOfSamplesChanged,
-            plotMan, &PlotManager::onNumOfSamplesChanged);
+            plotMan, &PlotManager::setNumOfSamples);
 
-    connect(&plotControlPanel, &PlotControlPanel::scaleChanged,
-            plotMan, &PlotManager::setAxis);
+    connect(&plotControlPanel, &PlotControlPanel::yScaleChanged,
+            plotMan, &PlotManager::setYAxis);
+
+    connect(&plotControlPanel, &PlotControlPanel::xScaleChanged,
+            plotMan, &PlotManager::setXAxis);
 
     QObject::connect(ui->actionClear, SIGNAL(triggered(bool)),
                      this, SLOT(clearPlot()));
@@ -211,9 +220,12 @@ MainWindow::MainWindow(QWidget *parent) :
         plotMan->addCurve(channelMan.channelName(i), channelMan.channelBuffer(i));
     }
 
-    // init auto scale
-    plotMan->setAxis(plotControlPanel.autoScale(),
-                     plotControlPanel.yMin(), plotControlPanel.yMax());
+    // init scales
+    plotMan->setYAxis(plotControlPanel.autoScale(),
+                      plotControlPanel.yMin(), plotControlPanel.yMax());
+    plotMan->setXAxis(plotControlPanel.xAxisAsIndex(),
+                      plotControlPanel.xMin(), plotControlPanel.xMax());
+    plotMan->setNumOfSamples(numOfSamples);
 
     // Init sps (sample per second) counter
     spsLabel.setText("0sps");
@@ -246,15 +258,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(commandPanel.newCommandAction(), &QAction::triggered, [this]()
             {
                 this->ui->tabWidget->setCurrentWidget(&commandPanel);
+                this->ui->tabWidget->showTabs();
             });
 }
 
 MainWindow::~MainWindow()
 {
-    // save settings
-    QSettings settings("serialplot", "serialplot");
-    saveAllSettings(&settings);
-
     if (serialPort.isOpen())
     {
         serialPort.close();
@@ -268,19 +277,54 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent * event)
 {
+    // save snapshots
     if (!snapshotMan.isAllSaved())
     {
         auto clickedButton = QMessageBox::warning(
             this, "Closing SerialPlot",
             "There are un-saved snapshots. If you close you will loose the data.",
-            QMessageBox::Discard | QMessageBox::Discard,
-            QMessageBox::Cancel);
+            QMessageBox::Discard, QMessageBox::Cancel);
         if (clickedButton == QMessageBox::Cancel)
         {
             event->ignore();
             return;
         }
     }
+
+    // save settings
+    QSettings settings("serialplot", "serialplot");
+    saveAllSettings(&settings);
+    settings.sync();
+
+    if (settings.status() != QSettings::NoError)
+    {
+        QString errorText;
+
+        if (settings.status() == QSettings::AccessError)
+        {
+            QString file = settings.fileName();
+            errorText = QString("Serialplot cannot save settings due to access error. \
+This happens if you have run serialplot as root (with sudo for ex.) previously. \
+Try fixing the permissions of file: %1, or just delete it.").arg(file);
+        }
+        else
+        {
+            errorText = QString("Serialplot cannot save settings due to unknown error: %1").\
+                arg(settings.status());
+        }
+
+        auto button = QMessageBox::critical(
+            NULL,
+            "Failed to save settings!", errorText,
+            QMessageBox::Cancel | QMessageBox::Ok);
+
+        if (button == QMessageBox::Cancel)
+        {
+            event->ignore();
+            return;
+        }
+    }
+
     QMainWindow::closeEvent(event);
 }
 
@@ -449,6 +493,11 @@ void MainWindow::onExportCsv()
     }
 }
 
+PlotViewSettings MainWindow::viewSettings() const
+{
+    return plotMan->viewSettings();
+}
+
 void MainWindow::messageHandler(QtMsgType type,
                                 const QMessageLogContext &context,
                                 const QString &msg)
@@ -500,6 +549,7 @@ void MainWindow::saveAllSettings(QSettings* settings)
     plotMan->saveSettings(settings);
     commandPanel.saveSettings(settings);
     recordPanel.saveSettings(settings);
+    updateCheckDialog.saveSettings(settings);
 }
 
 void MainWindow::loadAllSettings(QSettings* settings)
@@ -512,6 +562,7 @@ void MainWindow::loadAllSettings(QSettings* settings)
     plotMan->loadSettings(settings);
     commandPanel.loadSettings(settings);
     recordPanel.loadSettings(settings);
+    updateCheckDialog.loadSettings(settings);
 }
 
 void MainWindow::saveMWSettings(QSettings* settings)

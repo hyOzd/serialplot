@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -28,12 +28,14 @@
 #include "channelmanager.h"
 #include "snapshot.h"
 
+class MainWindow;
+
 class SnapshotManager : public QObject
 {
     Q_OBJECT
 
 public:
-    SnapshotManager(QMainWindow* mainWindow, ChannelManager* channelMan);
+    SnapshotManager(MainWindow* mainWindow, ChannelManager* channelMan);
     ~SnapshotManager();
 
     QMenu* menu();
@@ -46,7 +48,7 @@ public:
     bool isAllSaved(); ///< returns `true` if all snapshots are saved to a file
 
 private:
-    QMainWindow* _mainWindow;
+    MainWindow* _mainWindow;
     ChannelManager* _channelMan;
 
     QList<Snapshot*> snapshots;

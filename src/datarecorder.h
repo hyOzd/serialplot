@@ -34,6 +34,14 @@ public:
     bool disableBuffering;
 
     /**
+     * Use CR+LF as line ending. `false` by default.
+     *
+     * @note Toggling this variable during a recording will result in
+     * a corrupted file. Care must be taken at higher (UI) levels.
+     */
+    bool windowsLE;
+
+    /**
      * @brief Starts recording data to a file in CSV format.
      *
      * File is opened and header line (names of channels) is written.
@@ -72,6 +80,9 @@ private:
     QFile file;
     QTextStream fileStream;
     QString _sep;
+
+    /// Returns the selected line ending.
+    const char* le() const;
 };
 
 #endif // DATARECORDER_H

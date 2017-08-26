@@ -90,7 +90,7 @@
      <x>0</x>
      <y>0</y>
      <width>653</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp">
@@ -99,6 +99,7 @@
     </property>
     <addaction name="actionDemoMode"/>
     <addaction name="actionReportBug"/>
+    <addaction name="actionCheckUpdate"/>
     <addaction name="actionHelpAbout"/>
    </widget>
    <widget class="QMenu" name="menuFile">
@@ -141,6 +142,11 @@
    <property name="checked">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset theme="player_pause">
+     <normaloff/>
+    </iconset>
+   </property>
    <property name="text">
     <string>Pause</string>
    </property>
@@ -152,6 +158,11 @@
    </property>
   </action>
   <action name="actionClear">
+   <property name="icon">
+    <iconset theme="editclear">
+     <normaloff/>
+    </iconset>
+   </property>
    <property name="text">
     <string>Clear</string>
    </property>
@@ -213,6 +224,11 @@
    </property>
    <property name="toolTip">
     <string>Load Settings from a File</string>
+   </property>
+  </action>
+  <action name="actionCheckUpdate">
+   <property name="text">
+    <string>&amp;Check Update</string>
    </property>
   </action>
  </widget>

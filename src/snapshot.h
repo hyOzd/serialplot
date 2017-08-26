@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -21,7 +21,6 @@
 #define SNAPSHOT_H
 
 #include <QObject>
-#include <QMainWindow>
 #include <QAction>
 #include <QVector>
 #include <QString>
@@ -30,13 +29,14 @@
 #include "channelinfomodel.h"
 
 class SnapshotView;
+class MainWindow;
 
 class Snapshot : public QObject
 {
     Q_OBJECT
 
 public:
-    Snapshot(QMainWindow* parent, QString name, ChannelInfoModel infoModel);
+    Snapshot(MainWindow* parent, QString name, ChannelInfoModel infoModel, bool saved = false);
     ~Snapshot();
 
     QVector<QVector<QPointF>> data;
@@ -61,7 +61,7 @@ private:
     ChannelInfoModel cInfoModel;
     QAction _showAction;
     QAction _deleteAction;
-    QMainWindow* mainWindow;
+    MainWindow* mainWindow;
     SnapshotView* view;
     bool _saved;
 

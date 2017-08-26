@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -20,7 +20,7 @@
 #include "snapshotview.h"
 #include "ui_snapshotview.h"
 
-SnapshotView::SnapshotView(QWidget *parent, Snapshot* snapshot) :
+SnapshotView::SnapshotView(MainWindow* parent, Snapshot* snapshot) :
     QMainWindow(parent),
     ui(new Ui::SnapshotView),
     renameDialog(this)
@@ -29,17 +29,20 @@ SnapshotView::SnapshotView(QWidget *parent, Snapshot* snapshot) :
 
     ui->setupUi(this);
 
-    plotMan = new PlotManager(ui->plotArea, snapshot->infoModel());
+    plotMan = new PlotManager(ui->plotArea, snapshot->infoModel(), this);
+    plotMan->setViewSettings(parent->viewSettings());
 
     ui->menuSnapshot->insertAction(ui->actionClose, snapshot->deleteAction());
     this->setWindowTitle(snapshot->displayName());
 
     // initialize curves
     unsigned numOfChannels = snapshot->data.size();
+    unsigned numOfSamples = snapshot->data[0].size();
     for (unsigned ci = 0; ci < numOfChannels; ci++)
     {
         plotMan->addCurve(snapshot->channelName(ci), snapshot->data[ci]);
     }
+    plotMan->setNumOfSamples(numOfSamples);
 
     renameDialog.setWindowTitle("Rename Snapshot");
     renameDialog.setLabelText("Enter new name:");
@@ -62,6 +65,7 @@ SnapshotView::~SnapshotView()
     {
         delete curve;
     }
+    delete plotMan;
     delete ui;
 }
 

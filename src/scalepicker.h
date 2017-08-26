@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -25,6 +25,7 @@
 #include <QPen>
 #include <QWidget>
 #include <QList>
+#include <QMap>
 #include <qwt_scale_widget.h>
 #include <qwt_widget_overlay.h>
 
@@ -41,8 +42,6 @@ public:
     void setPen(QPen pen);
 
 signals:
-    void pickStarted(double pos);
-    void picking(double firstPos, double lastPos);
     void picked(double firstPos, double lastPos);
 
 private:
@@ -58,10 +57,18 @@ private:
     double firstPosPx; // pixel coordinates
     double currentPosPx; // current position in pixel coordinates
     QList<int> snapPoints;
+    /// used to restore precision of snappoints that is lost due to rounding
+    QMap<int, double> snapPointMap;
 
-    double position(double); // returns the axis mouse position relative to plot coordinates
+    double position(double) const; // returns the axis mouse position relative to plot coordinates
     int positionPx(QMouseEvent*); // returns the axis mouse position in pixels
-    double posCanvasPx(double pos); // returns the given position in canvas coordinates
+    double posCanvasPx(double pos) const; // returns the given position in canvas coordinates
+    void drawTriangle(QPainter* painter, int position);
+    QwtText trackerText() const;
+     /// Returns tracker text position
+    QRectF trackerTextRect(QPainter* painter, int posPx, QSizeF textSize) const;
+    /// Returns the text position for tracker text shown during picking
+    QRectF pickTrackerTextRect(QPainter* painter, QRect pickRect, QSizeF textSize) const;
 
 private slots:
     void updateSnapPoints();

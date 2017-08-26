@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -40,6 +40,13 @@ class Plot : public QwtPlot
     friend class PlotManager;
 
 public:
+    enum ShowSymbols
+    {
+        ShowSymbolsAuto,
+        ShowSymbolsShow,
+        ShowSymbolsHide
+    };
+
     Plot(QWidget* parent = 0);
     ~Plot();
 
@@ -50,9 +57,12 @@ public slots:
     void showMinorGrid(bool show = true);
     void showLegend(bool show = true);
     void showDemoIndicator(bool show = true);
+    void showNoChannel(bool show = true);
     void unzoom();
     void darkBackground(bool enabled = true);
-    void setAxis(bool autoScaled, double yMin = 0, double yMax = 1);
+    void setYAxis(bool autoScaled, double yMin = 0, double yMax = 1);
+    void setXAxis(double xMin, double xMax);
+    void setSymbols(ShowSymbols shown);
 
     /**
      * Displays an animation for snapshot.
@@ -61,7 +71,7 @@ public slots:
      */
     void flashSnapshotOverlay(bool light);
 
-    void onNumOfSamplesChanged(unsigned value);
+    void setNumOfSamples(unsigned value);
 
 protected:
     /// update the display of symbols depending on `symbolSize`
@@ -70,6 +80,8 @@ protected:
 private:
     bool isAutoScaled;
     double yMin, yMax;
+    double _xMin, _xMax;
+    unsigned numOfSamples;
     int symbolSize;
     Zoomer zoomer;
     ScaleZoomer sZoomer;
@@ -77,9 +89,12 @@ private:
     PlotSnapshotOverlay* snapshotOverlay;
     QwtPlotLegendItem legend;
     QwtPlotTextLabel demoIndicator;
+    QwtPlotTextLabel noChannelIndicator;
+    ShowSymbols showSymbols;
 
     void resetAxes();
     void resizeEvent(QResizeEvent * event);
+    void calcSymbolSize();
 
 private slots:
     void unzoomed();

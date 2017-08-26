@@ -17,43 +17,38 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ASCIIREADERSETTINGS_H
-#define ASCIIREADERSETTINGS_H
+#ifndef UPDATECHECKDIALOG_H
+#define UPDATECHECKDIALOG_H
 
-#include <QWidget>
+#include <QDialog>
+#include <QDate>
 #include <QSettings>
-#include <QChar>
+#include "updatechecker.h"
 
 namespace Ui {
-class AsciiReaderSettings;
+class UpdateCheckDialog;
 }
 
-class AsciiReaderSettings : public QWidget
+class UpdateCheckDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit AsciiReaderSettings(QWidget *parent = 0);
-    ~AsciiReaderSettings();
+    explicit UpdateCheckDialog(QWidget *parent = 0);
+    ~UpdateCheckDialog();
 
-    unsigned numOfChannels() const;
-    QChar delimiter() const;
-    /// Stores settings into a `QSettings`
+    /// Stores update settings into a `QSettings`.
     void saveSettings(QSettings* settings);
-    /// Loads settings from a `QSettings`.
+    /// Loads update settings from a `QSettings`.
     void loadSettings(QSettings* settings);
 
-signals:
-    void numOfChannelsChanged(unsigned);
-    /// Signaled only with a valid delimiter
-    void delimiterChanged(QChar);
-
 private:
-    Ui::AsciiReaderSettings *ui;
+    Ui::UpdateCheckDialog *ui;
+    UpdateChecker updateChecker;
+    QDate lastCheck;
 
-private slots:
-    void delimiterToggled(bool checked);
-    void customDelimiterChanged(const QString text);
+    void showEvent(QShowEvent *event);
+    void closeEvent(QShowEvent *event);
 };
 
-#endif // ASCIIREADERSETTINGS_H
+#endif // UPDATECHECKDIALOG_H

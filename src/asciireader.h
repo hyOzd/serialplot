@@ -48,6 +48,7 @@ private:
     unsigned _numOfChannels;
     /// number of channels will be determined from incoming data
     unsigned autoNumOfChannels;
+    QChar delimiter; ///< selected column delimiter
     bool paused;
 
     // We may have (usually true) started reading in the middle of a

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -76,4 +76,9 @@ void HidableTabWidget::connectSignals()
     {
         connect(this, SIGNAL(tabBarDoubleClicked(int)), this, SLOT(onTabBarDoubleClicked()));
     }
+}
+
+void HidableTabWidget::showTabs()
+{
+    hideAction.setChecked(false);
 }

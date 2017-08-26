@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -21,9 +21,13 @@
 #include <qwt_plot.h>
 #include <QtDebug>
 
+#include <QMouseEvent>
+
 Zoomer::Zoomer(QWidget* widget, bool doReplot) :
     ScrollZoomer(widget)
 {
+    is_panning = false;
+
     // set corner widget between the scrollbars with default background color
     auto cornerWidget = new QWidget();
     auto bgColor = cornerWidget->palette().color(QPalette::Window).name();
@@ -51,4 +55,89 @@ void Zoomer::zoom( const QRectF & rect)
     }
 
     ScrollZoomer::zoom(rect);
+}
+
+QwtText Zoomer::trackerTextF(const QPointF& pos) const
+{
+    QwtText b = ScrollZoomer::trackerTextF(pos);
+
+    const QPolygon pa = selection();
+    if (pa.count() < 2)
+    {
+        return b;
+    }
+
+    const QRectF rect = invTransform(QRect(pa.first(), pa.last()).normalized());
+
+    QString sizeText = QString(" [%1, %2]").\
+        arg(rect.width(), 0, 'g', 4).\
+        arg(rect.height(), 0, 'g', 4);
+
+    b.setText(b.text() + sizeText);
+
+    return b;
+}
+
+void Zoomer::drawRubberBand(QPainter* painter) const
+{
+    const double FILL_ALPHA = 0.2;
+
+    QColor color = painter->pen().color();
+    color.setAlphaF(FILL_ALPHA);
+    painter->setBrush(color);
+
+    ScrollZoomer::drawRubberBand(painter);
+}
+
+QRegion Zoomer::rubberBandMask() const
+{
+    const QPolygon pa = selection();
+    if (pa.count() < 2)
+    {
+        return QRegion();
+    }
+    const QRect r = QRect(pa.first(), pa.last()).normalized().adjusted(0, 0, 1, 1);
+    return QRegion(r);
+}
+
+void Zoomer::widgetMousePressEvent(QMouseEvent* mouseEvent)
+{
+    if (mouseEvent->modifiers() & Qt::ControlModifier)
+    {
+        is_panning = true;
+        parentWidget()->setCursor(Qt::ClosedHandCursor);
+        pan_point = invTransform(mouseEvent->pos());
+    }
+    else
+    {
+        ScrollZoomer::widgetMousePressEvent(mouseEvent);
+    }
+}
+
+void Zoomer::widgetMouseMoveEvent(QMouseEvent* mouseEvent)
+{
+    if (is_panning)
+    {
+        auto cur_point = invTransform(mouseEvent->pos());
+        auto delta = cur_point - pan_point;
+        moveBy(-delta.x(), -delta.y());
+        pan_point = invTransform(mouseEvent->pos());
+    }
+    else
+    {
+        ScrollZoomer::widgetMouseMoveEvent(mouseEvent);
+    }
+}
+
+void Zoomer::widgetMouseReleaseEvent(QMouseEvent* mouseEvent)
+{
+    if (is_panning)
+    {
+        is_panning = false;
+        parentWidget()->setCursor(Qt::CrossCursor);
+    }
+    else
+    {
+        ScrollZoomer::widgetMouseReleaseEvent(mouseEvent);
+    }
 }

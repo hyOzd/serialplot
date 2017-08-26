@@ -45,6 +45,7 @@
 #include "snapshotmanager.h"
 #include "plotmanager.h"
 #include "datarecorder.h"
+#include "updatecheckdialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -57,6 +58,8 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+    PlotViewSettings viewSettings() const;
 
     void messageHandler(QtMsgType type, const QMessageLogContext &context,
                         const QString &msg);
@@ -83,6 +86,7 @@ private:
     DataFormatPanel dataFormatPanel;
     RecordPanel recordPanel;
     PlotControlPanel plotControlPanel;
+    UpdateCheckDialog updateCheckDialog;
 
     bool isDemoRunning();
     /// Stores settings for all modules

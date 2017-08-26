@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -23,6 +23,7 @@
 #include <qwt_scale_widget.h>
 #include <qwt_scale_map.h>
 #include <qwt_scale_div.h>
+#include <qwt_text.h>
 #include <math.h>
 
 #include "scalepicker.h"
@@ -107,7 +108,7 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
         {
             for (auto sp : snapPoints)
             {
-                if (fabs(posPx-sp) <= SNAP_DISTANCE)
+                if (std::abs(posPx-sp) <= SNAP_DISTANCE)
                 {
                     posPx = sp;
                     break;
@@ -132,13 +133,8 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
             if (!started && pressed && (fabs(posPx-firstPosPx) > MIN_PICK_SIZE))
             {
                 started = true;
-                emit pickStarted(pos);
             }
-            else if (started)
-            {
-                pickerOverlay->updateOverlay();
-                emit picking(firstPos, pos);
-            }
+            pickerOverlay->updateOverlay();
             scaleOverlay->updateOverlay();
         }
         else // event->type() == QEvent::MouseButtonRelease
@@ -148,14 +144,20 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
             {
                 // finalize
                 started = false;
-                emit picked(firstPos, pos);
+                if (firstPos != pos) // ignore 0 width zoom
+                {
+                    emit picked(firstPos, pos);
+                }
             }
+            pickerOverlay->updateOverlay();
+            scaleOverlay->updateOverlay();
         }
         return true;
     }
     else if (event->type() == QEvent::Leave)
     {
         scaleOverlay->updateOverlay();
+        pickerOverlay->updateOverlay();
         return true;
     }
     else
@@ -164,54 +166,222 @@ bool ScalePicker::eventFilter(QObject* object, QEvent* event)
     }
 }
 
+const int TEXT_MARGIN = 4;
+
 void ScalePicker::drawPlotOverlay(QPainter* painter)
 {
+    const double FILL_ALPHA = 0.2;
+
+    painter->save();
+    painter->setPen(_pen);
+
     if (started)
     {
-        painter->save();
-        painter->setPen(_pen);
+        QColor color = _pen.color();
+        color.setAlphaF(FILL_ALPHA);
+        painter->setBrush(color);
 
         QRect rect;
+        QwtText text = trackerText();
+        auto tSize = text.textSize(painter->font());
+
         if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale ||
             _scaleWidget->alignment() == QwtScaleDraw::TopScale)
         {
-            int height = painter->device()->height();
-            rect = QRect(posCanvasPx(firstPosPx), 0, currentPosPx-firstPosPx, height);
+            int canvasHeight = painter->device()->height();
+            int pickWidth = currentPosPx-firstPosPx;
+            rect = QRect(posCanvasPx(firstPosPx), 0, pickWidth, canvasHeight);
         }
         else // vertical
         {
-            int width = painter->device()->width();
-            rect = QRect(0, posCanvasPx(firstPosPx), width, currentPosPx-firstPosPx);
+            int canvasWidth = painter->device()->width();
+            int pickHeight = currentPosPx-firstPosPx;
+            rect = QRect(0, posCanvasPx(firstPosPx), canvasWidth, pickHeight);
         }
         painter->drawRect(rect);
-        painter->restore();
+        text.draw(painter, pickTrackerTextRect(painter, rect, tSize));
     }
+    else if (_scaleWidget->underMouse())
+    {
+        // draw tracker text centered on cursor
+        QwtText text = trackerText();
+        auto tsize = text.textSize(painter->font());
+        text.draw(painter, trackerTextRect(painter, currentPosPx, tsize));
+    }
+    painter->restore();
+}
+
+QwtText ScalePicker::trackerText() const
+{
+    double pos;
+    // use stored value if snapped to restore precision
+    if (snapPointMap.contains(currentPosPx))
+    {
+        pos = snapPointMap[currentPosPx];
+    }
+    else
+    {
+        pos = position(currentPosPx);
+    }
+
+    return QwtText(QString("%1").arg(pos));
+}
+
+QRectF ScalePicker::trackerTextRect(QPainter* painter, int posPx, QSizeF textSize) const
+{
+    int canvasPosPx = posCanvasPx(posPx);
+    QPointF topLeft;
+
+    if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale ||
+        _scaleWidget->alignment() == QwtScaleDraw::TopScale)
+    {
+        int left = canvasPosPx - textSize.width() / 2;
+        int canvasWidth = painter->device()->width();
+        left = std::max(TEXT_MARGIN, left);
+        left = std::min(double(left), canvasWidth - textSize.width() - TEXT_MARGIN);
+        int top = 0;
+        if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale)
+        {
+            top = painter->device()->height() - textSize.height();
+        }
+        topLeft = QPointF(left, top);
+    }
+    else                        // left/right scales
+    {
+        int top = canvasPosPx-textSize.height() / 2;
+        int canvasHeight = painter->device()->height();
+        top = std::max(0, top);
+        top = std::min(double(top), canvasHeight - textSize.height());
+        int left = TEXT_MARGIN;
+        if (_scaleWidget->alignment() == QwtScaleDraw::RightScale)
+        {
+            left = painter->device()->width() - textSize.width();
+        }
+        topLeft = QPointF(left, top);
+    }
+    return QRectF(topLeft, textSize);
+}
+
+QRectF ScalePicker::pickTrackerTextRect(QPainter* painter, QRect pickRect, QSizeF textSize) const
+{
+    qreal left = 0;
+    int pickLength = currentPosPx - firstPosPx;
+    QPointF topLeft;
+
+    if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale ||
+        _scaleWidget->alignment() == QwtScaleDraw::TopScale)
+    {
+        int canvasWidth = painter->device()->width();
+
+        if (pickLength > 0)
+        {
+            left = pickRect.right() + TEXT_MARGIN;
+        }
+        else
+        {
+            left = pickRect.right() - (textSize.width() + TEXT_MARGIN);
+        }
+
+        // make sure text is not off the canvas
+        if (left < TEXT_MARGIN)
+        {
+            left = std::max(0, pickRect.right()) + TEXT_MARGIN;
+        }
+        else if (left + textSize.width() + TEXT_MARGIN > canvasWidth)
+        {
+            left = std::min(pickRect.right(), canvasWidth) - (textSize.width() + TEXT_MARGIN);
+        }
+
+        if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale)
+        {
+            int canvasHeight = painter->device()->height();
+            topLeft = QPointF(left, canvasHeight - textSize.height());
+        }
+        else                // top scale
+        {
+            topLeft = QPointF(left, 0);
+        }
+    }
+    else                        // left/right scale
+    {
+        int canvasHeight = painter->device()->height();
+
+        int top = 0;
+        if (pickLength > 0)
+        {
+            top = pickRect.bottom();
+        }
+        else
+        {
+            top = pickRect.bottom() - textSize.height();
+        }
+
+        // make sure text is not off the canvas
+        if (top < 0)
+        {
+            top = std::max(0, pickRect.bottom());
+        }
+        else if (top + textSize.height() > canvasHeight)
+        {
+            top = std::min(canvasHeight, pickRect.bottom()) - textSize.height();
+        }
+
+        if (_scaleWidget->alignment() == QwtScaleDraw::LeftScale)
+        {
+            topLeft = QPointF(TEXT_MARGIN, top);
+        }
+        else                    // right scale
+        {
+            int canvasWidth = painter->device()->width();
+            topLeft = QPointF(canvasWidth - textSize.width() - TEXT_MARGIN, top);
+        }
+    }
+    return QRectF(topLeft, textSize);
 }
 
 void ScalePicker::drawScaleOverlay(QPainter* painter)
 {
     painter->save();
-    painter->setPen(_pen);
 
-    if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale ||
-        _scaleWidget->alignment() == QwtScaleDraw::TopScale)
-    {
-        int height = painter->device()->height();
-        if (started) painter->drawLine(firstPosPx, 0, firstPosPx, height);
-        if (started || _scaleWidget->underMouse())
-        {
-            painter->drawLine(currentPosPx, 0, currentPosPx, height);
-        }
-    }
-    else // vertical
+    // rotate & adjust coordinate system for vertical drawing
+    if (_scaleWidget->alignment() == QwtScaleDraw::LeftScale ||
+        _scaleWidget->alignment() == QwtScaleDraw::RightScale) // vertical
     {
         int width = painter->device()->width();
-        if (started) painter->drawLine(0, firstPosPx, width, firstPosPx);
-        if (started || _scaleWidget->underMouse())
-        {
-            painter->drawLine(0, currentPosPx, width, currentPosPx);
-        }
+        painter->rotate(90);
+        painter->translate(0, -width);
     }
+
+    // draw the indicators
+    if (started) drawTriangle(painter, firstPosPx);
+    if (started || _scaleWidget->underMouse())
+    {
+        drawTriangle(painter, currentPosPx);
+    }
+
+    painter->restore();
+}
+
+void ScalePicker::drawTriangle(QPainter* painter, int position)
+{
+    const double tan60 = 1.732;
+    const double trsize = 10;
+    const int TRIANGLE_NUM_POINTS = 3;
+    const int MARGIN = 2;
+    const QPointF points[TRIANGLE_NUM_POINTS] =
+        {
+            {0, 0},
+            {-trsize/tan60 , trsize},
+            {trsize/tan60 , trsize}
+        };
+
+    painter->save();
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(_scaleWidget->palette().windowText());
+    painter->setRenderHint(QPainter::Antialiasing);
+
+    painter->translate(position, MARGIN);
+    painter->drawPolygon(points, TRIANGLE_NUM_POINTS);
 
     painter->restore();
 }
@@ -222,7 +392,7 @@ void ScalePicker::setPen(QPen pen)
 }
 
 // convert the position of the click to the plot coordinates
-double ScalePicker::position(double posPx)
+double ScalePicker::position(double posPx) const
 {
     return _scaleWidget->scaleDraw()->scaleMap().invTransform(posPx);
 }
@@ -248,7 +418,7 @@ int ScalePicker::positionPx(QMouseEvent* mouseEvent)
  * when drawing the tracker lines. This function maps scale widgets
  * pixel coordinate to canvas' coordinate.
  */
-double ScalePicker::posCanvasPx(double pos)
+double ScalePicker::posCanvasPx(double pos) const
 {
     // assumption: scale.width < canvas.width && scale.x > canvas.x
     if (_scaleWidget->alignment() == QwtScaleDraw::BottomScale ||
@@ -270,9 +440,12 @@ void ScalePicker::updateSnapPoints()
         _scaleWidget->scaleDraw()->scaleDiv().ticks(QwtScaleDiv::MinorTick);
 
     snapPoints.clear();
+    snapPointMap.clear();
     for(auto t : allTicks)
     {
         // `round` is used because `allTicks` is double but `snapPoints` is int
-        snapPoints << round(_scaleWidget->scaleDraw()->scaleMap().transform(t));
+        int p = round(_scaleWidget->scaleDraw()->scaleMap().transform(t));
+        snapPoints << p;
+        snapPointMap[p] = t;
     }
 }

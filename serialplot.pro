@@ -68,7 +68,9 @@ SOURCES += \
     src/framedreader.cpp \
     src/plotmanager.cpp \
     src/numberformat.cpp \
-    src/recordpanel.cpp
+    src/recordpanel.cpp \
+    src/updatechecker.cpp \
+    src/updatecheckdialog.cpp
 
 HEADERS += \
     src/mainwindow.h \
@@ -108,7 +110,9 @@ HEADERS += \
     src/plotmanager.h \
     src/setting_defines.h \
     src/numberformat.h \
-    src/recordpanel.h
+    src/recordpanel.h \
+    src/updatechecker.h \
+    src/updatecheckdialog.h
 
 FORMS += \
     src/mainwindow.ui \
@@ -124,7 +128,8 @@ FORMS += \
     src/framedreadersettings.ui \
     src/binarystreamreadersettings.ui \
     src/asciireadersettings.ui \
-    src/recordpanel.ui
+    src/recordpanel.ui \
+    src/updatecheckdialog.ui
 
 INCLUDEPATH += qmake/ src/
 

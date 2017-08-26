@@ -20,7 +20,13 @@
 #ifndef VERSION_H
 #define VERSION_H
 
-#define VERSION_STRING   "@VERSION_STRING@"
-#define VERSION_REVISION "@VERSION_REVISION@"
+#ifndef VERSION_STRING
+#warning VERSION_STRING not defined!
+#define VERSION_STRING   "0.0.0"
+#endif
+
+#ifndef VERSION_REVISION
+#define VERSION_REVISION ""
+#endif
 
 #endif // VERSION_H

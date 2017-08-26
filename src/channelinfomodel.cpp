@@ -267,7 +267,7 @@ void ChannelInfoModel::setNumOfChannels(unsigned number)
     // remember user entered info
     if ((int) number > infos.length())
     {
-        for (unsigned ci = _numOfChannels; ci < number; ci++)
+        for (unsigned ci = infos.length(); ci < number; ci++)
         {
             infos.append(ChannelInfo(ci));
         }
