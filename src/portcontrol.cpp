@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -130,6 +130,40 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
                      SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
                      this, &PortControl::selectFlowControl);
 
+    // initialize signal leds
+    ui->ledDTR->setOn(true);
+    ui->ledRTS->setOn(true);
+
+    // connect output signals
+    connect(ui->pbDTR, &QPushButton::clicked, [this]()
+            {
+                // toggle DTR
+                ui->ledDTR->toggle();
+                if (serialPort->isOpen())
+                {
+                    serialPort->setDataTerminalReady(ui->ledDTR->isOn());
+                }
+            });
+
+    connect(ui->pbRTS, &QPushButton::clicked, [this]()
+            {
+                // toggle RTS
+                ui->ledRTS->toggle();
+                if (serialPort->isOpen())
+                {
+                    serialPort->setRequestToSend(ui->ledRTS->isOn());
+                }
+            });
+
+    // setup pin update leds
+    ui->ledDCD->setColor(Qt::yellow);
+    ui->ledDSR->setColor(Qt::yellow);
+    ui->ledRI->setColor(Qt::yellow);
+    ui->ledCTS->setColor(Qt::yellow);
+
+    pinUpdateTimer.setInterval(1000); // ms
+    connect(&pinUpdateTimer, &QTimer::timeout, this, &PortControl::updatePinLeds);
+
     loadPortList();
     loadBaudRateList();
     ui->cbBaudRate->setCurrentIndex(ui->cbBaudRate->findText("9600"));
@@ -221,6 +255,7 @@ void PortControl::togglePort()
 {
     if (serialPort->isOpen())
     {
+        pinUpdateTimer.stop();
         serialPort->close();
         qDebug() << "Closed port:" << serialPort->portName();
         emit portToggled(false);
@@ -257,6 +292,14 @@ void PortControl::togglePort()
             selectDataBits((QSerialPort::DataBits) dataBitsButtons.checkedId());
             selectStopBits((QSerialPort::StopBits) stopBitsButtons.checkedId());
             selectFlowControl((QSerialPort::FlowControl) flowControlButtons.checkedId());
+
+            // set output signals
+            serialPort->setDataTerminalReady(ui->ledDTR->isOn());
+            serialPort->setRequestToSend(ui->ledRTS->isOn());
+
+            // update pin signals
+            updatePinLeds();
+            pinUpdateTimer.start();
 
             qDebug() << "Opened port:" << serialPort->portName();
             emit portToggled(true);
@@ -317,6 +360,15 @@ void PortControl::onCbPortListActivated(int index)
 void PortControl::onTbPortListActivated(int index)
 {
     ui->cbPortList->setCurrentIndex(index);
+}
+
+void PortControl::updatePinLeds(void)
+{
+    auto pins = serialPort->pinoutSignals();
+    ui->ledDCD->setOn(pins & QSerialPort::DataCarrierDetectSignal);
+    ui->ledDSR->setOn(pins & QSerialPort::DataSetReadySignal);
+    ui->ledRI->setOn(pins & QSerialPort::RingIndicatorSignal);
+    ui->ledCTS->setOn(pins & QSerialPort::ClearToSendSignal);
 }
 
 QString PortControl::currentParityText()

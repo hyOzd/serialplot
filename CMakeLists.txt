@@ -52,10 +52,18 @@ else ()
   find_package(QtColorWidgets REQUIRED)
 endif ()
 
+set(BUILD_LEDWIDGET true CACHE BOOL "Download and build LedWidget automatically.")
+if (BUILD_LEDWIDGET)
+  include(BuildLedWidget)
+else (BUILD_LEDWIDGET)
+  include(FindLedWidget)
+endif (BUILD_LEDWIDGET)
+
 # includes
 include_directories("./src"
   ${QWT_INCLUDE_DIR}
   ${QTCOLORWIDGETS_INCLUDE_DIRS}
+  ${LEDWIDGET_INCLUDE_DIR}
   )
 
 # flags
@@ -139,6 +147,7 @@ add_executable(${PROGRAM_NAME} WIN32
 target_link_libraries(${PROGRAM_NAME}
   ${QWT_LIBRARY}
   ${QTCOLORWIDGETS_LIBRARIES}
+  ${LEDWIDGET_LIBRARY}
   )
 qt5_use_modules(${PROGRAM_NAME} Widgets SerialPort Network)
 
@@ -149,6 +158,11 @@ endif ()
 if (BUILD_QTCOLORWIDGETS)
   add_dependencies(${PROGRAM_NAME} QCW)
 endif ()
+
+if (BUILD_LEDWIDGET)
+  add_dependencies(${PROGRAM_NAME} LEDW)
+endif (BUILD_LEDWIDGET)
+
 
 # set compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
