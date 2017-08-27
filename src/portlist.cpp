@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -50,7 +50,8 @@ void PortListItem::construct(QString name, QString description, quint16 vid, qui
     {
         text += QString(" ") + description;
     }
-    if (vid && pid)
+    // Note: in some cases internal ports or RS232 ports may have VID&PID
+    if (vid && pid && !name.contains("tty"))
     {
         text += QString("[%1:").arg(vid, 4, 16, QChar('0'));
         text += QString("%1]").arg(pid, 4, 16, QChar('0'));
