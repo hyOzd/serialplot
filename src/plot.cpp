@@ -39,6 +39,7 @@ Plot::Plot(QWidget* parent) :
     isAutoScaled = true;
     symbolSize = 0;
     numOfSamples = 1;
+    plotWidth = 1;
     showSymbols = Plot::ShowSymbolsAuto;
 
     QObject::connect(&zoomer, &Zoomer::unzoomed, this, &Plot::unzoomed);
@@ -109,17 +110,18 @@ void Plot::setXAxis(double xMin, double xMax)
     _xMin = xMin;
     _xMax = xMax;
 
+    zoomer.setXLimits(xMin, xMax);
     zoomer.zoom(0); // unzoom
 
     // set axis
-    setAxisScale(QwtPlot::xBottom, xMin, xMax);
+    // setAxisScale(QwtPlot::xBottom, xMin, xMax);
     replot(); // Note: if we don't replot here scale at startup isn't set correctly
 
     // reset zoom base
-    auto base = zoomer.zoomBase();
-    base.setLeft(xMin);
-    base.setRight(xMax);
-    zoomer.setZoomBase(base);
+    // auto base = zoomer.zoomBase();
+    // base.setLeft(xMin);
+    // base.setRight(xMax);
+    // zoomer.setZoomBase(base);
 
     onXScaleChanged();
 }
@@ -301,7 +303,8 @@ void Plot::calcSymbolSize()
     auto scaleDist = sw->scaleDraw()->scaleMap().sDist();
     auto fullScaleDist = zoomer.zoomBase().width();
     auto zoomRate = fullScaleDist / scaleDist;
-    float samplesInView = numOfSamples / zoomRate;
+    float plotWidthNumSamp = abs(numOfSamples * plotWidth / (_xMax - _xMin));
+    float samplesInView = plotWidthNumSamp / zoomRate;
     int symDisPx = round(paintDist / samplesInView);
 
     if (symDisPx < SYMBOL_SHOW_AT_WIDTH)
@@ -346,4 +349,10 @@ void Plot::setNumOfSamples(unsigned value)
 {
     numOfSamples = value;
     onXScaleChanged();
+}
+
+void Plot::setPlotWidth(double width)
+{
+    plotWidth = width;
+    zoomer.setHViewSize(width);
 }

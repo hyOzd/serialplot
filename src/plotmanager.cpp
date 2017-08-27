@@ -46,6 +46,7 @@ PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject
     isDemoShown = false;
     _infoModel = infoModel;
     _numOfSamples = 1;
+    _plotWidth = 1;
     showSymbols = Plot::ShowSymbolsAuto;
     emptyPlot = NULL;
 
@@ -316,6 +317,7 @@ Plot* PlotManager::addPlotWidget()
     plot->setNumOfSamples(_numOfSamples);
     plot->setSymbols(showSymbols);
 
+    plot->setPlotWidth(_plotWidth);
     if (_xAxisAsIndex)
     {
         plot->setXAxis(0, _numOfSamples);
@@ -539,6 +541,15 @@ void PlotManager::setNumOfSamples(unsigned value)
     {
         plot->setNumOfSamples(value);
         if (_xAxisAsIndex) plot->setXAxis(0, value);
+    }
+}
+
+void PlotManager::setPlotWidth(double width)
+{
+    _plotWidth = width;
+    for (auto plot : plotWidgets)
+    {
+        plot->setPlotWidth(width);
     }
 }
 

@@ -29,7 +29,7 @@
 #include "setting_defines.h"
 
 /// Confirm if #samples is being set to a value greater than this
-const int NUMSAMPLES_CONFIRM_AT = 10000;
+const int NUMSAMPLES_CONFIRM_AT = 1000000;
 
 /// Used for scale range selection combobox
 struct Range
@@ -88,6 +88,9 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
 
     connect(ui->spXmin, SIGNAL(valueChanged(double)),
             this, SLOT(onXScaleChanged()));
+
+    connect(ui->spPlotWidth, SIGNAL(valueChanged(int)),
+            this, SLOT(onPlotWidthChanged()));
 
     // init scale range preset list
     for (int nbits = 8; nbits <= 24; nbits++) // signed binary formats
@@ -275,6 +278,7 @@ void PlotControlPanel::onIndexChecked(bool checked)
 
         emit xScaleChanged(false, ui->spXmin->value(), ui->spXmax->value());
     }
+    emit plotWidthChanged(plotWidth());
 }
 
 void PlotControlPanel::onXScaleChanged()
@@ -282,7 +286,27 @@ void PlotControlPanel::onXScaleChanged()
     if (!xAxisAsIndex())
     {
         emit xScaleChanged(false, ui->spXmin->value(), ui->spXmax->value());
+        emit plotWidthChanged(plotWidth());
     }
+}
+
+double PlotControlPanel::plotWidth() const
+{
+    double value = ui->spPlotWidth->value();
+    if (!xAxisAsIndex())
+    {
+        // scale by xmin and xmax
+        auto xmax = ui->spXmax->value();
+        auto xmin = ui->spXmin->value();
+        double scale = (xmax - xmin) / _numOfSamples;
+        value *= scale;
+    }
+    return value;
+}
+
+void PlotControlPanel::onPlotWidthChanged()
+{
+    emit plotWidthChanged(plotWidth());
 }
 
 void PlotControlPanel::setChannelInfoModel(ChannelInfoModel* model)
@@ -362,6 +386,7 @@ void PlotControlPanel::saveSettings(QSettings* settings)
 {
     settings->beginGroup(SettingGroup_Plot);
     settings->setValue(SG_Plot_NumOfSamples, numOfSamples());
+    settings->setValue(SG_Plot_PlotWidth, ui->spPlotWidth->value());
     settings->setValue(SG_Plot_IndexAsX, xAxisAsIndex());
     settings->setValue(SG_Plot_XMax, xMax());
     settings->setValue(SG_Plot_XMin, xMin());
@@ -376,6 +401,8 @@ void PlotControlPanel::loadSettings(QSettings* settings)
     settings->beginGroup(SettingGroup_Plot);
     ui->spNumOfSamples->setValue(
         settings->value(SG_Plot_NumOfSamples, numOfSamples()).toInt());
+    ui->spPlotWidth->setValue(
+        settings->value(SG_Plot_PlotWidth, ui->spPlotWidth->value()).toInt());
     ui->cbIndex->setChecked(
         settings->value(SG_Plot_IndexAsX, xAxisAsIndex()).toBool());
     ui->spXmax->setValue(settings->value(SG_Plot_XMax, xMax()).toDouble());

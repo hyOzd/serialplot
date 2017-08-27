@@ -151,6 +151,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&plotControlPanel, &PlotControlPanel::xScaleChanged,
             plotMan, &PlotManager::setXAxis);
 
+    connect(&plotControlPanel, &PlotControlPanel::plotWidthChanged,
+            plotMan, &PlotManager::setPlotWidth);
+
     QObject::connect(ui->actionClear, SIGNAL(triggered(bool)),
                      this, SLOT(clearPlot()));
 
@@ -226,6 +229,7 @@ MainWindow::MainWindow(QWidget *parent) :
     plotMan->setXAxis(plotControlPanel.xAxisAsIndex(),
                       plotControlPanel.xMin(), plotControlPanel.xMax());
     plotMan->setNumOfSamples(numOfSamples);
+    plotMan->setPlotWidth(plotControlPanel.plotWidth());
 
     // Init sps (sample per second) counter
     spsLabel.setText("0sps");

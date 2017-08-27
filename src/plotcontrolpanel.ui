@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>706</width>
-    <height>187</height>
+    <height>195</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -132,15 +132,30 @@
      </property>
      <item row="0" column="0">
       <widget class="QLabel" name="label_3">
+       <property name="toolTip">
+        <string/>
+       </property>
        <property name="text">
-        <string>Number Of Samples:</string>
+        <string>Buffer Size:</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
       <widget class="QSpinBox" name="spNumOfSamples">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>100</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="toolTip">
-        <string>length of X axis</string>
+        <string>Length of acquisition as number of samples</string>
        </property>
        <property name="keyboardTracking">
         <bool>false</bool>
@@ -149,14 +164,14 @@
         <number>2</number>
        </property>
        <property name="maximum">
-        <number>1000000</number>
+        <number>10000000</number>
        </property>
        <property name="value">
         <number>1000</number>
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
+     <item row="2" column="0">
       <widget class="QCheckBox" name="cbIndex">
        <property name="text">
         <string>Index as X AXis</string>
@@ -166,7 +181,7 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
+     <item row="2" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_4">
        <item>
         <widget class="QLabel" name="lXmin">
@@ -237,7 +252,7 @@
        </item>
       </layout>
      </item>
-     <item row="2" column="0">
+     <item row="3" column="0">
       <widget class="QCheckBox" name="cbAutoScale">
        <property name="text">
         <string>Auto Scale Y Axis</string>
@@ -247,7 +262,7 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
+     <item row="3" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
         <widget class="QLabel" name="lYmin">
@@ -318,15 +333,56 @@
        </item>
       </layout>
      </item>
-     <item row="5" column="0">
+     <item row="6" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
         <string>Select Range Preset:</string>
        </property>
       </widget>
      </item>
-     <item row="5" column="1">
+     <item row="6" column="1">
       <widget class="QComboBox" name="cbRangePresets"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="text">
+        <string>Plot Width:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QSpinBox" name="spPlotWidth">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>100</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>Width of X axis as maximum number of samples that are shown in plot</string>
+       </property>
+       <property name="keyboardTracking">
+        <bool>false</bool>
+       </property>
+       <property name="minimum">
+        <number>2</number>
+       </property>
+       <property name="maximum">
+        <number>100000</number>
+       </property>
+       <property name="value">
+        <number>1000</number>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

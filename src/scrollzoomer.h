@@ -50,7 +50,13 @@ public:
 
     virtual bool eventFilter( QObject *, QEvent * );
 
+    void setXLimits(double min, double max);
+    void setHViewSize(double size);
+    virtual void setZoomBase(bool doReplot = true);
     virtual void rescale();
+
+public Q_SLOTS:
+    virtual void moveTo( const QPointF & );
 
 protected:
     virtual ScrollBar *scrollBar( Qt::Orientation );
@@ -61,6 +67,10 @@ private Q_SLOTS:
     void scrollBarMoved( Qt::Orientation o, double min, double max );
 
 private:
+    QRectF d_limits;
+    double xMin, xMax;
+    double hViewSize;
+
     bool needScrollBar( Qt::Orientation ) const;
     int oppositeAxis( int ) const;
 
@@ -71,6 +81,8 @@ private:
 
     bool d_inZoom;
     bool d_alignCanvasToScales[ QwtPlot::axisCnt ];
+    bool hscrollmove;
+    bool vscrollmove;
 };
 
 #endif

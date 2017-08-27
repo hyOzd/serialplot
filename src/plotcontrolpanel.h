@@ -46,6 +46,8 @@ public:
     bool   xAxisAsIndex() const;
     double xMax() const;
     double xMin() const;
+    /// Returns the plot width adjusted for x axis scaling.
+    double plotWidth() const;
 
     void setChannelInfoModel(ChannelInfoModel* model);
 
@@ -58,6 +60,7 @@ signals:
     void numOfSamplesChanged(int value);
     void yScaleChanged(bool autoScaled, double yMin = 0, double yMax = 1);
     void xScaleChanged(bool asIndex, double xMin = 0, double xMax = 1);
+    void plotWidthChanged(double width);
 
 private:
     Ui::PlotControlPanel *ui;
@@ -80,6 +83,7 @@ private slots:
     void onRangeSelected();
     void onIndexChecked(bool checked);
     void onXScaleChanged();
+    void onPlotWidthChanged();
 };
 
 #endif // PLOTCONTROLPANEL_H
