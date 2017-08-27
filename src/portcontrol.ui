@@ -421,9 +421,12 @@
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QLabel" name="labDCE">
+        <widget class="QLabel" name="labDCD">
+         <property name="toolTip">
+          <string>Data Carrier Detect</string>
+         </property>
          <property name="text">
-          <string>DCE</string>
+          <string>DCD</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -431,7 +434,7 @@
         </widget>
        </item>
        <item row="2" column="2">
-        <widget class="LedWidget" name="ledDCE" native="true">
+        <widget class="LedWidget" name="ledDCD" native="true">
          <property name="minimumSize">
           <size>
            <width>15</width>
@@ -443,6 +446,9 @@
            <width>15</width>
            <height>15</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>Data Carrier Detect</string>
          </property>
         </widget>
        </item>

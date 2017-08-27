@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -28,6 +28,7 @@
 #include <QAction>
 #include <QComboBox>
 #include <QSettings>
+#include <QTimer>
 
 #include "portlist.h"
 
@@ -65,6 +66,9 @@ private:
     QComboBox tbPortList;
     PortList portList;
 
+    /// Used to refresh pinout signal leds periodically
+    QTimer pinUpdateTimer;
+
     /// Returns the currently selected (entered) "portName" in the UI
     QString selectedPortName();
     /// Returns currently selected parity as text to be saved in settings
@@ -86,9 +90,9 @@ public slots:
 
 private slots:
     void openActionTriggered(bool checked);
-
     void onCbPortListActivated(int index);
     void onTbPortListActivated(int index);
+    void updatePinLeds(void);
 
 signals:
     void portToggled(bool open);

@@ -155,6 +155,15 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
                 }
             });
 
+    // setup pin update leds
+    ui->ledDCD->setColor(Qt::yellow);
+    ui->ledDSR->setColor(Qt::yellow);
+    ui->ledRI->setColor(Qt::yellow);
+    ui->ledCTS->setColor(Qt::yellow);
+
+    pinUpdateTimer.setInterval(1000); // ms
+    connect(&pinUpdateTimer, &QTimer::timeout, this, &PortControl::updatePinLeds);
+
     loadPortList();
     loadBaudRateList();
     ui->cbBaudRate->setCurrentIndex(ui->cbBaudRate->findText("9600"));
@@ -246,6 +255,7 @@ void PortControl::togglePort()
 {
     if (serialPort->isOpen())
     {
+        pinUpdateTimer.stop();
         serialPort->close();
         qDebug() << "Closed port:" << serialPort->portName();
         emit portToggled(false);
@@ -286,6 +296,10 @@ void PortControl::togglePort()
             // set output signals
             serialPort->setDataTerminalReady(ui->ledDTR->isOn());
             serialPort->setRequestToSend(ui->ledRTS->isOn());
+
+            // update pin signals
+            updatePinLeds();
+            pinUpdateTimer.start();
 
             qDebug() << "Opened port:" << serialPort->portName();
             emit portToggled(true);
@@ -346,6 +360,15 @@ void PortControl::onCbPortListActivated(int index)
 void PortControl::onTbPortListActivated(int index)
 {
     ui->cbPortList->setCurrentIndex(index);
+}
+
+void PortControl::updatePinLeds(void)
+{
+    auto pins = serialPort->pinoutSignals();
+    ui->ledDCD->setOn(pins & QSerialPort::DataCarrierDetectSignal);
+    ui->ledDSR->setOn(pins & QSerialPort::DataSetReadySignal);
+    ui->ledRI->setOn(pins & QSerialPort::RingIndicatorSignal);
+    ui->ledCTS->setOn(pins & QSerialPort::ClearToSendSignal);
 }
 
 QString PortControl::currentParityText()
