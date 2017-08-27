@@ -144,8 +144,14 @@
       <widget class="QSpinBox" name="spNumOfSamples">
        <property name="minimumSize">
         <size>
-         <width>80</width>
+         <width>100</width>
          <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>100</width>
+         <height>16777215</height>
         </size>
        </property>
        <property name="toolTip">
@@ -351,8 +357,14 @@
       <widget class="QSpinBox" name="spPlotWidth">
        <property name="minimumSize">
         <size>
-         <width>80</width>
+         <width>100</width>
          <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>100</width>
+         <height>16777215</height>
         </size>
        </property>
        <property name="toolTip">
