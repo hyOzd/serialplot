@@ -27,7 +27,7 @@ FrameBufferSeries::FrameBufferSeries(FrameBuffer* buffer)
     _xmax = 1;
     _buffer = buffer;
     int_index_start = 0;
-    int_index_end = 0;
+    int_index_end = _buffer->size();
 }
 
 void FrameBufferSeries::setXAxis(bool asIndex, double xmin, double xmax)
@@ -85,6 +85,6 @@ void FrameBufferSeries::setRectOfInterest(const QRectF& rect)
         int_index_end = ceil(bsize * (rect.right()-_xmin) / xsize)+1;
     }
 
-    int_index_start = std::max(int_index_start, (size_t) 0);
-    int_index_end = std::min(_buffer->size(), int_index_end);
+    int_index_start = std::max(int_index_start, 0);
+    int_index_end = std::min((int) _buffer->size(), int_index_end);
 }

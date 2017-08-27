@@ -52,8 +52,8 @@ private:
     double _xmin;
     double _xmax;
 
-    size_t int_index_start; ///< starting index of "rectangle of interest"
-    size_t int_index_end;   ///< ending index of "rectangle of interest"
+    int int_index_start; ///< starting index of "rectangle of interest"
+    int int_index_end;   ///< ending index of "rectangle of interest"
 };
 
 #endif // FRAMEBUFFERSERIES_H
