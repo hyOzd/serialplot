@@ -1,7 +1,11 @@
 # Based on: https://github.com/mhoeher/opentodolist
+#
+# Note: we extract linuxdeployqt appimage so that it can run in docker, that's
+# because fuse doesn't work in docker.
 
 set(LINUXDEPLOYQT_URL "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage")
-set(LINUXDEPLOYQT_TOOL ${CMAKE_CURRENT_BINARY_DIR}/linuxdeployqt-continuous-x86_64.AppImage)
+set(LINUXDEPLOYQT_APPIMAGE ${CMAKE_CURRENT_BINARY_DIR}/linuxdeployqt-continuous-x86_64.AppImage)
+set(LINUXDEPLOYQT_TOOL ${CMAKE_CURRENT_BINARY_DIR}/squashfs-root/AppRun)
 
 set(APPIMAGE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${PROGRAM_NAME}-${VERSION_STRING}-${CMAKE_HOST_SYSTEM_PROCESSOR})
 
@@ -11,7 +15,9 @@ add_custom_command(
     COMMAND
         wget ${LINUXDEPLOYQT_URL}
     COMMAND
-        chmod a+x ${LINUXDEPLOYQT_TOOL})
+        chmod a+x ${LINUXDEPLOYQT_APPIMAGE}
+    COMMAND
+        ${LINUXDEPLOYQT_APPIMAGE} --appimage-extract)
 
 add_custom_target(
     appimage
