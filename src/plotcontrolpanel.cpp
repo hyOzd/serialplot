@@ -86,8 +86,24 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
     connect(ui->spXmax, SIGNAL(valueChanged(double)),
             this, SLOT(onXScaleChanged()));
 
+    connect(ui->spXmax, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            [this](double v)
+            {
+                // set limit just a little below
+                double step = pow(10, -1 * ui->spXmin->decimals());
+                ui->spXmin->setMaximum(v - step);
+            });
+
     connect(ui->spXmin, SIGNAL(valueChanged(double)),
             this, SLOT(onXScaleChanged()));
+
+    connect(ui->spXmin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            [this](double v)
+            {
+                // set limit just a little above
+                double step = pow(10, -1 * ui->spXmax->decimals());
+                ui->spXmax->setMinimum(v + step);
+            });
 
     connect(ui->spPlotWidth, SIGNAL(valueChanged(int)),
             this, SLOT(onPlotWidthChanged()));
