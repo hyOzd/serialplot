@@ -1,7 +1,7 @@
 # Based on: https://github.com/mhoeher/opentodolist
 
-set(LINUXDEPLOYQT_URL "https://github.com/probonopd/linuxdeployqt/releases/download/4/linuxdeployqt-4-x86_64.AppImage")
-set(LINUXDEPLOYQT_TOOL ${CMAKE_CURRENT_BINARY_DIR}/linuxdeployqt-4-x86_64.AppImage)
+set(LINUXDEPLOYQT_URL "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage")
+set(LINUXDEPLOYQT_TOOL ${CMAKE_CURRENT_BINARY_DIR}/linuxdeployqt-continuous-x86_64.AppImage)
 
 set(APPIMAGE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${PROGRAM_NAME}-${VERSION_STRING}-${CMAKE_HOST_SYSTEM_PROCESSOR})
 
