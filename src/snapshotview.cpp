@@ -43,6 +43,7 @@ SnapshotView::SnapshotView(MainWindow* parent, Snapshot* snapshot) :
         plotMan->addCurve(snapshot->channelName(ci), snapshot->data[ci]);
     }
     plotMan->setNumOfSamples(numOfSamples);
+    plotMan->setPlotWidth(numOfSamples);
 
     renameDialog.setWindowTitle("Rename Snapshot");
     renameDialog.setLabelText("Enter new name:");
