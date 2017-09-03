@@ -74,8 +74,10 @@ void ScrollZoomer::setXLimits(double min, double max)
 
 void ScrollZoomer::setHViewSize(double size)
 {
+    hscrollmove = true;
     hViewSize = size;
     setZoomBase();
+    hscrollmove = false;
 }
 
 void ScrollZoomer::setZoomBase(bool doReplot)
