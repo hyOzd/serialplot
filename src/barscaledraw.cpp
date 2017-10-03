@@ -17,27 +17,36 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "barplot.h"
 #include "barscaledraw.h"
 
-BarPlot::BarPlot(ChannelManager* channelMan, QWidget* parent) :
-    QwtPlot(parent), barChart(channelMan)
+#include <QtDebug>
+
+BarScaleDraw::BarScaleDraw(ChannelManager* channelMan)
 {
     _channelMan = channelMan;
-    barChart.attach(this);
-    setAxisMaxMinor(QwtPlot::xBottom, 0);
-    setAxisScaleDraw(QwtPlot::xBottom, new BarScaleDraw(channelMan));
-
-    update();
-    connect(_channelMan, &ChannelManager::dataAdded, this, &BarPlot::update);
-    connect(_channelMan, &ChannelManager::numOfChannelsChanged, this, &BarPlot::update);
-    connect(_channelMan, &ChannelManager::channelNameChanged, this, &BarPlot::update);
+    enableComponent(Backbone, false);
+    setLabelRotation(-90);
+    setLabelAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 }
 
-void BarPlot::update()
+QwtText BarScaleDraw::label(double value) const
 {
-    setAxisScale(QwtPlot::xBottom, 0, _channelMan->numOfChannels(), 1);
-    static_cast<BarScaleDraw*>(axisScaleDraw(QwtPlot::xBottom))->updateLabels();
-    barChart.resample();
-    replot();
+    int index = value;
+    unsigned numChannels = _channelMan->numOfChannels();
+
+    qDebug() << index;
+
+    if (index >=0 && index < (int) numChannels)
+    {
+        return _channelMan->channelName(index);
+    }
+    else
+    {
+        return QString("");
+    }
+}
+
+void BarScaleDraw::updateLabels()
+{
+    invalidateCache();
 }
