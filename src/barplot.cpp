@@ -20,26 +20,14 @@
 #include "barplot.h"
 
 BarPlot::BarPlot(ChannelManager* channelMan, QWidget* parent) :
-    QwtPlot(parent)
+    QwtPlot(parent), barChart(channelMan)
 {
     _channelMan = channelMan;
     barChart.attach(this);
 
     connect(_channelMan, &ChannelManager::dataAdded, [this]()
             {
-                barChart.setSamples(chartData());
+                barChart.resample();
                 replot();
             });
-}
-
-QVector<double> BarPlot::chartData() const
-{
-    unsigned numChannels = _channelMan->numOfChannels();
-    unsigned numOfSamples = _channelMan->numOfSamples();
-    QVector<double> data(numChannels);
-    for (int i = 0; i < numChannels; i++)
-    {
-        data[i] = _channelMan->channelBuffer(i)->sample(numOfSamples-1);
-    }
-    return data;
 }

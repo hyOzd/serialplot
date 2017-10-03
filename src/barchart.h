@@ -17,26 +17,26 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef BARPLOT_H
-#define BARPLOT_H
+#ifndef BARCHART_H
+#define BARCHART_H
 
-#include <qwt_plot.h>
-
+#include <qwt_plot_barchart.h>
+#include <qwt_column_symbol.h>
 #include "channelmanager.h"
-#include "barchart.h"
 
-class BarPlot : public QwtPlot
+class BarChart : public QwtPlotBarChart
 {
-    Q_OBJECT
-
 public:
-    explicit BarPlot(ChannelManager* channelMan, QWidget* parent = 0);
+    explicit BarChart(ChannelManager* channelMan);
+
+    void resample();
+    QwtColumnSymbol* specialSymbol(int sampleIndex, const QPointF&) const;
 
 private:
     ChannelManager* _channelMan;
-    BarChart barChart;
 
     QVector<double> chartData() const;
 };
 
-#endif // BARPLOT_H
+
+#endif // BARCHART_H

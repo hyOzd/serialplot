@@ -60,10 +60,10 @@ MainWindow::MainWindow(QWidget *parent) :
     aboutDialog(this),
     portControl(&serialPort),
     channelMan(1, 1, this),
+    barPlot(&channelMan),
     snapshotMan(this, &channelMan),
     commandPanel(&serialPort),
     dataFormatPanel(&serialPort, &channelMan, &recorder),
-    barPlot(&channelMan),
     recordPanel(&recorder, &channelMan),
     updateCheckDialog(this)
 {
