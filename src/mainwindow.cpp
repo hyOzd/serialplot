@@ -63,6 +63,7 @@ MainWindow::MainWindow(QWidget *parent) :
     snapshotMan(this, &channelMan),
     commandPanel(&serialPort),
     dataFormatPanel(&serialPort, &channelMan, &recorder),
+    barPlot(&channelMan),
     recordPanel(&recorder, &channelMan),
     updateCheckDialog(this)
 {
@@ -264,6 +265,8 @@ MainWindow::MainWindow(QWidget *parent) :
                 this->ui->tabWidget->setCurrentWidget(&commandPanel);
                 this->ui->tabWidget->showTabs();
             });
+
+    barPlot.show();
 }
 
 MainWindow::~MainWindow()

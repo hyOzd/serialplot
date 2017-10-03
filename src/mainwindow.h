@@ -44,6 +44,7 @@
 #include "channelmanager.h"
 #include "snapshotmanager.h"
 #include "plotmanager.h"
+#include "barplot.h"
 #include "datarecorder.h"
 #include "updatecheckdialog.h"
 
@@ -78,6 +79,7 @@ private:
     QList<QwtPlotCurve*> curves;
     ChannelManager channelMan;
     PlotManager* plotMan;
+    BarPlot barPlot;
     SnapshotManager snapshotMan;
     DataRecorder recorder;       // operated by `recordPanel`
 
