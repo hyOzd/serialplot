@@ -37,6 +37,9 @@ private:
     BarChart barChart;
 
     QVector<double> chartData() const;
+
+private slots:
+    void update();
 };
 
 #endif // BARPLOT_H

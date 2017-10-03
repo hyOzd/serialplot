@@ -25,9 +25,12 @@ BarPlot::BarPlot(ChannelManager* channelMan, QWidget* parent) :
     _channelMan = channelMan;
     barChart.attach(this);
 
-    connect(_channelMan, &ChannelManager::dataAdded, [this]()
-            {
-                barChart.resample();
-                replot();
-            });
+    connect(_channelMan, &ChannelManager::dataAdded, this, &BarPlot::update);
+    connect(_channelMan, &ChannelManager::numOfChannelsChanged, this, &BarPlot::update);
+}
+
+void BarPlot::update()
+{
+    barChart.resample();
+    replot();
 }
