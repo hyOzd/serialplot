@@ -32,9 +32,6 @@ public:
     explicit BarScaleDraw(ChannelManager* channelMan);
     QwtText label(double value) const;
 
-public slots:
-    void updateLabels();
-
 private:
     ChannelManager* _channelMan;
 };

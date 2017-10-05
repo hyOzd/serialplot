@@ -31,13 +31,11 @@ BarPlot::BarPlot(ChannelManager* channelMan, QWidget* parent) :
     update();
     connect(_channelMan, &ChannelManager::dataAdded, this, &BarPlot::update);
     connect(_channelMan, &ChannelManager::numOfChannelsChanged, this, &BarPlot::update);
-    connect(_channelMan, &ChannelManager::channelNameChanged, this, &BarPlot::update);
 }
 
 void BarPlot::update()
 {
     setAxisScale(QwtPlot::xBottom, 0, _channelMan->numOfChannels(), 1);
-    static_cast<BarScaleDraw*>(axisScaleDraw(QwtPlot::xBottom))->updateLabels();
     barChart.resample();
     replot();
 }

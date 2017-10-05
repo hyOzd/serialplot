@@ -27,14 +27,18 @@ BarScaleDraw::BarScaleDraw(ChannelManager* channelMan)
     enableComponent(Backbone, false);
     setLabelRotation(-90);
     setLabelAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+
+    QObject::connect(_channelMan, &ChannelManager::channelNameChanged,
+            [this]()
+            {
+                invalidateCache();
+            });
 }
 
 QwtText BarScaleDraw::label(double value) const
 {
     int index = value;
     unsigned numChannels = _channelMan->numOfChannels();
-
-    qDebug() << index;
 
     if (index >=0 && index < (int) numChannels)
     {
@@ -44,9 +48,4 @@ QwtText BarScaleDraw::label(double value) const
     {
         return QString("");
     }
-}
-
-void BarScaleDraw::updateLabels()
-{
-    invalidateCache();
 }
