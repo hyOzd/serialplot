@@ -18,6 +18,7 @@
 */
 
 #include <QPalette>
+#include <qwt_scale_map.h>
 
 #include "barchart.h"
 
@@ -61,4 +62,36 @@ QwtColumnSymbol* BarChart::specialSymbol(int sampleIndex, const QPointF& sample)
     symbol->setPalette(QPalette(color));
 
     return symbol;
+}
+
+void BarChart::drawSample(
+        QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+        const QRectF &canvasRect, const QwtInterval &boundingInterval,
+        int index, const QPointF &sample ) const
+{
+    QwtPlotBarChart::drawSample(painter, xMap, yMap, canvasRect, boundingInterval, index, sample);
+
+    // calculate bar size
+    const double barWidth = sampleWidth(xMap, canvasRect.width(),
+                                        boundingInterval.width(), sample.y());
+    const double x = xMap.transform( sample.x() );
+    const double x1 = x - 0.5 * barWidth;
+    // const double x2 = x + 0.5 * barWidth;
+
+    const double y1 = yMap.transform(baseline());
+    const double y2 = yMap.transform(sample.y());
+    const double barHeight = fabs(y2 - y1);
+
+    // create and calculate text size
+    const auto valueStr = QString::number(sample.y());
+    auto valueText = QwtText(valueStr, QwtText::PlainText);
+    const auto textSize = valueText.textSize();
+    auto r = QRectF(x1, y2, barWidth, textSize.height());
+    if (y2 > y1) r.moveBottom(y2);
+
+    // display text if there is enough space
+    if (barHeight >= textSize.height() && barWidth >= textSize.width())
+    {
+        valueText.draw(painter, r);
+    }
 }

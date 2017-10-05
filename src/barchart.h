@@ -32,6 +32,11 @@ public:
     void resample();
     QwtColumnSymbol* specialSymbol(int sampleIndex, const QPointF&) const;
 
+    void drawSample(
+        QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+        const QRectF &canvasRect, const QwtInterval &boundingInterval,
+        int index, const QPointF &sample ) const;
+
 private:
     ChannelManager* _channelMan;
 
