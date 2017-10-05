@@ -35,7 +35,8 @@ BarPlot::BarPlot(ChannelManager* channelMan, QWidget* parent) :
 
 void BarPlot::update()
 {
-    setAxisScale(QwtPlot::xBottom, 0, _channelMan->numOfChannels(), 1);
+    // Note: -0.99 is used instead of -1 to handle the case of `numOfChannels==1`
+    setAxisScale(QwtPlot::xBottom, 0, _channelMan->numOfChannels()-0.99, 1);
     barChart.resample();
     replot();
 }
