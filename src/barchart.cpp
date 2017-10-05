@@ -24,6 +24,7 @@
 BarChart::BarChart(ChannelManager* channelMan)
 {
     _channelMan = channelMan;
+    setSpacing(0);
 }
 
 void BarChart::resample()
