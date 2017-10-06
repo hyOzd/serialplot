@@ -266,7 +266,7 @@ MainWindow::MainWindow(QWidget *parent) :
                 this->ui->tabWidget->showTabs();
             });
 
-    barPlot.show();
+    ui->splitter->addWidget(&barPlot);
 }
 
 MainWindow::~MainWindow()

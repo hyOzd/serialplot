@@ -14,15 +14,26 @@
    <string>SerialPlot</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QWidget" name="plotArea" native="true">
+     <widget class="QSplitter" name="splitter">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QWidget" name="plotArea" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
      </widget>
     </item>
     <item>
@@ -90,7 +101,7 @@
      <x>0</x>
      <y>0</y>
      <width>653</width>
-     <height>25</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp">
@@ -143,9 +154,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset theme="player_pause">
-     <normaloff/>
-    </iconset>
+    <iconset theme="player_pause"/>
    </property>
    <property name="text">
     <string>Pause</string>
@@ -159,9 +168,7 @@
   </action>
   <action name="actionClear">
    <property name="icon">
-    <iconset theme="editclear">
-     <normaloff/>
-    </iconset>
+    <iconset theme="editclear"/>
    </property>
    <property name="text">
     <string>Clear</string>
