@@ -286,6 +286,9 @@ void PlotManager::showBarPlot(bool show)
 
         barPlot = new BarPlot(_channelMan, _splitter);
         barPlot->darkBackground(darkBackgroundAction.isChecked());
+        barPlot->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        _splitter->setStretchFactor(0, 1);
+        _splitter->setStretchFactor(1, 0);
     }
     else
     {
