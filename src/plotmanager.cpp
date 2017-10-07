@@ -285,6 +285,7 @@ void PlotManager::showBarPlot(bool show)
         Q_ASSERT(barPlot == NULL);
 
         barPlot = new BarPlot(_channelMan, _splitter);
+        barPlot->darkBackground(darkBackgroundAction.isChecked());
     }
     else
     {
