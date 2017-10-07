@@ -33,6 +33,9 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="toolTip">
+          <string>You can enter a port name even if it's not listed, such as pseudo terminals.</string>
+         </property>
          <property name="editable">
           <bool>true</bool>
          </property>
@@ -40,6 +43,9 @@
        </item>
        <item row="1" column="1">
         <widget class="QComboBox" name="cbBaudRate">
+         <property name="toolTip">
+          <string>You can enter a custom baud rate if it's supported by your OS/adapter.</string>
+         </property>
          <property name="inputMethodHints">
           <set>Qt::ImhPreferNumbers</set>
          </property>
@@ -70,7 +76,7 @@
           </size>
          </property>
          <property name="toolTip">
-          <string/>
+          <string>Reload the list of ports</string>
          </property>
          <property name="text">
           <string>↺</string>
