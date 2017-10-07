@@ -28,10 +28,13 @@
 #include <QSettings>
 #include <QAction>
 #include <QMenu>
+#include <QSplitter>
 
 #include <qwt_plot_curve.h>
 #include "plot.h"
+#include "barplot.h"
 #include "framebufferseries.h"
+#include "channelmanager.h"
 #include "channelinfomodel.h"
 
 struct PlotViewSettings
@@ -49,7 +52,10 @@ class PlotManager : public QObject
     Q_OBJECT
 
 public:
-    explicit PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel = NULL, QObject *parent = 0);
+    explicit PlotManager(
+        QWidget* plotArea, QSplitter* splitter = NULL,
+        ChannelManager* channelMan = NULL, ChannelInfoModel* infoModel = NULL,
+        QObject *parent = 0);
     ~PlotManager();
     /// Add a new curve with title and buffer. A color is
     /// automatically chosen for curve.
@@ -74,8 +80,6 @@ public:
     void loadSettings(QSettings* settings);
 
 public slots:
-    /// Enable/Disable multiple plot display
-    void setMulti(bool enabled);
     /// Update all plot widgets
     void replot();
     /// Enable display of a "DEMO" label on each plot
@@ -94,11 +98,14 @@ public slots:
 private:
     bool isMulti;
     QWidget* _plotArea;
+    BarPlot* barPlot;
+    QSplitter* _splitter;
     QVBoxLayout* layout; ///< layout of the `plotArea`
     QScrollArea* scrollArea;
     QList<QwtPlotCurve*> curves;
     QList<Plot*> plotWidgets;
     Plot* emptyPlot;  ///< for displaying when all channels are hidden
+    ChannelManager* _channelMan;
     ChannelInfoModel* _infoModel;
     bool isDemoShown;
     bool _autoScaled;
@@ -118,6 +125,7 @@ private:
     QAction darkBackgroundAction;
     QAction showLegendAction;
     QAction showMultiAction;
+    QAction showBarPlotAction;
     QAction setSymbolsAction;
     QMenu setSymbolsMenu;
     QAction* setSymbolsAutoAct;
@@ -141,6 +149,10 @@ private slots:
     void showLegend(bool show = true);
     void unzoom();
     void darkBackground(bool enabled = true);
+    /// Enable/Disable multiple plot display
+    void setMulti(bool enabled);
+    /// Display/Hide bar plot
+    void showBarPlot(bool show = true);
 
     void onChannelInfoChanged(const QModelIndex & topLeft,
                               const QModelIndex & bottomRight,

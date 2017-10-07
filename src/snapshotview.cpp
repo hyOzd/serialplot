@@ -29,7 +29,7 @@ SnapshotView::SnapshotView(MainWindow* parent, Snapshot* snapshot) :
 
     ui->setupUi(this);
 
-    plotMan = new PlotManager(ui->plotArea, snapshot->infoModel(), this);
+    plotMan = new PlotManager(ui->plotArea, NULL, NULL, snapshot->infoModel(), this);
     plotMan->setViewSettings(parent->viewSettings());
 
     ui->menuSnapshot->insertAction(ui->actionClose, snapshot->deleteAction());

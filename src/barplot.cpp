@@ -40,3 +40,16 @@ void BarPlot::update()
     barChart.resample();
     replot();
 }
+
+void BarPlot::darkBackground(bool enabled)
+{
+    if (enabled)
+    {
+        setCanvasBackground(QBrush(Qt::black));
+    }
+    else
+    {
+        setCanvasBackground(QBrush(Qt::white));
+    }
+    replot();
+}

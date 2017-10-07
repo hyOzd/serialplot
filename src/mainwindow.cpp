@@ -60,7 +60,6 @@ MainWindow::MainWindow(QWidget *parent) :
     aboutDialog(this),
     portControl(&serialPort),
     channelMan(1, 1, this),
-    barPlot(&channelMan),
     snapshotMan(this, &channelMan),
     commandPanel(&serialPort),
     dataFormatPanel(&serialPort, &channelMan, &recorder),
@@ -69,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    plotMan = new PlotManager(ui->plotArea, channelMan.infoModel());
+    plotMan = new PlotManager(ui->plotArea, ui->splitter, &channelMan, channelMan.infoModel());
 
     ui->tabWidget->insertTab(0, &portControl, "Port");
     ui->tabWidget->insertTab(1, &dataFormatPanel, "Data Format");
@@ -265,8 +264,6 @@ MainWindow::MainWindow(QWidget *parent) :
                 this->ui->tabWidget->setCurrentWidget(&commandPanel);
                 this->ui->tabWidget->showTabs();
             });
-
-    ui->splitter->addWidget(&barPlot);
 }
 
 MainWindow::~MainWindow()

@@ -38,8 +38,12 @@ private:
 
     QVector<double> chartData() const;
 
+public slots:
+    void darkBackground(bool enabled);
+
 private slots:
     void update();
+
 };
 
 #endif // BARPLOT_H

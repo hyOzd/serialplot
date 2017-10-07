@@ -28,15 +28,19 @@
 #include "utils.h"
 #include "setting_defines.h"
 
-PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject *parent) :
+PlotManager::PlotManager(
+    QWidget* plotArea, QSplitter* splitter, ChannelManager* channelMan,
+    ChannelInfoModel* infoModel, QObject *parent) :
     QObject(parent),
     _plotArea(plotArea),
+    _splitter(splitter),
     showGridAction("&Grid", this),
     showMinorGridAction("&Minor Grid", this),
     unzoomAction("&Unzoom", this),
     darkBackgroundAction("&Dark Background", this),
     showLegendAction("&Legend", this),
     showMultiAction("Multi &Plot", this),
+    showBarPlotAction("&Bar Plot", this),
     setSymbolsAction("Symbols", this)
 {
     _autoScaled = true;
@@ -44,11 +48,13 @@ PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject
     _yMax = 1;
     _xAxisAsIndex = true;
     isDemoShown = false;
+    _channelMan = channelMan;
     _infoModel = infoModel;
     _numOfSamples = 1;
     _plotWidth = 1;
     showSymbols = Plot::ShowSymbolsAuto;
     emptyPlot = NULL;
+    barPlot = NULL;
 
     // initalize layout and single widget
     isMulti = false;
@@ -63,6 +69,7 @@ PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject
     darkBackgroundAction.setToolTip("Enable Dark Plot Background");
     showLegendAction.setToolTip("Display the Legend on Plot");
     showMultiAction.setToolTip("Display All Channels Separately");
+    showBarPlotAction.setToolTip("Show bar plot");
     setSymbolsAction.setToolTip("Show/Hide symbols");
 
     showGridAction.setShortcut(QKeySequence("G"));
@@ -73,12 +80,14 @@ PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject
     darkBackgroundAction.setCheckable(true);
     showLegendAction.setCheckable(true);
     showMultiAction.setCheckable(true);
+    showBarPlotAction.setCheckable(true);
 
     showGridAction.setChecked(false);
     showMinorGridAction.setChecked(false);
     darkBackgroundAction.setChecked(false);
     showLegendAction.setChecked(true);
     showMultiAction.setChecked(false);
+    showBarPlotAction.setChecked(false);
 
     showMinorGridAction.setEnabled(false);
 
@@ -128,6 +137,8 @@ PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject
             this, &PlotManager::showLegend);
     connect(&showMultiAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
             this, &PlotManager::setMulti);
+    connect(&showBarPlotAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+            this, &PlotManager::showBarPlot);
 
     // connect to channel info model
     if (_infoModel != NULL)     // TODO: remove when snapshots have infomodel
@@ -262,6 +273,26 @@ void PlotManager::setMulti(bool enabled)
     }
 
     checkNoVisChannels();
+}
+
+void PlotManager::showBarPlot(bool show)
+{
+    // A secondary plot can only be shown if splitter is provided.
+    Q_ASSERT(_splitter != NULL);
+
+    if (show)
+    {
+        Q_ASSERT(barPlot == NULL);
+
+        barPlot = new BarPlot(_channelMan, _splitter);
+    }
+    else
+    {
+        Q_ASSERT(barPlot != NULL);
+
+        delete barPlot;
+        barPlot = NULL;
+    }
 }
 
 void PlotManager::setupLayout(bool multiPlot)
@@ -428,6 +459,7 @@ QList<QAction*> PlotManager::menuActions()
     actions << &darkBackgroundAction;
     actions << &showLegendAction;
     actions << &showMultiAction;
+    actions << &showBarPlotAction;
     actions << &setSymbolsAction;
     return actions;
 }
@@ -479,6 +511,7 @@ void PlotManager::darkBackground(bool enabled)
     {
         plot->darkBackground(enabled);
     }
+    if (barPlot != NULL) barPlot->darkBackground(enabled);
 }
 
 void PlotManager::setSymbols(Plot::ShowSymbols shown)
