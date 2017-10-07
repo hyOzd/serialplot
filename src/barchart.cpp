@@ -33,6 +33,11 @@ void BarChart::resample()
     setSamples(chartData());
 }
 
+void BarChart::setBorderColor(QColor color)
+{
+    borderColor = color;
+}
+
 QVector<double> BarChart::chartData() const
 {
     unsigned numChannels = _channelMan->numOfChannels();
@@ -59,7 +64,9 @@ QwtColumnSymbol* BarChart::specialSymbol(int sampleIndex, const QPointF& sample)
     QwtColumnSymbol* symbol = new QwtColumnSymbol(QwtColumnSymbol::Box);
     symbol->setLineWidth(1);
     symbol->setFrameStyle(QwtColumnSymbol::Plain);
-    symbol->setPalette(QPalette(color));
+    QPalette pal(color);
+    pal.setColor(QPalette::Dark, borderColor);
+    symbol->setPalette(pal);
 
     return symbol;
 }

@@ -20,6 +20,7 @@
 #ifndef BARCHART_H
 #define BARCHART_H
 
+#include <QColor>
 #include <qwt_plot_barchart.h>
 #include <qwt_column_symbol.h>
 #include "channelmanager.h"
@@ -30,6 +31,8 @@ public:
     explicit BarChart(ChannelManager* channelMan);
 
     void resample();
+    void setBorderColor(QColor color);
+
     QwtColumnSymbol* specialSymbol(int sampleIndex, const QPointF&) const;
 
     void drawSample(
@@ -39,6 +42,7 @@ public:
 
 private:
     ChannelManager* _channelMan;
+    QColor borderColor;
 
     QVector<double> chartData() const;
 };

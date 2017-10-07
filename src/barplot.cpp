@@ -46,10 +46,12 @@ void BarPlot::darkBackground(bool enabled)
     if (enabled)
     {
         setCanvasBackground(QBrush(Qt::black));
+        barChart.setBorderColor(Qt::white);
     }
     else
     {
         setCanvasBackground(QBrush(Qt::white));
+        barChart.setBorderColor(Qt::black);
     }
     replot();
 }
