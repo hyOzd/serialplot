@@ -101,7 +101,7 @@
      <x>0</x>
      <y>0</y>
      <width>653</width>
-     <height>24</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp">
@@ -128,8 +128,18 @@
      <string>&amp;View</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuSecondary">
+    <property name="title">
+     <string>Secondary</string>
+    </property>
+    <addaction name="actionBarPlot"/>
+    <addaction name="separator"/>
+    <addaction name="actionVertical"/>
+    <addaction name="actionHorizontal"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
+   <addaction name="menuSecondary"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="plotToolBar">
@@ -154,7 +164,8 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset theme="player_pause"/>
+    <iconset theme="player_pause">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Pause</string>
@@ -168,7 +179,8 @@
   </action>
   <action name="actionClear">
    <property name="icon">
-    <iconset theme="editclear"/>
+    <iconset theme="editclear">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Clear</string>
@@ -236,6 +248,30 @@
   <action name="actionCheckUpdate">
    <property name="text">
     <string>&amp;Check Update</string>
+   </property>
+  </action>
+  <action name="actionBarPlot">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Bar Plot</string>
+   </property>
+  </action>
+  <action name="actionVertical">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Vertical</string>
+   </property>
+  </action>
+  <action name="actionHorizontal">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Horizontal</string>
    </property>
   </action>
  </widget>

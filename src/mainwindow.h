@@ -44,7 +44,6 @@
 #include "channelmanager.h"
 #include "snapshotmanager.h"
 #include "plotmanager.h"
-#include "barplot.h"
 #include "datarecorder.h"
 #include "updatecheckdialog.h"
 
@@ -79,7 +78,7 @@ private:
     QList<QwtPlotCurve*> curves;
     ChannelManager channelMan;
     PlotManager* plotMan;
-    BarPlot barPlot;
+    QWidget* secondaryPlot;
     SnapshotManager snapshotMan;
     DataRecorder recorder;       // operated by `recordPanel`
 
@@ -90,7 +89,13 @@ private:
     PlotControlPanel plotControlPanel;
     UpdateCheckDialog updateCheckDialog;
 
+    /// Returns true if demo is running
     bool isDemoRunning();
+    /// Display a secondary plot in the splitter, removing and
+    /// deleting previous one if it exists
+    void showSecondary(QWidget* wid);
+    /// Hide secondary plot
+    void hideSecondary();
     /// Stores settings for all modules
     void saveAllSettings(QSettings* settings);
     /// Load settings for all modules
@@ -113,6 +118,8 @@ private slots:
     void clearPlot();
     void onSpsChanged(unsigned sps);
     void enableDemo(bool enabled);
+    void showBarPlot(bool show);
+
     void onExportCsv();
     void onSaveSettings();
     void onLoadSettings();

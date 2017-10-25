@@ -35,6 +35,7 @@
 #include <iostream>
 
 #include <plot.h>
+#include <barplot.h>
 
 #include "framebufferseries.h"
 #include "utils.h"
@@ -60,7 +61,7 @@ MainWindow::MainWindow(QWidget *parent) :
     aboutDialog(this),
     portControl(&serialPort),
     channelMan(1, 1, this),
-    barPlot(&channelMan),
+    secondaryPlot(NULL),
     snapshotMan(this, &channelMan),
     commandPanel(&serialPort),
     dataFormatPanel(&serialPort, &channelMan, &recorder),
@@ -110,6 +111,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // init UI signals
 
+    // Secondary plot menu signals
+    connect(ui->actionBarPlot, &QAction::triggered,
+            this, &MainWindow::showBarPlot);
+
     // Help menu signals
     QObject::connect(ui->actionHelpAbout, &QAction::triggered,
               &aboutDialog, &QWidget::show);
@@ -155,10 +160,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&plotControlPanel, &PlotControlPanel::plotWidthChanged,
             plotMan, &PlotManager::setPlotWidth);
 
-    // secondary (bar) plot signals
-    connect(&plotControlPanel, &PlotControlPanel::yScaleChanged,
-            &barPlot, &BarPlot::setYAxis);
-
+    // plot toolbar signals
     QObject::connect(ui->actionClear, SIGNAL(triggered(bool)),
                      this, SLOT(clearPlot()));
 
@@ -269,8 +271,6 @@ MainWindow::MainWindow(QWidget *parent) :
                 this->ui->tabWidget->setCurrentWidget(&commandPanel);
                 this->ui->tabWidget->showTabs();
             });
-
-    ui->splitter->addWidget(&barPlot);
 }
 
 MainWindow::~MainWindow()
@@ -482,6 +482,46 @@ void MainWindow::enableDemo(bool enabled)
     {
         dataFormatPanel.enableDemo(false);
         ui->actionDemoMode->setChecked(false);
+    }
+}
+
+void MainWindow::showSecondary(QWidget* wid)
+{
+    if (secondaryPlot != NULL)
+    {
+        secondaryPlot->deleteLater();
+    }
+
+    secondaryPlot = wid;
+    ui->splitter->addWidget(wid);
+}
+
+void MainWindow::hideSecondary()
+{
+    if (secondaryPlot == NULL)
+    {
+        qFatal("Secondary plot doesn't exist!");
+    }
+
+    secondaryPlot->deleteLater();
+    secondaryPlot = NULL;
+}
+
+void MainWindow::showBarPlot(bool show)
+{
+    if (show)
+    {
+        auto plot = new BarPlot(&channelMan);
+        plot->setYAxis(plotControlPanel.autoScale(),
+                       plotControlPanel.yMin(),
+                       plotControlPanel.yMax());
+        connect(&plotControlPanel, &PlotControlPanel::yScaleChanged,
+                plot, &BarPlot::setYAxis);
+        showSecondary(plot);
+    }
+    else
+    {
+        hideSecondary();
     }
 }
 
