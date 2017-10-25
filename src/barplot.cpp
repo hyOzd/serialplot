@@ -40,3 +40,15 @@ void BarPlot::update()
     barChart.resample();
     replot();
 }
+
+void BarPlot::setYAxis(bool autoScaled, double yMin, double yMax)
+{
+    if (autoScaled)
+    {
+        setAxisAutoScale(QwtPlot::yLeft);
+    }
+    else
+    {
+        setAxisScale(QwtPlot::yLeft, yMin, yMax);
+    }
+}

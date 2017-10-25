@@ -32,6 +32,10 @@ class BarPlot : public QwtPlot
 public:
     explicit BarPlot(ChannelManager* channelMan, QWidget* parent = 0);
 
+public slots:
+    /// Set the Y axis
+    void setYAxis(bool autoScaled, double yMin = 0, double yMax = 1);
+
 private:
     ChannelManager* _channelMan;
     BarChart barChart;

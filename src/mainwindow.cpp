@@ -155,6 +155,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&plotControlPanel, &PlotControlPanel::plotWidthChanged,
             plotMan, &PlotManager::setPlotWidth);
 
+    // secondary (bar) plot signals
+    connect(&plotControlPanel, &PlotControlPanel::yScaleChanged,
+            &barPlot, &BarPlot::setYAxis);
+
     QObject::connect(ui->actionClear, SIGNAL(triggered(bool)),
                      this, SLOT(clearPlot()));
 
