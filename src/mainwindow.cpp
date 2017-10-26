@@ -494,6 +494,8 @@ void MainWindow::showSecondary(QWidget* wid)
 
     secondaryPlot = wid;
     ui->splitter->addWidget(wid);
+    ui->splitter->setStretchFactor(0, 1);
+    ui->splitter->setStretchFactor(1, 0);
 }
 
 void MainWindow::hideSecondary()
