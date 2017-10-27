@@ -19,9 +19,10 @@
 
 #include "barplot.h"
 #include "barscaledraw.h"
+#include "utils.h"
 
-BarPlot::BarPlot(ChannelManager* channelMan, QWidget* parent) :
-    QwtPlot(parent), barChart(channelMan)
+BarPlot::BarPlot(ChannelManager* channelMan, PlotMenu* menu, QWidget* parent) :
+    QwtPlot(parent), _menu(menu), barChart(channelMan)
 {
     _channelMan = channelMan;
     barChart.attach(this);
@@ -31,6 +32,11 @@ BarPlot::BarPlot(ChannelManager* channelMan, QWidget* parent) :
     update();
     connect(_channelMan, &ChannelManager::dataAdded, this, &BarPlot::update);
     connect(_channelMan, &ChannelManager::numOfChannelsChanged, this, &BarPlot::update);
+
+    // connect to menu
+    connect(&menu->darkBackgroundAction, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
+            this, &BarPlot::darkBackground);
+    darkBackground(menu->darkBackgroundAction.isChecked());
 }
 
 void BarPlot::update()
@@ -51,4 +57,18 @@ void BarPlot::setYAxis(bool autoScaled, double yMin, double yMax)
     {
         setAxisScale(QwtPlot::yLeft, yMin, yMax);
     }
+}
+
+
+void BarPlot::darkBackground(bool enabled)
+{
+    if (enabled)
+    {
+        setCanvasBackground(QBrush(Qt::black));
+    }
+    else
+    {
+        setCanvasBackground(QBrush(Qt::white));
+    }
+    replot();
 }

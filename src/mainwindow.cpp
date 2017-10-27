@@ -508,7 +508,7 @@ void MainWindow::showBarPlot(bool show)
 {
     if (show)
     {
-        auto plot = new BarPlot(&channelMan);
+        auto plot = new BarPlot(&channelMan, &plotMenu);
         plot->setYAxis(plotControlPanel.autoScale(),
                        plotControlPanel.yMin(),
                        plotControlPanel.yMax());
