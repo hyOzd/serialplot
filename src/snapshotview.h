@@ -31,6 +31,7 @@
 
 #include "mainwindow.h"
 #include "plotmanager.h"
+#include "plotmenu.h"
 #include "snapshot.h"
 
 namespace Ui {
@@ -54,6 +55,7 @@ private:
     Snapshot* _snapshot;
     QInputDialog renameDialog;
     PlotManager* plotMan;
+    PlotMenu plotMenu;
 
     void closeEvent(QCloseEvent *event);
 

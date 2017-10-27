@@ -26,30 +26,22 @@
 #include <QVBoxLayout>
 #include <QList>
 #include <QSettings>
-#include <QAction>
 #include <QMenu>
 
 #include <qwt_plot_curve.h>
 #include "plot.h"
 #include "framebufferseries.h"
 #include "channelinfomodel.h"
-
-struct PlotViewSettings
-{
-    bool showGrid;
-    bool showMinorGrid;
-    bool darkBackground;
-    bool showLegend;
-    bool showMulti;
-    Plot::ShowSymbols showSymbols;
-};
+#include "plotmenu.h"
 
 class PlotManager : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel = NULL, QObject *parent = 0);
+    explicit PlotManager(QWidget* plotArea, PlotMenu* menu,
+                         ChannelInfoModel* infoModel = NULL,
+                         QObject *parent = 0);
     ~PlotManager();
     /// Add a new curve with title and buffer. A color is
     /// automatically chosen for curve.
@@ -62,16 +54,8 @@ public:
     void removeCurves(unsigned number);
     /// Returns current number of curves known by plot manager
     unsigned numOfCurves();
-    /// Returns the list of actions to be inserted into the `View` menu
-    QList<QAction*> menuActions();
-    /// Returns current status of menu actions
-    PlotViewSettings viewSettings() const;
     /// Set the current state of view
     void setViewSettings(const PlotViewSettings& settings);
-    /// Stores plot settings into a `QSettings`.
-    void saveSettings(QSettings* settings);
-    /// Loads plot settings from a `QSettings`.
-    void loadSettings(QSettings* settings);
 
 public slots:
     /// Enable/Disable multiple plot display
@@ -94,6 +78,7 @@ public slots:
 private:
     bool isMulti;
     QWidget* _plotArea;
+    PlotMenu* _menu;
     QVBoxLayout* layout; ///< layout of the `plotArea`
     QScrollArea* scrollArea;
     QList<QwtPlotCurve*> curves;
@@ -111,19 +96,7 @@ private:
     double _plotWidth;
     Plot::ShowSymbols showSymbols;
 
-    // menu actions
-    QAction showGridAction;
-    QAction showMinorGridAction;
-    QAction unzoomAction;
-    QAction darkBackgroundAction;
-    QAction showLegendAction;
-    QAction showMultiAction;
-    QAction setSymbolsAction;
-    QMenu setSymbolsMenu;
-    QAction* setSymbolsAutoAct;
-    QAction* setSymbolsShowAct;
-    QAction* setSymbolsHideAct;
-
+    /// Setups the layout for multi or single plot
     void setupLayout(bool multiPlot);
     /// Inserts a new plot widget to the current layout.
     Plot* addPlotWidget();
@@ -131,7 +104,6 @@ private:
     Plot* plotWidget(unsigned curveIndex);
     /// Common part of overloaded `addCurve` functions
     void _addCurve(QwtPlotCurve* curve);
-    void setSymbols(Plot::ShowSymbols shown);
     /// Check and make sure "no visible channels" text is shown
     void checkNoVisChannels();
 
@@ -141,6 +113,7 @@ private slots:
     void showLegend(bool show = true);
     void unzoom();
     void darkBackground(bool enabled = true);
+    void setSymbols(Plot::ShowSymbols shown);
 
     void onChannelInfoChanged(const QModelIndex & topLeft,
                               const QModelIndex & bottomRight,

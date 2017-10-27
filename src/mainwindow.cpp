@@ -70,7 +70,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    plotMan = new PlotManager(ui->plotArea, channelMan.infoModel());
+    plotMan = new PlotManager(ui->plotArea, &plotMenu, channelMan.infoModel());
 
     ui->tabWidget->insertTab(0, &portControl, "Port");
     ui->tabWidget->insertTab(1, &dataFormatPanel, "Data Format");
@@ -83,8 +83,8 @@ MainWindow::MainWindow(QWidget *parent) :
     addToolBar(recordPanel.toolbar());
 
     ui->plotToolBar->addAction(snapshotMan.takeSnapshotAction());
-    ui->menuBar->insertMenu(ui->menuHelp->menuAction(), snapshotMan.menu());
-    ui->menuBar->insertMenu(ui->menuHelp->menuAction(), commandPanel.menu());
+    menuBar()->insertMenu(ui->menuHelp->menuAction(), snapshotMan.menu());
+    menuBar()->insertMenu(ui->menuHelp->menuAction(), commandPanel.menu());
 
     connect(&commandPanel, &CommandPanel::focusRequested, [this]()
             {
@@ -98,14 +98,9 @@ MainWindow::MainWindow(QWidget *parent) :
     setupAboutDialog();
 
     // init view menu
-    for (auto a : plotMan->menuActions())
-    {
-        ui->menuView->addAction(a);
-    }
-
-    ui->menuView->addSeparator();
-
-    QMenu* tbMenu = ui->menuView->addMenu("Toolbars");
+    ui->menuBar->insertMenu(ui->menuSecondary->menuAction(), &plotMenu);
+    plotMenu.addSeparator();
+    QMenu* tbMenu = plotMenu.addMenu("Toolbars");
     tbMenu->addAction(ui->plotToolBar->toggleViewAction());
     tbMenu->addAction(portControl.toolBar()->toggleViewAction());
 
@@ -548,7 +543,7 @@ void MainWindow::onExportCsv()
 
 PlotViewSettings MainWindow::viewSettings() const
 {
-    return plotMan->viewSettings();
+    return plotMenu.viewSettings();
 }
 
 void MainWindow::messageHandler(QtMsgType type,
@@ -599,7 +594,7 @@ void MainWindow::saveAllSettings(QSettings* settings)
     dataFormatPanel.saveSettings(settings);
     channelMan.saveSettings(settings);
     plotControlPanel.saveSettings(settings);
-    plotMan->saveSettings(settings);
+    plotMenu.saveSettings(settings);
     commandPanel.saveSettings(settings);
     recordPanel.saveSettings(settings);
     updateCheckDialog.saveSettings(settings);
@@ -612,7 +607,7 @@ void MainWindow::loadAllSettings(QSettings* settings)
     dataFormatPanel.loadSettings(settings);
     channelMan.loadSettings(settings);
     plotControlPanel.loadSettings(settings);
-    plotMan->loadSettings(settings);
+    plotMenu.loadSettings(settings);
     commandPanel.loadSettings(settings);
     recordPanel.loadSettings(settings);
     updateCheckDialog.loadSettings(settings);

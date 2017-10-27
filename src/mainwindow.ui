@@ -101,7 +101,7 @@
      <x>0</x>
      <y>0</y>
      <width>653</width>
-     <height>23</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp">
@@ -123,11 +123,6 @@
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
-   <widget class="QMenu" name="menuView">
-    <property name="title">
-     <string>&amp;View</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuSecondary">
     <property name="title">
      <string>Secondary</string>
@@ -138,7 +133,6 @@
     <addaction name="actionHorizontal"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuView"/>
    <addaction name="menuSecondary"/>
    <addaction name="menuHelp"/>
   </widget>

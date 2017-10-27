@@ -44,6 +44,7 @@
 #include "channelmanager.h"
 #include "snapshotmanager.h"
 #include "plotmanager.h"
+#include "plotmenu.h"
 #include "datarecorder.h"
 #include "updatecheckdialog.h"
 
@@ -87,6 +88,7 @@ private:
     DataFormatPanel dataFormatPanel;
     RecordPanel recordPanel;
     PlotControlPanel plotControlPanel;
+    PlotMenu plotMenu;
     UpdateCheckDialog updateCheckDialog;
 
     /// Returns true if demo is running
