@@ -129,8 +129,8 @@
     </property>
     <addaction name="actionBarPlot"/>
     <addaction name="separator"/>
-    <addaction name="actionVertical"/>
     <addaction name="actionHorizontal"/>
+    <addaction name="actionVertical"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSecondary"/>
@@ -262,6 +262,9 @@
   </action>
   <action name="actionHorizontal">
    <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
     <bool>true</bool>
    </property>
    <property name="text">

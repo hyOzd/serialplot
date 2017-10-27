@@ -104,11 +104,28 @@ MainWindow::MainWindow(QWidget *parent) :
     tbMenu->addAction(ui->plotToolBar->toggleViewAction());
     tbMenu->addAction(portControl.toolBar()->toggleViewAction());
 
+    // init secondary plot menu
+    auto group = new QActionGroup(this);
+    group->addAction(ui->actionVertical);
+    group->addAction(ui->actionHorizontal);
+
     // init UI signals
 
     // Secondary plot menu signals
     connect(ui->actionBarPlot, &QAction::triggered,
             this, &MainWindow::showBarPlot);
+
+    connect(ui->actionVertical, &QAction::triggered,
+            [this](bool checked)
+            {
+                if (checked) ui->splitter->setOrientation(Qt::Vertical);
+            });
+
+    connect(ui->actionHorizontal, &QAction::triggered,
+            [this](bool checked)
+            {
+                if (checked) ui->splitter->setOrientation(Qt::Horizontal);
+            });
 
     // Help menu signals
     QObject::connect(ui->actionHelpAbout, &QAction::triggered,
