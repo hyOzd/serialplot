@@ -23,14 +23,14 @@
 SnapshotView::SnapshotView(MainWindow* parent, Snapshot* snapshot) :
     QMainWindow(parent),
     ui(new Ui::SnapshotView),
-    renameDialog(this)
+    renameDialog(this),
+    plotMenu(parent->viewSettings())
 {
     _snapshot = snapshot;
 
     ui->setupUi(this);
 
-    plotMan = new PlotManager(ui->plotArea, snapshot->infoModel(), this);
-    plotMan->setViewSettings(parent->viewSettings());
+    plotMan = new PlotManager(ui->plotArea, &plotMenu, snapshot->infoModel(), this);
 
     ui->menuSnapshot->insertAction(ui->actionClose, snapshot->deleteAction());
     this->setWindowTitle(snapshot->displayName());
@@ -53,11 +53,8 @@ SnapshotView::SnapshotView(MainWindow* parent, Snapshot* snapshot) :
     connect(ui->actionSave, &QAction::triggered,
             this, &SnapshotView::save);
 
-    // add 'View' menu items
-    for (auto a : plotMan->menuActions())
-    {
-        ui->menuView->addAction(a);
-    }
+    // add "View" menu
+    menuBar()->insertMenu(NULL, &plotMenu);
 }
 
 SnapshotView::~SnapshotView()

@@ -35,6 +35,7 @@
 #include <iostream>
 
 #include <plot.h>
+#include <barplot.h>
 
 #include "framebufferseries.h"
 #include "utils.h"
@@ -60,6 +61,7 @@ MainWindow::MainWindow(QWidget *parent) :
     aboutDialog(this),
     portControl(&serialPort),
     channelMan(1, 1, this),
+    secondaryPlot(NULL),
     snapshotMan(this, &channelMan),
     commandPanel(&serialPort),
     dataFormatPanel(&serialPort, &channelMan, &recorder),
@@ -68,7 +70,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    plotMan = new PlotManager(ui->plotArea, channelMan.infoModel());
+    plotMan = new PlotManager(ui->plotArea, &plotMenu, channelMan.infoModel());
 
     ui->tabWidget->insertTab(0, &portControl, "Port");
     ui->tabWidget->insertTab(1, &dataFormatPanel, "Data Format");
@@ -81,8 +83,8 @@ MainWindow::MainWindow(QWidget *parent) :
     addToolBar(recordPanel.toolbar());
 
     ui->plotToolBar->addAction(snapshotMan.takeSnapshotAction());
-    ui->menuBar->insertMenu(ui->menuHelp->menuAction(), snapshotMan.menu());
-    ui->menuBar->insertMenu(ui->menuHelp->menuAction(), commandPanel.menu());
+    menuBar()->insertMenu(ui->menuHelp->menuAction(), snapshotMan.menu());
+    menuBar()->insertMenu(ui->menuHelp->menuAction(), commandPanel.menu());
 
     connect(&commandPanel, &CommandPanel::focusRequested, [this]()
             {
@@ -96,18 +98,34 @@ MainWindow::MainWindow(QWidget *parent) :
     setupAboutDialog();
 
     // init view menu
-    for (auto a : plotMan->menuActions())
-    {
-        ui->menuView->addAction(a);
-    }
-
-    ui->menuView->addSeparator();
-
-    QMenu* tbMenu = ui->menuView->addMenu("Toolbars");
+    ui->menuBar->insertMenu(ui->menuSecondary->menuAction(), &plotMenu);
+    plotMenu.addSeparator();
+    QMenu* tbMenu = plotMenu.addMenu("Toolbars");
     tbMenu->addAction(ui->plotToolBar->toggleViewAction());
     tbMenu->addAction(portControl.toolBar()->toggleViewAction());
 
+    // init secondary plot menu
+    auto group = new QActionGroup(this);
+    group->addAction(ui->actionVertical);
+    group->addAction(ui->actionHorizontal);
+
     // init UI signals
+
+    // Secondary plot menu signals
+    connect(ui->actionBarPlot, &QAction::triggered,
+            this, &MainWindow::showBarPlot);
+
+    connect(ui->actionVertical, &QAction::triggered,
+            [this](bool checked)
+            {
+                if (checked) ui->splitter->setOrientation(Qt::Vertical);
+            });
+
+    connect(ui->actionHorizontal, &QAction::triggered,
+            [this](bool checked)
+            {
+                if (checked) ui->splitter->setOrientation(Qt::Horizontal);
+            });
 
     // Help menu signals
     QObject::connect(ui->actionHelpAbout, &QAction::triggered,
@@ -154,6 +172,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&plotControlPanel, &PlotControlPanel::plotWidthChanged,
             plotMan, &PlotManager::setPlotWidth);
 
+    // plot toolbar signals
     QObject::connect(ui->actionClear, SIGNAL(triggered(bool)),
                      this, SLOT(clearPlot()));
 
@@ -478,6 +497,48 @@ void MainWindow::enableDemo(bool enabled)
     }
 }
 
+void MainWindow::showSecondary(QWidget* wid)
+{
+    if (secondaryPlot != NULL)
+    {
+        secondaryPlot->deleteLater();
+    }
+
+    secondaryPlot = wid;
+    ui->splitter->addWidget(wid);
+    ui->splitter->setStretchFactor(0, 1);
+    ui->splitter->setStretchFactor(1, 0);
+}
+
+void MainWindow::hideSecondary()
+{
+    if (secondaryPlot == NULL)
+    {
+        qFatal("Secondary plot doesn't exist!");
+    }
+
+    secondaryPlot->deleteLater();
+    secondaryPlot = NULL;
+}
+
+void MainWindow::showBarPlot(bool show)
+{
+    if (show)
+    {
+        auto plot = new BarPlot(&channelMan, &plotMenu);
+        plot->setYAxis(plotControlPanel.autoScale(),
+                       plotControlPanel.yMin(),
+                       plotControlPanel.yMax());
+        connect(&plotControlPanel, &PlotControlPanel::yScaleChanged,
+                plot, &BarPlot::setYAxis);
+        showSecondary(plot);
+    }
+    else
+    {
+        hideSecondary();
+    }
+}
+
 void MainWindow::onExportCsv()
 {
     bool wasPaused = ui->actionPause->isChecked();
@@ -499,7 +560,7 @@ void MainWindow::onExportCsv()
 
 PlotViewSettings MainWindow::viewSettings() const
 {
-    return plotMan->viewSettings();
+    return plotMenu.viewSettings();
 }
 
 void MainWindow::messageHandler(QtMsgType type,
@@ -550,7 +611,7 @@ void MainWindow::saveAllSettings(QSettings* settings)
     dataFormatPanel.saveSettings(settings);
     channelMan.saveSettings(settings);
     plotControlPanel.saveSettings(settings);
-    plotMan->saveSettings(settings);
+    plotMenu.saveSettings(settings);
     commandPanel.saveSettings(settings);
     recordPanel.saveSettings(settings);
     updateCheckDialog.saveSettings(settings);
@@ -563,7 +624,7 @@ void MainWindow::loadAllSettings(QSettings* settings)
     dataFormatPanel.loadSettings(settings);
     channelMan.loadSettings(settings);
     plotControlPanel.loadSettings(settings);
-    plotMan->loadSettings(settings);
+    plotMenu.loadSettings(settings);
     commandPanel.loadSettings(settings);
     recordPanel.loadSettings(settings);
     updateCheckDialog.loadSettings(settings);

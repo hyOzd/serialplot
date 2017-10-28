@@ -134,6 +134,10 @@ add_executable(${PROGRAM_NAME} WIN32
   src/framedreader.cpp
   src/framedreadersettings.cpp
   src/plotmanager.cpp
+  src/plotmenu.cpp
+  src/barplot.cpp
+  src/barchart.cpp
+  src/barscaledraw.cpp
   src/numberformat.cpp
   src/updatechecker.cpp
   src/versionnumber.cpp
