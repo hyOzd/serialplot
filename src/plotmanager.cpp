@@ -337,13 +337,6 @@ unsigned PlotManager::numOfCurves()
     return curves.size();
 }
 
-void PlotManager::setTitle(unsigned index, QString title)
-{
-    curves[index]->setTitle(title);
-
-    plotWidget(index)->replot();
-}
-
 Plot* PlotManager::plotWidget(unsigned curveIndex)
 {
     if (isMulti)

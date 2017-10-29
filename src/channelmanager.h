@@ -46,8 +46,6 @@ public:
     void loadSettings(QSettings* settings);
     /// Returns a model that manages channel information (name, color etc)
     ChannelInfoModel* infoModel();
-    /// Returns a list of channel names
-    QStringList channelNames();
 
 signals:
     void numOfChannelsChanged(unsigned value);
@@ -81,8 +79,6 @@ private:
     QList<FrameBuffer*> channelBuffers;
     // QStringListModel _channelNames;
     ChannelInfoModel _infoModel;
-
-    void addChannelName(QString name); ///< appends a new channel name at the end of list
 
 private slots:
     void onChannelInfoChanged(const QModelIndex & topLeft,

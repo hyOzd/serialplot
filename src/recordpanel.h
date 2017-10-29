@@ -43,7 +43,6 @@ public:
 
     QToolBar* toolbar();
 
-    bool isRecording();
     bool recordPaused();
 
     /// Stores settings into a `QSettings`

@@ -80,11 +80,6 @@ QToolBar* RecordPanel::toolbar()
     return &recordToolBar;
 }
 
-bool RecordPanel::isRecording()
-{
-    return recordAction.isChecked();
-}
-
 bool RecordPanel::recordPaused()
 {
     return ui->cbRecordPaused->isChecked();

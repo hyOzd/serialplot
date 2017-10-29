@@ -50,8 +50,6 @@ public:
     Plot(QWidget* parent = 0);
     ~Plot();
 
-    static QColor makeColor(unsigned int channelIndex);
-
 public slots:
     void showGrid(bool show = true);
     void showMinorGrid(bool show = true);

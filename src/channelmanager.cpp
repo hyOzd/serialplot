@@ -119,16 +119,6 @@ QString ChannelManager::channelName(unsigned channel)
                            Qt::DisplayRole).toString();
 }
 
-QStringList ChannelManager::channelNames()
-{
-    QStringList list;
-    for (unsigned ci = 0; ci < _numOfChannels; ci++)
-    {
-        list << channelName(ci);
-    }
-    return list;
-}
-
 void ChannelManager::onChannelInfoChanged(const QModelIndex & topLeft,
                                           const QModelIndex & bottomRight,
                                           const QVector<int> & roles)

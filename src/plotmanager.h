@@ -48,14 +48,10 @@ public:
     void addCurve(QString title, FrameBuffer* buffer);
     /// Alternative of `addCurve` for static curve data (snapshots).
     void addCurve(QString title, QVector<QPointF> data);
-    /// Set the displayed title for a curve
-    void setTitle(unsigned index, QString title);
     /// Removes curves from the end
     void removeCurves(unsigned number);
     /// Returns current number of curves known by plot manager
     unsigned numOfCurves();
-    /// Set the current state of view
-    void setViewSettings(const PlotViewSettings& settings);
 
 public slots:
     /// Enable/Disable multiple plot display
