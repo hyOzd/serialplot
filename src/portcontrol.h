@@ -92,6 +92,7 @@ private slots:
     void openActionTriggered(bool checked);
     void onCbPortListActivated(int index);
     void onTbPortListActivated(int index);
+    void onPortError(QSerialPort::SerialPortError error);
     void updatePinLeds(void);
 
 signals:

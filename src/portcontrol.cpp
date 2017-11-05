@@ -48,6 +48,8 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     ui->setupUi(this);
 
     serialPort = port;
+    connect(serialPort, SIGNAL(error(QSerialPort::SerialPortError)),
+            this, SLOT(onPortError(QSerialPort::SerialPortError)));
 
     // setup actions
     openAction.setCheckable(true);
@@ -360,6 +362,64 @@ void PortControl::onCbPortListActivated(int index)
 void PortControl::onTbPortListActivated(int index)
 {
     ui->cbPortList->setCurrentIndex(index);
+}
+
+void PortControl::onPortError(QSerialPort::SerialPortError error)
+{
+    switch(error)
+    {
+        case QSerialPort::NoError :
+            break;
+        case QSerialPort::ResourceError :
+            qWarning() << "Port error: resource unavaliable; most likely device removed.";
+            if (serialPort->isOpen())
+            {
+                qWarning() << "Closing port on resource error: " << serialPort->portName();
+                togglePort();
+            }
+            loadPortList();
+            break;
+        case QSerialPort::DeviceNotFoundError:
+            qCritical() << "Device doesn't exists: " << serialPort->portName();
+            break;
+        case QSerialPort::PermissionError:
+            qCritical() << "Permission denied. Either you don't have \
+required privileges or device is already opened by another process.";
+            break;
+        case QSerialPort::OpenError:
+            qWarning() << "Device is already opened!";
+            break;
+        case QSerialPort::NotOpenError:
+            qCritical() << "Device is not open!";
+            break;
+        case QSerialPort::ParityError:
+            qCritical() << "Parity error detected.";
+            break;
+        case QSerialPort::FramingError:
+            qCritical() << "Framing error detected.";
+            break;
+        case QSerialPort::BreakConditionError:
+            qCritical() << "Break condition is detected.";
+            break;
+        case QSerialPort::WriteError:
+            qCritical() << "An error occurred while writing data.";
+            break;
+        case QSerialPort::ReadError:
+            qCritical() << "An error occurred while reading data.";
+            break;
+        case QSerialPort::UnsupportedOperationError:
+            qCritical() << "Operation is not supported.";
+            break;
+        case QSerialPort::TimeoutError:
+            qCritical() << "A timeout error occurred.";
+            break;
+        case QSerialPort::UnknownError:
+            qCritical() << "Unknown error! Error: " << serialPort->errorString();
+            break;
+        default:
+            qCritical() << "Unhandled port error: " << error;
+            break;
+    }
 }
 
 void PortControl::updatePinLeds(void)

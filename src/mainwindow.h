@@ -112,7 +112,6 @@ private:
 
 private slots:
     void onPortToggled(bool open);
-    void onPortError(QSerialPort::SerialPortError error);
 
     void onNumOfSamplesChanged(int value);
     void onNumOfChannelsChanged(unsigned value);
