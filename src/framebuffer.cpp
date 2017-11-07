@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -25,7 +25,8 @@ FrameBuffer::FrameBuffer(size_t size)
     data = new double[_size]();
     headIndex = 0;
 
-    _boundingRect.setCoords(0, 0, size, 0);
+    brInvalid = false;
+    _brCache.setCoords(0, 0, size, 0);
 }
 
 FrameBuffer::~FrameBuffer()
@@ -63,8 +64,8 @@ void FrameBuffer::resize(size_t size)
     headIndex = 0;
     _size = size;
 
-    // update the bounding rectangle
-    _boundingRect.setRight(_size);
+    // invalidate bounding rectangle
+    brInvalid = true;
 }
 
 void FrameBuffer::addSamples(double* samples, size_t size)
@@ -113,7 +114,30 @@ void FrameBuffer::addSamples(double* samples, size_t size)
         headIndex = 0;
     }
 
-    // update bounding rectangle
+    // invalidate cache
+    brInvalid = true;
+}
+
+void FrameBuffer::clear()
+{
+    for (size_t i=0; i < _size; i++) data[i] = 0.;
+
+    _brCache.setCoords(0, 0, _size, 0);
+}
+
+size_t FrameBuffer::size() const
+{
+    return _size;
+}
+
+QRectF FrameBuffer::boundingRect() const
+{
+    if (brInvalid) updateBoundingRect();
+    return _brCache;
+}
+
+void FrameBuffer::updateBoundingRect() const
+{
     double minValue = data[0];
     double maxValue = data[0];
     for (size_t i = 0; i < _size; i++)
@@ -127,23 +151,10 @@ void FrameBuffer::addSamples(double* samples, size_t size)
             minValue = data[i];
         }
     }
-    _boundingRect.setTop(minValue);
-    _boundingRect.setBottom(maxValue);
-}
+    _brCache.setTop(minValue);
+    _brCache.setBottom(maxValue);
 
-void FrameBuffer::clear()
-{
-    for (size_t i=0; i < _size; i++) data[i] = 0.;
-}
-
-size_t FrameBuffer::size() const
-{
-    return _size;
-}
-
-QRectF FrameBuffer::boundingRect() const
-{
-    return _boundingRect;
+    brInvalid = false;
 }
 
 double FrameBuffer::sample(size_t i) const

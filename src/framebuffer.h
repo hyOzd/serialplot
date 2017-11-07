@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -43,7 +43,9 @@ private:
     double* data;
     size_t headIndex; // indicates the actual `0` index of the ring buffer
 
-    QRectF _boundingRect;
+    mutable bool brInvalid; ///< Indicates that bounding rectangle needs to be re-calculated
+    mutable QRectF _brCache; ///< Cache for boundingRect()
+    void updateBoundingRect() const; ///< Updates bounding rectangle cache
 };
 
 #endif // FRAMEBUFFER_H
