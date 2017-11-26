@@ -143,6 +143,8 @@ add_executable(${PROGRAM_NAME} WIN32
   src/versionnumber.cpp
   src/updatecheckdialog.cpp
   src/samplepack.cpp
+  src/source.cpp
+  src/sink.cpp
   misc/windows_icon.rc
   ${UI_FILES}
   ${RES_FILES}
