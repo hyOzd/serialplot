@@ -41,8 +41,9 @@ public:
 protected:
     /// Feeds "in" given data to connected sinks
     void feedOut(const SamplePack& data) const;
-    /// Updates "number of channels" of connected sinks
-    void feedNumChannels(unsigned nc, bool x = false) const;
+    /// Updates "number of channels" of connected sinks. Must be
+    /// called when num. channels or hasX changes.
+    void updateNumChannels() const;
 
 private:
     QList<Sink*> sinks;

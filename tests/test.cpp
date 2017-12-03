@@ -63,7 +63,6 @@ public:
             _hasX = false;
         };
 
-public:
     void feedIn(const SamplePack& data)
         {
             REQUIRE(data.numChannels() == numChannels());
@@ -118,4 +117,66 @@ TEST_CASE("sink", "[memory, stream]")
     sink.setNumChannels(2, true);
     REQUIRE(follower.numChannels() == 2);
     REQUIRE(follower.hasX() == true);
+}
+
+class TestSource : public Source
+{
+public:
+    int _numChannels;
+    bool _hasX;
+
+    TestSource(unsigned nc, bool x)
+        {
+            _numChannels = nc;
+            _hasX = x;
+        };
+
+    virtual unsigned numChannels() const
+        {
+            return _numChannels;
+        };
+
+    virtual bool hasX() const
+        {
+            return _hasX;
+        };
+
+    void _feed(const SamplePack& data) const
+        {
+            feedOut(data);
+        };
+
+    void _setNumChannels(unsigned nc, bool x)
+        {
+            _numChannels = nc;
+            _hasX = x;
+
+            updateNumChannels();
+        };
+};
+
+TEST_CASE("source", "[memory, stream]")
+{
+    TestSink sink;
+
+    TestSource source(3, false);
+
+    REQUIRE(source.numChannels() == 3);
+    REQUIRE(source.hasX() == false);
+
+    source.connect(&sink);
+    REQUIRE(sink.numChannels() == 3);
+    REQUIRE(sink.hasX() == false);
+
+    source._setNumChannels(5, true);
+    REQUIRE(sink.numChannels() == 5);
+    REQUIRE(sink.hasX() == true);
+
+    SamplePack pack(100, 5, true);
+    source._feed(pack);
+    REQUIRE(sink.totalFed == 100);
+
+    source.disconnect(&sink);
+    source._feed(pack);
+    REQUIRE(sink.totalFed == 100);
 }

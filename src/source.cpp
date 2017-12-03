@@ -26,6 +26,7 @@ void Source::connect(Sink* sink)
     Q_ASSERT(!sinks.contains(sink));
 
     sinks.append(sink);
+    sink->setNumChannels(numChannels(), hasX());
 }
 
 void Source::disconnect(Sink* sink)
@@ -43,10 +44,10 @@ void Source::feedOut(const SamplePack& data) const
     }
 }
 
-void Source::feedNumChannels(unsigned nc, bool x) const
+void Source::updateNumChannels() const
 {
     for (auto sink : sinks)
     {
-        sink->setNumChannels(nc, x);
+        sink->setNumChannels(numChannels(), hasX());
     }
 }
