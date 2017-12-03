@@ -23,7 +23,11 @@ find_package(Qt5Widgets)
 include_directories("../src")
 
 add_executable(Test EXCLUDE_FROM_ALL
-  test.cpp ../src/samplepack.cpp)
+  test.cpp
+  ../src/samplepack.cpp
+  ../src/sink.cpp
+  ../src/source.cpp
+  )
 add_test(NAME test1 COMMAND Test)
 qt5_use_modules(Test Widgets)
 

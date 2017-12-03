@@ -38,10 +38,14 @@ public:
 protected:
     /// Entry point for incoming data. Re-implementations should
     /// call this function to feed followers.
-    void feedIn(const SamplePack& data);
+    virtual void feedIn(const SamplePack& data);
     /// Is set by connected source. Re-implementations should call
     /// this function to update followers.
-    void setNumChannels(unsigned nc, bool x);
+    virtual void setNumChannels(unsigned nc, bool x);
+    /// Returns true if sink has X data
+    virtual bool hasX() const = 0;
+    /// Returns number of channels
+    virtual unsigned numChannels() const = 0;
 
     friend Source;
 

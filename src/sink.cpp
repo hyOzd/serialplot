@@ -25,6 +25,7 @@ void Sink::connectFollower(Sink* sink)
     Q_ASSERT(!followers.contains(sink));
 
     followers.append(sink);
+    sink->setNumChannels(numChannels(), hasX());
 }
 
 void Sink::disconnectFollower(Sink* sink)

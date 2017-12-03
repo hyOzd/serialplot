@@ -43,7 +43,6 @@ void Source::feedOut(const SamplePack& data) const
     }
 }
 
-/// Updates "number of channels" of connected sinks
 void Source::feedNumChannels(unsigned nc, bool x) const
 {
     for (auto sink : sinks)
