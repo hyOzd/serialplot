@@ -22,6 +22,7 @@
 
 #include "samplepack.h"
 #include "source.h"
+#include "indexbuffer.h"
 
 TEST_CASE("samplepack with no X", "[memory]")
 {
@@ -179,4 +180,25 @@ TEST_CASE("source", "[memory, stream]")
     source.disconnect(&sink);
     source._feed(pack);
     REQUIRE(sink.totalFed == 100);
+}
+
+TEST_CASE("IndexBuffer", "[memory, buffer]")
+{
+    IndexBuffer buf(10);
+
+    REQUIRE(buf.size() == 10);
+    for (unsigned i = 0; i < 10; i++)
+    {
+        REQUIRE(buf.sample(i) == i);
+    }
+    auto l = buf.limits();
+    REQUIRE(l.min == 0);
+    REQUIRE(l.max == 9);
+
+    buf.resize(20);
+    REQUIRE(buf.size() == 20);
+    REQUIRE(buf.sample(15) == 15);
+    l = buf.limits();
+    REQUIRE(l.min == 0);
+    REQUIRE(l.max == 19);
 }
