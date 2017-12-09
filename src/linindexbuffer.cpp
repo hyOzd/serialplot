@@ -1,4 +1,4 @@
-/*
+ /*
   Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
@@ -17,28 +17,41 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef INDEXBUFFER_H
-#define INDEXBUFFER_H
+#include <QtGlobal>
 
-// IMPORTANT TODO: rename to "framebuffer.h" when stream work is done.
-#include "framebuffer2.h"
+#include "linindexbuffer.h"
 
-/// A simple frame buffer that simply returns requested index as
-/// sample value.
-///
-/// @note This buffer isn't for storing data.
-class IndexBuffer : public ResizableBuffer
+LinIndexBuffer::LinIndexBuffer(unsigned n, Range lim)
 {
-public:
-    IndexBuffer(unsigned n);
+    Q_ASSERT(n > 0);
 
-    unsigned size() const;
-    double sample(unsigned i) const;
-    Range limits() const;
-    void resize(unsigned n);
+    _size = n;
+    setLimits(lim);
+}
 
-private:
-    unsigned _size;
-};
+unsigned LinIndexBuffer::size() const
+{
+    return _size;
+}
 
-#endif
+double LinIndexBuffer::sample(unsigned i) const
+{
+    return _limits.start + i * _step;
+}
+
+Range LinIndexBuffer::limits() const
+{
+    return _limits;
+}
+
+void LinIndexBuffer::resize(unsigned n)
+{
+    _size = n;
+    setLimits(_limits);         // called to update `_step`
+}
+
+void LinIndexBuffer::setLimits(Range lim)
+{
+    _limits = lim;
+    _step = (lim.end - lim.start) / (_size-1);
+}

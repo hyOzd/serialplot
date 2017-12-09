@@ -28,6 +28,7 @@ add_executable(Test EXCLUDE_FROM_ALL
   ../src/sink.cpp
   ../src/source.cpp
   ../src/indexbuffer.cpp
+  ../src/linindexbuffer.cpp
   )
 add_test(NAME test1 COMMAND Test)
 qt5_use_modules(Test Widgets)

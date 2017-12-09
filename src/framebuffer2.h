@@ -25,7 +25,7 @@
 
 struct Range
 {
-    double min, max;
+    double start, end;
 };
 
 /// Abstract base class for all frame buffers.

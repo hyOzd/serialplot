@@ -23,6 +23,7 @@
 #include "samplepack.h"
 #include "source.h"
 #include "indexbuffer.h"
+#include "linindexbuffer.h"
 
 TEST_CASE("samplepack with no X", "[memory]")
 {
@@ -192,13 +193,46 @@ TEST_CASE("IndexBuffer", "[memory, buffer]")
         REQUIRE(buf.sample(i) == i);
     }
     auto l = buf.limits();
-    REQUIRE(l.min == 0);
-    REQUIRE(l.max == 9);
+    REQUIRE(l.start == 0);
+    REQUIRE(l.end == 9);
 
     buf.resize(20);
     REQUIRE(buf.size() == 20);
     REQUIRE(buf.sample(15) == 15);
     l = buf.limits();
-    REQUIRE(l.min == 0);
-    REQUIRE(l.max == 19);
+    REQUIRE(l.start == 0);
+    REQUIRE(l.end == 19);
+}
+
+TEST_CASE("LinIndexBuffer", "[memory, buffer]")
+{
+    LinIndexBuffer buf(10, 0., 3.0);
+
+    REQUIRE(buf.size() == 10);
+    REQUIRE(buf.sample(0) == 0.);
+    REQUIRE(buf.sample(9) == 3.0);
+    REQUIRE(buf.sample(4) == Approx(1+1/3.));
+
+    auto l = buf.limits();
+    REQUIRE(l.start == 0.);
+    REQUIRE(l.end == 3.);
+
+    buf.resize(20);
+    REQUIRE(buf.size() == 20);
+    REQUIRE(buf.sample(0) == 0.);
+    REQUIRE(buf.sample(9) == Approx(9.*3./19.));
+    REQUIRE(buf.sample(4) == Approx(4.*3./19.));
+    REQUIRE(buf.sample(19) == 3.0);
+
+    l = buf.limits();
+    REQUIRE(l.start == 0.);
+    REQUIRE(l.end == 3.0);
+
+    buf.setLimits({-5., 5.});
+    l = buf.limits();
+    REQUIRE(l.start == -5.0);
+    REQUIRE(l.end == 5.0);
+
+    REQUIRE(buf.sample(0) == -5.0);
+    REQUIRE(buf.sample(19) == 5.0);
 }

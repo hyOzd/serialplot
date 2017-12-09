@@ -1,4 +1,4 @@
-/*
+ /*
   Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
@@ -17,28 +17,34 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef INDEXBUFFER_H
-#define INDEXBUFFER_H
+#ifndef LININDEXBUFFER_H
+#define LININDEXBUFFER_H
 
 // IMPORTANT TODO: rename to "framebuffer.h" when stream work is done.
 #include "framebuffer2.h"
 
-/// A simple frame buffer that simply returns requested index as
-/// sample value.
+/// A dynamic frame buffer that start and end values can be set and
+/// intermediate values are calculated linearly.
 ///
 /// @note This buffer isn't for storing data.
-class IndexBuffer : public ResizableBuffer
+class LinIndexBuffer : public ResizableBuffer
 {
 public:
-    IndexBuffer(unsigned n);
+    LinIndexBuffer(unsigned n, Range lim);
+    LinIndexBuffer(unsigned n, double min, double max) :
+        LinIndexBuffer(n, {min, max}) {};
 
     unsigned size() const;
     double sample(unsigned i) const;
     Range limits() const;
     void resize(unsigned n);
+    /// Sets minimum and maximum sample values of the buffer.
+    void setLimits(Range lim);
 
 private:
     unsigned _size;
+    Range _limits;
+    double _step;
 };
 
 #endif
