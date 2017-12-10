@@ -32,15 +32,20 @@ struct Range
 class FrameBuffer
 {
 public:
+    /// Returns size of the buffer.
     virtual unsigned size() const = 0;
+    /// Returns a sample from given index.
     virtual double sample(unsigned i) const = 0;
+    /// Returns minimum and maximum of the buffer values.
     virtual Range limits() const = 0;
 };
 
 /// Common base class for index and writable frame buffers
 class ResizableBuffer : public FrameBuffer
 {
-    /// Resize buffer
+    /// Resize the buffer.
+    ///
+    /// @important Resizing to same value is an error.
     virtual void resize(unsigned n) = 0;
 };
 

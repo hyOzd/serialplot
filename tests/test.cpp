@@ -24,6 +24,7 @@
 #include "source.h"
 #include "indexbuffer.h"
 #include "linindexbuffer.h"
+#include "ringbuffer.h"
 
 TEST_CASE("samplepack with no X", "[memory]")
 {
@@ -235,4 +236,131 @@ TEST_CASE("LinIndexBuffer", "[memory, buffer]")
 
     REQUIRE(buf.sample(0) == -5.0);
     REQUIRE(buf.sample(19) == 5.0);
+}
+
+TEST_CASE("RingBuffer sizing", "[memory, buffer]")
+{
+    RingBuffer buf(10);
+
+    REQUIRE(buf.size() == 10);
+
+    buf.resize(5);
+    REQUIRE(buf.size() == 5);
+
+    buf.resize(15);
+    REQUIRE(buf.size() == 15);
+}
+
+TEST_CASE("RingBuffer initial values should be 0", "[memory, buffer]")
+{
+    RingBuffer buf(10);
+
+    for (unsigned i = 0; i < 10; i++)
+    {
+        REQUIRE(buf.sample(i) == 0.);
+    }
+}
+
+TEST_CASE("RingBuffer data access", "[memory, buffer]")
+{
+    RingBuffer buf(10);
+    double values[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+    buf.addSamples(values, 10);
+
+    REQUIRE(buf.size() == 10);
+    for (unsigned i = 0; i < 10; i++)
+    {
+        REQUIRE(buf.sample(i) == values[i]);
+    }
+
+    buf.addSamples(values, 5);
+
+    REQUIRE(buf.size() == 10);
+    for (unsigned i = 0; i < 5; i++)
+    {
+        REQUIRE(buf.sample(i) == values[i+5]);
+    }
+    for (unsigned i = 5; i < 10; i++)
+    {
+        REQUIRE(buf.sample(i) == values[i-5]);
+    }
+}
+
+TEST_CASE("making RingBuffer bigger should keep end values", "[memory, buffer]")
+{
+    RingBuffer buf(5);
+    double values[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+    buf.addSamples(values, 5);
+    buf.resize(10);
+
+    REQUIRE(buf.size() == 10);
+    for (unsigned i = 0; i < 5; i++)
+    {
+        REQUIRE(buf.sample(i) == 0);
+    }
+    for (unsigned i = 5; i < 10; i++)
+    {
+        REQUIRE(buf.sample(i) == values[i-5]);
+    }
+}
+
+TEST_CASE("making RingBuffer smaller should keep end values", "[memory, buffer]")
+{
+    RingBuffer buf(10);
+    double values[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+    buf.addSamples(values, 10);
+    buf.resize(5);
+
+    REQUIRE(buf.size() == 5);
+    for (unsigned i = 0; i < 5; i++)
+    {
+        REQUIRE(buf.sample(i) == values[i+5]);
+    }
+}
+
+TEST_CASE("RingBuffer limits", "[memory, buffer]")
+{
+    RingBuffer buf(10);
+    double values[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+    auto lim = buf.limits();
+    REQUIRE(lim.start == 0.);
+    REQUIRE(lim.end == 0.);
+
+    buf.addSamples(values, 10);
+    lim = buf.limits();
+    REQUIRE(lim.start == 1.);
+    REQUIRE(lim.end == 10.);
+
+    buf.addSamples(&values[9], 1);
+    lim = buf.limits();
+    REQUIRE(lim.start == 2.);
+    REQUIRE(lim.end == 10.);
+
+    buf.addSamples(values, 9);
+    buf.addSamples(values, 1);
+    lim = buf.limits();
+    REQUIRE(lim.start == 1.);
+    REQUIRE(lim.end == 9.);
+}
+
+TEST_CASE("RingBuffer clear", "[memory, buffer]")
+{
+    RingBuffer buf(10);
+    double values[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+    buf.addSamples(values, 10);
+    buf.clear();
+
+    REQUIRE(buf.size() == 10);
+    for (unsigned i = 0; i < 10; i++)
+    {
+        REQUIRE(buf.sample(i) == 0.);
+    }
+    auto lim = buf.limits();
+    REQUIRE(lim.start == 0.);
+    REQUIRE(lim.end == 0.);
 }
