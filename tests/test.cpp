@@ -25,6 +25,7 @@
 #include "indexbuffer.h"
 #include "linindexbuffer.h"
 #include "ringbuffer.h"
+#include "readonlybuffer.h"
 
 TEST_CASE("samplepack with no X", "[memory]")
 {
@@ -363,4 +364,36 @@ TEST_CASE("RingBuffer clear", "[memory, buffer]")
     auto lim = buf.limits();
     REQUIRE(lim.start == 0.);
     REQUIRE(lim.end == 0.);
+}
+
+TEST_CASE("ReadOnlyBuffer", "[memory, buffer]")
+{
+    IndexBuffer source(10);
+
+    ReadOnlyBuffer buf(&source);
+
+    REQUIRE(buf.size() == 10);
+    auto lim = buf.limits();
+    REQUIRE(lim.start == 0.);
+    REQUIRE(lim.end == 9.);
+    for (unsigned i = 0; i < 10; i++)
+    {
+        REQUIRE(buf.sample(i) == i);
+    }
+}
+
+TEST_CASE("ReadOnlyBuffer sliced constructor", "[memory, buffer]")
+{
+    IndexBuffer source(10);
+
+    ReadOnlyBuffer buf(&source, 5, 4);
+
+    REQUIRE(buf.size() == 4);
+    auto lim = buf.limits();
+    REQUIRE(lim.start == 5.);
+    REQUIRE(lim.end == 8.);
+    for (unsigned i = 0; i < 4; i++)
+    {
+        REQUIRE(buf.sample(i) == (i + 5));
+    }
 }

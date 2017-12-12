@@ -30,6 +30,7 @@ add_executable(Test EXCLUDE_FROM_ALL
   ../src/indexbuffer.cpp
   ../src/linindexbuffer.cpp
   ../src/ringbuffer.cpp
+  ../src/readonlybuffer.cpp
   )
 add_test(NAME test1 COMMAND Test)
 qt5_use_modules(Test Widgets)
