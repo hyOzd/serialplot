@@ -32,6 +32,8 @@ struct Range
 class FrameBuffer
 {
 public:
+    /// Placeholder virtual destructor
+    virtual ~FrameBuffer() {};
     /// Returns size of the buffer.
     virtual unsigned size() const = 0;
     /// Returns a sample from given index.
