@@ -123,6 +123,12 @@ TEST_CASE("sink", "[memory, stream]")
     REQUIRE(follower.hasX() == true);
 }
 
+TEST_CASE("sink must be created unconnected", "[memory, stream]")
+{
+    TestSink sink;
+    REQUIRE(sink.connectedSource() == NULL);
+}
+
 class TestSource : public Source
 {
 public:
@@ -183,6 +189,18 @@ TEST_CASE("source", "[memory, stream]")
     source.disconnect(&sink);
     source._feed(pack);
     REQUIRE(sink.totalFed == 100);
+}
+
+TEST_CASE("source must set/unset sink 'source'", "[memory, stream]")
+{
+    TestSink sink;
+    TestSource source(3, false);
+
+    source.connect(&sink);
+    REQUIRE(sink.connectedSource() == &source);
+
+    source.disconnect(&sink);
+    REQUIRE(sink.connectedSource() == NULL);
 }
 
 TEST_CASE("IndexBuffer", "[memory, buffer]")

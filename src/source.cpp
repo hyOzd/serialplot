@@ -24,15 +24,19 @@
 void Source::connect(Sink* sink)
 {
     Q_ASSERT(!sinks.contains(sink));
+    Q_ASSERT(sink->connectedSource() == NULL);
 
     sinks.append(sink);
+    sink->setSource(this);
     sink->setNumChannels(numChannels(), hasX());
 }
 
 void Source::disconnect(Sink* sink)
 {
     Q_ASSERT(sinks.contains(sink));
+    Q_ASSERT(sink->connectedSource() == this);
 
+    sink->setSource(NULL);
     sinks.removeOne(sink);
 }
 

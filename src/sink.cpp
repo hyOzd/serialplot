@@ -50,3 +50,14 @@ void Sink::setNumChannels(unsigned nc, bool x)
         sink->setNumChannels(nc, x);
     }
 }
+
+void Sink::setSource(const Source* s)
+{
+    Q_ASSERT((source == NULL) != (s == NULL));
+    source = s;
+}
+
+const Source* Sink::connectedSource() const
+{
+    return source;
+}
