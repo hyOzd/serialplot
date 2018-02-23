@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -25,7 +25,7 @@ void Sink::connectFollower(Sink* sink)
     Q_ASSERT(!followers.contains(sink));
 
     followers.append(sink);
-    sink->setNumChannels(numChannels(), hasX());
+    sink->setNumChannels(_numChannels, _hasX);
 }
 
 void Sink::disconnectFollower(Sink* sink)
@@ -45,6 +45,8 @@ void Sink::feedIn(const SamplePack& data)
 
 void Sink::setNumChannels(unsigned nc, bool x)
 {
+    _numChannels = nc;
+    _hasX = x;
     for (auto sink : followers)
     {
         sink->setNumChannels(nc, x);

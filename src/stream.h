@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -29,6 +29,7 @@
 #include "source.h"
 #include "channelinfomodel.h"
 #include "streamchannel.h"
+#include "resizablebuffer.h"
 
 /**
  * Main waveform storage class. It consists of channels. Channels are
@@ -38,29 +39,32 @@
  * connected to a `Device` source. Also implements a `Source` class
  * for data that exists the buffers.
  */
-class Stream : public Sink, public Source, public QObject
+class Stream : public Sink, public QObject
 {
 public:
     /**
      * @param nc number of channels
      * @param ns number of samples
      */
-    Stream(unsigned ns);
+    Stream(unsigned nc = 0, bool x = false, unsigned ns = 0);
     ~Stream();
 
     // implementations for `Source`
     virtual bool hasX() const;
     virtual unsigned numChannels();
 
-    // implementations for `Sink`
-    virtual void setNumChannels(unsigned nc, bool x);
-
     unsigned numSamples() const;
     const StreamChannel* channel(unsigned index) const;
+
     /// Saves channel information
     void saveSettings(QSettings* settings) const;
     /// Load channel information
     void loadSettings(QSettings* settings);
+
+protected:
+    // implementations for `Sink`
+    virtual void setNumChannels(unsigned nc, bool x);
+    virtual void feedIn(const SamplePack& data);
 
 signals:
     void numChannelsChanged(unsigned value);
@@ -72,10 +76,20 @@ signals:
 public slots:
     // TODO: these won't be public
     void setNumChannels(unsigned number);
-    void setNumSamples(unsigned number);
+    void setNumSamples(unsigned value);
 
-    /// When paused `addData` does nothing.
+    /// When paused data feed is ignored
     void pause(bool paused);
+
+private:
+    unsigned _numSamples;
+    bool _paused;
+
+    bool _hasx;
+    ResizableBuffer* xData;
+    QList<StreamChannel*> channels;
+
+    ChannelInfoModel _infoModel;
 };
 
 

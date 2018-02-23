@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -41,3 +41,4 @@ const FrameBuffer* StreamChannel::xData() const {return _x;}
 const FrameBuffer* StreamChannel::yData() const {return _y;}
 FrameBuffer* StreamChannel::yData() {return _y;}
 const ChannelInfoModel* StreamChannel::info() const {return _info;}
+void StreamChannel::setX(const FrameBuffer* x) {_x = x};

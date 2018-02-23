@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -50,7 +50,7 @@ public:
     FrameBuffer* yData();
     const FrameBuffer* yData() const;
     const ChannelInfoModel* info() const;
-
+    void setX(const FrameBuffer* x);
 
 private:
     unsigned _index;

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -28,7 +28,11 @@
 class Source
 {
 public:
+    /// Placeholder virtual destructor
+    virtual ~Source() {};
+    /// Returns true if source has X data
     virtual bool hasX() const = 0;
+    /// Returns number of channels
     virtual unsigned numChannels() const = 0;
 
     /// Connects a sink to this source. Trying to connect an already

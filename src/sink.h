@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -28,6 +28,8 @@ class Source;
 class Sink
 {
 public:
+    /// Placeholder virtual destructor
+    virtual ~Sink() {};
     /// Connects a sink to get any data that this sink
     /// gets. Connecting an already connected sink is an error.
     void connectFollower(Sink* sink);
@@ -44,10 +46,6 @@ protected:
     /// Is set by connected source. Re-implementations should call
     /// this function to update followers.
     virtual void setNumChannels(unsigned nc, bool x);
-    /// Returns true if sink has X data
-    virtual bool hasX() const = 0;
-    /// Returns number of channels
-    virtual unsigned numChannels() const = 0;
     /// Set by the connected source when its connected. When
     /// disconnecting it's set to `NULL`.
     ///
@@ -60,6 +58,8 @@ protected:
 private:
     QList<Sink*> followers;
     const Source* source = NULL;   ///< source that this sink is connected to
+    bool _hasX;
+    unsigned _numChannels;
 };
 
 #endif // SINK_H
