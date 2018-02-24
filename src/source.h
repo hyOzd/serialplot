@@ -28,16 +28,19 @@
 class Source
 {
 public:
-    /// Placeholder virtual destructor
-    virtual ~Source() {};
+    /// Virtual destructor. Must be called by implementors to notify sinks.
+    virtual ~Source();
+
     /// Returns true if source has X data
     virtual bool hasX() const = 0;
+
     /// Returns number of channels
     virtual unsigned numChannels() const = 0;
 
     /// Connects a sink to this source. Trying to connect an already
     /// connected sink is an error.
     void connect(Sink* sink);
+
     /// Disconnects an already connected sink. Trying to disconnect an
     /// unconnected sink is an error.
     void disconnect(Sink* sink);
@@ -45,6 +48,7 @@ public:
 protected:
     /// Feeds "in" given data to connected sinks
     void feedOut(const SamplePack& data) const;
+
     /// Updates "number of channels" of connected sinks. Must be
     /// called when num. channels or hasX changes.
     void updateNumChannels() const;

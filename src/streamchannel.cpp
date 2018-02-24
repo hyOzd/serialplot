@@ -34,11 +34,11 @@ StreamChannel::~StreamChannel()
 }
 
 unsigned StreamChannel::index() const {return _index;}
-QString StreamChannel::name() const {return _info->name(_index)};
-QColor StreamChannel::color() const {return _info->color(_index)};
-bool StreamChannel::visible() const {return _info->isVisible(_index)};
+QString StreamChannel::name() const {return _info->name(_index);};
+QColor StreamChannel::color() const {return _info->color(_index);};
+bool StreamChannel::visible() const {return _info->isVisible(_index);};
 const FrameBuffer* StreamChannel::xData() const {return _x;}
 const FrameBuffer* StreamChannel::yData() const {return _y;}
 FrameBuffer* StreamChannel::yData() {return _y;}
 const ChannelInfoModel* StreamChannel::info() const {return _info;}
-void StreamChannel::setX(const FrameBuffer* x) {_x = x};
+void StreamChannel::setX(const FrameBuffer* x) {_x = x;};

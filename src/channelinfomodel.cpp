@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -336,7 +336,7 @@ void ChannelInfoModel::resetVisibility()
     endResetModel();
 }
 
-void ChannelInfoModel::saveSettings(QSettings* settings)
+void ChannelInfoModel::saveSettings(QSettings* settings) const
 {
     settings->beginGroup(SettingGroup_Channels);
     settings->beginWriteArray(SG_Channels_Channel);

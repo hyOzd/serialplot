@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 Hasan Yavuz Özderya
+# Copyright © 2018 Hasan Yavuz Özderya
 #
 # This file is part of serialplot.
 #
@@ -24,6 +24,7 @@ include_directories("../src")
 
 add_executable(Test EXCLUDE_FROM_ALL
   test.cpp
+  test_stream.cpp
   ../src/samplepack.cpp
   ../src/sink.cpp
   ../src/source.cpp
@@ -31,6 +32,9 @@ add_executable(Test EXCLUDE_FROM_ALL
   ../src/linindexbuffer.cpp
   ../src/ringbuffer.cpp
   ../src/readonlybuffer.cpp
+  ../src/stream.cpp
+  ../src/streamchannel.cpp
+  ../src/channelinfomodel.cpp
   )
 add_test(NAME test1 COMMAND Test)
 qt5_use_modules(Test Widgets)

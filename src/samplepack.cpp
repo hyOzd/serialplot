@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -75,4 +75,14 @@ double* SamplePack::data(unsigned channel) const
     Q_ASSERT(channel < _numChannels);
 
     return &_yData[channel * _numSamples];
+}
+
+double* SamplePack::xData()
+{
+    return const_cast<double*>(static_cast<const SamplePack&>(*this).xData());
+}
+
+double* SamplePack::data(unsigned channel)
+{
+    return const_cast<double*>(static_cast<const SamplePack&>(*this).data(channel));
 }

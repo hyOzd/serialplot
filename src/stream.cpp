@@ -19,6 +19,7 @@
 
 #include "stream.h"
 #include "ringbuffer.h"
+#include "indexbuffer.h"
 
 Stream::Stream(unsigned nc, bool x, unsigned ns) :
     _infoModel(nc)
@@ -56,7 +57,7 @@ bool Stream::hasX() const
     return _hasx;
 }
 
-unsigned Stream::numChannels()
+unsigned Stream::numChannels() const
 {
     return channels.length();
 }
@@ -72,52 +73,57 @@ const StreamChannel* Stream::channel(unsigned index) const
     return channels[index];
 }
 
+StreamChannel* Stream::channel(unsigned index)
+{
+    return const_cast<StreamChannel*>(static_cast<const Stream&>(*this).channel(index));
+}
+
 void Stream::setNumChannels(unsigned nc, bool x)
 {
     unsigned oldNum = numChannels();
-    if (oldNum == nc && x == _hasX) return;
+    if (oldNum == nc && x == _hasx) return;
 
     // adjust the number of channels
     if (nc > oldNum)
     {
-        for (int i = oldNum; i < nc; i++)
+        for (unsigned i = oldNum; i < nc; i++)
         {
-            auto c = new StreamChannel(i, xData, new RingBuffer(ns), &_infoModel);
+            auto c = new StreamChannel(i, xData, new RingBuffer(_numSamples), &_infoModel);
             channels.append(c);
         }
     }
     else if (nc < oldNum)
     {
-        for (int i = oldNum-1; i > nc-1; i--)
+        for (unsigned i = oldNum-1; i > nc-1; i--)
         {
             delete channels.takeLast();
         }
     }
 
     // change the xdata
-    if (x != _hasX)
+    if (x != _hasx)
     {
         if (x)
         {
-            xData = new RingBuffer(ns);
+            xData = new RingBuffer(_numSamples);
         }
         else
         {
-            xData = new IndexBuffer(ns);
+            xData = new IndexBuffer(_numSamples);
         }
 
         for (auto c : channels)
         {
-            c.setX(xData);
+            c->setX(xData);
         }
-        _hasX = x;
+        _hasx = x;
     }
 
     if (nc != oldNum)
     {
-        _infoModel.setNumChannels(nc);
+        _infoModel.setNumOfChannels(nc);
         // TODO: how abut X change?
-        emit numOfChannelsChanged(nc);
+        emit numChannelsChanged(nc);
     }
 
     Sink::setNumChannels(nc, x);
@@ -131,13 +137,13 @@ void Stream::feedIn(const SamplePack& data)
     if (_paused) return;
 
     unsigned ns = data.numSamples();
-    if (_hasX)
+    if (_hasx)
     {
-        xData.addSamples(data.xData(), ns);
+        static_cast<RingBuffer*>(xData)->addSamples(data.xData(), ns);
     }
     for (unsigned i = 0; i < numChannels(); i++)
     {
-        channels[i].yData()->addSamples(data.data(i), ns);
+        static_cast<RingBuffer*>(channels[i]->yData())->addSamples(data.data(i), ns);
     }
 
     Sink::feedIn(data);
@@ -153,10 +159,10 @@ void Stream::setNumSamples(unsigned value)
     if (value == _numSamples) return;
     _numSamples = value;
 
-    xData.resize(value);
+    xData->resize(value);
     for (auto c : channels)
     {
-        channels[i].yData()->resize(value);
+        static_cast<RingBuffer*>(c->yData())->resize(value);
     }
 }
 

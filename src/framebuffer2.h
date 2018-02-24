@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -45,6 +45,7 @@ public:
 /// Common base class for index and writable frame buffers
 class ResizableBuffer : public FrameBuffer
 {
+public:
     /// Resize the buffer.
     ///
     /// @important Resizing to same value is an error.

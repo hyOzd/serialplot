@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -27,6 +27,8 @@
 #include "ringbuffer.h"
 #include "readonlybuffer.h"
 
+#include "test_helpers.h"
+
 TEST_CASE("samplepack with no X", "[memory]")
 {
     SamplePack pack(100, 3, false);
@@ -52,48 +54,6 @@ TEST_CASE("samplepack with X", "[memory]")
     REQUIRE(pack.numSamples() == 100);
     REQUIRE(pack.xData() != nullptr);
 }
-
-class TestSink : public Sink
-{
-public:
-    int totalFed;
-    int _numChannels;
-    bool _hasX;
-
-    TestSink()
-        {
-            totalFed = 0;
-            _numChannels = 0;
-            _hasX = false;
-        };
-
-    void feedIn(const SamplePack& data)
-        {
-            REQUIRE(data.numChannels() == numChannels());
-
-            totalFed += data.numSamples();
-
-            Sink::feedIn(data);
-        };
-
-    void setNumChannels(unsigned nc, bool x)
-        {
-            _numChannels = nc;
-            _hasX = x;
-
-            Sink::setNumChannels(nc, x);
-        };
-
-    virtual unsigned numChannels() const
-        {
-            return _numChannels;
-        };
-
-    virtual bool hasX() const
-        {
-            return _hasX;
-        };
-};
 
 TEST_CASE("sink", "[memory, stream]")
 {
@@ -128,42 +88,6 @@ TEST_CASE("sink must be created unconnected", "[memory, stream]")
     TestSink sink;
     REQUIRE(sink.connectedSource() == NULL);
 }
-
-class TestSource : public Source
-{
-public:
-    int _numChannels;
-    bool _hasX;
-
-    TestSource(unsigned nc, bool x)
-        {
-            _numChannels = nc;
-            _hasX = x;
-        };
-
-    virtual unsigned numChannels() const
-        {
-            return _numChannels;
-        };
-
-    virtual bool hasX() const
-        {
-            return _hasX;
-        };
-
-    void _feed(const SamplePack& data) const
-        {
-            feedOut(data);
-        };
-
-    void _setNumChannels(unsigned nc, bool x)
-        {
-            _numChannels = nc;
-            _hasX = x;
-
-            updateNumChannels();
-        };
-};
 
 TEST_CASE("source", "[memory, stream]")
 {

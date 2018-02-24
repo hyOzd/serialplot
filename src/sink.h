@@ -30,12 +30,15 @@ class Sink
 public:
     /// Placeholder virtual destructor
     virtual ~Sink() {};
+
     /// Connects a sink to get any data that this sink
     /// gets. Connecting an already connected sink is an error.
     void connectFollower(Sink* sink);
+
     /// Disconnects a follower. Disconnecting an unconnected sink is
     /// an error.
     void disconnectFollower(Sink* sink);
+
     /// Returns the connected source. `NULL` if it's not connected.
     const Source* connectedSource() const;
 
@@ -43,9 +46,11 @@ protected:
     /// Entry point for incoming data. Re-implementations should
     /// call this function to feed followers.
     virtual void feedIn(const SamplePack& data);
+
     /// Is set by connected source. Re-implementations should call
     /// this function to update followers.
     virtual void setNumChannels(unsigned nc, bool x);
+
     /// Set by the connected source when its connected. When
     /// disconnecting it's set to `NULL`.
     ///

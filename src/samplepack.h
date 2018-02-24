@@ -32,6 +32,9 @@ public:
     double* xData() const;
     double* data(unsigned channel) const;
 
+    double* xData();
+    double* data(unsigned channel);
+
 private:
     unsigned _numSamples, _numChannels;
     double* _xData;

@@ -29,21 +29,23 @@
 #include "source.h"
 #include "channelinfomodel.h"
 #include "streamchannel.h"
-#include "resizablebuffer.h"
+#include "framebuffer2.h"
 
 /**
  * Main waveform storage class. It consists of channels. Channels are
  * synchronized with each other.
  *
  * Implements `Sink` class for data entry. It's expected to be
- * connected to a `Device` source. Also implements a `Source` class
- * for data that exists the buffers.
+ * connected to a `Device` source.
  */
-class Stream : public Sink, public QObject
+class Stream : public QObject, public Sink
 {
+    Q_OBJECT
+
 public:
     /**
      * @param nc number of channels
+     * @param x has X data input
      * @param ns number of samples
      */
     Stream(unsigned nc = 0, bool x = false, unsigned ns = 0);
@@ -51,10 +53,11 @@ public:
 
     // implementations for `Source`
     virtual bool hasX() const;
-    virtual unsigned numChannels();
+    virtual unsigned numChannels() const;
 
     unsigned numSamples() const;
     const StreamChannel* channel(unsigned index) const;
+    StreamChannel* channel(unsigned index);
 
     /// Saves channel information
     void saveSettings(QSettings* settings) const;
@@ -75,7 +78,7 @@ signals:
 
 public slots:
     // TODO: these won't be public
-    void setNumChannels(unsigned number);
+    // void setNumChannels(unsigned number);
     void setNumSamples(unsigned value);
 
     /// When paused data feed is ignored
