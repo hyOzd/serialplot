@@ -178,3 +178,36 @@ TEST_CASE("adding data to a stream with X", "[memory, stream, data, sink]")
         REQUIRE(x->sample(i) == (i-5)+10);
     }
 }
+
+TEST_CASE("paused stream shoulnd't store data", "[memory, stream, pause]")
+{
+    Stream s(3, false, 10);
+
+    // prepare data
+    SamplePack pack(5, 3, false);
+    for (unsigned ci = 0; ci < 3; ci++)
+    {
+        for (unsigned i = 0; i < 5; i++)
+        {
+            pack.data(ci)[i] = i;
+        }
+    }
+
+    TestSource so(3, false);
+    so.connect(&s);
+
+    // test
+    s.pause(true);
+    so._feed(pack);
+
+    for (unsigned ci = 0; ci < 3; ci++)
+    {
+        const StreamChannel* c = s.channel(ci);
+        const FrameBuffer* y = c->yData();
+
+        for (unsigned i = 0; i < 10; i++)
+        {
+            REQUIRE(y->sample(i) == 0);
+        }
+    }
+}
