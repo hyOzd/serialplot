@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -205,7 +205,11 @@ void PlotManager::setMulti(bool enabled)
         }
     }
 
-    checkNoVisChannels();
+    // will skip if no plot widgets exist (can happen during constructor)
+    if (plotWidgets.length())
+    {
+        checkNoVisChannels();
+    }
 }
 
 void PlotManager::setupLayout(bool multiPlot)
