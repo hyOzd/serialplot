@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -155,7 +155,7 @@ bool UpdateChecker::parseData(const QJsonDocument& data, QList<FileInfo>& files)
         else if (finfo.name.contains("win32") ||
                  finfo.name.contains("i386"))
         {
-            finfo.arch = FileArch::i386;
+            finfo.arch = FileArch::_i386;
         }
         else
         {
@@ -186,7 +186,7 @@ bool UpdateChecker::findUpdate(const QList<FileInfo>& files, FileInfo& foundFile
 #if defined(Q_PROCESSOR_X86_64)
         const FileArch arch = FileArch::amd64;
 #elif defined(Q_PROCESSOR_X86_32)
-        const FileArch arch = FileArch::i386;
+        const FileArch arch = FileArch::_i386;
 #elif defined(Q_PROCESSOR_ARM)
         const FileArch arch = FileArch::arm;
 #else

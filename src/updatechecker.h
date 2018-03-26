@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -47,7 +47,7 @@ private:
     enum class FileArch
     {
         unknown,
-        i386,
+        _i386,
         amd64,
         arm
     };
