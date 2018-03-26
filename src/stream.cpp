@@ -78,6 +78,11 @@ StreamChannel* Stream::channel(unsigned index)
     return const_cast<StreamChannel*>(static_cast<const Stream&>(*this).channel(index));
 }
 
+const ChannelInfoModel* Stream::infoModel() const
+{
+    return &_infoModel;
+}
+
 void Stream::setNumChannels(unsigned nc, bool x)
 {
     unsigned oldNum = numChannels();

@@ -58,6 +58,7 @@ public:
     unsigned numSamples() const;
     const StreamChannel* channel(unsigned index) const;
     StreamChannel* channel(unsigned index);
+    const ChannelInfoModel* infoModel() const;
 
     /// Saves channel information
     void saveSettings(QSettings* settings) const;
