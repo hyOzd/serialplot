@@ -85,6 +85,9 @@ public slots:
     /// When paused data feed is ignored
     void pause(bool paused);
 
+    /// Clears buffer data (fills with 0)
+    void clear();
+
 private:
     unsigned _numSamples;
     bool _paused;

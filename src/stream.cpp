@@ -159,6 +159,14 @@ void Stream::pause(bool paused)
     _paused = paused;
 }
 
+void Stream::clear()
+{
+    for (auto c : channels)
+    {
+        static_cast<RingBuffer*>(c->yData())->clear();
+    }
+}
+
 void Stream::setNumSamples(unsigned value)
 {
     if (value == _numSamples) return;
