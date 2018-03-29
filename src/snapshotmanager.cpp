@@ -22,6 +22,7 @@
 #include <QKeySequence>
 #include <QFileDialog>
 #include <QFile>
+#include <QTextStream>
 #include <QVector>
 #include <QPointF>
 #include <QIcon>
@@ -159,17 +160,19 @@ void SnapshotManager::loadSnapshotFromFile(QString fileName)
 
     // read data
     QVector<QVector<QPointF>> data(numOfChannels);
+    QTextStream ts(&file);
+    QString line;
     unsigned lineNum = 1;
-    while (file.canReadLine())
+    while (ts.readLineInto(&line))
     {
         // parse line
-        auto line = QString(file.readLine());
         auto split = line.split(',');
 
         if (split.size() != (int) numOfChannels)
         {
             qCritical() << "Parsing error at line " << lineNum
                         << ": number of columns is not consistent.";
+            qCritical() << "Line " << lineNum << ": " << line;
             return;
         }
 
