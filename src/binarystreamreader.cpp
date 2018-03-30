@@ -133,7 +133,7 @@ void BinaryStreamReader::onDataReady()
     int bytesAvailable = _device->bytesAvailable();
 
     // skip 1 byte if requested
-    if (bytesAvailable > 0 && skipByteRequested)
+    if (skipByteRequested && bytesAvailable > 0)
     {
         _device->read(1);
         skipByteRequested = false;
@@ -141,7 +141,7 @@ void BinaryStreamReader::onDataReady()
     }
 
     // skip 1 sample (channel) if requested
-    if (bytesAvailable >= (int) sampleSize && skipSampleRequested)
+    if (skipSampleRequested && bytesAvailable >= (int) sampleSize)
     {
         _device->read(sampleSize);
         skipSampleRequested = false;
