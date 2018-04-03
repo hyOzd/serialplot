@@ -127,6 +127,24 @@ TEST_CASE("source must set/unset sink 'source'", "[memory, stream]")
     REQUIRE(sink.connectedSource() == NULL);
 }
 
+TEST_CASE("source disconnect all sinks", "[memory, stream]")
+{
+    TestSink sinks[3];
+    TestSource source(3, false);
+
+    // connect sinks
+    for (int i = 0; i < 3; i++)
+    {
+        source.connect(&sinks[i]);
+    }
+
+    source.disconnectSinks();
+    for (int i = 0; i < 3; i++)
+    {
+        REQUIRE(sinks[i].connectedSource() == NULL);
+    }
+}
+
 TEST_CASE("IndexBuffer", "[memory, buffer]")
 {
     IndexBuffer buf(10);

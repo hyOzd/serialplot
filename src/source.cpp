@@ -48,6 +48,15 @@ void Source::disconnect(Sink* sink)
     sinks.removeOne(sink);
 }
 
+void Source::disconnectSinks()
+{
+    while (!sinks.isEmpty())
+    {
+        auto sink = sinks.takeFirst();
+        sink->setSource(NULL);
+    }
+}
+
 void Source::feedOut(const SamplePack& data) const
 {
     for (auto sink : sinks)

@@ -45,9 +45,12 @@ public:
     /// unconnected sink is an error.
     void disconnect(Sink* sink);
 
+    /// Disconnects all connected sinks.
+    void disconnectSinks();
+
 protected:
     /// Feeds "in" given data to connected sinks
-    void feedOut(const SamplePack& data) const;
+    virtual void feedOut(const SamplePack& data) const;
 
     /// Updates "number of channels" of connected sinks. Must be
     /// called when num. channels or hasX changes.
