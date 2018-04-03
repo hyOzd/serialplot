@@ -52,7 +52,7 @@ TEST_CASE("changing stream number of channels via sink", "[memory, stream, sink]
 {
     Stream s;
     TestSource so(3, false);
-    so.connect(&s);
+    so.connectSink(&s);
 
     // nc=3, x= false
     REQUIRE(s.numChannels() == 3);
@@ -106,7 +106,7 @@ TEST_CASE("adding data to a stream with no X", "[memory, stream, data, sink]")
     }
 
     TestSource so(3, false);
-    so.connect(&s);
+    so.connectSink(&s);
 
     // test
     so._feed(pack);
@@ -147,7 +147,7 @@ TEST_CASE("adding data to a stream with X", "[memory, stream, data, sink]")
     }
 
     TestSource so(3, true);
-    so.connect(&s);
+    so.connectSink(&s);
 
     // test
     so._feed(pack);
@@ -194,7 +194,7 @@ TEST_CASE("paused stream shouldn't store data", "[memory, stream, pause]")
     }
 
     TestSource so(3, false);
-    so.connect(&s);
+    so.connectSink(&s);
 
     // test
     s.pause(true);
@@ -227,7 +227,7 @@ TEST_CASE("clear stream data", "[memory, stream, pause]")
     }
 
     TestSource so(3, false);
-    so.connect(&s);
+    so.connectSink(&s);
 
     // test
     so._feed(pack);

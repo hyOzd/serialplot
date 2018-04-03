@@ -98,7 +98,7 @@ TEST_CASE("source", "[memory, stream]")
     REQUIRE(source.numChannels() == 3);
     REQUIRE(source.hasX() == false);
 
-    source.connect(&sink);
+    source.connectSink(&sink);
     REQUIRE(sink.numChannels() == 3);
     REQUIRE(sink.hasX() == false);
 
@@ -120,7 +120,7 @@ TEST_CASE("source must set/unset sink 'source'", "[memory, stream]")
     TestSink sink;
     TestSource source(3, false);
 
-    source.connect(&sink);
+    source.connectSink(&sink);
     REQUIRE(sink.connectedSource() == &source);
 
     source.disconnect(&sink);
@@ -135,7 +135,7 @@ TEST_CASE("source disconnect all sinks", "[memory, stream]")
     // connect sinks
     for (int i = 0; i < 3; i++)
     {
-        source.connect(&sinks[i]);
+        source.connectSink(&sinks[i]);
     }
 
     source.disconnectSinks();

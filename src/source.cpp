@@ -29,7 +29,7 @@ Source::~Source()
     }
 }
 
-void Source::connect(Sink* sink)
+void Source::connectSink(Sink* sink)
 {
     Q_ASSERT(!sinks.contains(sink));
     Q_ASSERT(sink->connectedSource() == NULL);
