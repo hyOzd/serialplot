@@ -17,10 +17,27 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "abstractreader.h"
+// This tells Catch to provide a main() - only do this in one cpp file per executable
+#define CATCH_CONFIG_RUNNER
+#include "catch.hpp"
 
-AbstractReader::AbstractReader(QIODevice* device, QObject* parent) :
-    QObject(parent)
+#include <QBuffer>
+#include "binarystreamreader.h"
+
+TEST_CASE("creating a BinaryStreamReader", "[reader]")
 {
-    _device = device;
+    QBuffer buffer;
+
+    BinaryStreamReader bs(&buffer);
+}
+
+// Note: this is added because `QApplication` is a must be created for widgets
+#include <QApplication>
+int main(int argc, char* argv[])
+{
+    QApplication a(argc, argv);
+
+    int result = Catch::Session().run( argc, argv );
+
+    return result;
 }

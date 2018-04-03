@@ -39,6 +39,29 @@ add_executable(Test EXCLUDE_FROM_ALL
 add_test(NAME test1 COMMAND Test)
 qt5_use_modules(Test Widgets)
 
+qt5_wrap_ui(UI_FILES_T
+  ../src/binarystreamreadersettings.ui
+  ../src/numberformatbox.ui
+  ../src/endiannessbox.ui
+  )
+
+# test for readers
+add_executable(TestReaders EXCLUDE_FROM_ALL
+  test_readers.cpp
+  ../src/samplepack.cpp
+  ../src/sink.cpp
+  ../src/source.cpp
+  ../src/binarystreamreader.cpp
+  ../src/abstractreader.cpp
+  ../src/binarystreamreadersettings.cpp
+  ../src/endiannessbox.cpp
+  ../src/numberformatbox.cpp
+  ../src/numberformat.cpp
+  ${UI_FILES_T}
+  )
+qt5_use_modules(TestReaders Widgets)
+add_test(NAME test_readers COMMAND TestReaders)
+
 set(CMAKE_CTEST_COMMAND ctest -V)
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
-add_dependencies(check Test)
+add_dependencies(check Test TestReaders)

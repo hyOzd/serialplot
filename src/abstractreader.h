@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -25,20 +25,16 @@
 #include <QWidget>
 #include <QTimer>
 
-#include "channelmanager.h"
-#include "datarecorder.h"
+#include "source.h"
 
 /**
  * All reader classes must inherit this class.
  */
-class AbstractReader : public QObject
+class AbstractReader : public QObject, public Source
 {
     Q_OBJECT
 public:
-    explicit AbstractReader(QIODevice* device, ChannelManager* channelMan,
-                            DataRecorder* recorder, QObject* parent = 0);
-
-    bool recording;                 /// is recording started
+    explicit AbstractReader(QIODevice* device, QObject* parent = 0);
 
     /**
      * Returns a widget to be shown in data format panel when reader
@@ -46,31 +42,16 @@ public:
      */
     virtual QWidget* settingsWidget() = 0;
 
-    /**
-     * Number of channels being read.
-     *
-     * This number may be user selected or automatically determined
-     * from incoming stream.
-     */
-    virtual unsigned numOfChannels() = 0;
-
     /// Reader should only read when enabled. Default state should be
     /// 'disabled'.
     virtual void enable(bool enabled = true) = 0;
 
-    /**
-     * @brief Starts sending data to recorder.
-     *
-     * @note recorder must have been started!
-     */
-    void startRecording();
-
-    /// Stops recording.
-    void stopRecording();
+    /// None of the current readers support X channel at the moment
+    bool hasX() const final { return false; };
 
 signals:
+    // TODO: should we keep this?
     void numOfChannelsChanged(unsigned);
-    void samplesPerSecondChanged(unsigned);
 
 public slots:
     /**
@@ -83,22 +64,6 @@ public slots:
 
 protected:
     QIODevice* _device;
-
-    /// Should be called with read data
-    void addData(double* samples, unsigned length);
-
-private:
-    const int SPS_UPDATE_TIMEOUT = 1;  // second
-
-    unsigned sampleCount;
-    unsigned samplesPerSecond;
-
-    ChannelManager* _channelMan;
-    DataRecorder* _recorder;
-    QTimer spsTimer;
-
-private slots:
-    void spsTimerTimeout();
 };
 
 #endif // ABSTRACTREADER_H
