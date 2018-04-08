@@ -23,6 +23,11 @@
 class SamplePack
 {
 public:
+    /**
+     * @param ns number of samples
+     * @param nc number of channels
+     * @param x has X channel
+     */
     SamplePack(unsigned ns, unsigned nc, bool x = false);
     ~SamplePack();
 
