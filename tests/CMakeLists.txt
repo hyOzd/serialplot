@@ -19,6 +19,7 @@
 
 # Find the QtWidgets library
 find_package(Qt5Widgets)
+find_package(Qt5Test)
 
 include_directories("../src")
 
@@ -59,7 +60,7 @@ add_executable(TestReaders EXCLUDE_FROM_ALL
   ../src/numberformat.cpp
   ${UI_FILES_T}
   )
-qt5_use_modules(TestReaders Widgets)
+qt5_use_modules(TestReaders Widgets Test)
 add_test(NAME test_readers COMMAND TestReaders)
 
 set(CMAKE_CTEST_COMMAND ctest -V)

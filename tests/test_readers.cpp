@@ -21,8 +21,11 @@
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
 
+#include <QSignalSpy>
 #include <QBuffer>
 #include "binarystreamreader.h"
+
+#include "test_helpers.h"
 
 TEST_CASE("creating a BinaryStreamReader", "[reader]")
 {
@@ -31,7 +34,29 @@ TEST_CASE("creating a BinaryStreamReader", "[reader]")
     BinaryStreamReader bs(&buffer);
 }
 
-// Note: this is added because `QApplication` is a must be created for widgets
+TEST_CASE("reading data with BinaryStreamReader", "[reader]")
+{
+    QBuffer bufferDev;
+    BinaryStreamReader bs(&bufferDev);
+    bs.enable(true);
+
+    TestSink sink;
+    bs.connectSink(&sink);
+
+    REQUIRE(sink._numChannels == 1);
+    REQUIRE(sink._hasX == false);
+
+    bufferDev.open(QIODevice::ReadWrite);
+    const char data[] = {0x01, 0x02, 0x03, 0x04};
+    bufferDev.write(data, 4);
+    bufferDev.seek(0);
+
+    QSignalSpy spy(&bufferDev, SIGNAL(readyRead()));
+    REQUIRE(spy.wait());
+    REQUIRE(sink.totalFed == 4);
+}
+
+// Note: this is added because `QApplication` must be created for widgets
 #include <QApplication>
 int main(int argc, char* argv[])
 {
