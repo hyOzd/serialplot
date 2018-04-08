@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -23,15 +23,14 @@
 
 #include "framedreader.h"
 
-FramedReader::FramedReader(QIODevice* device, ChannelManager* channelMan,
-                           DataRecorder* recorder, QObject* parent) :
-    AbstractReader(device, channelMan, recorder, parent)
+FramedReader::FramedReader(QIODevice* device, QObject* parent) :
+    AbstractReader(device, parent)
 {
     paused = false;
 
     // initial settings
     settingsInvalid = 0;
-    _numOfChannels = _settingsWidget.numOfChannels();
+    _numChannels = _settingsWidget.numOfChannels();
     hasSizeByte = _settingsWidget.frameSize() == 0;
     frameSize = _settingsWidget.frameSize();
     syncWord = _settingsWidget.syncWord();
@@ -73,6 +72,7 @@ void FramedReader::enable(bool enabled)
     else
     {
         QObject::disconnect(_device, 0, this, 0);
+        disconnectSinks();
     }
 }
 
@@ -81,9 +81,9 @@ QWidget* FramedReader::settingsWidget()
     return &_settingsWidget;
 }
 
-unsigned FramedReader::numOfChannels()
+unsigned FramedReader::numChannels() const
 {
-    return _numOfChannels;
+    return _numChannels;
 }
 
 void FramedReader::pause(bool enabled)
@@ -145,7 +145,7 @@ void FramedReader::checkSettings()
     }
 
     // check if fixed frame size is multiple of a sample set size
-    if (!hasSizeByte && frameSize % (_numOfChannels * sampleSize) != 0)
+    if (!hasSizeByte && frameSize % (_numChannels * sampleSize) != 0)
     {
         settingsInvalid |= FRAMESIZE_INVALID;
     }
@@ -163,7 +163,7 @@ void FramedReader::checkSettings()
     {
         QString errorMessage =
             QString("Frame size must be multiple of %1 (#channels * sample size)!")\
-            .arg(_numOfChannels * sampleSize);
+            .arg(_numChannels * sampleSize);
 
         _settingsWidget.showMessage(errorMessage, true);
     }
@@ -175,7 +175,7 @@ void FramedReader::checkSettings()
 
 void FramedReader::onNumOfChannelsChanged(unsigned value)
 {
-    _numOfChannels = value;
+    _numChannels = value;
     checkSettings();
     reset();
     emit numOfChannelsChanged(value);
@@ -238,11 +238,11 @@ void FramedReader::onDataReady()
                 qCritical() << "Frame size is 0!";
                 reset();
             }
-            else if (frameSize % (_numOfChannels * sampleSize) != 0)
+            else if (frameSize % (_numChannels * sampleSize) != 0)
             {
                 qCritical() <<
                     QString("Frame size is not multiple of %1 (#channels * sample size)!") \
-                    .arg(_numOfChannels * sampleSize);
+                    .arg(_numChannels * sampleSize);
                 reset();
             }
             else
@@ -287,14 +287,13 @@ void FramedReader::readFrameDataAndCheck()
     }
 
     // a package is 1 set of samples for all channels
-    unsigned numOfPackagesToRead = frameSize / (_numOfChannels * sampleSize);
-    double* channelSamples = new double[numOfPackagesToRead * _numOfChannels];
-
+    unsigned numOfPackagesToRead = frameSize / (_numChannels * sampleSize);
+    SamplePack samples(numOfPackagesToRead, _numChannels);
     for (unsigned i = 0; i < numOfPackagesToRead; i++)
     {
-        for (unsigned int ci = 0; ci < _numOfChannels; ci++)
+        for (unsigned int ci = 0; ci < _numChannels; ci++)
         {
-            channelSamples[ci*numOfPackagesToRead+i] = (this->*readSample)();
+            samples.data(ci)[i] = (this->*readSample)();
         }
     }
 
@@ -311,14 +310,12 @@ void FramedReader::readFrameDataAndCheck()
     if (!checksumEnabled || checksumPassed)
     {
         // commit data
-        addData(channelSamples, numOfPackagesToRead*_numOfChannels);
+        feedOut(samples);
     }
     else
     {
         qCritical() << "Checksum failed! Received:" << rChecksum << "Calculated:" << calcChecksum;
     }
-
-    delete[] channelSamples;
 }
 
 template<typename T> double FramedReader::readSampleAs()

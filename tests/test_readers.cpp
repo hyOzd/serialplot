@@ -25,6 +25,7 @@
 #include <QBuffer>
 #include "binarystreamreader.h"
 #include "asciireader.h"
+#include "framedreader.h"
 
 #include "test_helpers.h"
 
@@ -118,6 +119,49 @@ TEST_CASE("AsciiReader shouldn't read when disabled", "[reader, ascii]")
     REQUIRE_FALSE(spy.wait(READYREAD_TIMEOUT));
     REQUIRE(sink._numChannels == 1);
     REQUIRE(sink._hasX == false);
+    REQUIRE(sink.totalFed == 0);
+}
+
+TEST_CASE("reading data with FramedReader", "[reader]")
+{
+    QBuffer bufferDev;
+    FramedReader reader(&bufferDev);
+    reader.enable(true);
+
+    TestSink sink;
+    reader.connectSink(&sink);
+
+    REQUIRE(sink._numChannels == 1);
+    REQUIRE(sink._hasX == false);
+
+    bufferDev.open(QIODevice::ReadWrite);
+    const uint8_t data[] = {0xAA, 0xBB, 4, 0x01, 0x02, 0x03, 0x04};
+    bufferDev.write((const char*) data, 7);
+    bufferDev.seek(0);
+
+    QSignalSpy spy(&bufferDev, SIGNAL(readyRead()));
+    REQUIRE(spy.wait(READYREAD_TIMEOUT));
+    REQUIRE(sink.totalFed == 4);
+}
+
+TEST_CASE("FramedReader shouldn't read when disabled", "[reader]")
+{
+    QBuffer bufferDev;
+    FramedReader reader(&bufferDev);
+
+    TestSink sink;
+    reader.connectSink(&sink);
+
+    REQUIRE(sink._numChannels == 1);
+    REQUIRE(sink._hasX == false);
+
+    bufferDev.open(QIODevice::ReadWrite);
+    const uint8_t data[] = {0xAA, 0xBB, 4, 0x01, 0x02, 0x03, 0x04};
+    bufferDev.write((const char*) data, 7);
+    bufferDev.seek(0);
+
+    QSignalSpy spy(&bufferDev, SIGNAL(readyRead()));
+    REQUIRE_FALSE(spy.wait(READYREAD_TIMEOUT));
     REQUIRE(sink.totalFed == 0);
 }
 
