@@ -61,6 +61,7 @@ add_executable(TestReaders EXCLUDE_FROM_ALL
   ../src/asciireadersettings.cpp
   ../src/framedreader.cpp
   ../src/framedreadersettings.cpp
+  ../src/demoreader.cpp
   ../src/commandedit.cpp
   ../src/endiannessbox.cpp
   ../src/numberformatbox.cpp

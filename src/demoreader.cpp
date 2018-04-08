@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -25,12 +25,11 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-DemoReader::DemoReader(QIODevice* device, ChannelManager* channelMan,
-                       DataRecorder* recorder, QObject* parent) :
-    AbstractReader(device, channelMan, recorder, parent)
+DemoReader::DemoReader(QIODevice* device, QObject* parent) :
+    AbstractReader(device, parent)
 {
     paused = false;
-    _numOfChannels = 1;
+    _numChannels = 1;
     count = 0;
     timer.setInterval(100);
     QObject::connect(&timer, &QTimer::timeout,
@@ -51,17 +50,19 @@ void DemoReader::enable(bool enabled)
     else
     {
         timer.stop();
+        disconnectSinks();
     }
 }
 
-unsigned DemoReader::numOfChannels()
+unsigned DemoReader::numChannels() const
 {
-    return _numOfChannels;
+    return _numChannels;
 }
 
 void DemoReader::setNumOfChannels(unsigned value)
 {
-    _numOfChannels = value;
+    _numChannels = value;
+    updateNumChannels();
 }
 
 void DemoReader::pause(bool enabled)
@@ -77,13 +78,12 @@ void DemoReader::demoTimerTimeout()
 
     if (!paused)
     {
-        double* samples = new double[_numOfChannels];
-        for (unsigned ci = 0; ci < _numOfChannels; ci++)
+        SamplePack samples(1, _numChannels);
+        for (unsigned ci = 0; ci < _numChannels; ci++)
         {
             // we are calculating the fourier components of square wave
-            samples[ci] = 4*sin(2*M_PI*double((ci+1)*count)/period)/((2*(ci+1))*M_PI);
+            samples.data(ci)[0] = 4*sin(2*M_PI*double((ci+1)*count)/period)/((2*(ci+1))*M_PI);
         }
-        addData(samples, _numOfChannels);
-        delete[] samples;
+        feedOut(samples);
     }
 }

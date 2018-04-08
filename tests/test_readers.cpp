@@ -26,6 +26,7 @@
 #include "binarystreamreader.h"
 #include "asciireader.h"
 #include "framedreader.h"
+#include "demoreader.h"
 
 #include "test_helpers.h"
 
@@ -164,6 +165,52 @@ TEST_CASE("FramedReader shouldn't read when disabled", "[reader]")
     REQUIRE_FALSE(spy.wait(READYREAD_TIMEOUT));
     REQUIRE(sink.totalFed == 0);
 }
+
+TEST_CASE("DemoReader doesn't have a settings widget", "[reader, demo]")
+{
+    QBuffer bufferDev;          // not actually used
+    DemoReader reader(&bufferDev);
+
+    REQUIRE(reader.settingsWidget() == NULL);
+}
+
+TEST_CASE("Generating data with DemoReader", "[reader, demo]")
+{
+    QBuffer bufferDev;          // not actually used
+    DemoReader demoReader(&bufferDev);
+    demoReader.enable(true);
+
+    TestSink sink;
+    demoReader.connectSink(&sink);
+    REQUIRE(sink._numChannels == 1);
+
+    demoReader.setNumOfChannels(3);
+    REQUIRE(sink._numChannels == 3);
+
+    // we need to wait somehow, we are not actually looking for signals
+    QSignalSpy spy(&bufferDev, SIGNAL(readyRead()));
+    REQUIRE_FALSE(spy.wait(1000)); // we need some time for demoreader to produce data
+    REQUIRE(sink.totalFed >= 9);
+}
+
+TEST_CASE("DemoReader shouldn't generate data when paused", "[reader, demo]")
+{
+    QBuffer bufferDev;          // not actually used
+    DemoReader demoReader(&bufferDev); // paused by default
+
+    TestSink sink;
+    demoReader.connectSink(&sink);
+    REQUIRE(sink._numChannels == 1);
+
+    demoReader.setNumOfChannels(3);
+    REQUIRE(sink._numChannels == 3);
+
+    // we need to wait somehow, we are not actually looking for signals
+    QSignalSpy spy(&bufferDev, SIGNAL(readyRead()));
+    REQUIRE_FALSE(spy.wait(1000)); // we need some time for demoreader to produce data
+    REQUIRE(sink.totalFed == 0);
+}
+
 
 // Note: this is added because `QApplication` must be created for widgets
 #include <QApplication>
