@@ -27,6 +27,8 @@
 
 #include "test_helpers.h"
 
+static const int READYREAD_TIMEOUT = 10; // milliseconds
+
 TEST_CASE("creating a BinaryStreamReader", "[reader]")
 {
     QBuffer buffer;
@@ -52,8 +54,30 @@ TEST_CASE("reading data with BinaryStreamReader", "[reader]")
     bufferDev.seek(0);
 
     QSignalSpy spy(&bufferDev, SIGNAL(readyRead()));
-    REQUIRE(spy.wait());
+    REQUIRE(spy.wait(READYREAD_TIMEOUT));
     REQUIRE(sink.totalFed == 4);
+}
+
+TEST_CASE("disabled BinaryStreamReader shouldn't read", "[reader]")
+{
+    QBuffer bufferDev;
+    BinaryStreamReader bs(&bufferDev); // disabled by default
+
+    TestSink sink;
+    bs.connectSink(&sink);
+
+    REQUIRE(sink._numChannels == 1);
+    REQUIRE(sink._hasX == false);
+
+    bufferDev.open(QIODevice::ReadWrite);
+    const char data[] = {0x01, 0x02, 0x03, 0x04};
+    bufferDev.write(data, 4);
+    bufferDev.seek(0);
+
+    QSignalSpy spy(&bufferDev, SIGNAL(readyRead()));
+    // readyRead isn't signaled because there are no connections to it
+    REQUIRE_FALSE(spy.wait(READYREAD_TIMEOUT));
+    REQUIRE(sink.totalFed == 0);
 }
 
 // Note: this is added because `QApplication` must be created for widgets
