@@ -24,17 +24,11 @@
 #include <QSignalSpy>
 #include <QBuffer>
 #include "binarystreamreader.h"
+#include "asciireader.h"
 
 #include "test_helpers.h"
 
 static const int READYREAD_TIMEOUT = 10; // milliseconds
-
-TEST_CASE("creating a BinaryStreamReader", "[reader]")
-{
-    QBuffer buffer;
-
-    BinaryStreamReader bs(&buffer);
-}
 
 TEST_CASE("reading data with BinaryStreamReader", "[reader]")
 {
@@ -77,6 +71,53 @@ TEST_CASE("disabled BinaryStreamReader shouldn't read", "[reader]")
     QSignalSpy spy(&bufferDev, SIGNAL(readyRead()));
     // readyRead isn't signaled because there are no connections to it
     REQUIRE_FALSE(spy.wait(READYREAD_TIMEOUT));
+    REQUIRE(sink.totalFed == 0);
+}
+
+TEST_CASE("reading data with AsciiReader", "[reader, ascii]")
+{
+    QBuffer bufferDev;
+    AsciiReader reader(&bufferDev);
+    reader.enable(true);
+
+    TestSink sink;
+    reader.connectSink(&sink);
+
+    REQUIRE(sink._numChannels == 1);
+    REQUIRE(sink._hasX == false);
+
+    // inject data to the buffer
+    bufferDev.open(QIODevice::ReadWrite);
+    bufferDev.write("0,1,3\n0,1,3\n0,1,3\n0,1,3\n");
+    bufferDev.seek(0);
+
+    QSignalSpy spy(&bufferDev, SIGNAL(readyRead()));
+    REQUIRE(spy.wait(READYREAD_TIMEOUT));
+    REQUIRE(sink._numChannels == 3);
+    REQUIRE(sink._hasX == false);
+    REQUIRE(sink.totalFed == 3);
+}
+
+TEST_CASE("AsciiReader shouldn't read when disabled", "[reader, ascii]")
+{
+    QBuffer bufferDev;
+    AsciiReader reader(&bufferDev); // disabled by default
+
+    TestSink sink;
+    reader.connectSink(&sink);
+
+    REQUIRE(sink._numChannels == 1);
+    REQUIRE(sink._hasX == false);
+
+    // inject data to the buffer
+    bufferDev.open(QIODevice::ReadWrite);
+    bufferDev.write("0,1,3\n0,1,3\n0,1,3\n0,1,3\n");
+    bufferDev.seek(0);
+
+    QSignalSpy spy(&bufferDev, SIGNAL(readyRead()));
+    REQUIRE_FALSE(spy.wait(READYREAD_TIMEOUT));
+    REQUIRE(sink._numChannels == 1);
+    REQUIRE(sink._hasX == false);
     REQUIRE(sink.totalFed == 0);
 }
 

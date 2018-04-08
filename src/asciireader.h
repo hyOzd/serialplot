@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -30,10 +30,9 @@ class AsciiReader : public AbstractReader
     Q_OBJECT
 
 public:
-    explicit AsciiReader(QIODevice* device, ChannelManager* channelMan,
-                         DataRecorder* recorder, QObject *parent = 0);
+    explicit AsciiReader(QIODevice* device, QObject *parent = 0);
     QWidget* settingsWidget();
-    unsigned numOfChannels();
+    unsigned numChannels() const;
     void enable(bool enabled = true);
     /// Stores settings into a `QSettings`
     void saveSettings(QSettings* settings);
@@ -45,7 +44,7 @@ public slots:
 
 private:
     AsciiReaderSettings _settingsWidget;
-    unsigned _numOfChannels;
+    unsigned _numChannels;
     /// number of channels will be determined from incoming data
     unsigned autoNumOfChannels;
     QChar delimiter; ///< selected column delimiter

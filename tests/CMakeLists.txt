@@ -42,6 +42,7 @@ qt5_use_modules(Test Widgets)
 
 qt5_wrap_ui(UI_FILES_T
   ../src/binarystreamreadersettings.ui
+  ../src/asciireadersettings.ui
   ../src/numberformatbox.ui
   ../src/endiannessbox.ui
   )
@@ -52,9 +53,11 @@ add_executable(TestReaders EXCLUDE_FROM_ALL
   ../src/samplepack.cpp
   ../src/sink.cpp
   ../src/source.cpp
-  ../src/binarystreamreader.cpp
   ../src/abstractreader.cpp
+  ../src/binarystreamreader.cpp
   ../src/binarystreamreadersettings.cpp
+  ../src/asciireader.cpp
+  ../src/asciireadersettings.cpp
   ../src/endiannessbox.cpp
   ../src/numberformatbox.cpp
   ../src/numberformat.cpp
