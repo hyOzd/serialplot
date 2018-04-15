@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -28,8 +28,6 @@
 #include <QSettings>
 #include <QtGlobal>
 
-#include "framebuffer.h"
-#include "channelmanager.h"
 #include "binarystreamreader.h"
 #include "asciireader.h"
 #include "demoreader.h"
@@ -45,14 +43,13 @@ class DataFormatPanel : public QWidget
     Q_OBJECT
 
 public:
-    explicit DataFormatPanel(QSerialPort* port,
-                             ChannelManager* channelMan,
-                             DataRecorder* recorder,
-                             QWidget* parent = 0);
+    explicit DataFormatPanel(QSerialPort* port, QWidget* parent = 0);
     ~DataFormatPanel();
 
     /// Returns currently selected number of channels
-    unsigned numOfChannels();
+    unsigned numChannels() const;
+    /// Returns active source (reader)
+    Source* activeSource();
     /// Stores data format panel settings into a `QSettings`
     void saveSettings(QSettings* settings);
     /// Loads data format panel settings from a `QSettings`.
@@ -62,17 +59,9 @@ public slots:
     void pause(bool);
     void enableDemo(bool); // demo shouldn't be enabled when port is open
 
-    /**
-     * @brief Starts sending data to recorder.
-     *
-     * @note recorder must have been started!
-     */
-    void startRecording();
-
-    /// Stops recording.
-    void stopRecording();
-
 signals:
+    /// Active (selected) reader has changed.
+    void sourceChanged(Source* source);
     void numOfChannelsChanged(unsigned);
     void samplesPerSecondChanged(unsigned);
 
@@ -80,7 +69,6 @@ private:
     Ui::DataFormatPanel *ui;
 
     QSerialPort* serialPort;
-    ChannelManager* _channelMan;
 
     BinaryStreamReader bsReader;
     AsciiReader asciiReader;

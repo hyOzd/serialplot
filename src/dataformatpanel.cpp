@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -21,29 +21,22 @@
 #include "ui_dataformatpanel.h"
 
 #include <QRadioButton>
-#include <QtEndian>
-#include <QMap>
 #include <QtDebug>
 
 #include "utils.h"
 #include "setting_defines.h"
-#include "floatswap.h"
 
-DataFormatPanel::DataFormatPanel(QSerialPort* port,
-                                 ChannelManager* channelMan,
-                                 DataRecorder* recorder,
-                                 QWidget *parent) :
+DataFormatPanel::DataFormatPanel(QSerialPort* port, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::DataFormatPanel),
-    bsReader(port, channelMan, recorder, this),
-    asciiReader(port, channelMan, recorder, this),
-    framedReader(port, channelMan, recorder, this),
-    demoReader(port, channelMan, recorder, this)
+    bsReader(port, this),
+    asciiReader(port, this),
+    framedReader(port, this),
+    demoReader(port, this)
 {
     ui->setupUi(this);
 
     serialPort = port;
-    _channelMan = channelMan;
     paused = false;
     demoEnabled = false;
 
@@ -83,9 +76,14 @@ DataFormatPanel::~DataFormatPanel()
     delete ui;
 }
 
-unsigned DataFormatPanel::numOfChannels()
+unsigned DataFormatPanel::numChannels() const
 {
-    return currentReader->numOfChannels();
+    return currentReader->numChannels();
+}
+
+Source* DataFormatPanel::activeSource()
+{
+    return &currentReader;
 }
 
 void DataFormatPanel::pause(bool enabled)
@@ -100,28 +98,17 @@ void DataFormatPanel::enableDemo(bool enabled)
     if (enabled)
     {
         demoReader.enable();
-        demoReader.recording = currentReader->recording;
         connect(&demoReader, &DemoReader::samplesPerSecondChanged,
                 this, &DataFormatPanel::samplesPerSecondChanged);
+        emit sourceChanged(&demoreader);
     }
     else
     {
         demoReader.enable(false);
         disconnect(&demoReader, 0, this, 0);
+        emit sourceChanged(currentReader);
     }
     demoEnabled = enabled;
-}
-
-void DataFormatPanel::startRecording()
-{
-    currentReader->recording = true;
-    if (demoEnabled) demoReader.recording = true;
-}
-
-void DataFormatPanel::stopRecording()
-{
-    currentReader->recording = false;
-    if (demoEnabled) demoReader.recording = false;
 }
 
 void DataFormatPanel::selectReader(AbstractReader* reader)
@@ -152,6 +139,7 @@ void DataFormatPanel::selectReader(AbstractReader* reader)
     reader->recording = currentReader->recording;
 
     currentReader = reader;
+    emit sourceChanged(currentReader);
 }
 
 void DataFormatPanel::saveSettings(QSettings* settings)
