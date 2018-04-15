@@ -62,3 +62,46 @@ TEST_CASE("test recording single channel", "[recorder]")
     // cleanup
     if (QFile::exists(fileName)) QFile::remove(fileName);
 }
+
+TEST_CASE("test recording multiple channels", "[recorder]")
+{
+    DataRecorder rec;
+    TestSource source(3, false);
+
+    // temporary file, remove if exists
+    auto fileName = QDir::tempPath() + QString("/" TEST_FILE_NAME);
+    if (QFile::exists(fileName)) QFile::remove(fileName);
+
+    // connect source → sink
+    source.connectSink(&rec);
+
+    // prepare data
+    QStringList channelNames({"Channel 1", "Channel 2", "Channel 3"});
+    SamplePack samples(5, 3);
+    for (int ci = 0; ci < 3; ci++)
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            samples.data(ci)[i] = (ci+1)*(i+1);
+        }
+    }
+
+    // test
+    rec.startRecording(fileName, ",", channelNames);
+    source._feed(samples);
+    rec.stopRecording();
+
+    // read file contents back
+    QFile recordFile(fileName);
+    REQUIRE(recordFile.open(QIODevice::ReadOnly | QIODevice::Text));
+    // NOTE: mind the extra parantheses, otherwise 'catch' macros fail to compile
+    REQUIRE((recordFile.readLine() == "Channel 1,Channel 2,Channel 3\n"));
+    REQUIRE((recordFile.readLine() == "1,2,3\n"));
+    REQUIRE((recordFile.readLine() == "2,4,6\n"));
+    REQUIRE((recordFile.readLine() == "3,6,9\n"));
+    REQUIRE((recordFile.readLine() == "4,8,12\n"));
+    REQUIRE((recordFile.readLine() == "5,10,15\n"));
+
+    // cleanup
+    if (QFile::exists(fileName)) QFile::remove(fileName);
+}
