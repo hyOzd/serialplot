@@ -71,6 +71,21 @@ add_executable(TestReaders EXCLUDE_FROM_ALL
 qt5_use_modules(TestReaders Widgets Test)
 add_test(NAME test_readers COMMAND TestReaders)
 
+# test for recroder
+add_executable(TestRecorder EXCLUDE_FROM_ALL
+  test_recorder.cpp
+  ../src/samplepack.cpp
+  ../src/sink.cpp
+  ../src/source.cpp
+  ../src/datarecorder.cpp
+)
+qt5_use_modules(TestRecorder Widgets Test)
+add_test(NAME test_recorder COMMAND TestRecorder)
+
 set(CMAKE_CTEST_COMMAND ctest -V)
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
-add_dependencies(check Test TestReaders)
+add_dependencies(check
+  Test
+  TestReaders
+  TestRecorder
+  )
