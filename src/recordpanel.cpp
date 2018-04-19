@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -29,15 +29,15 @@
 #include "ui_recordpanel.h"
 #include "setting_defines.h"
 
-RecordPanel::RecordPanel(DataRecorder* recorder, ChannelManager* channelMan, QWidget *parent) :
+RecordPanel::RecordPanel(Stream* stream, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::RecordPanel),
     recordToolBar(tr("Record Toolbar")),
-    recordAction(QIcon::fromTheme("media-record"), tr("Record"), this)
+    recordAction(QIcon::fromTheme("media-record"), tr("Record"), this),
+    recorder(this)
 {
     overwriteSelected = false;
-    _recorder = recorder;
-    _channelMan = channelMan;
+    _stream = stream;
 
     ui->setupUi(this);
 
@@ -58,13 +58,13 @@ RecordPanel::RecordPanel(DataRecorder* recorder, ChannelManager* channelMan, QWi
     connect(ui->cbDisableBuffering, &QCheckBox::toggled,
             [this](bool enabled)
             {
-                _recorder->disableBuffering = enabled;
+                recorder.disableBuffering = enabled;
             });
 
     connect(ui->cbWindowsLE, &QCheckBox::toggled,
             [this](bool enabled)
             {
-                _recorder->windowsLE = enabled;
+                recorder.windowsLE = enabled;
             });
 
     connect(&recordAction, &QAction::toggled, ui->cbWindowsLE, &QWidget::setDisabled);
@@ -231,16 +231,17 @@ void RecordPanel::startRecording(void)
     QStringList channelNames;
     if (ui->cbHeader->isChecked())
     {
-        channelNames = _channelMan->infoModel()->channelNames();
+        channelNames = _stream->infoModel()->channelNames();
     }
-    _recorder->startRecording(selectedFile, getSeparator(), channelNames);
-    emit recordStarted();
+    if (recorder.startRecording(selectedFile, getSeparator(), channelNames))
+    {
+        stream->connectFollower(&recorder);
+    }
 }
 
 void RecordPanel::stopRecording(void)
 {
-    emit recordStopped();
-    _recorder->stopRecording();
+    recorder.stopRecording();
 }
 
 void RecordPanel::onPortClose()
