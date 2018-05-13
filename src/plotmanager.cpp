@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -28,7 +28,7 @@
 #include "setting_defines.h"
 
 PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
-                         ChannelInfoModel* infoModel, QObject* parent) :
+                         const Stream* stream, QObject* parent) :
     QObject(parent)
 {
     _menu = menu;
@@ -38,7 +38,7 @@ PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
     _yMax = 1;
     _xAxisAsIndex = true;
     isDemoShown = false;
-    _infoModel = infoModel;
+    _stream = stream;
     _numOfSamples = 1;
     _plotWidth = 1;
     showSymbols = Plot::ShowSymbolsAuto;
@@ -74,16 +74,17 @@ PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
     setMulti(menu->showMultiAction.isChecked());
 
     // connect to channel info model
-    if (_infoModel != NULL)     // TODO: remove when snapshots have infomodel
+    if (_stream != NULL)
     {
-        connect(_infoModel, &QAbstractItemModel::dataChanged,
+        auto infoModel = _stream->infoModel();
+        connect(infoModel, &QAbstractItemModel::dataChanged,
                 this, &PlotManager::onChannelInfoChanged);
 
-        connect(_infoModel, &QAbstractItemModel::modelReset,
+        connect(infoModel, &QAbstractItemModel::modelReset,
                 [this]()
                 {
-                    onChannelInfoChanged(_infoModel->index(0, 0), // start
-                                         _infoModel->index(_infoModel->rowCount()-1, 0), // end
+                    onChannelInfoChanged(infoModel->index(0, 0), // start
+                                         infoModel->index(infoModel->rowCount()-1, 0), // end
                                          {}); // roles ignored
                 });
     }
@@ -297,7 +298,7 @@ void PlotManager::_addCurve(QwtPlotCurve* curve)
     curves.append(curve);
 
     unsigned index = curves.size()-1;
-    auto color = _infoModel->color(index);
+    auto color = _stream->channel(index)->color();
     curve->setPen(color);
 
     // create the plot for the curve if we are on multi display

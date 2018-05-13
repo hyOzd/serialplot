@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -31,7 +31,7 @@
 #include <qwt_plot_curve.h>
 #include "plot.h"
 #include "framebufferseries.h"
-#include "channelinfomodel.h"
+#include "stream.h"
 #include "plotmenu.h"
 
 class PlotManager : public QObject
@@ -40,7 +40,7 @@ class PlotManager : public QObject
 
 public:
     explicit PlotManager(QWidget* plotArea, PlotMenu* menu,
-                         ChannelInfoModel* infoModel = NULL,
+                         const Stream* stream = NULL,
                          QObject *parent = 0);
     ~PlotManager();
     /// Add a new curve with title and buffer. A color is
@@ -80,7 +80,7 @@ private:
     QList<QwtPlotCurve*> curves;
     QList<Plot*> plotWidgets;
     Plot* emptyPlot;  ///< for displaying when all channels are hidden
-    ChannelInfoModel* _infoModel;
+    const Stream* stream;       ///< attached stream, can be `NULL`
     bool isDemoShown;
     bool _autoScaled;
     double _yMin;
