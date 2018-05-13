@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -24,7 +24,8 @@
 #include <QRectF>
 #include <qwt_series_data.h>
 
-#include "framebuffer.h"
+// TODO: rename when framebuffer.h is deleted
+#include "framebuffer2.h"
 
 /**
  * This class provides an interface for actual FrameBuffer
@@ -35,7 +36,7 @@
 class FrameBufferSeries : public QwtSeriesData<QPointF>
 {
 public:
-    FrameBufferSeries(FrameBuffer* buffer);
+    FrameBufferSeries(const FrameBuffer* buffer);
 
     /// Behavior of X axis
     void setXAxis(bool asIndex, double xmin, double xmax);
@@ -47,7 +48,7 @@ public:
     void setRectOfInterest(const QRectF& rect);
 
 private:
-    FrameBuffer* _buffer;
+    const FrameBuffer* _buffer;
     bool xAsIndex;
     double _xmin;
     double _xmax;
