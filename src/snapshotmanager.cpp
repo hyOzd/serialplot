@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -31,14 +31,14 @@
 #include "snapshotmanager.h"
 
 SnapshotManager::SnapshotManager(MainWindow* mainWindow,
-                                 ChannelManager* channelMan) :
+                                 Stream* stream) :
     _menu("&Snapshots"),
     _takeSnapshotAction("&Take Snapshot", this),
     loadSnapshotAction("&Load Snapshots", this),
     clearAction("&Clear Snapshots", this)
 {
     _mainWindow = mainWindow;
-    _channelMan = channelMan;
+    _stream = stream;
 
     _takeSnapshotAction.setToolTip("Take a snapshot of current plot");
     _takeSnapshotAction.setShortcut(QKeySequence("F5"));
@@ -63,20 +63,22 @@ SnapshotManager::~SnapshotManager()
     }
 }
 
-Snapshot* SnapshotManager::makeSnapshot()
+Snapshot* SnapshotManager::makeSnapshot() const
 {
     QString name = QTime::currentTime().toString("'Snapshot ['HH:mm:ss']'");
-    auto snapshot = new Snapshot(_mainWindow, name, *(_channelMan->infoModel()));
+    auto snapshot = new Snapshot(_mainWindow, name, *(_stream->infoModel()));
 
-    unsigned numOfChannels = _channelMan->numOfChannels();
-    unsigned numOfSamples = _channelMan->numOfSamples();
+    unsigned numChannels = _stream->numChannels();
+    unsigned numSamples = _stream->numSamples();
 
-    for (unsigned ci = 0; ci < numOfChannels; ci++)
+    for (unsigned ci = 0; ci < numChannels; ci++)
     {
-        snapshot->data.append(QVector<QPointF>(numOfSamples));
-        for (unsigned i = 0; i < numOfSamples; i++)
+        snapshot->data.append(QVector<QPointF>(numSamples));
+        auto x = _stream->channel(ci)->xData();
+        auto y = _stream->channel(ci)->yData();
+        for (unsigned i = 0; i < numSamples; i++)
         {
-            snapshot->data[ci][i] = QPointF(i, _channelMan->channelBuffer(ci)->sample(i));
+            snapshot->data[ci][i] = QPointF(x->sample(i), y->sample(i));
         }
     }
 

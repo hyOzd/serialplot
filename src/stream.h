@@ -59,6 +59,7 @@ public:
     const StreamChannel* channel(unsigned index) const;
     StreamChannel* channel(unsigned index);
     const ChannelInfoModel* infoModel() const;
+    ChannelInfoModel* infoModel();
 
     /// Saves channel information
     void saveSettings(QSettings* settings) const;

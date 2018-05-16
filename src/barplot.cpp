@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -21,17 +21,17 @@
 #include "barscaledraw.h"
 #include "utils.h"
 
-BarPlot::BarPlot(ChannelManager* channelMan, PlotMenu* menu, QWidget* parent) :
-    QwtPlot(parent), _menu(menu), barChart(channelMan)
+BarPlot::BarPlot(Stream* stream, PlotMenu* menu, QWidget* parent) :
+    QwtPlot(parent), _menu(menu), barChart(stream)
 {
-    _channelMan = channelMan;
+    _stream = stream;
     barChart.attach(this);
     setAxisMaxMinor(QwtPlot::xBottom, 0);
-    setAxisScaleDraw(QwtPlot::xBottom, new BarScaleDraw(channelMan));
+    setAxisScaleDraw(QwtPlot::xBottom, new BarScaleDraw(stream));
 
     update();
-    connect(_channelMan, &ChannelManager::dataAdded, this, &BarPlot::update);
-    connect(_channelMan, &ChannelManager::numOfChannelsChanged, this, &BarPlot::update);
+    connect(_stream, &Stream::dataAdded, this, &BarPlot::update);
+    connect(_stream, &Stream::numChannelsChanged, this, &BarPlot::update);
 
     // connect to menu
     connect(&menu->darkBackgroundAction, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
@@ -42,7 +42,7 @@ BarPlot::BarPlot(ChannelManager* channelMan, PlotMenu* menu, QWidget* parent) :
 void BarPlot::update()
 {
     // Note: -0.99 is used instead of -1 to handle the case of `numOfChannels==1`
-    setAxisScale(QwtPlot::xBottom, 0, _channelMan->numOfChannels()-0.99, 1);
+    setAxisScale(QwtPlot::xBottom, 0, _stream->numChannels()-0.99, 1);
     barChart.resample();
     replot();
 }

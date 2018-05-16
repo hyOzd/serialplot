@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -108,9 +108,24 @@ void Snapshot::setName(QString name)
     emit nameChanged(this);
 }
 
-ChannelInfoModel* Snapshot::infoModel()
+unsigned Snapshot::numChannels() const
+{
+    return data.size();
+}
+
+unsigned Snapshot::numSamples() const
+{
+    return data[0].size();
+}
+
+const ChannelInfoModel* Snapshot::infoModel() const
 {
     return &cInfoModel;
+}
+
+ChannelInfoModel* Snapshot::infoModel()
+{
+    return const_cast<ChannelInfoModel*>(static_cast<const Snapshot&>(*this).infoModel());
 }
 
 QString Snapshot::channelName(unsigned channel)

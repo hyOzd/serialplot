@@ -235,7 +235,7 @@ void RecordPanel::startRecording(void)
     }
     if (recorder.startRecording(selectedFile, getSeparator(), channelNames))
     {
-        stream->connectFollower(&recorder);
+        _stream->connectFollower(&recorder);
     }
 }
 

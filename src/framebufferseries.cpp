@@ -20,7 +20,7 @@
 #include <math.h>
 #include "framebufferseries.h"
 
-FrameBufferSeries::FrameBufferSeries(FrameBuffer* buffer)
+FrameBufferSeries::FrameBufferSeries(const FrameBuffer* buffer)
 {
     xAsIndex = true;
     _xmin = 0;

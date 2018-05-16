@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -24,16 +24,16 @@
 #include <qwt_scale_draw.h>
 #include <qwt_text.h>
 
-#include "channelmanager.h"
+#include "stream.h"
 
 class BarScaleDraw : public QwtScaleDraw
 {
 public:
-    explicit BarScaleDraw(ChannelManager* channelMan);
+    explicit BarScaleDraw(const Stream* stream);
     QwtText label(double value) const;
 
 private:
-    ChannelManager* _channelMan;
+    const Stream* _stream;
 };
 
 #endif // BARSCALEDRAW_H

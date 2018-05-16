@@ -31,6 +31,55 @@ PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
                          const Stream* stream, QObject* parent) :
     QObject(parent)
 {
+    construct(plotArea, menu);
+    _stream = stream;
+    if (_stream == NULL) return;
+
+    // connect to ChannelInfoModel
+    infoModel = _stream->infoModel();
+    connect(infoModel, &QAbstractItemModel::dataChanged,
+                this, &PlotManager::onChannelInfoChanged);
+    connect(infoModel, &QAbstractItemModel::modelReset,
+            [this]()
+            {
+                onChannelInfoChanged(infoModel->index(0, 0), // start
+                                     infoModel->index(infoModel->rowCount()-1, 0), // end
+                                     {}); // roles ignored
+            });
+
+
+    connect(stream, &Stream::numChannelsChanged, this, &PlotManager::onNumChannelsChanged);
+    connect(stream, &Stream::dataAdded, this, &PlotManager::replot);
+
+    // add initial curves if any?
+    for (unsigned int i = 0; i < stream->numChannels(); i++)
+    {
+        addCurve(stream->channel(i)->name(), stream->channel(i)->yData());
+    }
+
+}
+
+PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
+                         Snapshot* snapshot, QObject *parent) :
+    QObject(parent)
+{
+    construct(plotArea, menu);
+
+    setNumOfSamples(snapshot->numSamples());
+    setPlotWidth(snapshot->numSamples());
+
+    for (unsigned ci = 0; ci < snapshot->numChannels(); ci++)
+    {
+        addCurve(snapshot->channelName(ci), snapshot->data[ci]);
+    }
+
+    infoModel = snapshot->infoModel();
+    connect(infoModel, &QAbstractItemModel::dataChanged,
+            this, &PlotManager::onChannelInfoChanged);
+}
+
+void PlotManager::construct(QWidget* plotArea, PlotMenu* menu)
+{
     _menu = menu;
     _plotArea = plotArea;
     _autoScaled = true;
@@ -38,7 +87,6 @@ PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
     _yMax = 1;
     _xAxisAsIndex = true;
     isDemoShown = false;
-    _stream = stream;
     _numOfSamples = 1;
     _plotWidth = 1;
     showSymbols = Plot::ShowSymbolsAuto;
@@ -72,22 +120,6 @@ PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
     darkBackground(menu->darkBackgroundAction.isChecked());
     showLegend(menu->showLegendAction.isChecked());
     setMulti(menu->showMultiAction.isChecked());
-
-    // connect to channel info model
-    if (_stream != NULL)
-    {
-        auto infoModel = _stream->infoModel();
-        connect(infoModel, &QAbstractItemModel::dataChanged,
-                this, &PlotManager::onChannelInfoChanged);
-
-        connect(infoModel, &QAbstractItemModel::modelReset,
-                [this]()
-                {
-                    onChannelInfoChanged(infoModel->index(0, 0), // start
-                                         infoModel->index(infoModel->rowCount()-1, 0), // end
-                                         {}); // roles ignored
-                });
-    }
 }
 
 PlotManager::~PlotManager()
@@ -105,6 +137,27 @@ PlotManager::~PlotManager()
 
     if (scrollArea != NULL) delete scrollArea;
     if (emptyPlot != NULL) delete emptyPlot;
+}
+
+void PlotManager::onNumChannelsChanged(unsigned value)
+{
+    unsigned int oldNum = numOfCurves();
+    unsigned numOfChannels = value;
+
+    if (numOfChannels > oldNum)
+    {
+        // add new channels
+        for (unsigned int i = oldNum; i < numOfChannels; i++)
+        {
+            addCurve(_stream->channel(i)->name(), _stream->channel(i)->yData());
+        }
+    }
+    else if(numOfChannels < oldNum)
+    {
+        removeCurves(oldNum - numOfChannels);
+    }
+
+    replot();
 }
 
 void PlotManager::onChannelInfoChanged(const QModelIndex &topLeft,
@@ -276,7 +329,7 @@ Plot* PlotManager::addPlotWidget()
     return plot;
 }
 
-void PlotManager::addCurve(QString title, FrameBuffer* buffer)
+void PlotManager::addCurve(QString title, const FrameBuffer* buffer)
 {
     auto curve = new QwtPlotCurve(title);
     auto series = new FrameBufferSeries(buffer);
@@ -298,7 +351,7 @@ void PlotManager::_addCurve(QwtPlotCurve* curve)
     curves.append(curve);
 
     unsigned index = curves.size()-1;
-    auto color = _stream->channel(index)->color();
+    auto color = infoModel->color(index);
     curve->setPen(color);
 
     // create the plot for the curve if we are on multi display

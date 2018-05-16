@@ -83,7 +83,7 @@ unsigned DataFormatPanel::numChannels() const
 
 Source* DataFormatPanel::activeSource()
 {
-    return &currentReader;
+    return currentReader;
 }
 
 void DataFormatPanel::pause(bool enabled)
@@ -100,7 +100,7 @@ void DataFormatPanel::enableDemo(bool enabled)
         demoReader.enable();
         connect(&demoReader, &DemoReader::samplesPerSecondChanged,
                 this, &DataFormatPanel::samplesPerSecondChanged);
-        emit sourceChanged(&demoreader);
+        emit sourceChanged(&demoReader);
     }
     else
     {
@@ -130,13 +130,12 @@ void DataFormatPanel::selectReader(AbstractReader* reader)
     reader->settingsWidget()->show();
 
     // notify if number of channels is different
-    if (currentReader->numOfChannels() != reader->numOfChannels())
+    if (currentReader->numChannels() != reader->numChannels())
     {
-        emit numOfChannelsChanged(reader->numOfChannels());
+        emit numOfChannelsChanged(reader->numChannels());
     }
 
     reader->pause(paused);
-    reader->recording = currentReader->recording;
 
     currentReader = reader;
     emit sourceChanged(currentReader);

@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 Hasan Yavuz Özderya
+# Copyright © 2018 Hasan Yavuz Özderya
 #
 # This file is part of serialplot.
 #
@@ -103,7 +103,6 @@ add_executable(${PROGRAM_NAME} WIN32
   src/scrollzoomer.cpp
   src/scrollbar.cpp
   src/hidabletabwidget.cpp
-  src/framebuffer.cpp
   src/scalepicker.cpp
   src/scalezoomer.cpp
   src/portlist.cpp
@@ -120,8 +119,12 @@ add_executable(${PROGRAM_NAME} WIN32
   src/datarecorder.cpp
   src/tooltipfilter.cpp
   src/sneakylineedit.cpp
-  src/channelmanager.cpp
+  src/stream.cpp
+  src/streamchannel.cpp
   src/channelinfomodel.cpp
+  src/ringbuffer.cpp
+  src/ringbuffer.cpp
+  src/indexbuffer.cpp
   src/framebufferseries.cpp
   src/numberformatbox.cpp
   src/endiannessbox.cpp

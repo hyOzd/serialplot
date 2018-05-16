@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -22,9 +22,9 @@
 
 #include "barchart.h"
 
-BarChart::BarChart(ChannelManager* channelMan)
+BarChart::BarChart(const Stream* stream)
 {
-    _channelMan = channelMan;
+    _stream = stream;
     setSpacing(0);
 }
 
@@ -35,26 +35,25 @@ void BarChart::resample()
 
 QVector<double> BarChart::chartData() const
 {
-    unsigned numChannels = _channelMan->numOfChannels();
-    unsigned numOfSamples = _channelMan->numOfSamples();
+    unsigned numChannels = _stream->numChannels();
+    unsigned numSamples = _stream->numSamples();
     QVector<double> data(numChannels);
     for (unsigned i = 0; i < numChannels; i++)
     {
-        data[i] = _channelMan->channelBuffer(i)->sample(numOfSamples-1);
+        data[i] = _stream->channel(i)->yData()->sample(numSamples-1);
     }
     return data;
 }
 
 QwtColumnSymbol* BarChart::specialSymbol(int sampleIndex, const QPointF& sample) const
 {
-    unsigned numChannels = _channelMan->numOfChannels();
+    unsigned numChannels = _stream->numChannels();
     if (sampleIndex < 0 || sampleIndex > (int) numChannels)
     {
         return NULL;
     }
 
-    auto info = _channelMan->infoModel();
-    auto color = info->color(sampleIndex);
+    auto color = _stream->channel(sampleIndex)->color();
 
     QwtColumnSymbol* symbol = new QwtColumnSymbol(QwtColumnSymbol::Box);
     symbol->setLineWidth(1);

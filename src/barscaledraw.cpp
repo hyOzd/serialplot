@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -21,14 +21,14 @@
 
 #include <QtDebug>
 
-BarScaleDraw::BarScaleDraw(ChannelManager* channelMan)
+BarScaleDraw::BarScaleDraw(const Stream* stream)
 {
-    _channelMan = channelMan;
+    _stream = stream;
     enableComponent(Backbone, false);
     setLabelRotation(-90);
     setLabelAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
-    QObject::connect(_channelMan, &ChannelManager::channelNameChanged,
+    QObject::connect(_stream, &Stream::channelNameChanged,
             [this]()
             {
                 invalidateCache();
@@ -38,11 +38,11 @@ BarScaleDraw::BarScaleDraw(ChannelManager* channelMan)
 QwtText BarScaleDraw::label(double value) const
 {
     int index = value;
-    unsigned numChannels = _channelMan->numOfChannels();
+    unsigned numChannels = _stream->numChannels();
 
     if (index >=0 && index < (int) numChannels)
     {
-        return _channelMan->channelName(index);
+        return _stream->channel(index)->name();
     }
     else
     {

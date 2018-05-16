@@ -32,6 +32,7 @@
 #include "plot.h"
 #include "framebufferseries.h"
 #include "stream.h"
+#include "snapshot.h"
 #include "plotmenu.h"
 
 class PlotManager : public QObject
@@ -42,10 +43,13 @@ public:
     explicit PlotManager(QWidget* plotArea, PlotMenu* menu,
                          const Stream* stream = NULL,
                          QObject *parent = 0);
+    explicit PlotManager(QWidget* plotArea, PlotMenu* menu,
+                         Snapshot* snapshot,
+                         QObject *parent = 0);
     ~PlotManager();
     /// Add a new curve with title and buffer. A color is
     /// automatically chosen for curve.
-    void addCurve(QString title, FrameBuffer* buffer);
+    void addCurve(QString title, const FrameBuffer* buffer);
     /// Alternative of `addCurve` for static curve data (snapshots).
     void addCurve(QString title, QVector<QPointF> data);
     /// Removes curves from the end
@@ -80,7 +84,8 @@ private:
     QList<QwtPlotCurve*> curves;
     QList<Plot*> plotWidgets;
     Plot* emptyPlot;  ///< for displaying when all channels are hidden
-    const Stream* stream;       ///< attached stream, can be `NULL`
+    const Stream* _stream;       ///< attached stream, can be `NULL`
+    const ChannelInfoModel* infoModel;
     bool isDemoShown;
     bool _autoScaled;
     double _yMin;
@@ -92,6 +97,8 @@ private:
     double _plotWidth;
     Plot::ShowSymbols showSymbols;
 
+    /// Common constructor
+    void construct(QWidget* plotArea, PlotMenu* menu);
     /// Setups the layout for multi or single plot
     void setupLayout(bool multiPlot);
     /// Inserts a new plot widget to the current layout.
@@ -111,6 +118,7 @@ private slots:
     void darkBackground(bool enabled = true);
     void setSymbols(Plot::ShowSymbols shown);
 
+    void onNumChannelsChanged(unsigned value);
     void onChannelInfoChanged(const QModelIndex & topLeft,
                               const QModelIndex & bottomRight,
                               const QVector<int> & roles = QVector<int> ());

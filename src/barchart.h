@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -22,12 +22,12 @@
 
 #include <qwt_plot_barchart.h>
 #include <qwt_column_symbol.h>
-#include "channelmanager.h"
+#include "stream.h"
 
 class BarChart : public QwtPlotBarChart
 {
 public:
-    explicit BarChart(ChannelManager* channelMan);
+    explicit BarChart(const Stream* stream);
 
     void resample();
     QwtColumnSymbol* specialSymbol(int sampleIndex, const QPointF&) const;
@@ -38,7 +38,7 @@ public:
         int index, const QPointF &sample ) const;
 
 private:
-    ChannelManager* _channelMan;
+    const Stream* _stream;
 
     QVector<double> chartData() const;
 };

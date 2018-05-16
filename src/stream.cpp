@@ -48,8 +48,8 @@ Stream::Stream(unsigned nc, bool x, unsigned ns) :
 
 Stream::~Stream()
 {
-    // notify deletion
-    // delete channels
+    // TODO: notify deletion
+    // TODO: delete channels
 }
 
 bool Stream::hasX() const
@@ -81,6 +81,11 @@ StreamChannel* Stream::channel(unsigned index)
 const ChannelInfoModel* Stream::infoModel() const
 {
     return &_infoModel;
+}
+
+ChannelInfoModel* Stream::infoModel()
+{
+    return const_cast<ChannelInfoModel*>(static_cast<const Stream&>(*this).infoModel());
 }
 
 void Stream::setNumChannels(unsigned nc, bool x)

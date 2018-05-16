@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -45,6 +45,9 @@ public:
 
     QString name();
     QString displayName(); ///< `name()` plus '*' if snapshot is not saved
+    unsigned numChannels() const; ///< number of channels in this snapshot
+    unsigned numSamples() const;  ///< number of samples in every channel
+    const ChannelInfoModel* infoModel() const;
     ChannelInfoModel* infoModel();
     void setName(QString name);
     QString channelName(unsigned channel);
