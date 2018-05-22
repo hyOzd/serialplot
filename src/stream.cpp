@@ -157,6 +157,8 @@ void Stream::feedIn(const SamplePack& data)
     }
 
     Sink::feedIn(data);
+
+    emit dataAdded();
 }
 
 void Stream::pause(bool paused)

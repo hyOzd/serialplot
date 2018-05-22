@@ -39,8 +39,9 @@ public:
     /// an error.
     void disconnectFollower(Sink* sink);
 
-    /// Returns the connected source. `NULL` if it's not connected.
+    /// Returns the connected source. `nullptr` if it's not connected.
     const Source* connectedSource() const;
+    Source* connectedSource();
 
 protected:
     /// Entry point for incoming data. Re-implementations should
@@ -62,7 +63,7 @@ protected:
 
 private:
     QList<Sink*> followers;
-    const Source* source = NULL;   ///< source that this sink is connected to
+    const Source* source = nullptr;   ///< source that this sink is connected to
     bool _hasX;
     unsigned _numChannels;
 };

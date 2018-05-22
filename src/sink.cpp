@@ -55,11 +55,16 @@ void Sink::setNumChannels(unsigned nc, bool x)
 
 void Sink::setSource(const Source* s)
 {
-    Q_ASSERT((source == NULL) != (s == NULL));
+    Q_ASSERT((source == nullptr) != (s == nullptr));
     source = s;
 }
 
 const Source* Sink::connectedSource() const
 {
     return source;
+}
+
+Source* Sink::connectedSource()
+{
+    return const_cast<Source*>(static_cast<const Sink&>(*this).connectedSource());
 }

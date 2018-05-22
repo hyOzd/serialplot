@@ -112,7 +112,7 @@ private:
 
 private slots:
     void onPortToggled(bool open);
-
+    void setStreamSource(Source* source);
     void onNumOfSamplesChanged(int value);
 
     void clearPlot();

@@ -25,14 +25,14 @@ Source::~Source()
 {
     for (auto sink : sinks)
     {
-        sink->setSource(NULL);
+        sink->setSource(nullptr);
     }
 }
 
 void Source::connectSink(Sink* sink)
 {
     Q_ASSERT(!sinks.contains(sink));
-    Q_ASSERT(sink->connectedSource() == NULL);
+    Q_ASSERT(sink->connectedSource() == nullptr);
 
     sinks.append(sink);
     sink->setSource(this);
@@ -44,7 +44,7 @@ void Source::disconnect(Sink* sink)
     Q_ASSERT(sinks.contains(sink));
     Q_ASSERT(sink->connectedSource() == this);
 
-    sink->setSource(NULL);
+    sink->setSource(nullptr);
     sinks.removeOne(sink);
 }
 
@@ -53,7 +53,7 @@ void Source::disconnectSinks()
     while (!sinks.isEmpty())
     {
         auto sink = sinks.takeFirst();
-        sink->setSource(NULL);
+        sink->setSource(nullptr);
     }
 }
 

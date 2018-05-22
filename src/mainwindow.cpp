@@ -206,7 +206,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&serialPort, &QIODevice::aboutToClose,
             &recordPanel, &RecordPanel::onPortClose);
 
-    // init data arrays and plot
+    // init plot
     numOfSamples = plotControlPanel.numOfSamples();
     stream.setNumSamples(numOfSamples);
     plotControlPanel.setChannelInfoModel(stream.infoModel());
@@ -233,6 +233,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(ui->actionDemoMode, &QAction::toggled,
                      plotMan, &PlotManager::showDemoIndicator);
+
+    // init stream connections
+    connect(&dataFormatPanel, &DataFormatPanel::sourceChanged,
+            this, &MainWindow::setStreamSource);
+    setStreamSource(dataFormatPanel.activeSource());
 
     // load default settings
     QSettings settings("serialplot", "serialplot");
@@ -339,6 +344,18 @@ void MainWindow::onPortToggled(bool open)
     // make sure demo mode is disabled
     if (open && isDemoRunning()) enableDemo(false);
     ui->actionDemoMode->setEnabled(!open);
+}
+
+void MainWindow::setStreamSource(Source* source)
+{
+    // disconnect previous source
+    auto currentSource = stream.connectedSource();
+    if (currentSource != nullptr)
+    {
+        currentSource->disconnect((Sink*) &stream);
+    }
+    // connect to new source
+    source->connectSink(&stream);
 }
 
 void MainWindow::clearPlot()

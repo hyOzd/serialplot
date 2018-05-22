@@ -47,8 +47,6 @@ DataFormatPanel::DataFormatPanel(QSerialPort* port, QWidget *parent) :
     ui->horizontalLayout->addWidget(bsReader.settingsWidget(), 1);
     connect(&bsReader, SIGNAL(numOfChannelsChanged(unsigned)),
             this, SIGNAL(numOfChannelsChanged(unsigned)));
-    connect(&bsReader, SIGNAL(samplesPerSecondChanged(unsigned)),
-            this, SIGNAL(samplesPerSecondChanged(unsigned)));
 
     // initalize reader selection buttons
     connect(ui->rbBinary, &QRadioButton::toggled, [this](bool checked)
@@ -98,8 +96,6 @@ void DataFormatPanel::enableDemo(bool enabled)
     if (enabled)
     {
         demoReader.enable();
-        connect(&demoReader, &DemoReader::samplesPerSecondChanged,
-                this, &DataFormatPanel::samplesPerSecondChanged);
         emit sourceChanged(&demoReader);
     }
     else
@@ -120,8 +116,6 @@ void DataFormatPanel::selectReader(AbstractReader* reader)
     disconnect(currentReader, 0, this, 0);
     connect(reader, SIGNAL(numOfChannelsChanged(unsigned)),
             this, SIGNAL(numOfChannelsChanged(unsigned)));
-    connect(reader, SIGNAL(samplesPerSecondChanged(unsigned)),
-            this, SIGNAL(samplesPerSecondChanged(unsigned)));
 
     // switch the settings widget
     ui->horizontalLayout->removeWidget(currentReader->settingsWidget());
