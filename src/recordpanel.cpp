@@ -242,6 +242,7 @@ void RecordPanel::startRecording(void)
 void RecordPanel::stopRecording(void)
 {
     recorder.stopRecording();
+    _stream->disconnectFollower(&recorder);
 }
 
 void RecordPanel::onPortClose()
