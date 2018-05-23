@@ -44,7 +44,6 @@
 #include "snapshotmanager.h"
 #include "plotmanager.h"
 #include "plotmenu.h"
-#include "datarecorder.h"
 #include "updatecheckdialog.h"
 
 namespace Ui {
@@ -81,7 +80,6 @@ private:
     PlotManager* plotMan;
     QWidget* secondaryPlot;
     SnapshotManager snapshotMan;
-    DataRecorder recorder;       // operated by `recordPanel`
 
     QLabel spsLabel;
     CommandPanel commandPanel;
