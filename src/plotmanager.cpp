@@ -67,13 +67,13 @@ PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
 
     setNumOfSamples(snapshot->numSamples());
     setPlotWidth(snapshot->numSamples());
+    infoModel = snapshot->infoModel();
 
     for (unsigned ci = 0; ci < snapshot->numChannels(); ci++)
     {
         addCurve(snapshot->channelName(ci), snapshot->data[ci]);
     }
 
-    infoModel = snapshot->infoModel();
     connect(infoModel, &QAbstractItemModel::dataChanged,
             this, &PlotManager::onChannelInfoChanged);
 }
