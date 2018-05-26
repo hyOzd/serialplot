@@ -45,6 +45,7 @@
 #include "plotmanager.h"
 #include "plotmenu.h"
 #include "updatecheckdialog.h"
+#include "samplecounter.h"
 
 namespace Ui {
 class MainWindow;
@@ -80,6 +81,7 @@ private:
     PlotManager* plotMan;
     QWidget* secondaryPlot;
     SnapshotManager snapshotMan;
+    SampleCounter sampleCounter;
 
     QLabel spsLabel;
     CommandPanel commandPanel;
@@ -110,11 +112,11 @@ private:
 
 private slots:
     void onPortToggled(bool open);
-    void setStreamSource(Source* source);
+    void onSourceChanged(Source* source);
     void onNumOfSamplesChanged(int value);
 
     void clearPlot();
-    void onSpsChanged(unsigned sps);
+    void onSpsChanged(float sps);
     void enableDemo(bool enabled);
     void showBarPlot(bool show);
 

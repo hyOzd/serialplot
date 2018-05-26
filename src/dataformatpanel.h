@@ -63,7 +63,6 @@ signals:
     /// Active (selected) reader has changed.
     void sourceChanged(Source* source);
     void numOfChannelsChanged(unsigned);
-    void samplesPerSecondChanged(unsigned);
 
 private:
     Ui::DataFormatPanel *ui;

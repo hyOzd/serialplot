@@ -223,9 +223,8 @@ MainWindow::MainWindow(QWidget *parent) :
     spsLabel.setText("0sps");
     spsLabel.setToolTip("samples per second (per channel)");
     ui->statusBar->addPermanentWidget(&spsLabel);
-    QObject::connect(&dataFormatPanel,
-                     &DataFormatPanel::samplesPerSecondChanged,
-                     this, &MainWindow::onSpsChanged);
+    connect(&sampleCounter, &SampleCounter::spsChanged,
+            this, &MainWindow::onSpsChanged);
 
     // init demo
     QObject::connect(ui->actionDemoMode, &QAction::toggled,
@@ -236,8 +235,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // init stream connections
     connect(&dataFormatPanel, &DataFormatPanel::sourceChanged,
-            this, &MainWindow::setStreamSource);
-    setStreamSource(dataFormatPanel.activeSource());
+            this, &MainWindow::onSourceChanged);
+    onSourceChanged(dataFormatPanel.activeSource());
 
     // load default settings
     QSettings settings("serialplot", "serialplot");
@@ -346,10 +345,10 @@ void MainWindow::onPortToggled(bool open)
     ui->actionDemoMode->setEnabled(!open);
 }
 
-void MainWindow::setStreamSource(Source* source)
+void MainWindow::onSourceChanged(Source* source)
 {
-    // connect to new source
     source->connectSink(&stream);
+    source->connectSink(&sampleCounter);
 }
 
 void MainWindow::clearPlot()
@@ -365,9 +364,10 @@ void MainWindow::onNumOfSamplesChanged(int value)
     plotMan->replot();
 }
 
-void MainWindow::onSpsChanged(unsigned sps)
+void MainWindow::onSpsChanged(float sps)
 {
-    spsLabel.setText(QString::number(sps) + "sps");
+    int precision = sps < 1. ? 3 : 0;
+    spsLabel.setText(QString::number(sps, 'f', precision) + "sps");
 }
 
 bool MainWindow::isDemoRunning()

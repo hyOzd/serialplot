@@ -148,6 +148,7 @@ add_executable(${PROGRAM_NAME} WIN32
   src/samplepack.cpp
   src/source.cpp
   src/sink.cpp
+  src/samplecounter.cpp
   misc/windows_icon.rc
   ${UI_FILES}
   ${RES_FILES}

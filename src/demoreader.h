@@ -53,10 +53,6 @@ public slots:
     /// Sets the number of channels, this doesn't trigger a `numOfChannelsChanged` signal.
     void setNumOfChannels(unsigned value);
 
-signals:
-    // TODO: added for build only, remove later
-    void samplesPerSecondChanged(unsigned);
-
 private:
     bool paused;
     unsigned _numChannels;
