@@ -37,8 +37,9 @@ public:
     /// Returns number of channels
     virtual unsigned numChannels() const = 0;
 
-    /// Connects a sink to this source. Trying to connect an already
-    /// connected sink is an error.
+    /// Connects a sink to this source.
+    ///
+    /// If `Sink` is already connected to a source, it's disconnected first.
     void connectSink(Sink* sink);
 
     /// Disconnects an already connected sink. Trying to disconnect an

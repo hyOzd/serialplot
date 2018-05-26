@@ -348,12 +348,6 @@ void MainWindow::onPortToggled(bool open)
 
 void MainWindow::setStreamSource(Source* source)
 {
-    // disconnect previous source
-    auto currentSource = stream.connectedSource();
-    if (currentSource != nullptr)
-    {
-        currentSource->disconnect((Sink*) &stream);
-    }
     // connect to new source
     source->connectSink(&stream);
 }

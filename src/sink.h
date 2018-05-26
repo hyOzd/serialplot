@@ -53,17 +53,19 @@ protected:
     virtual void setNumChannels(unsigned nc, bool x);
 
     /// Set by the connected source when its connected. When
-    /// disconnecting it's set to `NULL`.
+    /// disconnecting it's set to `nullptr`.
+    ///
+    /// @note Previous source is disconnected.
     ///
     /// @important Trying to connect a source while its already
     /// connected is an error.
-    void setSource(const Source* s);
+    void setSource(Source* s);
 
     friend Source;
 
 private:
     QList<Sink*> followers;
-    const Source* source = nullptr;   ///< source that this sink is connected to
+    Source* source = nullptr;   ///< source that this sink is connected to
     bool _hasX;
     unsigned _numChannels;
 };

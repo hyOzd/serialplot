@@ -32,7 +32,12 @@ Source::~Source()
 void Source::connectSink(Sink* sink)
 {
     Q_ASSERT(!sinks.contains(sink));
-    Q_ASSERT(sink->connectedSource() == nullptr);
+
+    auto prevSource = sink->connectedSource();
+    if (prevSource != nullptr)
+    {
+        prevSource->disconnect(sink);
+    }
 
     sinks.append(sink);
     sink->setSource(this);

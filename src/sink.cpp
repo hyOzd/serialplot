@@ -53,7 +53,7 @@ void Sink::setNumChannels(unsigned nc, bool x)
     }
 }
 
-void Sink::setSource(const Source* s)
+void Sink::setSource(Source* s)
 {
     Q_ASSERT((source == nullptr) != (s == nullptr));
     source = s;
