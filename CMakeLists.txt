@@ -85,6 +85,7 @@ qt5_wrap_ui(UI_FILES
   src/binarystreamreadersettings.ui
   src/asciireadersettings.ui
   src/framedreadersettings.ui
+  src/demoreadersettings.ui
   src/updatecheckdialog.ui
   )
 
@@ -134,6 +135,7 @@ add_executable(${PROGRAM_NAME} WIN32
   src/asciireader.cpp
   src/asciireadersettings.cpp
   src/demoreader.cpp
+  src/demoreadersettings.cpp
   src/framedreader.cpp
   src/framedreadersettings.cpp
   src/plotmanager.cpp

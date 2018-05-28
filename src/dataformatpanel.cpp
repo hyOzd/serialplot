@@ -39,6 +39,7 @@ DataFormatPanel::DataFormatPanel(QSerialPort* port, QWidget *parent) :
     serialPort = port;
     paused = false;
     demoEnabled = false;
+    readerBeforeDemo = nullptr;
 
     // initalize default reader
     currentReader = &bsReader;
@@ -63,10 +64,6 @@ DataFormatPanel::DataFormatPanel(QSerialPort* port, QWidget *parent) :
             {
                 if (checked) selectReader(&framedReader);
             });
-
-    // re-purpose numofchannels settings from actual reader settings to demo reader
-    connect(this, &DataFormatPanel::numOfChannelsChanged,
-            &demoReader, &DemoReader::setNumOfChannels);
 }
 
 DataFormatPanel::~DataFormatPanel()
@@ -95,14 +92,13 @@ void DataFormatPanel::enableDemo(bool enabled)
 {
     if (enabled)
     {
-        demoReader.enable();
-        emit sourceChanged(&demoReader);
+        readerBeforeDemo = currentReader;
+        selectReader(&demoReader);
     }
     else
     {
-        demoReader.enable(false);
-        disconnect(&demoReader, 0, this, 0);
-        emit sourceChanged(currentReader);
+        Q_ASSERT(readerBeforeDemo != nullptr);
+        selectReader(readerBeforeDemo);
     }
     demoEnabled = enabled;
 }

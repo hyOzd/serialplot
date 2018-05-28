@@ -23,6 +23,7 @@
 #include <QTimer>
 
 #include "abstractreader.h"
+#include "demoreadersettings.h"
 
 /**
  * This is a special case of reader implementation and should be used
@@ -40,20 +41,17 @@ class DemoReader : public AbstractReader
 public:
     explicit DemoReader(QIODevice* device, QObject* parent = 0);
 
-    /// Demo reader is an exception so this function returns NULL
     QWidget* settingsWidget();
-
     unsigned numChannels() const;
-
     void enable(bool enabled = true);
 
 public slots:
     void pause(bool);
-
-    /// Sets the number of channels, this doesn't trigger a `numOfChannelsChanged` signal.
-    void setNumOfChannels(unsigned value);
+    void setNumChannels(unsigned value);
 
 private:
+    DemoReaderSettings _settingsWidget;
+
     bool paused;
     unsigned _numChannels;
     QTimer timer;
@@ -61,6 +59,7 @@ private:
 
 private slots:
     void demoTimerTimeout();
+    void onNumChannelsChanged(unsigned value);
 };
 
 #endif // DEMOREADER_H

@@ -81,6 +81,7 @@ private:
 
     bool demoEnabled;
     DemoReader demoReader;
+    AbstractReader* readerBeforeDemo;
 };
 
 #endif // DATAFORMATPANEL_H

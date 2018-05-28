@@ -29,16 +29,19 @@ DemoReader::DemoReader(QIODevice* device, QObject* parent) :
     AbstractReader(device, parent)
 {
     paused = false;
-    _numChannels = 1;
+    _numChannels = _settingsWidget.numChannels();
+    connect(&_settingsWidget, &DemoReaderSettings::numChannelsChanged,
+            this, &DemoReader::onNumChannelsChanged);
+
     count = 0;
     timer.setInterval(100);
-    QObject::connect(&timer, &QTimer::timeout,
-                     this, &DemoReader::demoTimerTimeout);
+    connect(&timer, &QTimer::timeout,
+            this, &DemoReader::demoTimerTimeout);
 }
 
 QWidget* DemoReader::settingsWidget()
 {
-    return NULL;
+    return &_settingsWidget;
 }
 
 void DemoReader::enable(bool enabled)
@@ -59,10 +62,9 @@ unsigned DemoReader::numChannels() const
     return _numChannels;
 }
 
-void DemoReader::setNumOfChannels(unsigned value)
+void DemoReader::setNumChannels(unsigned value)
 {
-    _numChannels = value;
-    updateNumChannels();
+    _settingsWidget.setNumChannels(value);
 }
 
 void DemoReader::pause(bool enabled)
@@ -86,4 +88,10 @@ void DemoReader::demoTimerTimeout()
         }
         feedOut(samples);
     }
+}
+
+void DemoReader::onNumChannelsChanged(unsigned value)
+{
+    _numChannels = value;
+    updateNumChannels();
 }
