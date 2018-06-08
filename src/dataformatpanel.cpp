@@ -93,6 +93,7 @@ void DataFormatPanel::enableDemo(bool enabled)
     if (enabled)
     {
         readerBeforeDemo = currentReader;
+        demoReader.setNumChannels(readerBeforeDemo->numChannels());
         selectReader(&demoReader);
     }
     else
