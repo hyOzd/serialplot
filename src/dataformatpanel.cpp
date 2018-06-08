@@ -100,7 +100,13 @@ void DataFormatPanel::enableDemo(bool enabled)
         Q_ASSERT(readerBeforeDemo != nullptr);
         selectReader(readerBeforeDemo);
     }
+
     demoEnabled = enabled;
+
+    // disable/enable reader selection buttons during/after demo
+    ui->rbAscii->setDisabled(demoEnabled);
+    ui->rbBinary->setDisabled(demoEnabled);
+    ui->rbFramed->setDisabled(demoEnabled);
 }
 
 void DataFormatPanel::selectReader(AbstractReader* reader)
