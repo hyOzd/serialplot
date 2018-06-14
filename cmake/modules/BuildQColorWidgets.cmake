@@ -21,7 +21,7 @@ include(ExternalProject)
 
 ExternalProject_Add(QCW
   PREFIX qcw
-  GIT_REPOSITORY https://github.com/mbasaglia/Qt-Color-Widgets
+  GIT_REPOSITORY https://gitlab.com/mattia.basaglia/Qt-Color-Widgets.git
   GIT_TAG 2c49e1bb4e1f591e720e2132cc2aaeef3ba73f14
   CMAKE_CACHE_ARGS "-DCMAKE_CXX_FLAGS:string=-D QTCOLORWIDGETS_STATICALLY_LINKED"
   UPDATE_COMMAND ""
