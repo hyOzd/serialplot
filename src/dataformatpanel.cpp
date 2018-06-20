@@ -46,8 +46,6 @@ DataFormatPanel::DataFormatPanel(QSerialPort* port, QWidget *parent) :
     bsReader.enable();
     ui->rbBinary->setChecked(true);
     ui->horizontalLayout->addWidget(bsReader.settingsWidget(), 1);
-    connect(&bsReader, SIGNAL(numOfChannelsChanged(unsigned)),
-            this, SIGNAL(numOfChannelsChanged(unsigned)));
 
     // initalize reader selection buttons
     connect(ui->rbBinary, &QRadioButton::toggled, [this](bool checked)
@@ -117,20 +115,12 @@ void DataFormatPanel::selectReader(AbstractReader* reader)
 
     // re-connect signals
     disconnect(currentReader, 0, this, 0);
-    connect(reader, SIGNAL(numOfChannelsChanged(unsigned)),
-            this, SIGNAL(numOfChannelsChanged(unsigned)));
 
     // switch the settings widget
     ui->horizontalLayout->removeWidget(currentReader->settingsWidget());
     currentReader->settingsWidget()->hide();
     ui->horizontalLayout->addWidget(reader->settingsWidget(), 1);
     reader->settingsWidget()->show();
-
-    // notify if number of channels is different
-    if (currentReader->numChannels() != reader->numChannels())
-    {
-        emit numOfChannelsChanged(reader->numChannels());
-    }
 
     reader->pause(paused);
 

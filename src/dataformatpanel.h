@@ -62,7 +62,6 @@ public slots:
 signals:
     /// Active (selected) reader has changed.
     void sourceChanged(Source* source);
-    void numOfChannelsChanged(unsigned);
 
 private:
     Ui::DataFormatPanel *ui;
