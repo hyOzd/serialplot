@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -20,8 +20,7 @@
 #ifndef RINGBUFFER_H
 #define RINGBUFFER_H
 
-// IMPORTANT TODO: rename to "framebuffer.h" when stream work is done.
-#include "framebuffer2.h"
+#include "framebuffer.h"
 
 /// A fast buffer implementation for storing data.
 class RingBuffer : public WFrameBuffer

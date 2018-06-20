@@ -24,8 +24,7 @@
 #include <QRectF>
 #include <qwt_series_data.h>
 
-// TODO: rename when framebuffer.h is deleted
-#include "framebuffer2.h"
+#include "framebuffer.h"
 
 /**
  * This class provides an interface for actual FrameBuffer

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -20,8 +20,7 @@
 #ifndef READONLYBUFFER_H
 #define READONLYBUFFER_H
 
-// IMPORTANT TODO: rename to "framebuffer.h" when stream work is done.
-#include "framebuffer2.h"
+#include "framebuffer.h"
 
 /// A read only frame buffer used for storing snapshot data. Main advantage of
 /// this compared to `RingBuffer` is that reading data should be somewhat

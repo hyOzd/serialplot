@@ -29,7 +29,7 @@
 #include "source.h"
 #include "channelinfomodel.h"
 #include "streamchannel.h"
-#include "framebuffer2.h"
+#include "framebuffer.h"
 
 /**
  * Main waveform storage class. It consists of channels. Channels are

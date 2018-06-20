@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -20,8 +20,7 @@
 #ifndef INDEXBUFFER_H
 #define INDEXBUFFER_H
 
-// IMPORTANT TODO: rename to "framebuffer.h" when stream work is done.
-#include "framebuffer2.h"
+#include "framebuffer.h"
 
 /// A simple frame buffer that simply returns requested index as
 /// sample value.

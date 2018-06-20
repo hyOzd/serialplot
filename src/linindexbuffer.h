@@ -1,5 +1,5 @@
  /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -20,8 +20,7 @@
 #ifndef LININDEXBUFFER_H
 #define LININDEXBUFFER_H
 
-// IMPORTANT TODO: rename to "framebuffer.h" when stream work is done.
-#include "framebuffer2.h"
+#include "framebuffer.h"
 
 /// A dynamic frame buffer that start and end values can be set and
 /// intermediate values are calculated linearly.

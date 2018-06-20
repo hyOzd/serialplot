@@ -20,9 +20,7 @@
 #ifndef STREAMCHANNEL_H
 #define STREAMCHANNEL_H
 
-// IMPORTANT TODO: rename to "framebuffer.h" when stream work is done.
-#include "framebuffer2.h"
-
+#include "framebuffer.h"
 #include "channelinfomodel.h"
 
 class StreamChannel
