@@ -479,7 +479,6 @@ void PlotManager::setXAxis(bool asIndex, double xMin, double xMax)
     _xMax = xMax;
     for (auto curve : curves)
     {
-        // TODO: what happens when addCurve(QVector) is used?
         FrameBufferSeries* series = static_cast<FrameBufferSeries*>(curve->data());
         series->setXAxis(asIndex, xMin, xMax);
     }

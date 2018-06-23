@@ -48,8 +48,11 @@ Stream::Stream(unsigned nc, bool x, unsigned ns) :
 
 Stream::~Stream()
 {
-    // TODO: notify deletion
-    // TODO: delete channels
+    for (auto ch : channels)
+    {
+        delete ch;
+    }
+    delete xData;
 }
 
 bool Stream::hasX() const
@@ -132,7 +135,7 @@ void Stream::setNumChannels(unsigned nc, bool x)
     if (nc != oldNum)
     {
         _infoModel.setNumOfChannels(nc);
-        // TODO: how abut X change?
+        // TODO: how about X change?
         emit numChannelsChanged(nc);
     }
 
