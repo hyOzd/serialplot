@@ -71,7 +71,7 @@ QRectF FrameBufferSeries::boundingRect() const
         rect.setLeft(_xmin);
         rect.setRight(_xmax);
     }
-    return rect;
+    return rect.normalized();
 }
 
 void FrameBufferSeries::setRectOfInterest(const QRectF& rect)
