@@ -50,8 +50,6 @@ public:
     /// Add a new curve with title and buffer. A color is
     /// automatically chosen for curve.
     void addCurve(QString title, const FrameBuffer* buffer);
-    /// Alternative of `addCurve` for static curve data (snapshots).
-    void addCurve(QString title, QVector<QPointF> data);
     /// Removes curves from the end
     void removeCurves(unsigned number);
     /// Returns current number of curves known by plot manager

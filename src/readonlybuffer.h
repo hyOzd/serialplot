@@ -41,6 +41,9 @@ public:
     /// otherwise it's an error.
     ReadOnlyBuffer(const FrameBuffer* source, unsigned start, unsigned n);
 
+    /// Creates a buffer with data copied from an array
+    ReadOnlyBuffer(const double* source, unsigned ssize);
+
     ~ReadOnlyBuffer();
 
     virtual unsigned size() const;
@@ -51,6 +54,9 @@ private:
     double* data;    ///< data storage
     unsigned _size;  ///< data size
     Range _limits;   ///< limits cache
+
+    // TODO: duplicate with `RingBuffer`
+    void updateLimits(); ///< Updates limits cache
 };
 
 #endif // READONLYBUFFER_H

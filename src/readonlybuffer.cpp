@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -18,13 +18,14 @@
 */
 
 #include <QtGlobal>
+#include <string.h>
 
 #include "readonlybuffer.h"
 
 ReadOnlyBuffer::ReadOnlyBuffer(const FrameBuffer* source) :
     ReadOnlyBuffer(source, 0, source->size())
 {
-    // empty
+    // intentionally empty, see ↑
 }
 
 ReadOnlyBuffer::ReadOnlyBuffer(const FrameBuffer* source, unsigned start, unsigned n)
@@ -47,22 +48,18 @@ ReadOnlyBuffer::ReadOnlyBuffer(const FrameBuffer* source, unsigned start, unsign
     }
     else
     {
-        // TODO: code duplication with RingBuffer::updateLimits, consider reuse
-        _limits.start = data[0];
-        _limits.end = data[0];
-
-        for (unsigned i = 0; i < _size; i++)
-        {
-            if (data[i] > _limits.end)
-            {
-                _limits.end = data[i];
-            }
-            else if (data[i] < _limits.start)
-            {
-                _limits.start = data[i];
-            }
-        }
+        updateLimits();
     }
+}
+
+ReadOnlyBuffer::ReadOnlyBuffer(const double* source, unsigned ssize)
+{
+    Q_ASSERT(source != nullptr && ssize);
+
+    _size = ssize;
+    data = new double[_size];
+    memcpy(data, source, sizeof(double) * ssize);
+    updateLimits();
 }
 
 ReadOnlyBuffer::~ReadOnlyBuffer()
@@ -83,4 +80,24 @@ double ReadOnlyBuffer::sample(unsigned i) const
 Range ReadOnlyBuffer::limits() const
 {
     return _limits;
+}
+
+void ReadOnlyBuffer::updateLimits()
+{
+    Q_ASSERT(_size);
+
+    _limits.start = data[0];
+    _limits.end = data[0];
+
+    for (unsigned i = 0; i < _size; i++)
+    {
+        if (data[i] > _limits.end)
+        {
+            _limits.end = data[i];
+        }
+        else if (data[i] < _limits.start)
+        {
+            _limits.start = data[i];
+        }
+    }
 }

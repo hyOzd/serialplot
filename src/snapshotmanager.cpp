@@ -68,18 +68,9 @@ Snapshot* SnapshotManager::makeSnapshot() const
     QString name = QTime::currentTime().toString("'Snapshot ['HH:mm:ss']'");
     auto snapshot = new Snapshot(_mainWindow, name, *(_stream->infoModel()));
 
-    unsigned numChannels = _stream->numChannels();
-    unsigned numSamples = _stream->numSamples();
-
-    for (unsigned ci = 0; ci < numChannels; ci++)
+    for (unsigned ci = 0; ci < _stream->numChannels(); ci++)
     {
-        snapshot->data.append(QVector<QPointF>(numSamples));
-        auto x = _stream->channel(ci)->xData();
-        auto y = _stream->channel(ci)->yData();
-        for (unsigned i = 0; i < numSamples; i++)
-        {
-            snapshot->data[ci][i] = QPointF(x->sample(i), y->sample(i));
-        }
+        snapshot->yData.append(new ReadOnlyBuffer(_stream->channel(ci)->yData()));
     }
 
     return snapshot;
@@ -160,7 +151,7 @@ void SnapshotManager::loadSnapshotFromFile(QString fileName)
     unsigned numOfChannels = channelNames.size();
 
     // read data
-    QVector<QVector<QPointF>> data(numOfChannels);
+    QVector<QVector<double>> data(numOfChannels);
     unsigned lineNum = 1;
     while (file.canReadLine())
     {
@@ -188,17 +179,20 @@ void SnapshotManager::loadSnapshotFromFile(QString fileName)
                             << "\" to double.";
                 return;
             }
-            data[ci].append(QPointF(lineNum-1, y));
+            data[ci].append(y);
         }
         lineNum++;
     }
 
-    ChannelInfoModel channelInfo(channelNames);
-
+    // create snapshot
     auto snapshot = new Snapshot(
         _mainWindow, QFileInfo(fileName).baseName(),
         ChannelInfoModel(channelNames), true);
-    snapshot->data = data;
+
+    for (unsigned ci = 0; ci < numOfChannels; ci++)
+    {
+        snapshot->yData.append(new ReadOnlyBuffer(data[ci].data(), data[ci].size()));
+    }
 
     addSnapshot(snapshot, false);
 }

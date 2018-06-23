@@ -47,7 +47,6 @@ PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
                                      {}); // roles ignored
             });
 
-
     connect(stream, &Stream::numChannelsChanged, this, &PlotManager::onNumChannelsChanged);
     connect(stream, &Stream::dataAdded, this, &PlotManager::replot);
 
@@ -71,7 +70,7 @@ PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
 
     for (unsigned ci = 0; ci < snapshot->numChannels(); ci++)
     {
-        addCurve(snapshot->channelName(ci), snapshot->data[ci]);
+        addCurve(snapshot->channelName(ci), snapshot->yData[ci]);
     }
 
     connect(infoModel, &QAbstractItemModel::dataChanged,
@@ -335,13 +334,6 @@ void PlotManager::addCurve(QString title, const FrameBuffer* buffer)
     auto series = new FrameBufferSeries(buffer);
     series->setXAxis(_xAxisAsIndex, _xMin, _xMax);
     curve->setSamples(series);
-    _addCurve(curve);
-}
-
-void PlotManager::addCurve(QString title, QVector<QPointF> data)
-{
-    auto curve = new QwtPlotCurve(title);
-    curve->setSamples(data);
     _addCurve(curve);
 }
 

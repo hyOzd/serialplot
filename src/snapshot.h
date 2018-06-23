@@ -27,6 +27,7 @@
 #include <QStringList>
 
 #include "channelinfomodel.h"
+#include "readonlybuffer.h"
 
 class SnapshotView;
 class MainWindow;
@@ -39,7 +40,8 @@ public:
     Snapshot(MainWindow* parent, QString name, ChannelInfoModel infoModel, bool saved = false);
     ~Snapshot();
 
-    QVector<QVector<QPointF>> data;
+    // TODO: yData of snapshot shouldn't be public, preferable should be handled in constructor
+    QVector<ReadOnlyBuffer*> yData;
     QAction* showAction();
     QAction* deleteAction();
 
