@@ -23,19 +23,16 @@
 #include "binarystreamreader.h"
 #include "floatswap.h"
 
-BinaryStreamReader::BinaryStreamReader(QIODevice* device, ChannelManager* channelMan,
-                                       DataRecorder* recorder, QObject* parent) :
-    AbstractReader(device, channelMan, recorder, parent)
+BinaryStreamReader::BinaryStreamReader(QIODevice* device, QObject* parent) :
+    AbstractReader(device, parent)
 {
     paused = false;
     skipByteRequested = false;
     skipSampleRequested = false;
 
-    _numOfChannels = _settingsWidget.numOfChannels();
+    _numChannels = _settingsWidget.numOfChannels();
     connect(&_settingsWidget, &BinaryStreamReaderSettings::numOfChannelsChanged,
-            this, &BinaryStreamReader::numOfChannelsChanged);
-    connect(&_settingsWidget, &BinaryStreamReaderSettings::numOfChannelsChanged,
-            this, &BinaryStreamReader::onNumOfChannelsChanged);
+                     this, &BinaryStreamReader::onNumOfChannelsChanged);
 
     // initial number format selection
     onNumberFormatChanged(_settingsWidget.numberFormat());
@@ -60,9 +57,9 @@ QWidget* BinaryStreamReader::settingsWidget()
     return &_settingsWidget;
 }
 
-unsigned BinaryStreamReader::numOfChannels()
+unsigned BinaryStreamReader::numChannels() const
 {
-    return _numOfChannels;
+    return _numChannels;
 }
 
 void BinaryStreamReader::enable(bool enabled)
@@ -75,6 +72,7 @@ void BinaryStreamReader::enable(bool enabled)
     else
     {
         QObject::disconnect(_device, 0, this, 0);
+        disconnectSinks();
     }
 }
 
@@ -123,13 +121,15 @@ void BinaryStreamReader::onNumberFormatChanged(NumberFormat numberFormat)
 
 void BinaryStreamReader::onNumOfChannelsChanged(unsigned value)
 {
-    _numOfChannels = value;
+    _numChannels = value;
+    updateNumChannels();
+    emit numOfChannelsChanged(value);
 }
 
 void BinaryStreamReader::onDataReady()
 {
     // a package is a set of channel data like {CHAN0_SAMPLE, CHAN1_SAMPLE...}
-    int packageSize = sampleSize * _numOfChannels;
+    int packageSize = sampleSize * _numChannels;
     int bytesAvailable = _device->bytesAvailable();
 
     // skip 1 byte if requested
@@ -160,20 +160,16 @@ void BinaryStreamReader::onDataReady()
         return;
     }
 
-    double* channelSamples = new double[numOfPackagesToRead*_numOfChannels];
-
+    // actual reading
+    SamplePack samples(numOfPackagesToRead, _numChannels);
     for (int i = 0; i < numOfPackagesToRead; i++)
     {
-        for (unsigned int ci = 0; ci < _numOfChannels; ci++)
+        for (unsigned int ci = 0; ci < _numChannels; ci++)
         {
-            // channelSamples[ci].replace(i, (this->*readSample)());
-            channelSamples[ci*numOfPackagesToRead+i] = (this->*readSample)();
+            samples.data(ci)[i] = (this->*readSample)();
         }
     }
-
-    addData(channelSamples, numOfPackagesToRead*_numOfChannels);
-
-    delete[] channelSamples;
+    feedOut(samples);
 }
 
 template<typename T> double BinaryStreamReader::readSampleAs()

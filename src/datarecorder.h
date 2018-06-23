@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -24,7 +24,15 @@
 #include <QFile>
 #include <QTextStream>
 
-class DataRecorder : public QObject
+#include "sink.h"
+
+/**
+ * Implemented as a `Sink` that writes incoming data to a file. Before
+ * connecting a `Source` recording must be started with the `startRecording`
+ * method. Also before calling `stopRecording`, recorder should be disconnected
+ * from source.
+ */
+class DataRecorder : public QObject, public Sink
 {
     Q_OBJECT
 public:
@@ -44,7 +52,8 @@ public:
     /**
      * @brief Starts recording data to a file in CSV format.
      *
-     * File is opened and header line (names of channels) is written.
+     * File is opened and header line (names of channels) is written. After
+     * calling this function recorder should be connected to a `Source`.
      *
      * @param fileName name of the recording file
      * @param separator column separator
@@ -74,6 +83,9 @@ public:
 
     /// Stops recording, closes file.
     void stopRecording();
+
+protected:
+    virtual void feedIn(const SamplePack& data);
 
 private:
     unsigned lastNumChannels;   ///< used for error message only

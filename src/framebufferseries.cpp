@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -20,7 +20,7 @@
 #include <math.h>
 #include "framebufferseries.h"
 
-FrameBufferSeries::FrameBufferSeries(FrameBuffer* buffer)
+FrameBufferSeries::FrameBufferSeries(const FrameBuffer* buffer)
 {
     xAsIndex = true;
     _xmin = 0;
@@ -57,17 +57,21 @@ QPointF FrameBufferSeries::sample(size_t i) const
 
 QRectF FrameBufferSeries::boundingRect() const
 {
+    QRectF rect;
+    auto yLim = _buffer->limits();
+    rect.setBottom(yLim.start);
+    rect.setTop(yLim.end);
     if (xAsIndex)
     {
-        return _buffer->boundingRect();
+        rect.setLeft(0);
+        rect.setRight(size());
     }
     else
     {
-        auto rect = _buffer->boundingRect();
         rect.setLeft(_xmin);
         rect.setRight(_xmax);
-        return rect;
     }
+    return rect.normalized();
 }
 
 void FrameBufferSeries::setRectOfInterest(const QRectF& rect)

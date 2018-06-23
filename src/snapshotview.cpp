@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -30,20 +30,20 @@ SnapshotView::SnapshotView(MainWindow* parent, Snapshot* snapshot) :
 
     ui->setupUi(this);
 
-    plotMan = new PlotManager(ui->plotArea, &plotMenu, snapshot->infoModel(), this);
+    plotMan = new PlotManager(ui->plotArea, &plotMenu, snapshot, this);
 
     ui->menuSnapshot->insertAction(ui->actionClose, snapshot->deleteAction());
     this->setWindowTitle(snapshot->displayName());
 
     // initialize curves
-    unsigned numOfChannels = snapshot->data.size();
-    unsigned numOfSamples = snapshot->data[0].size();
-    for (unsigned ci = 0; ci < numOfChannels; ci++)
-    {
-        plotMan->addCurve(snapshot->channelName(ci), snapshot->data[ci]);
-    }
-    plotMan->setNumOfSamples(numOfSamples);
-    plotMan->setPlotWidth(numOfSamples);
+    // unsigned numOfChannels = snapshot->data.size();
+    // unsigned numOfSamples = snapshot->data[0].size();
+    // for (unsigned ci = 0; ci < numOfChannels; ci++)
+    // {
+    //     plotMan->addCurve(snapshot->channelName(ci), snapshot->data[ci]);
+    // }
+    // plotMan->setNumOfSamples(numOfSamples);
+    // plotMan->setPlotWidth(numOfSamples);
 
     renameDialog.setWindowTitle("Rename Snapshot");
     renameDialog.setLabelText("Enter new name:");

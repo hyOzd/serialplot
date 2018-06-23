@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -26,7 +26,7 @@
 #include <QAction>
 
 #include "datarecorder.h"
-#include "channelmanager.h"
+#include "stream.h"
 
 namespace Ui {
 class RecordPanel;
@@ -37,8 +37,7 @@ class RecordPanel : public QWidget
     Q_OBJECT
 
 public:
-    explicit RecordPanel(DataRecorder* recorder, ChannelManager* channelMan,
-                         QWidget* parent = 0);
+    explicit RecordPanel(Stream* stream, QWidget* parent = 0);
     ~RecordPanel();
 
     QToolBar* toolbar();
@@ -65,8 +64,8 @@ private:
     QAction recordAction;
     QString selectedFile;
     bool overwriteSelected;
-    DataRecorder* _recorder;
-    ChannelManager* _channelMan;
+    DataRecorder recorder;
+    Stream* _stream;
 
     /**
      * @brief Increments the file name.

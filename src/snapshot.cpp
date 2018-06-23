@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -108,9 +108,24 @@ void Snapshot::setName(QString name)
     emit nameChanged(this);
 }
 
-ChannelInfoModel* Snapshot::infoModel()
+unsigned Snapshot::numChannels() const
+{
+    return yData.size();
+}
+
+unsigned Snapshot::numSamples() const
+{
+    return yData[0]->size();
+}
+
+const ChannelInfoModel* Snapshot::infoModel() const
 {
     return &cInfoModel;
+}
+
+ChannelInfoModel* Snapshot::infoModel()
+{
+    return const_cast<ChannelInfoModel*>(static_cast<const Snapshot&>(*this).infoModel());
 }
 
 QString Snapshot::channelName(unsigned channel)
@@ -120,31 +135,27 @@ QString Snapshot::channelName(unsigned channel)
 
 void Snapshot::save(QString fileName)
 {
-    // TODO: remove code duplication (MainWindow::onExportCsv)
     QSaveFile file(fileName);
 
     if (file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
         QTextStream fileStream(&file);
 
-        unsigned numOfChannels = data.size();
-        unsigned numOfSamples = data[0].size();
-
         // print header
-        for (unsigned int ci = 0; ci < numOfChannels; ci++)
+        for (unsigned int ci = 0; ci < numChannels(); ci++)
         {
             fileStream << channelName(ci);
-            if (ci != numOfChannels-1) fileStream << ",";
+            if (ci != numChannels()-1) fileStream << ",";
         }
         fileStream << '\n';
 
         // print rows
-        for (unsigned int i = 0; i < numOfSamples; i++)
+        for (unsigned int i = 0; i < numSamples(); i++)
         {
-            for (unsigned int ci = 0; ci < numOfChannels; ci++)
+            for (unsigned int ci = 0; ci < numChannels(); ci++)
             {
-                fileStream << data[ci][i].y();
-                if (ci != numOfChannels-1) fileStream << ",";
+                fileStream << yData[ci]->sample(i);
+                if (ci != numChannels()-1) fileStream << ",";
             }
             fileStream << '\n';
         }

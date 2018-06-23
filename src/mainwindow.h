@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -40,13 +40,12 @@
 #include "plotcontrolpanel.h"
 #include "recordpanel.h"
 #include "ui_about_dialog.h"
-#include "framebuffer.h"
-#include "channelmanager.h"
+#include "stream.h"
 #include "snapshotmanager.h"
 #include "plotmanager.h"
 #include "plotmenu.h"
-#include "datarecorder.h"
 #include "updatecheckdialog.h"
+#include "samplecounter.h"
 
 namespace Ui {
 class MainWindow;
@@ -77,11 +76,12 @@ private:
     unsigned int numOfSamples;
 
     QList<QwtPlotCurve*> curves;
-    ChannelManager channelMan;
+    // ChannelManager channelMan;
+    Stream stream;
     PlotManager* plotMan;
     QWidget* secondaryPlot;
     SnapshotManager snapshotMan;
-    DataRecorder recorder;       // operated by `recordPanel`
+    SampleCounter sampleCounter;
 
     QLabel spsLabel;
     CommandPanel commandPanel;
@@ -112,12 +112,11 @@ private:
 
 private slots:
     void onPortToggled(bool open);
-
+    void onSourceChanged(Source* source);
     void onNumOfSamplesChanged(int value);
-    void onNumOfChannelsChanged(unsigned value);
 
     void clearPlot();
-    void onSpsChanged(unsigned sps);
+    void onSpsChanged(float sps);
     void enableDemo(bool enabled);
     void showBarPlot(bool show);
 

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -21,41 +21,30 @@
 #include "ui_dataformatpanel.h"
 
 #include <QRadioButton>
-#include <QtEndian>
-#include <QMap>
 #include <QtDebug>
 
 #include "utils.h"
 #include "setting_defines.h"
-#include "floatswap.h"
 
-DataFormatPanel::DataFormatPanel(QSerialPort* port,
-                                 ChannelManager* channelMan,
-                                 DataRecorder* recorder,
-                                 QWidget *parent) :
+DataFormatPanel::DataFormatPanel(QSerialPort* port, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::DataFormatPanel),
-    bsReader(port, channelMan, recorder, this),
-    asciiReader(port, channelMan, recorder, this),
-    framedReader(port, channelMan, recorder, this),
-    demoReader(port, channelMan, recorder, this)
+    bsReader(port, this),
+    asciiReader(port, this),
+    framedReader(port, this),
+    demoReader(port, this)
 {
     ui->setupUi(this);
 
     serialPort = port;
-    _channelMan = channelMan;
     paused = false;
-    demoEnabled = false;
+    readerBeforeDemo = nullptr;
 
     // initalize default reader
     currentReader = &bsReader;
     bsReader.enable();
     ui->rbBinary->setChecked(true);
     ui->horizontalLayout->addWidget(bsReader.settingsWidget(), 1);
-    connect(&bsReader, SIGNAL(numOfChannelsChanged(unsigned)),
-            this, SIGNAL(numOfChannelsChanged(unsigned)));
-    connect(&bsReader, SIGNAL(samplesPerSecondChanged(unsigned)),
-            this, SIGNAL(samplesPerSecondChanged(unsigned)));
 
     // initalize reader selection buttons
     connect(ui->rbBinary, &QRadioButton::toggled, [this](bool checked)
@@ -72,10 +61,6 @@ DataFormatPanel::DataFormatPanel(QSerialPort* port,
             {
                 if (checked) selectReader(&framedReader);
             });
-
-    // re-purpose numofchannels settings from actual reader settings to demo reader
-    connect(this, &DataFormatPanel::numOfChannelsChanged,
-            &demoReader, &DemoReader::setNumOfChannels);
 }
 
 DataFormatPanel::~DataFormatPanel()
@@ -83,9 +68,14 @@ DataFormatPanel::~DataFormatPanel()
     delete ui;
 }
 
-unsigned DataFormatPanel::numOfChannels()
+unsigned DataFormatPanel::numChannels() const
 {
-    return currentReader->numOfChannels();
+    return currentReader->numChannels();
+}
+
+Source* DataFormatPanel::activeSource()
+{
+    return currentReader;
 }
 
 void DataFormatPanel::pause(bool enabled)
@@ -95,33 +85,29 @@ void DataFormatPanel::pause(bool enabled)
     demoReader.pause(enabled);
 }
 
-void DataFormatPanel::enableDemo(bool enabled)
+void DataFormatPanel::enableDemo(bool demoEnabled)
 {
-    if (enabled)
+    if (demoEnabled)
     {
-        demoReader.enable();
-        demoReader.recording = currentReader->recording;
-        connect(&demoReader, &DemoReader::samplesPerSecondChanged,
-                this, &DataFormatPanel::samplesPerSecondChanged);
+        readerBeforeDemo = currentReader;
+        demoReader.setNumChannels(readerBeforeDemo->numChannels());
+        selectReader(&demoReader);
     }
     else
     {
-        demoReader.enable(false);
-        disconnect(&demoReader, 0, this, 0);
+        Q_ASSERT(readerBeforeDemo != nullptr);
+        selectReader(readerBeforeDemo);
     }
-    demoEnabled = enabled;
+
+    // disable/enable reader selection buttons during/after demo
+    ui->rbAscii->setDisabled(demoEnabled);
+    ui->rbBinary->setDisabled(demoEnabled);
+    ui->rbFramed->setDisabled(demoEnabled);
 }
 
-void DataFormatPanel::startRecording()
+bool DataFormatPanel::isDemoEnabled() const
 {
-    currentReader->recording = true;
-    if (demoEnabled) demoReader.recording = true;
-}
-
-void DataFormatPanel::stopRecording()
-{
-    currentReader->recording = false;
-    if (demoEnabled) demoReader.recording = false;
+    return currentReader == &demoReader;
 }
 
 void DataFormatPanel::selectReader(AbstractReader* reader)
@@ -131,10 +117,6 @@ void DataFormatPanel::selectReader(AbstractReader* reader)
 
     // re-connect signals
     disconnect(currentReader, 0, this, 0);
-    connect(reader, SIGNAL(numOfChannelsChanged(unsigned)),
-            this, SIGNAL(numOfChannelsChanged(unsigned)));
-    connect(reader, SIGNAL(samplesPerSecondChanged(unsigned)),
-            this, SIGNAL(samplesPerSecondChanged(unsigned)));
 
     // switch the settings widget
     ui->horizontalLayout->removeWidget(currentReader->settingsWidget());
@@ -142,29 +124,24 @@ void DataFormatPanel::selectReader(AbstractReader* reader)
     ui->horizontalLayout->addWidget(reader->settingsWidget(), 1);
     reader->settingsWidget()->show();
 
-    // notify if number of channels is different
-    if (currentReader->numOfChannels() != reader->numOfChannels())
-    {
-        emit numOfChannelsChanged(reader->numOfChannels());
-    }
-
     reader->pause(paused);
-    reader->recording = currentReader->recording;
 
     currentReader = reader;
+    emit sourceChanged(currentReader);
 }
 
 void DataFormatPanel::saveSettings(QSettings* settings)
 {
     settings->beginGroup(SettingGroup_DataFormat);
 
-    // save selected format
+    // save selected data format (current reader)
     QString format;
-    if (currentReader == &bsReader)
+    AbstractReader* selectedReader = isDemoEnabled() ? readerBeforeDemo : currentReader;
+    if (selectedReader == &bsReader)
     {
         format = "binary";
     }
-    else if (currentReader == &asciiReader)
+    else if (selectedReader == &asciiReader)
     {
         format = "ascii";
     }

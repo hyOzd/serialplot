@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -22,7 +22,7 @@
 
 #include <qwt_plot.h>
 
-#include "channelmanager.h"
+#include "stream.h"
 #include "plotmenu.h"
 #include "barchart.h"
 
@@ -31,7 +31,7 @@ class BarPlot : public QwtPlot
     Q_OBJECT
 
 public:
-    explicit BarPlot(ChannelManager* channelMan,
+    explicit BarPlot(Stream* stream,
                      PlotMenu* menu,
                      QWidget* parent = 0);
 
@@ -42,7 +42,7 @@ public slots:
     void darkBackground(bool enabled);
 
 private:
-    ChannelManager* _channelMan;
+    Stream* _stream;
     PlotMenu* _menu;
     BarChart barChart;
 

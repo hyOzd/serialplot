@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -57,7 +57,7 @@ public:
 
     void setNumOfChannels(unsigned number);
     /// Stores all channel info into a `QSettings`
-    void saveSettings(QSettings* settings);
+    void saveSettings(QSettings* settings) const;
     /// Loads all channel info from a `QSettings`.
     void loadSettings(QSettings* settings);
 

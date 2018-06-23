@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 Hasan Yavuz Özderya
+# Copyright © 2018 Hasan Yavuz Özderya
 #
 # This file is part of serialplot.
 #
@@ -85,6 +85,7 @@ qt5_wrap_ui(UI_FILES
   src/binarystreamreadersettings.ui
   src/asciireadersettings.ui
   src/framedreadersettings.ui
+  src/demoreadersettings.ui
   src/updatecheckdialog.ui
   )
 
@@ -103,7 +104,6 @@ add_executable(${PROGRAM_NAME} WIN32
   src/scrollzoomer.cpp
   src/scrollbar.cpp
   src/hidabletabwidget.cpp
-  src/framebuffer.cpp
   src/scalepicker.cpp
   src/scalezoomer.cpp
   src/portlist.cpp
@@ -120,8 +120,13 @@ add_executable(${PROGRAM_NAME} WIN32
   src/datarecorder.cpp
   src/tooltipfilter.cpp
   src/sneakylineedit.cpp
-  src/channelmanager.cpp
+  src/stream.cpp
+  src/streamchannel.cpp
   src/channelinfomodel.cpp
+  src/ringbuffer.cpp
+  src/ringbuffer.cpp
+  src/indexbuffer.cpp
+  src/readonlybuffer.cpp
   src/framebufferseries.cpp
   src/numberformatbox.cpp
   src/endiannessbox.cpp
@@ -131,6 +136,7 @@ add_executable(${PROGRAM_NAME} WIN32
   src/asciireader.cpp
   src/asciireadersettings.cpp
   src/demoreader.cpp
+  src/demoreadersettings.cpp
   src/framedreader.cpp
   src/framedreadersettings.cpp
   src/plotmanager.cpp
@@ -142,6 +148,10 @@ add_executable(${PROGRAM_NAME} WIN32
   src/updatechecker.cpp
   src/versionnumber.cpp
   src/updatecheckdialog.cpp
+  src/samplepack.cpp
+  src/source.cpp
+  src/sink.cpp
+  src/samplecounter.cpp
   misc/windows_icon.rc
   ${UI_FILES}
   ${RES_FILES}
@@ -238,6 +248,13 @@ if (UNIX)
   add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 endif (UNIX)
+
+# testing
+set(ENABLE_TESTS false CACHE BOOL "Build tests.")
+if (ENABLE_TESTS)
+  enable_testing()
+  add_subdirectory(tests)
+endif ()
 
 # packaging
 include(BuildLinuxAppImage)

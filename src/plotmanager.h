@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -31,7 +31,8 @@
 #include <qwt_plot_curve.h>
 #include "plot.h"
 #include "framebufferseries.h"
-#include "channelinfomodel.h"
+#include "stream.h"
+#include "snapshot.h"
 #include "plotmenu.h"
 
 class PlotManager : public QObject
@@ -40,14 +41,15 @@ class PlotManager : public QObject
 
 public:
     explicit PlotManager(QWidget* plotArea, PlotMenu* menu,
-                         ChannelInfoModel* infoModel = NULL,
+                         const Stream* stream = NULL,
+                         QObject *parent = 0);
+    explicit PlotManager(QWidget* plotArea, PlotMenu* menu,
+                         Snapshot* snapshot,
                          QObject *parent = 0);
     ~PlotManager();
     /// Add a new curve with title and buffer. A color is
     /// automatically chosen for curve.
-    void addCurve(QString title, FrameBuffer* buffer);
-    /// Alternative of `addCurve` for static curve data (snapshots).
-    void addCurve(QString title, QVector<QPointF> data);
+    void addCurve(QString title, const FrameBuffer* buffer);
     /// Removes curves from the end
     void removeCurves(unsigned number);
     /// Returns current number of curves known by plot manager
@@ -80,7 +82,8 @@ private:
     QList<QwtPlotCurve*> curves;
     QList<Plot*> plotWidgets;
     Plot* emptyPlot;  ///< for displaying when all channels are hidden
-    ChannelInfoModel* _infoModel;
+    const Stream* _stream;       ///< attached stream, can be `NULL`
+    const ChannelInfoModel* infoModel;
     bool isDemoShown;
     bool _autoScaled;
     double _yMin;
@@ -92,6 +95,8 @@ private:
     double _plotWidth;
     Plot::ShowSymbols showSymbols;
 
+    /// Common constructor
+    void construct(QWidget* plotArea, PlotMenu* menu);
     /// Setups the layout for multi or single plot
     void setupLayout(bool multiPlot);
     /// Inserts a new plot widget to the current layout.
@@ -111,6 +116,7 @@ private slots:
     void darkBackground(bool enabled = true);
     void setSymbols(Plot::ShowSymbols shown);
 
+    void onNumChannelsChanged(unsigned value);
     void onChannelInfoChanged(const QModelIndex & topLeft,
                               const QModelIndex & bottomRight,
                               const QVector<int> & roles = QVector<int> ());

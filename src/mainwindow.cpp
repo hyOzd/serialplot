@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -60,17 +60,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     aboutDialog(this),
     portControl(&serialPort),
-    channelMan(1, 1, this),
     secondaryPlot(NULL),
-    snapshotMan(this, &channelMan),
+    snapshotMan(this, &stream),
     commandPanel(&serialPort),
-    dataFormatPanel(&serialPort, &channelMan, &recorder),
-    recordPanel(&recorder, &channelMan),
+    dataFormatPanel(&serialPort),
+    recordPanel(&stream),
     updateCheckDialog(this)
 {
     ui->setupUi(this);
 
-    plotMan = new PlotManager(ui->plotArea, &plotMenu, channelMan.infoModel());
+    plotMan = new PlotManager(ui->plotArea, &plotMenu, &stream);
 
     ui->tabWidget->insertTab(0, &portControl, "Port");
     ui->tabWidget->insertTab(1, &dataFormatPanel, "Data Format");
@@ -179,18 +178,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(snapshotMan.takeSnapshotAction(), &QAction::triggered,
                      plotMan, &PlotManager::flashSnapshotOverlay);
 
-    // init data format and reader
-    QObject::connect(&channelMan, &ChannelManager::dataAdded,
-                     plotMan, &PlotManager::replot);
-
     QObject::connect(ui->actionPause, &QAction::triggered,
-                     &channelMan, &ChannelManager::pause);
-
-    QObject::connect(&recordPanel, &RecordPanel::recordStarted,
-                     &dataFormatPanel, &DataFormatPanel::startRecording);
-
-    QObject::connect(&recordPanel, &RecordPanel::recordStopped,
-                     &dataFormatPanel, &DataFormatPanel::stopRecording);
+                     &stream, &Stream::pause);
 
     QObject::connect(ui->actionPause, &QAction::triggered,
                      [this](bool enabled)
@@ -217,26 +206,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&serialPort, &QIODevice::aboutToClose,
             &recordPanel, &RecordPanel::onPortClose);
 
-    // init data arrays and plot
+    // init plot
     numOfSamples = plotControlPanel.numOfSamples();
-    unsigned numOfChannels = dataFormatPanel.numOfChannels();
-
-    channelMan.setNumOfSamples(numOfSamples);
-    channelMan.setNumOfChannels(dataFormatPanel.numOfChannels());
-
-    connect(&dataFormatPanel, &DataFormatPanel::numOfChannelsChanged,
-            &channelMan, &ChannelManager::setNumOfChannels);
-
-    connect(&channelMan, &ChannelManager::numOfChannelsChanged,
-            this, &MainWindow::onNumOfChannelsChanged);
-
-    plotControlPanel.setChannelInfoModel(channelMan.infoModel());
-
-    // init curve list
-    for (unsigned int i = 0; i < numOfChannels; i++)
-    {
-        plotMan->addCurve(channelMan.channelName(i), channelMan.channelBuffer(i));
-    }
+    stream.setNumSamples(numOfSamples);
+    plotControlPanel.setChannelInfoModel(stream.infoModel());
 
     // init scales
     plotMan->setYAxis(plotControlPanel.autoScale(),
@@ -250,9 +223,8 @@ MainWindow::MainWindow(QWidget *parent) :
     spsLabel.setText("0sps");
     spsLabel.setToolTip("samples per second (per channel)");
     ui->statusBar->addPermanentWidget(&spsLabel);
-    QObject::connect(&dataFormatPanel,
-                     &DataFormatPanel::samplesPerSecondChanged,
-                     this, &MainWindow::onSpsChanged);
+    connect(&sampleCounter, &SampleCounter::spsChanged,
+            this, &MainWindow::onSpsChanged);
 
     // init demo
     QObject::connect(ui->actionDemoMode, &QAction::toggled,
@@ -260,6 +232,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(ui->actionDemoMode, &QAction::toggled,
                      plotMan, &PlotManager::showDemoIndicator);
+
+    // init stream connections
+    connect(&dataFormatPanel, &DataFormatPanel::sourceChanged,
+            this, &MainWindow::onSourceChanged);
+    onSourceChanged(dataFormatPanel.activeSource());
 
     // load default settings
     QSettings settings("serialplot", "serialplot");
@@ -368,46 +345,29 @@ void MainWindow::onPortToggled(bool open)
     ui->actionDemoMode->setEnabled(!open);
 }
 
+void MainWindow::onSourceChanged(Source* source)
+{
+    source->connectSink(&stream);
+    source->connectSink(&sampleCounter);
+}
+
 void MainWindow::clearPlot()
 {
-    for (unsigned ci = 0; ci < channelMan.numOfChannels(); ci++)
-    {
-        channelMan.channelBuffer(ci)->clear();
-    }
+    stream.clear();
     plotMan->replot();
 }
 
 void MainWindow::onNumOfSamplesChanged(int value)
 {
     numOfSamples = value;
-    channelMan.setNumOfSamples(value);
+    stream.setNumSamples(value);
     plotMan->replot();
 }
 
-void MainWindow::onNumOfChannelsChanged(unsigned value)
+void MainWindow::onSpsChanged(float sps)
 {
-    unsigned int oldNum = plotMan->numOfCurves();
-    unsigned numOfChannels = value;
-
-    if (numOfChannels > oldNum)
-    {
-        // add new channels
-        for (unsigned int i = oldNum; i < numOfChannels; i++)
-        {
-            plotMan->addCurve(channelMan.channelName(i), channelMan.channelBuffer(i));
-        }
-    }
-    else if(numOfChannels < oldNum)
-    {
-        plotMan->removeCurves(oldNum - numOfChannels);
-    }
-
-    plotMan->replot();
-}
-
-void MainWindow::onSpsChanged(unsigned sps)
-{
-    spsLabel.setText(QString::number(sps) + "sps");
+    int precision = sps < 1. ? 3 : 0;
+    spsLabel.setText(QString::number(sps, 'f', precision) + "sps");
 }
 
 bool MainWindow::isDemoRunning()
@@ -463,7 +423,7 @@ void MainWindow::showBarPlot(bool show)
 {
     if (show)
     {
-        auto plot = new BarPlot(&channelMan, &plotMenu);
+        auto plot = new BarPlot(&stream, &plotMenu);
         plot->setYAxis(plotControlPanel.autoScale(),
                        plotControlPanel.yMin(),
                        plotControlPanel.yMax());
@@ -547,7 +507,7 @@ void MainWindow::saveAllSettings(QSettings* settings)
     saveMWSettings(settings);
     portControl.saveSettings(settings);
     dataFormatPanel.saveSettings(settings);
-    channelMan.saveSettings(settings);
+    stream.saveSettings(settings);
     plotControlPanel.saveSettings(settings);
     plotMenu.saveSettings(settings);
     commandPanel.saveSettings(settings);
@@ -560,7 +520,7 @@ void MainWindow::loadAllSettings(QSettings* settings)
     loadMWSettings(settings);
     portControl.loadSettings(settings);
     dataFormatPanel.loadSettings(settings);
-    channelMan.loadSettings(settings);
+    stream.loadSettings(settings);
     plotControlPanel.loadSettings(settings);
     plotMenu.loadSettings(settings);
     commandPanel.loadSettings(settings);

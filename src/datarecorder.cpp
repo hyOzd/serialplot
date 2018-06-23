@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -54,26 +54,29 @@ bool DataRecorder::startRecording(QString fileName, QString separator, QStringLi
     return true;
 }
 
-void DataRecorder::addData(double* data, unsigned length, unsigned numOfChannels)
+void DataRecorder::feedIn(const SamplePack& data)
 {
-    Q_ASSERT(length > 0);
-    Q_ASSERT(length % numOfChannels == 0);
+    Q_ASSERT(file.isOpen());    // recorder should be disconnected before stopping recording
+    Q_ASSERT(!data.hasX());     // NYI
 
-    if (lastNumChannels != 0 && numOfChannels != lastNumChannels)
+    // check if number of channels has changed during recording and warn
+    unsigned numChannels = data.numChannels();
+    if (lastNumChannels != 0 && numChannels != lastNumChannels)
     {
         qWarning() << "Number of channels changed from " << lastNumChannels
-                   << " to " << numOfChannels <<
+                   << " to " << numChannels <<
             " during recording, CSV file is corrupted but no data will be lost.";
     }
-    lastNumChannels = numOfChannels;
+    lastNumChannels = numChannels;
 
-    unsigned numOfSamples = length / numOfChannels; // per channel
-    for (unsigned int i = 0; i < numOfSamples; i++)
+    // write data
+    unsigned numSamples = data.numSamples();
+    for (unsigned int i = 0; i < numSamples; i++)
     {
-        for (unsigned ci = 0; ci < numOfChannels; ci++)
+        for (unsigned ci = 0; ci < numChannels; ci++)
         {
-            fileStream << data[ci * numOfSamples + i];
-            if (ci != numOfChannels-1) fileStream << _sep;
+            fileStream << data.data(ci)[i];
+            if (ci != numChannels-1) fileStream << _sep;
         }
         fileStream << le();
     }
