@@ -38,7 +38,6 @@ DataFormatPanel::DataFormatPanel(QSerialPort* port, QWidget *parent) :
 
     serialPort = port;
     paused = false;
-    demoEnabled = false;
     readerBeforeDemo = nullptr;
 
     // initalize default reader
@@ -86,9 +85,9 @@ void DataFormatPanel::pause(bool enabled)
     demoReader.pause(enabled);
 }
 
-void DataFormatPanel::enableDemo(bool enabled)
+void DataFormatPanel::enableDemo(bool demoEnabled)
 {
-    if (enabled)
+    if (demoEnabled)
     {
         readerBeforeDemo = currentReader;
         demoReader.setNumChannels(readerBeforeDemo->numChannels());
@@ -100,12 +99,15 @@ void DataFormatPanel::enableDemo(bool enabled)
         selectReader(readerBeforeDemo);
     }
 
-    demoEnabled = enabled;
-
     // disable/enable reader selection buttons during/after demo
     ui->rbAscii->setDisabled(demoEnabled);
     ui->rbBinary->setDisabled(demoEnabled);
     ui->rbFramed->setDisabled(demoEnabled);
+}
+
+bool DataFormatPanel::isDemoEnabled() const
+{
+    return currentReader == &demoReader;
 }
 
 void DataFormatPanel::selectReader(AbstractReader* reader)
@@ -132,13 +134,14 @@ void DataFormatPanel::saveSettings(QSettings* settings)
 {
     settings->beginGroup(SettingGroup_DataFormat);
 
-    // save selected format
+    // save selected data format (current reader)
     QString format;
-    if (currentReader == &bsReader)
+    AbstractReader* selectedReader = isDemoEnabled() ? readerBeforeDemo : currentReader;
+    if (selectedReader == &bsReader)
     {
         format = "binary";
     }
-    else if (currentReader == &asciiReader)
+    else if (selectedReader == &asciiReader)
     {
         format = "ascii";
     }

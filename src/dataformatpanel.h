@@ -78,9 +78,10 @@ private:
 
     bool paused;
 
-    bool demoEnabled;
     DemoReader demoReader;
     AbstractReader* readerBeforeDemo;
+
+    bool isDemoEnabled() const;
 };
 
 #endif // DATAFORMATPANEL_H
