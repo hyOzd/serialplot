@@ -24,3 +24,8 @@ AbstractReader::AbstractReader(QIODevice* device, QObject* parent) :
 {
     _device = device;
 }
+
+void AbstractReader::pause(bool enabled)
+{
+    paused = enabled;
+}

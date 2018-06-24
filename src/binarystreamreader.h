@@ -43,14 +43,10 @@ public:
     /// Loads settings from a `QSettings`.
     void loadSettings(QSettings* settings);
 
-public slots:
-    void pause(bool);
-
 private:
     BinaryStreamReaderSettings _settingsWidget;
     unsigned _numChannels;
     unsigned sampleSize;
-    bool paused;
     bool skipByteRequested;
     bool skipSampleRequested;
 

@@ -84,11 +84,6 @@ void AsciiReader::enable(bool enabled)
     }
 }
 
-void AsciiReader::pause(bool enabled)
-{
-    paused = enabled;
-}
-
 void AsciiReader::onDataReady()
 {
     while(_device->canReadLine())

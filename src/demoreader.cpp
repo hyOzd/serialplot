@@ -67,11 +67,6 @@ void DemoReader::setNumChannels(unsigned value)
     _settingsWidget.setNumChannels(value);
 }
 
-void DemoReader::pause(bool enabled)
-{
-    paused = enabled;
-}
-
 void DemoReader::demoTimerTimeout()
 {
     const double period = 100;

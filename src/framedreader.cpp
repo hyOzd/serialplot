@@ -86,11 +86,6 @@ unsigned FramedReader::numChannels() const
     return _numChannels;
 }
 
-void FramedReader::pause(bool enabled)
-{
-    paused = enabled;
-}
-
 void FramedReader::onNumberFormatChanged(NumberFormat numberFormat)
 {
     switch(numberFormat)

@@ -60,10 +60,11 @@ public slots:
      * Reader should actually continue reading to keep the
      * synchronization but shouldn't commit data.
      */
-    virtual void pause(bool) = 0;
+    void pause(bool enabled);
 
 protected:
     QIODevice* _device;
+    bool paused;
 };
 
 #endif // ABSTRACTREADER_H

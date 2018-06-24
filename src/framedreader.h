@@ -42,9 +42,6 @@ public:
     /// Loads settings from a `QSettings`.
     void loadSettings(QSettings* settings);
 
-public slots:
-    void pause(bool);
-
 private:
     /// bit wise fields for `settingsValid` member
     enum SettingInvalidFlag
@@ -57,7 +54,6 @@ private:
     FramedReaderSettings _settingsWidget;
     unsigned _numChannels;
     unsigned sampleSize;
-    bool paused;
     unsigned settingsInvalid;   /// settings are all valid if this is 0, if not no reading is done
     QByteArray syncWord;
     bool checksumEnabled;

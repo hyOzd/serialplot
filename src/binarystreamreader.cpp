@@ -76,11 +76,6 @@ void BinaryStreamReader::enable(bool enabled)
     }
 }
 
-void BinaryStreamReader::pause(bool enabled)
-{
-    paused = enabled;
-}
-
 void BinaryStreamReader::onNumberFormatChanged(NumberFormat numberFormat)
 {
     switch(numberFormat)

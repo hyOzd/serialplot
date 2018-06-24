@@ -39,16 +39,12 @@ public:
     /// Loads settings from a `QSettings`.
     void loadSettings(QSettings* settings);
 
-public slots:
-    void pause(bool);
-
 private:
     AsciiReaderSettings _settingsWidget;
     unsigned _numChannels;
     /// number of channels will be determined from incoming data
     unsigned autoNumOfChannels;
     QChar delimiter; ///< selected column delimiter
-    bool paused;
 
     // We may have (usually true) started reading in the middle of a
     // line, so its a better idea to just discard first line.

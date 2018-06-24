@@ -46,13 +46,11 @@ public:
     void enable(bool enabled = true);
 
 public slots:
-    void pause(bool);
     void setNumChannels(unsigned value);
 
 private:
     DemoReaderSettings _settingsWidget;
 
-    bool paused;
     unsigned _numChannels;
     QTimer timer;
     int count;
