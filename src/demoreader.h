@@ -43,7 +43,7 @@ public:
 
     QWidget* settingsWidget();
     unsigned numChannels() const;
-    void enable(bool enabled = true);
+    void enable(bool enabled = true) override;
 
 public slots:
     void setNumChannels(unsigned value);

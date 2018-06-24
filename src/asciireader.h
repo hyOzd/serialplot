@@ -33,7 +33,7 @@ public:
     explicit AsciiReader(QIODevice* device, QObject *parent = 0);
     QWidget* settingsWidget();
     unsigned numChannels() const;
-    void enable(bool enabled);
+    void enable(bool enabled) override;
     /// Stores settings into a `QSettings`
     void saveSettings(QSettings* settings);
     /// Loads settings from a `QSettings`.

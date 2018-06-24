@@ -75,7 +75,6 @@ void AsciiReader::enable(bool enabled)
     }
     else
     {
-        firstReadAfterEnable = false;
         QObject::disconnect(_device, 0, this, 0);
         disconnectSinks();
     }
