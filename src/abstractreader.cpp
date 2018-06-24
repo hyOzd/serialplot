@@ -29,3 +29,10 @@ void AbstractReader::pause(bool enabled)
 {
     paused = enabled;
 }
+
+unsigned AbstractReader::numChannels() const
+{
+    // TODO: an alternative is to never set _numChannels to '0'
+    // do not allow '0'
+    return _numChannels == 0 ? 1 : _numChannels;
+}

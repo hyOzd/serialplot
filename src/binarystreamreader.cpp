@@ -57,11 +57,6 @@ QWidget* BinaryStreamReader::settingsWidget()
     return &_settingsWidget;
 }
 
-unsigned BinaryStreamReader::numChannels() const
-{
-    return _numChannels;
-}
-
 void BinaryStreamReader::enable(bool enabled)
 {
     if (enabled)

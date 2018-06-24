@@ -61,13 +61,6 @@ QWidget* AsciiReader::settingsWidget()
     return &_settingsWidget;
 }
 
-unsigned AsciiReader::numChannels() const
-{
-    // TODO: an alternative is to never set _numChannels to '0'
-    // do not allow '0'
-    return _numChannels == 0 ? 1 : _numChannels;
-}
-
 // TODO: this could be a part of AbstractReader
 void AsciiReader::enable(bool enabled)
 {
