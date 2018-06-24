@@ -44,7 +44,7 @@ public:
 
     /// Reader should only read when enabled. Default state should be
     /// 'disabled'.
-    void enable(bool enabled = true);
+    virtual void enable(bool enabled = true);
 
     /// None of the current readers support X channel at the moment
     bool hasX() const final { return false; };
@@ -68,7 +68,6 @@ protected:
     QIODevice* _device;
     bool paused;
     unsigned _numChannels;
-    bool firstReadAfterEnable = false;
 
 protected slots:
     /// all derived readers has to override this function

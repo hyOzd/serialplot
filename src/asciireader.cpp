@@ -58,6 +58,22 @@ QWidget* AsciiReader::settingsWidget()
     return &_settingsWidget;
 }
 
+void AsciiReader::enable(bool enabled)
+{
+    if (enabled)
+    {
+        firstReadAfterEnable = true;
+        QObject::connect(_device, &QIODevice::readyRead,
+                         this, &AsciiReader::onDataReady);
+    }
+    else
+    {
+        firstReadAfterEnable = false;
+        QObject::disconnect(_device, 0, this, 0);
+        disconnectSinks();
+    }
+}
+
 void AsciiReader::onDataReady()
 {
     while(_device->canReadLine())
