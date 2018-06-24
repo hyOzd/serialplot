@@ -85,3 +85,8 @@ void DemoReader::onNumChannelsChanged(unsigned value)
     _numChannels = value;
     updateNumChannels();
 }
+
+void DemoReader::onDataReady()
+{
+    // intentionally empty, required by AbstractReader
+}

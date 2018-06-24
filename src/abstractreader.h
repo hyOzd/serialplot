@@ -44,7 +44,7 @@ public:
 
     /// Reader should only read when enabled. Default state should be
     /// 'disabled'.
-    virtual void enable(bool enabled = true) = 0;
+    void enable(bool enabled = true);
 
     /// None of the current readers support X channel at the moment
     bool hasX() const final { return false; };
@@ -68,6 +68,11 @@ protected:
     QIODevice* _device;
     bool paused;
     unsigned _numChannels;
+    bool firstReadAfterEnable = false;
+
+protected slots:
+    /// all derived readers has to override this function
+    virtual void onDataReady() = 0;
 };
 
 #endif // ABSTRACTREADER_H

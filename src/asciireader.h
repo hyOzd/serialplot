@@ -32,7 +32,6 @@ class AsciiReader : public AbstractReader
 public:
     explicit AsciiReader(QIODevice* device, QObject *parent = 0);
     QWidget* settingsWidget();
-    void enable(bool enabled = true);
     /// Stores settings into a `QSettings`
     void saveSettings(QSettings* settings);
     /// Loads settings from a `QSettings`.
@@ -44,12 +43,8 @@ private:
     unsigned autoNumOfChannels;
     QChar delimiter; ///< selected column delimiter
 
-    // We may have (usually true) started reading in the middle of a
-    // line, so its a better idea to just discard first line.
-    bool discardFirstLine;
-
 private slots:
-    void onDataReady();
+    void onDataReady() override;
 };
 
 #endif // ASCIIREADER_H

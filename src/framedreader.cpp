@@ -62,20 +62,6 @@ FramedReader::FramedReader(QIODevice* device, QObject* parent) :
     reset();
 }
 
-void FramedReader::enable(bool enabled)
-{
-    if (enabled)
-    {
-        connect(_device, &QIODevice::readyRead,
-                this, &FramedReader::onDataReady);
-    }
-    else
-    {
-        QObject::disconnect(_device, 0, this, 0);
-        disconnectSinks();
-    }
-}
-
 QWidget* FramedReader::settingsWidget()
 {
     return &_settingsWidget;

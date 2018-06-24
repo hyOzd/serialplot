@@ -56,6 +56,7 @@ private:
 private slots:
     void demoTimerTimeout();
     void onNumChannelsChanged(unsigned value);
+    void onDataReady() override;
 };
 
 #endif // DEMOREADER_H

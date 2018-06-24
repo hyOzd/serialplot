@@ -57,20 +57,6 @@ QWidget* BinaryStreamReader::settingsWidget()
     return &_settingsWidget;
 }
 
-void BinaryStreamReader::enable(bool enabled)
-{
-    if (enabled)
-    {
-        QObject::connect(_device, &QIODevice::readyRead,
-                         this, &BinaryStreamReader::onDataReady);
-    }
-    else
-    {
-        QObject::disconnect(_device, 0, this, 0);
-        disconnectSinks();
-    }
-}
-
 void BinaryStreamReader::onNumberFormatChanged(NumberFormat numberFormat)
 {
     switch(numberFormat)

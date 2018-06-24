@@ -36,3 +36,19 @@ unsigned AbstractReader::numChannels() const
     // do not allow '0'
     return _numChannels == 0 ? 1 : _numChannels;
 }
+
+void AbstractReader::enable(bool enabled)
+{
+    if (enabled)
+    {
+        firstReadAfterEnable = true;
+        QObject::connect(_device, &QIODevice::readyRead,
+                         this, &AbstractReader::onDataReady);
+    }
+    else
+    {
+        firstReadAfterEnable = false;
+        QObject::disconnect(_device, 0, this, 0);
+        disconnectSinks();
+    }
+}

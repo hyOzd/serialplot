@@ -35,7 +35,6 @@ class FramedReader : public AbstractReader
 public:
     explicit FramedReader(QIODevice* device, QObject *parent = 0);
     QWidget* settingsWidget();
-    void enable(bool enabled = true);
     /// Stores settings into a `QSettings`
     void saveSettings(QSettings* settings);
     /// Loads settings from a `QSettings`.
@@ -79,7 +78,7 @@ private:
     void readFrameDataAndCheck();
 
 private slots:
-    void onDataReady();
+    void onDataReady() override;
 
     void onNumberFormatChanged(NumberFormat numberFormat);
     void onNumOfChannelsChanged(unsigned value);
