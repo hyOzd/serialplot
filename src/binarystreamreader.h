@@ -36,6 +36,7 @@ class BinaryStreamReader : public AbstractReader
 public:
     explicit BinaryStreamReader(QIODevice* device, QObject *parent = 0);
     QWidget* settingsWidget();
+    unsigned numChannels() const;
     /// Stores settings into a `QSettings`
     void saveSettings(QSettings* settings);
     /// Loads settings from a `QSettings`.
@@ -43,6 +44,7 @@ public:
 
 private:
     BinaryStreamReaderSettings _settingsWidget;
+    unsigned _numChannels;
     unsigned sampleSize;
     bool skipByteRequested;
     bool skipSampleRequested;

@@ -32,6 +32,7 @@ class AsciiReader : public AbstractReader
 public:
     explicit AsciiReader(QIODevice* device, QObject *parent = 0);
     QWidget* settingsWidget();
+    unsigned numChannels() const;
     void enable(bool enabled);
     /// Stores settings into a `QSettings`
     void saveSettings(QSettings* settings);
@@ -40,6 +41,7 @@ public:
 
 private:
     AsciiReaderSettings _settingsWidget;
+    unsigned _numChannels;
     /// number of channels will be determined from incoming data
     unsigned autoNumOfChannels;
     QChar delimiter; ///< selected column delimiter

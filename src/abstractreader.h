@@ -49,8 +49,6 @@ public:
     /// None of the current readers support X channel at the moment
     bool hasX() const final { return false; };
 
-    unsigned numChannels() const;
-
 signals:
     // TODO: should we keep this?
     void numOfChannelsChanged(unsigned);
@@ -67,7 +65,6 @@ public slots:
 protected:
     QIODevice* _device;
     bool paused;
-    unsigned _numChannels;
 
 protected slots:
     /// all derived readers has to override this function

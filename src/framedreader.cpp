@@ -67,6 +67,11 @@ QWidget* FramedReader::settingsWidget()
     return &_settingsWidget;
 }
 
+unsigned FramedReader::numChannels() const
+{
+    return _numChannels;
+}
+
 void FramedReader::onNumberFormatChanged(NumberFormat numberFormat)
 {
     switch(numberFormat)

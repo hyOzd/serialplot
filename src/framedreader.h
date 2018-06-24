@@ -35,6 +35,7 @@ class FramedReader : public AbstractReader
 public:
     explicit FramedReader(QIODevice* device, QObject *parent = 0);
     QWidget* settingsWidget();
+    unsigned numChannels() const;
     /// Stores settings into a `QSettings`
     void saveSettings(QSettings* settings);
     /// Loads settings from a `QSettings`.
@@ -50,6 +51,7 @@ private:
 
     // settings related members
     FramedReaderSettings _settingsWidget;
+    unsigned _numChannels;
     unsigned sampleSize;
     unsigned settingsInvalid;   /// settings are all valid if this is 0, if not no reading is done
     QByteArray syncWord;

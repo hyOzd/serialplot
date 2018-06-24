@@ -57,6 +57,11 @@ void DemoReader::enable(bool enabled)
     }
 }
 
+unsigned DemoReader::numChannels() const
+{
+    return _numChannels;
+}
+
 void DemoReader::setNumChannels(unsigned value)
 {
     _settingsWidget.setNumChannels(value);

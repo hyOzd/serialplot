@@ -42,6 +42,7 @@ public:
     explicit DemoReader(QIODevice* device, QObject* parent = 0);
 
     QWidget* settingsWidget();
+    unsigned numChannels() const;
     void enable(bool enabled = true);
 
 public slots:
@@ -50,6 +51,7 @@ public slots:
 private:
     DemoReaderSettings _settingsWidget;
 
+    unsigned _numChannels;
     QTimer timer;
     int count;
 

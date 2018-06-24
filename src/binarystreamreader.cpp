@@ -57,6 +57,11 @@ QWidget* BinaryStreamReader::settingsWidget()
     return &_settingsWidget;
 }
 
+unsigned BinaryStreamReader::numChannels() const
+{
+    return _numChannels;
+}
+
 void BinaryStreamReader::onNumberFormatChanged(NumberFormat numberFormat)
 {
     switch(numberFormat)
