@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -47,6 +47,7 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
     resetNamesAct(tr("Reset Names"), this),
     resetColorsAct(tr("Reset Colors"), this),
     showAllAct(tr("Show All"), this),
+    hideAllAct(tr("Hide All"), this),
     resetMenu(tr("Reset Menu"), this)
 {
     ui->setupUi(this);
@@ -138,12 +139,17 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
     ui->colorSelector->setDisplayMode(color_widgets::ColorPreview::AllAlpha);
     ui->colorSelector->setDisabled(true);
 
-    // reset button
+    // reset buttons
+    resetAct.setToolTip(tr("Reset channel names and colors"));
     resetMenu.addAction(&resetNamesAct);
     resetMenu.addAction(&resetColorsAct);
-    resetMenu.addAction(&showAllAct);
     resetAct.setMenu(&resetMenu);
     ui->tbReset->setDefaultAction(&resetAct);
+
+    showAllAct.setToolTip(tr("Show all channels"));
+    hideAllAct.setToolTip(tr("Hide all channels"));
+    ui->tbShowAll->setDefaultAction(&showAllAct);
+    ui->tbHideAll->setDefaultAction(&hideAllAct);
 }
 
 PlotControlPanel::~PlotControlPanel()
@@ -395,7 +401,8 @@ void PlotControlPanel::setChannelInfoModel(ChannelInfoModel* model)
     connect(&resetAct, &QAction::triggered, model, &ChannelInfoModel::resetInfos);
     connect(&resetNamesAct, &QAction::triggered, model, &ChannelInfoModel::resetNames);
     connect(&resetColorsAct, &QAction::triggered, model, &ChannelInfoModel::resetColors);
-    connect(&showAllAct, &QAction::triggered, model, &ChannelInfoModel::resetVisibility);
+    connect(&showAllAct, &QAction::triggered, [model]{model->resetVisibility(true);});
+    connect(&hideAllAct, &QAction::triggered, [model]{model->resetVisibility(false);});
 }
 
 void PlotControlPanel::saveSettings(QSettings* settings)

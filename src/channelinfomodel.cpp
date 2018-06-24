@@ -326,12 +326,12 @@ void ChannelInfoModel::resetColors()
     endResetModel();
 }
 
-void ChannelInfoModel::resetVisibility()
+void ChannelInfoModel::resetVisibility(bool visible)
 {
     beginResetModel();
     for (unsigned ci = 0; (int) ci < infos.length(); ci++)
     {
-        infos[ci].visibility = true;
+        infos[ci].visibility = visible;
     }
     endResetModel();
 }

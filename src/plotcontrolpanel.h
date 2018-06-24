@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -70,7 +70,7 @@ private:
     /// User can disable this setting in the checkbox
     bool warnNumOfSamples;
 
-    QAction resetAct, resetNamesAct, resetColorsAct, showAllAct;
+    QAction resetAct, resetNamesAct, resetColorsAct, showAllAct, hideAllAct;
     QMenu resetMenu;
 
     /// Show a confirmation dialog before setting #samples to a big value

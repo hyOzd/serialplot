@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>706</width>
+    <width>704</width>
     <height>195</height>
    </rect>
   </property>
@@ -62,6 +62,9 @@
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="spacing">
+         <number>3</number>
+        </property>
         <property name="sizeConstraint">
          <enum>QLayout::SetMaximumSize</enum>
         </property>
@@ -95,10 +98,30 @@
           <property name="sizeHint" stdset="0">
            <size>
             <width>1</width>
-            <height>20</height>
+            <height>1</height>
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QToolButton" name="tbShowAll">
+          <property name="toolTip">
+           <string>Show all channels</string>
+          </property>
+          <property name="text">
+           <string>Show All</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="tbHideAll">
+          <property name="toolTip">
+           <string>Hide all channels</string>
+          </property>
+          <property name="text">
+           <string>Hide All</string>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QToolButton" name="tbReset">

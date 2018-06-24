@@ -69,7 +69,7 @@ public slots:
     /// reset all channel colors
     void resetColors();
     /// reset visibility
-    void resetVisibility();
+    void resetVisibility(bool visible);
 
 private:
     struct ChannelInfo
