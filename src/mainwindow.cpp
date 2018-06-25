@@ -48,11 +48,14 @@
 Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
 #endif
 
+// TODO: depends on tab insertion order, a better solution would be to use object names
 const QMap<int, QString> panelSettingMap({
         {0, "Port"},
         {1, "DataFormat"},
         {2, "Plot"},
-        {3, "Commands"}
+        {3, "Commands"},
+        {4, "Record"},
+        {5, "Log"}
     });
 
 MainWindow::MainWindow(QWidget *parent) :
