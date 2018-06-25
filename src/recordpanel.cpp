@@ -69,6 +69,8 @@ RecordPanel::RecordPanel(Stream* stream, QWidget *parent) :
 
     connect(&recordAction, &QAction::toggled, ui->cbWindowsLE, &QWidget::setDisabled);
     connect(&recordAction, &QAction::toggled, ui->cbTimestamp, &QWidget::setDisabled);
+    connect(&recordAction, &QAction::toggled, ui->leSeparator, &QWidget::setDisabled);
+    connect(&recordAction, &QAction::toggled, ui->pbBrowse, &QWidget::setDisabled);
 }
 
 RecordPanel::~RecordPanel()
