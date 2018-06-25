@@ -58,9 +58,11 @@ public:
      * @param fileName name of the recording file
      * @param separator column separator
      * @param channelNames names of the channels for header line, if empty no header line is written
+     * @param insertTime enable inserting timestamp
      * @return false if file operation fails (read only etc.)
      */
-    bool startRecording(QString fileName, QString separator, QStringList channelNames);
+    bool startRecording(QString fileName, QString separator,
+                        QStringList channelNames, bool insertTime);
 
     /**
      * @brief Adds data to a channel.
@@ -92,6 +94,7 @@ private:
     QFile file;
     QTextStream fileStream;
     QString _sep;
+    bool timestampEn;
 
     /// Returns the selected line ending.
     const char* le() const;

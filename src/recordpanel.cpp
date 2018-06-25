@@ -68,6 +68,7 @@ RecordPanel::RecordPanel(Stream* stream, QWidget *parent) :
             });
 
     connect(&recordAction, &QAction::toggled, ui->cbWindowsLE, &QWidget::setDisabled);
+    connect(&recordAction, &QAction::toggled, ui->cbTimestamp, &QWidget::setDisabled);
 }
 
 RecordPanel::~RecordPanel()
@@ -233,7 +234,8 @@ void RecordPanel::startRecording(void)
     {
         channelNames = _stream->infoModel()->channelNames();
     }
-    if (recorder.startRecording(selectedFile, getSeparator(), channelNames))
+    if (recorder.startRecording(selectedFile, getSeparator(),
+                                channelNames, ui->cbTimestamp->isChecked()))
     {
         _stream->connectFollower(&recorder);
     }

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>627</width>
-    <height>261</height>
+    <height>207</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -45,6 +45,52 @@
      </item>
      <item>
       <layout class="QGridLayout" name="gridLayout">
+       <item row="2" column="1">
+        <widget class="QCheckBox" name="cbStopOnClose">
+         <property name="text">
+          <string>Stop recording when port closed</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="cbAutoIncrement">
+         <property name="toolTip">
+          <string>Increments file name automatically everytime a new recording starts</string>
+         </property>
+         <property name="text">
+          <string>Auto increment file name</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QCheckBox" name="cbDisableBuffering">
+         <property name="toolTip">
+          <string>Do not buffer when writing to file. Check this if you are using other software to open the file during recording.</string>
+         </property>
+         <property name="text">
+          <string>Disable buffering</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QCheckBox" name="cbWindowsLE">
+         <property name="toolTip">
+          <string>Use CR+LF as line endings. Some windows software may not show lines correctly otherwise. Can't be changed during recording.</string>
+         </property>
+         <property name="text">
+          <string>Windows Style Line Endings</string>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
        <item row="1" column="1">
         <widget class="QCheckBox" name="cbHeader">
          <property name="toolTip">
@@ -71,52 +117,6 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QCheckBox" name="cbDisableBuffering">
-         <property name="toolTip">
-          <string>Do not buffer when writing to file. Check this if you are using other software to open the file during recording.</string>
-         </property>
-         <property name="text">
-          <string>Disable buffering</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QCheckBox" name="cbStopOnClose">
-         <property name="text">
-          <string>Stop recording when port closed</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QCheckBox" name="cbAutoIncrement">
-         <property name="toolTip">
-          <string>Increments file name automatically everytime a new recording starts</string>
-         </property>
-         <property name="text">
-          <string>Auto increment file name</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QCheckBox" name="cbWindowsLE">
-         <property name="toolTip">
-          <string>Use CR+LF as line endings. Some windows software may not show lines correctly otherwise. Can't be changed during recording.</string>
-         </property>
-         <property name="text">
-          <string>Windows Style Line Endings</string>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="2">
         <spacer name="horizontalSpacer_2">
          <property name="orientation">
@@ -129,6 +129,16 @@
           </size>
          </property>
         </spacer>
+       </item>
+       <item row="4" column="0">
+        <widget class="QCheckBox" name="cbTimestamp">
+         <property name="toolTip">
+          <string>Insert timestamp (milliseconds from epoch) as first column</string>
+         </property>
+         <property name="text">
+          <string>Insert timestamp</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>

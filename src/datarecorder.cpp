@@ -19,6 +19,7 @@
 
 #include "datarecorder.h"
 
+#include <QDateTime>
 #include <QtDebug>
 
 DataRecorder::DataRecorder(QObject *parent) :
@@ -28,12 +29,15 @@ DataRecorder::DataRecorder(QObject *parent) :
     lastNumChannels = 0;
     disableBuffering = false;
     windowsLE = false;
+    timestampEn = false;
 }
 
-bool DataRecorder::startRecording(QString fileName, QString separator, QStringList channelNames)
+bool DataRecorder::startRecording(QString fileName, QString separator,
+                                  QStringList channelNames, bool insertTime)
 {
     Q_ASSERT(!file.isOpen());
     _sep =  separator;
+    timestampEn = insertTime;
 
     // open file
     file.setFileName(fileName);
@@ -47,6 +51,10 @@ bool DataRecorder::startRecording(QString fileName, QString separator, QStringLi
     // write header line
     if (!channelNames.isEmpty())
     {
+        if (timestampEn)
+        {
+            fileStream << tr("timestamp") << _sep;
+        }
         fileStream << channelNames.join(_sep);
         fileStream << le();
         lastNumChannels = channelNames.length();
@@ -70,9 +78,15 @@ void DataRecorder::feedIn(const SamplePack& data)
     lastNumChannels = numChannels;
 
     // write data
+    qint64 timestamp;
+    if (timestampEn) timestamp = QDateTime::currentMSecsSinceEpoch();
     unsigned numSamples = data.numSamples();
     for (unsigned int i = 0; i < numSamples; i++)
     {
+        if (timestampEn)
+        {
+            fileStream << timestamp << _sep;
+        }
         for (unsigned ci = 0; ci < numChannels; ci++)
         {
             fileStream << data.data(ci)[i];
