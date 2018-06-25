@@ -271,6 +271,7 @@ void RecordPanel::saveSettings(QSettings* settings)
     settings->setValue(SG_Record_StopOnClose, ui->cbStopOnClose->isChecked());
     settings->setValue(SG_Record_Header, ui->cbHeader->isChecked());
     settings->setValue(SG_Record_DisableBuffering, ui->cbDisableBuffering->isChecked());
+    settings->setValue(SG_Record_Timestamp, ui->cbTimestamp->isChecked());
     settings->setValue(SG_Record_Separator, ui->leSeparator->text());
     settings->endGroup();
 }
@@ -288,6 +289,8 @@ void RecordPanel::loadSettings(QSettings* settings)
         settings->value(SG_Record_Header, ui->cbHeader->isChecked()).toBool());
     ui->cbDisableBuffering->setChecked(
         settings->value(SG_Record_DisableBuffering, ui->cbDisableBuffering->isChecked()).toBool());
+    ui->cbTimestamp->setChecked(
+        settings->value(SG_Record_Timestamp, ui->cbTimestamp->isChecked()).toBool());
     ui->leSeparator->setText(settings->value(SG_Record_Separator, ui->leSeparator->text()).toString());
     settings->endGroup();
 }
