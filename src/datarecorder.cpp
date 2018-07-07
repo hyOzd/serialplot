@@ -19,6 +19,8 @@
 
 #include "datarecorder.h"
 
+#include <QFileInfo>
+#include <QDir>
 #include <QDateTime>
 #include <QtDebug>
 
@@ -38,6 +40,16 @@ bool DataRecorder::startRecording(QString fileName, QString separator,
     Q_ASSERT(!file.isOpen());
     _sep =  separator;
     timestampEn = insertTime;
+
+    // create directory if it doesn't exist
+    {
+        QFileInfo fi(fileName);
+        if (!fi.dir().mkpath("."))
+        {
+            qCritical() << "Failed to create directory for: " << fileName;
+            return false;
+        }
+    }
 
     // open file
     file.setFileName(fileName);
