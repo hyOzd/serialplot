@@ -62,7 +62,6 @@ private:
     Ui::RecordPanel *ui;
     QToolBar recordToolBar;
     QAction recordAction;
-    QString selectedFile;
     bool overwriteSelected;
     DataRecorder recorder;
     Stream* _stream;
@@ -90,7 +89,26 @@ private:
      */
     bool confirmOverwrite(QString fileName);
 
-    void startRecording(void);
+    /// Returns filename in edit box. May be invalid!
+    QString selectedFile() const;
+    /// Sets the filename in edit box.
+    void setSelectedFile(QString f);
+
+    /**
+     * Tries to get a valid file name by handling user interactions and
+     * automatic naming (increment, timestamp etc).
+     *
+     * Returned file name can be used immediately. File name box should also be
+     * set to selected file name.
+     *
+     * @return empty if failure otherwise valid filename
+     */
+    QString getSelectedFile();
+
+    /// Formats timestamp in given text
+    QString formatTimeStamp(QString t) const;
+
+    void startRecording(QString fileName);
     void stopRecording(void);
 
     /// Returns separator text from ui. "\t" is converted to TAB

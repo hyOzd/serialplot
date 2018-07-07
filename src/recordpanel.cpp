@@ -23,7 +23,11 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QRegularExpression>
+#include <QCompleter>
+#include <QFileSystemModel>
+#include <QDirModel>
 #include <QtDebug>
+#include <ctime>
 
 #include "recordpanel.h"
 #include "ui_recordpanel.h"
@@ -71,6 +75,12 @@ RecordPanel::RecordPanel(Stream* stream, QWidget *parent) :
     connect(&recordAction, &QAction::toggled, ui->cbTimestamp, &QWidget::setDisabled);
     connect(&recordAction, &QAction::toggled, ui->leSeparator, &QWidget::setDisabled);
     connect(&recordAction, &QAction::toggled, ui->pbBrowse, &QWidget::setDisabled);
+
+    QCompleter *completer = new QCompleter(this);
+    // TODO: QDirModel is deprecated, use QFileSystemModel (but it doesn't work)
+    completer->setModel(new QDirModel(completer));
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    ui->leFileName->setCompleter(completer);
 }
 
 RecordPanel::~RecordPanel()
@@ -99,11 +109,73 @@ bool RecordPanel::selectFile()
     }
     else
     {
-        selectedFile = fileName;
-        ui->lbFileName->setText(selectedFile);
+        setSelectedFile(fileName);
         overwriteSelected = QFile::exists(fileName);
         return true;
     }
+}
+
+QString RecordPanel::selectedFile() const
+{
+    return ui->leFileName->text();
+}
+
+void RecordPanel::setSelectedFile(QString f)
+{
+    ui->leFileName->setText(f);
+}
+
+QString RecordPanel::getSelectedFile()
+{
+    if (selectedFile().isEmpty())
+    {
+        if (!selectFile()) return QString();
+    }
+
+    // assume that file name contains a time format specifier
+    if (selectedFile().contains("%"))
+    {
+        auto ts = formatTimeStamp(selectedFile());
+        if (!QFile::exists(ts) || // file doesn't exists
+            confirmOverwrite(ts)) // exists but user accepted overwrite
+        {
+            return ts;
+        }
+        return QString();
+    }
+
+    // if no timestamp and file exists try autoincrement option
+    if (!overwriteSelected && QFile::exists(selectedFile()))
+    {
+        if (ui->cbAutoIncrement->isChecked())
+        {
+            if (!incrementFileName()) return QString();
+        }
+        else
+        {
+            if (!confirmOverwrite(selectedFile()))
+                return QString();
+        }
+    }
+
+    return selectedFile();
+}
+
+QString RecordPanel::formatTimeStamp(QString t) const
+{
+    auto maxSize = t.size() + 1024;
+    auto r = new char[maxSize];
+
+    time_t rawtime;
+    struct tm * timeinfo;
+
+    time(&rawtime);
+    timeinfo = localtime (&rawtime);
+    strftime(r, maxSize, t.toLatin1().data(), timeinfo);
+
+    auto rs = QString(r);
+    delete r;
+    return rs;
 }
 
 void RecordPanel::onRecord(bool start)
@@ -124,22 +196,11 @@ void RecordPanel::onRecord(bool start)
     }
 
     // check file name
-    if (!canceled && selectedFile.isEmpty() && !selectFile())
+    QString fn;
+    if (!canceled)
     {
-        canceled = true;
-    }
-
-    if (!canceled && !overwriteSelected && QFile::exists(selectedFile))
-    {
-        if (ui->cbAutoIncrement->isChecked())
-        {
-            // TODO: should we increment even if user selected to replace?
-            canceled = !incrementFileName();
-        }
-        else
-        {
-            canceled = !confirmOverwrite(selectedFile);
-        }
+        fn = getSelectedFile();
+        canceled = fn.isEmpty();
     }
 
     if (canceled)
@@ -149,13 +210,13 @@ void RecordPanel::onRecord(bool start)
     else
     {
         overwriteSelected = false;
-        startRecording();
+        startRecording(fn);
     }
 }
 
 bool RecordPanel::incrementFileName(void)
 {
-    QFileInfo fileInfo(selectedFile);
+    QFileInfo fileInfo(selectedFile());
 
     QString base = fileInfo.completeBaseName();
     QRegularExpression regex("(.*?)(\\d+)(?!.*\\d)(.*)");
@@ -190,10 +251,9 @@ bool RecordPanel::incrementFileName(void)
     }
     else
     {
-        selectedFile = autoFileName;
+        setSelectedFile(autoFileName);
     }
 
-    ui->lbFileName->setText(selectedFile);
     return true;
 }
 
@@ -220,7 +280,7 @@ bool RecordPanel::confirmOverwrite(QString fileName)
     }
     else if (mb.clickedButton() == bOverwrite)
     {
-        selectedFile = fileName;
+        setSelectedFile(fileName);
         return true;
     }
     else                    // select button
@@ -229,14 +289,14 @@ bool RecordPanel::confirmOverwrite(QString fileName)
     }
 }
 
-void RecordPanel::startRecording(void)
+void RecordPanel::startRecording(QString fileName)
 {
     QStringList channelNames;
     if (ui->cbHeader->isChecked())
     {
         channelNames = _stream->infoModel()->channelNames();
     }
-    if (recorder.startRecording(selectedFile, getSeparator(),
+    if (recorder.startRecording(fileName, getSeparator(),
                                 channelNames, ui->cbTimestamp->isChecked()))
     {
         _stream->connectFollower(&recorder);

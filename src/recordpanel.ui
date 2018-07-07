@@ -19,25 +19,28 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
+        <widget class="QLineEdit" name="leFileName">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="toolTip">
+          <string>You can use C `strftime` function format specifiers for timestamps in your file name.</string>
+         </property>
+         <property name="placeholderText">
+          <string>Enter file name or browse</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="pbBrowse">
          <property name="toolTip">
           <string>Select record file</string>
          </property>
          <property name="text">
           <string>Browse</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="lbFileName">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Select file...</string>
          </property>
         </widget>
        </item>
