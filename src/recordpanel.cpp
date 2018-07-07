@@ -210,7 +210,9 @@ void RecordPanel::onRecord(bool start)
     else
     {
         overwriteSelected = false;
-        startRecording(fn);
+        // TODO: show more visible error message when recording fails
+        if (!startRecording(fn))
+            recordAction.setChecked(false);
     }
 }
 
@@ -289,7 +291,7 @@ bool RecordPanel::confirmOverwrite(QString fileName)
     }
 }
 
-void RecordPanel::startRecording(QString fileName)
+bool RecordPanel::startRecording(QString fileName)
 {
     QStringList channelNames;
     if (ui->cbHeader->isChecked())
@@ -300,6 +302,11 @@ void RecordPanel::startRecording(QString fileName)
                                 channelNames, ui->cbTimestamp->isChecked()))
     {
         _stream->connectFollower(&recorder);
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }
 

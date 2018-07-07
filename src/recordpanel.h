@@ -108,7 +108,7 @@ private:
     /// Formats timestamp in given text
     QString formatTimeStamp(QString t) const;
 
-    void startRecording(QString fileName);
+    bool startRecording(QString fileName);
     void stopRecording(void);
 
     /// Returns separator text from ui. "\t" is converted to TAB
