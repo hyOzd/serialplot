@@ -154,11 +154,25 @@ void Stream::feedIn(const SamplePack& data)
     {
         static_cast<RingBuffer*>(xData)->addSamples(data.xData(), ns);
     }
-    for (unsigned i = 0; i < numChannels(); i++)
+    for (unsigned ci = 0; ci < numChannels(); ci++)
     {
-        static_cast<RingBuffer*>(channels[i]->yData())->addSamples(data.data(i), ns);
+        // TODO: check for gainEn and offsetEn
+        // apply gain and offset
+        auto rdata = data.data(ci);
+        auto mdata = new double[sizeof(double) * ns];
+        // TODO: add gain&offset access methods to `StreamChannel`
+        double gain = channels[ci]->info()->gain(ci);
+        double offset = channels[ci]->info()->offset(ci);
+        for (int i = 0; i < ns; i++)
+        {
+            mdata[i] = rdata[i] * gain + offset;
+        }
+
+        static_cast<RingBuffer*>(channels[ci]->yData())->addSamples(mdata, ns);
+        delete[] mdata;
     }
 
+    // TODO: emit modified (gain&offset) data
     Sink::feedIn(data);
 
     emit dataAdded();

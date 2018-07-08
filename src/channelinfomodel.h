@@ -46,6 +46,10 @@ public:
     QString name     (unsigned i) const;
     QColor  color    (unsigned i) const;
     bool    isVisible(unsigned i) const;
+    bool    gainEn   (unsigned i) const;
+    double  gain     (unsigned i) const;
+    bool    offsetEn (unsigned i) const;
+    double  offset   (unsigned i) const;
     /// Returns a list of channel names
     QStringList channelNames() const;
 

@@ -118,6 +118,26 @@ bool ChannelInfoModel::isVisible(unsigned i) const
     return infos[i].visibility;
 }
 
+bool ChannelInfoModel::gainEn (unsigned i) const
+{
+    return infos[i].gainEn;
+}
+
+double ChannelInfoModel::gain (unsigned i) const
+{
+    return infos[i].gain;
+}
+
+bool ChannelInfoModel::offsetEn (unsigned i) const
+{
+    return infos[i].offsetEn;
+}
+
+double ChannelInfoModel::offset (unsigned i) const
+{
+    return infos[i].offset;
+}
+
 QStringList ChannelInfoModel::channelNames() const
 {
     QStringList r;
