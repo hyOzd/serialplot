@@ -34,7 +34,9 @@ public:
     {
         COLUMN_NAME = 0,
         COLUMN_VISIBILITY,
-        COLUMN_COUNT
+        COLUMN_GAIN,
+        COLUMN_OFFSET,
+        COLUMN_COUNT            // MUST be last
     };
 
     explicit ChannelInfoModel(unsigned numberOfChannels, QObject *parent = 0);
@@ -79,6 +81,8 @@ private:
         QString name;
         bool visibility;
         QColor color;
+        double gain, offset;
+        bool gainEn, offsetEn;
     };
 
     unsigned _numOfChannels;     ///< @note this is not necessarily the length of `infos`

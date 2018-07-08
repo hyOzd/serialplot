@@ -79,6 +79,7 @@ ChannelInfoModel::ChannelInfoModel(const ChannelInfoModel& other) :
         setData(index(i, COLUMN_VISIBILITY),
                 other.data(other.index(i, COLUMN_VISIBILITY), Qt::CheckStateRole),
                 Qt::CheckStateRole);
+        // TODO: gain and offset
     }
 }
 
@@ -96,6 +97,10 @@ ChannelInfoModel::ChannelInfo::ChannelInfo(unsigned index)
     name = tr("Channel %1").arg(index + 1);
     visibility = true;
     color = colors[index % NUMOF_COLORS];
+    gain = 1.0;
+    offset = 0.0;
+    gainEn = false;
+    offsetEn = false;
 }
 
 QString ChannelInfoModel::name(unsigned i) const
@@ -143,6 +148,10 @@ Qt::ItemFlags ChannelInfoModel::flags(const QModelIndex &index) const
     {
         return Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren | Qt::ItemIsSelectable;
     }
+    else if (index.column() == COLUMN_GAIN || index.column() == COLUMN_OFFSET)
+    {
+        return Qt::ItemIsEditable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren | Qt::ItemIsSelectable;
+    }
 
     return Qt::NoItemFlags;
 }
@@ -155,26 +164,50 @@ QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
         return QVariant();
     }
 
+    auto &info = infos[index.row()];
+
     // get color
     if (role == Qt::ForegroundRole)
     {
-        return infos[index.row()].color;
+        return info.color;
     }
 
-    // get name
+    // name
     if (index.column() == COLUMN_NAME)
     {
         if (role == Qt::DisplayRole || role == Qt::EditRole)
         {
-            return QVariant(infos[index.row()].name);
+            return QVariant(info.name);
         }
-    } // get visibility
+    } // visibility
     else if (index.column() == COLUMN_VISIBILITY)
     {
         if (role == Qt::CheckStateRole)
         {
-            bool visible = infos[index.row()].visibility;
+            bool visible = info.visibility;
             return visible ? Qt::Checked : Qt::Unchecked;
+        }
+    } // gain
+    else if (index.column() == COLUMN_GAIN)
+    {
+        if (role == Qt::CheckStateRole)
+        {
+            return info.gainEn ? Qt::Checked : Qt::Unchecked;
+        }
+        else if (role == Qt::DisplayRole || role == Qt::EditRole)
+        {
+            return QVariant(info.gain);
+        }
+    } // offset
+    else if (index.column() == COLUMN_OFFSET)
+    {
+        if (role == Qt::CheckStateRole)
+        {
+            return info.offsetEn ? Qt::Checked : Qt::Unchecked;
+        }
+        else if (role == Qt::DisplayRole || role == Qt::EditRole)
+        {
+            return QVariant(info.offset);
         }
     }
 
@@ -194,6 +227,14 @@ QVariant ChannelInfoModel::headerData(int section, Qt::Orientation orientation, 
             else if (section == COLUMN_VISIBILITY)
             {
                 return tr("Visible");
+            }
+            else if (section == COLUMN_GAIN)
+            {
+                return tr("Gain");
+            }
+            else if (section == COLUMN_OFFSET)
+            {
+                return tr("Offset");
             }
         }
     }
@@ -216,10 +257,12 @@ bool ChannelInfoModel::setData(const QModelIndex &index, const QVariant &value, 
         return false;
     }
 
+    auto &info = infos[index.row()];
+
     // set color
     if (role == Qt::ForegroundRole)
     {
-        infos[index.row()].color = value.value<QColor>();
+        info.color = value.value<QColor>();
         emit dataChanged(index, index, QVector<int>({Qt::ForegroundRole}));
         return true;
     }
@@ -229,7 +272,7 @@ bool ChannelInfoModel::setData(const QModelIndex &index, const QVariant &value, 
     {
         if (role == Qt::DisplayRole || role == Qt::EditRole)
         {
-            infos[index.row()].name = value.toString();
+            info.name = value.toString();
             emit dataChanged(index, index, QVector<int>({role}));
             return true;
         }
@@ -239,7 +282,39 @@ bool ChannelInfoModel::setData(const QModelIndex &index, const QVariant &value, 
         if (role == Qt::CheckStateRole)
         {
             bool checked = value.toInt() == Qt::Checked;
-            infos[index.row()].visibility = checked;
+            info.visibility = checked;
+            emit dataChanged(index, index, QVector<int>({role}));
+            return true;
+        }
+    }
+    else if (index.column() == COLUMN_GAIN)
+    {
+        if (role == Qt::DisplayRole || role == Qt::EditRole)
+        {
+            info.gain = value.toDouble();
+            emit dataChanged(index, index, QVector<int>({role}));
+            return true;
+        }
+        else if (role == Qt::CheckStateRole)
+        {
+            bool checked = value.toInt() == Qt::Checked;
+            info.gainEn = checked;
+            emit dataChanged(index, index, QVector<int>({role}));
+            return true;
+        }
+    }
+    else if (index.column() == COLUMN_OFFSET)
+    {
+        if (role == Qt::DisplayRole || role == Qt::EditRole)
+        {
+            info.offset = value.toDouble();
+            emit dataChanged(index, index, QVector<int>({role}));
+            return true;
+        }
+        else if (role == Qt::CheckStateRole)
+        {
+            bool checked = value.toInt() == Qt::Checked;
+            info.offsetEn = checked;
             emit dataChanged(index, index, QVector<int>({role}));
             return true;
         }
