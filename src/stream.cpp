@@ -142,39 +142,72 @@ void Stream::setNumChannels(unsigned nc, bool x)
     Sink::setNumChannels(nc, x);
 }
 
-void Stream::feedIn(const SamplePack& data)
+const SamplePack* Stream::applyGainOffset(const SamplePack& pack) const
 {
-    Q_ASSERT(data.numChannels() == numChannels() &&
-             data.hasX() == hasX());
+    SamplePack* mPack = nullptr;
+    unsigned ns = pack.numSamples();
+
+    for (unsigned ci = 0; ci < numChannels(); ci++)
+    {
+        bool gainEn = channels[ci]->info()->gainEn(ci);
+        bool offsetEn = channels[ci]->info()->offsetEn(ci);
+        double* mdata;
+        if (gainEn || offsetEn)
+        {
+            if (mPack == nullptr)
+                mPack = new SamplePack(pack);
+
+            mdata = mPack->data(ci);
+
+            double gain = channels[ci]->info()->gain(ci);
+            double offset = channels[ci]->info()->offset(ci);
+
+            if (gainEn)
+            {
+                for (unsigned i = 0; i < ns; i++)
+                {
+                    mdata[i] *= gain;
+                }
+            }
+            if (offsetEn)
+            {
+                for (unsigned i = 0; i < ns; i++)
+                {
+                    mdata[i] += offset;
+                }
+            }
+        }
+    }
+
+    return mPack;
+}
+
+void Stream::feedIn(const SamplePack& pack)
+{
+    Q_ASSERT(pack.numChannels() == numChannels() &&
+             pack.hasX() == hasX());
 
     if (_paused) return;
 
-    unsigned ns = data.numSamples();
+    unsigned ns = pack.numSamples();
     if (_hasx)
     {
-        static_cast<RingBuffer*>(xData)->addSamples(data.xData(), ns);
+        static_cast<RingBuffer*>(xData)->addSamples(pack.xData(), ns);
     }
+
+    // modified pack that gain and offset is applied to
+    const SamplePack* mPack = applyGainOffset(pack);
+
     for (unsigned ci = 0; ci < numChannels(); ci++)
     {
-        // TODO: check for gainEn and offsetEn
-        // apply gain and offset
-        auto rdata = data.data(ci);
-        auto mdata = new double[sizeof(double) * ns];
-        // TODO: add gain&offset access methods to `StreamChannel`
-        double gain = channels[ci]->info()->gain(ci);
-        double offset = channels[ci]->info()->offset(ci);
-        for (int i = 0; i < ns; i++)
-        {
-            mdata[i] = rdata[i] * gain + offset;
-        }
-
-        static_cast<RingBuffer*>(channels[ci]->yData())->addSamples(mdata, ns);
-        delete[] mdata;
+        auto buf = static_cast<RingBuffer*>(channels[ci]->yData());
+        double* data = (mPack == nullptr) ? pack.data(ci) : mPack->data(ci);
+        buf->addSamples(data, ns);
     }
 
-    // TODO: emit modified (gain&offset) data
-    Sink::feedIn(data);
+    Sink::feedIn((mPack == nullptr) ? pack : *mPack);
 
+    if (mPack != nullptr) delete mPack;
     emit dataAdded();
 }
 
