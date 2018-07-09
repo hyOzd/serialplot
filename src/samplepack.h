@@ -29,6 +29,7 @@ public:
      * @param x has X channel
      */
     SamplePack(unsigned ns, unsigned nc, bool x = false);
+    SamplePack(const SamplePack& other);
     ~SamplePack();
 
     bool hasX() const;

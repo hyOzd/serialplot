@@ -17,6 +17,7 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <cstring>
 #include <QtGlobal>
 
 #include "samplepack.h"
@@ -37,6 +38,15 @@ SamplePack::SamplePack(unsigned ns, unsigned nc, bool x)
     {
         _xData = nullptr;
     }
+}
+
+SamplePack::SamplePack(const SamplePack& other) :
+    SamplePack(other.numSamples(), other.numChannels(), other.hasX())
+{
+    size_t dataSize = sizeof(double) * numSamples();
+    if (hasX())
+        memcpy(xData(), other.xData(), dataSize);
+    memcpy(_yData, other._yData, dataSize * numChannels());
 }
 
 SamplePack::~SamplePack()
