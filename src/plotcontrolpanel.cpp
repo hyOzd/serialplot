@@ -70,6 +70,8 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
     resetColorsAct(tr("Reset Colors"), this),
     showAllAct(tr("Show All"), this),
     hideAllAct(tr("Hide All"), this),
+    resetGainsAct(tr("Reset All Gain"), this),
+    resetOffsetsAct(tr("Reset All Offset"), this),
     resetMenu(tr("Reset Menu"), this)
 {
     ui->setupUi(this);
@@ -168,6 +170,8 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
     resetAct.setToolTip(tr("Reset channel names and colors"));
     resetMenu.addAction(&resetNamesAct);
     resetMenu.addAction(&resetColorsAct);
+    resetMenu.addAction(&resetGainsAct);
+    resetMenu.addAction(&resetOffsetsAct);
     resetAct.setMenu(&resetMenu);
     ui->tbReset->setDefaultAction(&resetAct);
 
@@ -426,6 +430,8 @@ void PlotControlPanel::setChannelInfoModel(ChannelInfoModel* model)
     connect(&resetAct, &QAction::triggered, model, &ChannelInfoModel::resetInfos);
     connect(&resetNamesAct, &QAction::triggered, model, &ChannelInfoModel::resetNames);
     connect(&resetColorsAct, &QAction::triggered, model, &ChannelInfoModel::resetColors);
+    connect(&resetGainsAct, &QAction::triggered, model, &ChannelInfoModel::resetGains);
+    connect(&resetOffsetsAct, &QAction::triggered, model, &ChannelInfoModel::resetOffsets);
     connect(&showAllAct, &QAction::triggered, [model]{model->resetVisibility(true);});
     connect(&hideAllAct, &QAction::triggered, [model]{model->resetVisibility(false);});
 }

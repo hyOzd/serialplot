@@ -71,7 +71,8 @@ private:
     /// User can disable this setting in the checkbox
     bool warnNumOfSamples;
 
-    QAction resetAct, resetNamesAct, resetColorsAct, showAllAct, hideAllAct;
+    QAction resetAct, resetNamesAct, resetColorsAct, showAllAct,
+        hideAllAct, resetGainsAct, resetOffsetsAct;
     QMenu resetMenu;
     QStyledItemDelegate* delegate;
 

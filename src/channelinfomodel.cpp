@@ -401,6 +401,7 @@ void ChannelInfoModel::resetInfos()
     endResetModel();
 }
 
+// TODO: fix repetitive code, ChannelInfoModel::reset* functions
 void ChannelInfoModel::resetNames()
 {
     beginResetModel();
@@ -427,6 +428,28 @@ void ChannelInfoModel::resetVisibility(bool visible)
     for (unsigned ci = 0; (int) ci < infos.length(); ci++)
     {
         infos[ci].visibility = visible;
+    }
+    endResetModel();
+}
+
+void ChannelInfoModel::resetGains()
+{
+    beginResetModel();
+    for (unsigned ci = 0; (int) ci < infos.length(); ci++)
+    {
+        infos[ci].gain = ChannelInfo(ci).gain;
+        infos[ci].gainEn = ChannelInfo(ci).gainEn;
+    }
+    endResetModel();
+}
+
+void ChannelInfoModel::resetOffsets()
+{
+    beginResetModel();
+    for (unsigned ci = 0; (int) ci < infos.length(); ci++)
+    {
+        infos[ci].offset = ChannelInfo(ci).offset;
+        infos[ci].offsetEn = ChannelInfo(ci).offsetEn;
     }
     endResetModel();
 }

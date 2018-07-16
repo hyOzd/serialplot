@@ -74,6 +74,10 @@ public slots:
     void resetNames();
     /// reset all channel colors
     void resetColors();
+    /// reset all channel gain values and disables gains
+    void resetGains();
+    /// reset all channel offset values and disables offsets
+    void resetOffsets();
     /// reset visibility
     void resetVisibility(bool visible);
 
