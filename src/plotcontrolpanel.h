@@ -24,6 +24,7 @@
 #include <QSettings>
 #include <QAction>
 #include <QMenu>
+#include <QStyledItemDelegate>
 
 #include "channelinfomodel.h"
 
@@ -72,6 +73,7 @@ private:
 
     QAction resetAct, resetNamesAct, resetColorsAct, showAllAct, hideAllAct;
     QMenu resetMenu;
+    QStyledItemDelegate* delegate;
 
     /// Show a confirmation dialog before setting #samples to a big value
     bool askNSConfirmation(int value);

@@ -20,6 +20,7 @@
 #include <QVariant>
 #include <QMessageBox>
 #include <QCheckBox>
+#include <QStyledItemDelegate>
 
 #include <math.h>
 
@@ -30,6 +31,8 @@
 
 /// Confirm if #samples is being set to a value greater than this
 const int NUMSAMPLES_CONFIRM_AT = 1000000;
+/// Precision used for channel info table numbers
+const int DOUBLESP_PRECISION = 6;
 
 /// Used for scale range selection combobox
 struct Range
@@ -39,6 +42,25 @@ struct Range
 };
 
 Q_DECLARE_METATYPE(Range);
+
+/// Used for customizing double precision in tables
+class SpinBoxDelegate : public QStyledItemDelegate
+{
+public:
+    QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option,
+                          const QModelIndex &index) const Q_DECL_OVERRIDE
+        {
+            auto w = QStyledItemDelegate::createEditor(
+                parent, option, index);
+
+            auto sp = qobject_cast<QDoubleSpinBox*>(w);
+            if (sp)
+            {
+                sp->setDecimals(DOUBLESP_PRECISION);
+            }
+            return w;
+        }
+};
 
 PlotControlPanel::PlotControlPanel(QWidget *parent) :
     QWidget(parent),
@@ -51,6 +73,9 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
     resetMenu(tr("Reset Menu"), this)
 {
     ui->setupUi(this);
+
+    delegate = new SpinBoxDelegate();
+    ui->tvChannelInfo->setItemDelegate(delegate);
 
     warnNumOfSamples = true;    // TODO: load from settings
     _numOfSamples = ui->spNumOfSamples->value();
