@@ -463,9 +463,14 @@ void ChannelInfoModel::saveSettings(QSettings* settings) const
     for (unsigned ci = 0; (int) ci < infos.length(); ci++)
     {
         settings->setArrayIndex(ci);
-        settings->setValue(SG_Channels_Name, infos[ci].name);
-        settings->setValue(SG_Channels_Color, infos[ci].color);
-        settings->setValue(SG_Channels_Visible, infos[ci].visibility);
+        auto& info = infos[ci];
+        settings->setValue(SG_Channels_Name, info.name);
+        settings->setValue(SG_Channels_Color, info.color);
+        settings->setValue(SG_Channels_Visible, info.visibility);
+        settings->setValue(SG_Channels_Gain, info.gain);
+        settings->setValue(SG_Channels_GainEn, info.gainEn);
+        settings->setValue(SG_Channels_Offset, info.offset);
+        settings->setValue(SG_Channels_OffsetEn, info.offsetEn);
     }
 
     settings->endArray();
@@ -482,9 +487,13 @@ void ChannelInfoModel::loadSettings(QSettings* settings)
         settings->setArrayIndex(ci);
 
         ChannelInfo chanInfo(ci);
-        chanInfo.name       = settings->value(SG_Channels_Name, chanInfo.name).toString();
-        chanInfo.color      = settings->value(SG_Channels_Color, chanInfo.color).value<QColor>();
-        chanInfo.visibility = settings->value(SG_Channels_Visible, true).toBool();
+        chanInfo.name       = settings->value(SG_Channels_Name     , chanInfo.name).toString();
+        chanInfo.color      = settings->value(SG_Channels_Color    , chanInfo.color).value<QColor>();
+        chanInfo.visibility = settings->value(SG_Channels_Visible  , chanInfo.visibility).toBool();
+        chanInfo.gain       = settings->value(SG_Channels_Gain     , chanInfo.gain).toDouble();
+        chanInfo.gainEn     = settings->value(SG_Channels_GainEn   , chanInfo.gainEn).toBool();
+        chanInfo.offset     = settings->value(SG_Channels_Offset   , chanInfo.offset).toDouble();
+        chanInfo.offsetEn   = settings->value(SG_Channels_OffsetEn , chanInfo.offsetEn).toBool();
 
         if ((int) ci < infos.size())
         {
