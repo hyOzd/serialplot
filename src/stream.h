@@ -69,7 +69,7 @@ public:
 protected:
     // implementations for `Sink`
     virtual void setNumChannels(unsigned nc, bool x);
-    virtual void feedIn(const SamplePack& data);
+    virtual void feedIn(const SamplePack& pack);
 
 signals:
     void numChannelsChanged(unsigned value);
@@ -98,6 +98,19 @@ private:
     QList<StreamChannel*> channels;
 
     ChannelInfoModel _infoModel;
+
+    /**
+     * Applies gain and offset to given pack.
+     *
+     * Caller is responsible for deleting returned `SamplePack`.
+     *
+     * @note Should be called only when gain or offset is enabled. Guard with
+     * `ChannelInfoModel::gainOrOffsetEn()`.
+     *
+     * @param pack input data
+     * @return modified data
+     */
+    const SamplePack* applyGainOffset(const SamplePack& pack) const;
 };
 
 

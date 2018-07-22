@@ -20,6 +20,7 @@
 #include <QVariant>
 #include <QMessageBox>
 #include <QCheckBox>
+#include <QStyledItemDelegate>
 
 #include <math.h>
 
@@ -30,6 +31,8 @@
 
 /// Confirm if #samples is being set to a value greater than this
 const int NUMSAMPLES_CONFIRM_AT = 1000000;
+/// Precision used for channel info table numbers
+const int DOUBLESP_PRECISION = 6;
 
 /// Used for scale range selection combobox
 struct Range
@@ -40,6 +43,25 @@ struct Range
 
 Q_DECLARE_METATYPE(Range);
 
+/// Used for customizing double precision in tables
+class SpinBoxDelegate : public QStyledItemDelegate
+{
+public:
+    QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option,
+                          const QModelIndex &index) const Q_DECL_OVERRIDE
+        {
+            auto w = QStyledItemDelegate::createEditor(
+                parent, option, index);
+
+            auto sp = qobject_cast<QDoubleSpinBox*>(w);
+            if (sp)
+            {
+                sp->setDecimals(DOUBLESP_PRECISION);
+            }
+            return w;
+        }
+};
+
 PlotControlPanel::PlotControlPanel(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::PlotControlPanel),
@@ -48,9 +70,14 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
     resetColorsAct(tr("Reset Colors"), this),
     showAllAct(tr("Show All"), this),
     hideAllAct(tr("Hide All"), this),
+    resetGainsAct(tr("Reset All Gain"), this),
+    resetOffsetsAct(tr("Reset All Offset"), this),
     resetMenu(tr("Reset Menu"), this)
 {
     ui->setupUi(this);
+
+    delegate = new SpinBoxDelegate();
+    ui->tvChannelInfo->setItemDelegate(delegate);
 
     warnNumOfSamples = true;    // TODO: load from settings
     _numOfSamples = ui->spNumOfSamples->value();
@@ -143,6 +170,8 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
     resetAct.setToolTip(tr("Reset channel names and colors"));
     resetMenu.addAction(&resetNamesAct);
     resetMenu.addAction(&resetColorsAct);
+    resetMenu.addAction(&resetGainsAct);
+    resetMenu.addAction(&resetOffsetsAct);
     resetAct.setMenu(&resetMenu);
     ui->tbReset->setDefaultAction(&resetAct);
 
@@ -401,6 +430,8 @@ void PlotControlPanel::setChannelInfoModel(ChannelInfoModel* model)
     connect(&resetAct, &QAction::triggered, model, &ChannelInfoModel::resetInfos);
     connect(&resetNamesAct, &QAction::triggered, model, &ChannelInfoModel::resetNames);
     connect(&resetColorsAct, &QAction::triggered, model, &ChannelInfoModel::resetColors);
+    connect(&resetGainsAct, &QAction::triggered, model, &ChannelInfoModel::resetGains);
+    connect(&resetOffsetsAct, &QAction::triggered, model, &ChannelInfoModel::resetOffsets);
     connect(&showAllAct, &QAction::triggered, [model]{model->resetVisibility(true);});
     connect(&hideAllAct, &QAction::triggered, [model]{model->resetVisibility(false);});
 }

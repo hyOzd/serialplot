@@ -142,25 +142,73 @@ void Stream::setNumChannels(unsigned nc, bool x)
     Sink::setNumChannels(nc, x);
 }
 
-void Stream::feedIn(const SamplePack& data)
+const SamplePack* Stream::applyGainOffset(const SamplePack& pack) const
 {
-    Q_ASSERT(data.numChannels() == numChannels() &&
-             data.hasX() == hasX());
+    Q_ASSERT(infoModel()->gainOrOffsetEn());
+
+    SamplePack* mPack = new SamplePack(pack);
+    unsigned ns = pack.numSamples();
+
+    for (unsigned ci = 0; ci < numChannels(); ci++)
+    {
+        // TODO: we could use some kind of map (int32, int64 would suffice) to speed things up
+        bool gainEn = infoModel()->gainEn(ci);
+        bool offsetEn = infoModel()->offsetEn(ci);
+        if (gainEn || offsetEn)
+        {
+            double* mdata = mPack->data(ci);
+
+            double gain = infoModel()->gain(ci);
+            double offset = infoModel()->offset(ci);
+
+            if (gainEn)
+            {
+                for (unsigned i = 0; i < ns; i++)
+                {
+                    mdata[i] *= gain;
+                }
+            }
+            if (offsetEn)
+            {
+                for (unsigned i = 0; i < ns; i++)
+                {
+                    mdata[i] += offset;
+                }
+            }
+        }
+    }
+
+    return mPack;
+}
+
+void Stream::feedIn(const SamplePack& pack)
+{
+    Q_ASSERT(pack.numChannels() == numChannels() &&
+             pack.hasX() == hasX());
 
     if (_paused) return;
 
-    unsigned ns = data.numSamples();
+    unsigned ns = pack.numSamples();
     if (_hasx)
     {
-        static_cast<RingBuffer*>(xData)->addSamples(data.xData(), ns);
+        static_cast<RingBuffer*>(xData)->addSamples(pack.xData(), ns);
     }
-    for (unsigned i = 0; i < numChannels(); i++)
+
+    // modified pack that gain and offset is applied to
+    const SamplePack* mPack = nullptr;
+    if (infoModel()->gainOrOffsetEn())
+        mPack = applyGainOffset(pack);
+
+    for (unsigned ci = 0; ci < numChannels(); ci++)
     {
-        static_cast<RingBuffer*>(channels[i]->yData())->addSamples(data.data(i), ns);
+        auto buf = static_cast<RingBuffer*>(channels[ci]->yData());
+        double* data = (mPack == nullptr) ? pack.data(ci) : mPack->data(ci);
+        buf->addSamples(data, ns);
     }
 
-    Sink::feedIn(data);
+    Sink::feedIn((mPack == nullptr) ? pack : *mPack);
 
+    if (mPack != nullptr) delete mPack;
     emit dataAdded();
 }
 

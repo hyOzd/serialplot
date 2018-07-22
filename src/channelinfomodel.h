@@ -34,7 +34,9 @@ public:
     {
         COLUMN_NAME = 0,
         COLUMN_VISIBILITY,
-        COLUMN_COUNT
+        COLUMN_GAIN,
+        COLUMN_OFFSET,
+        COLUMN_COUNT            // MUST be last
     };
 
     explicit ChannelInfoModel(unsigned numberOfChannels, QObject *parent = 0);
@@ -44,6 +46,12 @@ public:
     QString name     (unsigned i) const;
     QColor  color    (unsigned i) const;
     bool    isVisible(unsigned i) const;
+    bool    gainEn   (unsigned i) const;
+    double  gain     (unsigned i) const;
+    bool    offsetEn (unsigned i) const;
+    double  offset   (unsigned i) const;
+    /// Returns true if any of the channels have gain or offset enabled
+    bool gainOrOffsetEn() const;
     /// Returns a list of channel names
     QStringList channelNames() const;
 
@@ -68,6 +76,10 @@ public slots:
     void resetNames();
     /// reset all channel colors
     void resetColors();
+    /// reset all channel gain values and disables gains
+    void resetGains();
+    /// reset all channel offset values and disables offsets
+    void resetOffsets();
     /// reset visibility
     void resetVisibility(bool visible);
 
@@ -79,6 +91,8 @@ private:
         QString name;
         bool visibility;
         QColor color;
+        double gain, offset;
+        bool gainEn, offsetEn;
     };
 
     unsigned _numOfChannels;     ///< @note this is not necessarily the length of `infos`
@@ -88,6 +102,16 @@ private:
      * remember user entered info (names, colors etc.).
      */
     QList<ChannelInfo> infos;
+
+    /**
+     * Cache for gain and offset enabled variables of channels. If gain and/or
+     * offset is not enabled for *any* of the channels this is false otherwise
+     * true.
+     */
+    bool _gainOrOffsetEn;
+
+    /// Updates `_gainOrOffsetEn` by scanning all channel infos.
+    void updateGainOrOffsetEn();
 };
 
 #endif // CHANNELINFOMODEL_H

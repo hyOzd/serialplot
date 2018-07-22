@@ -24,6 +24,7 @@
 #include <QSettings>
 #include <QAction>
 #include <QMenu>
+#include <QStyledItemDelegate>
 
 #include "channelinfomodel.h"
 
@@ -70,8 +71,10 @@ private:
     /// User can disable this setting in the checkbox
     bool warnNumOfSamples;
 
-    QAction resetAct, resetNamesAct, resetColorsAct, showAllAct, hideAllAct;
+    QAction resetAct, resetNamesAct, resetColorsAct, showAllAct,
+        hideAllAct, resetGainsAct, resetOffsetsAct;
     QMenu resetMenu;
+    QStyledItemDelegate* delegate;
 
     /// Show a confirmation dialog before setting #samples to a big value
     bool askNSConfirmation(int value);

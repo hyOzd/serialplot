@@ -71,11 +71,15 @@ const char SG_CustomFrame_Endianness[] = "endianness";
 const char SG_CustomFrame_Checksum[] = "checksum";
 const char SG_CustomFrame_DebugMode[] = "debugMode";
 
-// channel manager keys
+// channel info keys
 const char SG_Channels_Channel[] = "channel";
 const char SG_Channels_Name[] = "name";
 const char SG_Channels_Color[] = "color";
 const char SG_Channels_Visible[] = "visible";
+const char SG_Channels_Gain[] = "gain";
+const char SG_Channels_GainEn[] = "gainEnabled";
+const char SG_Channels_Offset[] = "offset";
+const char SG_Channels_OffsetEn[] = "offsetEnabled";
 
 // plot settings keys
 const char SG_Plot_NumOfSamples[] = "numOfSamples";

@@ -55,6 +55,30 @@ TEST_CASE("samplepack with X", "[memory]")
     REQUIRE(pack.xData() != nullptr);
 }
 
+TEST_CASE("samplepack copy", "[memory]")
+{
+    SamplePack pack(10, 3, true);
+
+    // fill test data
+    for (int i = 0; i < 10; i++)
+    {
+        pack.xData()[i] = i;
+        pack.data(0)[i] = i+5;
+        pack.data(1)[i] = i*2;
+        pack.data(2)[i] = i*3;
+    }
+
+    SamplePack other = pack;
+    // compare
+    for (int i = 0; i < 10; i++)
+    {
+        REQUIRE(other.xData()[i] == i);
+        REQUIRE(other.data(0)[i] == i+5);
+        REQUIRE(other.data(1)[i] == i*2);
+        REQUIRE(other.data(2)[i] == i*3);
+    }
+}
+
 TEST_CASE("sink", "[memory, stream]")
 {
     TestSink sink;
