@@ -102,13 +102,13 @@ private:
     /**
      * Applies gain and offset to given pack.
      *
-     * If gain or offset isn't enabled this function returns `nullptr`. If gain
-     * or offset is enabled for at least 1 channel input pack is copied and
-     * modified. Result is returned. Caller is responsible for deleting
-     * returned `SamplePack`.
+     * Caller is responsible for deleting returned `SamplePack`.
+     *
+     * @note Should be called only when gain or offset is enabled. Guard with
+     * `ChannelInfoModel::gainOrOffsetEn()`.
      *
      * @param pack input data
-     * @return `nullptr` if no gain or offset is enabled otherwise modified data
+     * @return modified data
      */
     const SamplePack* applyGainOffset(const SamplePack& pack) const;
 };

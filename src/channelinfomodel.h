@@ -50,6 +50,8 @@ public:
     double  gain     (unsigned i) const;
     bool    offsetEn (unsigned i) const;
     double  offset   (unsigned i) const;
+    /// Returns true if any of the channels have gain or offset enabled
+    bool gainOrOffsetEn() const;
     /// Returns a list of channel names
     QStringList channelNames() const;
 
@@ -100,6 +102,16 @@ private:
      * remember user entered info (names, colors etc.).
      */
     QList<ChannelInfo> infos;
+
+    /**
+     * Cache for gain and offset enabled variables of channels. If gain and/or
+     * offset is not enabled for *any* of the channels this is false otherwise
+     * true.
+     */
+    bool _gainOrOffsetEn;
+
+    /// Updates `_gainOrOffsetEn` by scanning all channel infos.
+    void updateGainOrOffsetEn();
 };
 
 #endif // CHANNELINFOMODEL_H

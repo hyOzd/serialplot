@@ -144,23 +144,22 @@ void Stream::setNumChannels(unsigned nc, bool x)
 
 const SamplePack* Stream::applyGainOffset(const SamplePack& pack) const
 {
-    SamplePack* mPack = nullptr;
+    Q_ASSERT(infoModel()->gainOrOffsetEn());
+
+    SamplePack* mPack = new SamplePack(pack);
     unsigned ns = pack.numSamples();
 
     for (unsigned ci = 0; ci < numChannels(); ci++)
     {
-        bool gainEn = channels[ci]->info()->gainEn(ci);
-        bool offsetEn = channels[ci]->info()->offsetEn(ci);
-        double* mdata;
+        // TODO: we could use some kind of map (int32, int64 would suffice) to speed things up
+        bool gainEn = infoModel()->gainEn(ci);
+        bool offsetEn = infoModel()->offsetEn(ci);
         if (gainEn || offsetEn)
         {
-            if (mPack == nullptr)
-                mPack = new SamplePack(pack);
+            double* mdata = mPack->data(ci);
 
-            mdata = mPack->data(ci);
-
-            double gain = channels[ci]->info()->gain(ci);
-            double offset = channels[ci]->info()->offset(ci);
+            double gain = infoModel()->gain(ci);
+            double offset = infoModel()->offset(ci);
 
             if (gainEn)
             {
@@ -196,7 +195,9 @@ void Stream::feedIn(const SamplePack& pack)
     }
 
     // modified pack that gain and offset is applied to
-    const SamplePack* mPack = applyGainOffset(pack);
+    const SamplePack* mPack = nullptr;
+    if (infoModel()->gainOrOffsetEn())
+        mPack = applyGainOffset(pack);
 
     for (unsigned ci = 0; ci < numChannels(); ci++)
     {

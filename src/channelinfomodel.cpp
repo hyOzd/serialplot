@@ -68,6 +68,7 @@ ChannelInfoModel::ChannelInfoModel(unsigned numberOfChannels, QObject* parent) :
 ChannelInfoModel::ChannelInfoModel(const ChannelInfoModel& other) :
     ChannelInfoModel(other.rowCount(), other.parent())
 {
+    // TODO: why not set (copy) info list directly instead?
     for (int i = 0; i < other.rowCount(); i++)
     {
         setData(index(i, COLUMN_NAME),
@@ -76,10 +77,24 @@ ChannelInfoModel::ChannelInfoModel(const ChannelInfoModel& other) :
         setData(index(i, COLUMN_NAME),
                 other.data(other.index(i, COLUMN_NAME), Qt::ForegroundRole),
                 Qt::ForegroundRole);
+
         setData(index(i, COLUMN_VISIBILITY),
                 other.data(other.index(i, COLUMN_VISIBILITY), Qt::CheckStateRole),
                 Qt::CheckStateRole);
-        // TODO: gain and offset
+
+        setData(index(i, COLUMN_GAIN),
+                other.data(other.index(i, COLUMN_GAIN), Qt::CheckStateRole),
+                Qt::CheckStateRole);
+        setData(index(i, COLUMN_GAIN),
+                other.data(other.index(i, COLUMN_GAIN), Qt::EditRole),
+                Qt::EditRole);
+
+        setData(index(i, COLUMN_OFFSET),
+                other.data(other.index(i, COLUMN_OFFSET), Qt::CheckStateRole),
+                Qt::CheckStateRole);
+        setData(index(i, COLUMN_OFFSET),
+                other.data(other.index(i, COLUMN_OFFSET), Qt::EditRole),
+                Qt::EditRole);
     }
 }
 
@@ -288,13 +303,13 @@ bool ChannelInfoModel::setData(const QModelIndex &index, const QVariant &value, 
     }
 
     // set name
+    bool r = false;
     if (index.column() == COLUMN_NAME)
     {
         if (role == Qt::DisplayRole || role == Qt::EditRole)
         {
             info.name = value.toString();
-            emit dataChanged(index, index, QVector<int>({role}));
-            return true;
+            r = true;
         }
     } // set visibility
     else if (index.column() == COLUMN_VISIBILITY)
@@ -303,8 +318,7 @@ bool ChannelInfoModel::setData(const QModelIndex &index, const QVariant &value, 
         {
             bool checked = value.toInt() == Qt::Checked;
             info.visibility = checked;
-            emit dataChanged(index, index, QVector<int>({role}));
-            return true;
+            r = true;
         }
     }
     else if (index.column() == COLUMN_GAIN)
@@ -312,15 +326,14 @@ bool ChannelInfoModel::setData(const QModelIndex &index, const QVariant &value, 
         if (role == Qt::DisplayRole || role == Qt::EditRole)
         {
             info.gain = value.toDouble();
-            emit dataChanged(index, index, QVector<int>({role}));
-            return true;
+            r = true;
         }
         else if (role == Qt::CheckStateRole)
         {
             bool checked = value.toInt() == Qt::Checked;
             info.gainEn = checked;
-            emit dataChanged(index, index, QVector<int>({role}));
-            return true;
+            if (_gainOrOffsetEn != checked) updateGainOrOffsetEn();
+            r = true;
         }
     }
     else if (index.column() == COLUMN_OFFSET)
@@ -328,20 +341,23 @@ bool ChannelInfoModel::setData(const QModelIndex &index, const QVariant &value, 
         if (role == Qt::DisplayRole || role == Qt::EditRole)
         {
             info.offset = value.toDouble();
-            emit dataChanged(index, index, QVector<int>({role}));
-            return true;
+            r = true;
         }
         else if (role == Qt::CheckStateRole)
         {
             bool checked = value.toInt() == Qt::Checked;
             info.offsetEn = checked;
-            emit dataChanged(index, index, QVector<int>({role}));
-            return true;
+            if (_gainOrOffsetEn != checked) updateGainOrOffsetEn();
+            r = true;
         }
     }
 
-    // invalid index/role
-    return false;
+    if (r)
+    {
+        emit dataChanged(index, index, QVector<int>({role}));
+    }
+
+    return r;
 }
 
 void ChannelInfoModel::setNumOfChannels(unsigned number)
@@ -380,6 +396,7 @@ void ChannelInfoModel::setNumOfChannels(unsigned number)
     }
 
     _numOfChannels = number;
+    updateGainOrOffsetEn();
 
     if (isInserting)
     {
@@ -407,6 +424,7 @@ void ChannelInfoModel::resetNames()
     beginResetModel();
     for (unsigned ci = 0; (int) ci < infos.length(); ci++)
     {
+        // TODO: do not create a full object every time (applies to other reset methods as well)
         infos[ci].name = ChannelInfo(ci).name;
     }
     endResetModel();
@@ -440,6 +458,7 @@ void ChannelInfoModel::resetGains()
         infos[ci].gain = ChannelInfo(ci).gain;
         infos[ci].gainEn = ChannelInfo(ci).gainEn;
     }
+    updateGainOrOffsetEn();
     endResetModel();
 }
 
@@ -451,7 +470,23 @@ void ChannelInfoModel::resetOffsets()
         infos[ci].offset = ChannelInfo(ci).offset;
         infos[ci].offsetEn = ChannelInfo(ci).offsetEn;
     }
+    updateGainOrOffsetEn();
     endResetModel();
+}
+
+bool ChannelInfoModel::gainOrOffsetEn() const
+{
+    return _gainOrOffsetEn;
+}
+
+void ChannelInfoModel::updateGainOrOffsetEn()
+{
+    _gainOrOffsetEn = false;
+    for (int ci = 0; ci < _numOfChannels; ci++)
+    {
+        auto& info = infos[ci];
+        _gainOrOffsetEn |= (info.gainEn || info.offsetEn);
+    }
 }
 
 void ChannelInfoModel::saveSettings(QSettings* settings) const
@@ -511,6 +546,8 @@ void ChannelInfoModel::loadSettings(QSettings* settings)
             infos.append(chanInfo);
         }
     }
+
+    updateGainOrOffsetEn();
 
     settings->endArray();
     settings->endGroup();
