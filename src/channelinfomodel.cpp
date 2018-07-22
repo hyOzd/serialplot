@@ -482,7 +482,7 @@ bool ChannelInfoModel::gainOrOffsetEn() const
 void ChannelInfoModel::updateGainOrOffsetEn()
 {
     _gainOrOffsetEn = false;
-    for (int ci = 0; ci < _numOfChannels; ci++)
+    for (unsigned ci = 0; ci < _numOfChannels; ci++)
     {
         auto& info = infos[ci];
         _gainOrOffsetEn |= (info.gainEn || info.offsetEn);
