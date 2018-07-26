@@ -44,6 +44,7 @@ qt5_wrap_ui(UI_FILES_T
   ../src/binarystreamreadersettings.ui
   ../src/asciireadersettings.ui
   ../src/framedreadersettings.ui
+  ../src/demoreadersettings.ui
   ../src/numberformatbox.ui
   ../src/endiannessbox.ui
   )
@@ -62,6 +63,7 @@ add_executable(TestReaders EXCLUDE_FROM_ALL
   ../src/framedreader.cpp
   ../src/framedreadersettings.cpp
   ../src/demoreader.cpp
+  ../src/demoreadersettings.cpp
   ../src/commandedit.cpp
   ../src/endiannessbox.cpp
   ../src/numberformatbox.cpp

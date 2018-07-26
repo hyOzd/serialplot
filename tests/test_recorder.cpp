@@ -47,7 +47,7 @@ TEST_CASE("test recording single channel", "[recorder]")
     }
 
     // test
-    rec.startRecording(fileName, ",", channelNames);
+    rec.startRecording(fileName, ",", channelNames, false);
     source._feed(samples);
     rec.stopRecording();
 
@@ -87,7 +87,7 @@ TEST_CASE("test recording multiple channels", "[recorder]")
     }
 
     // test
-    rec.startRecording(fileName, ",", channelNames);
+    rec.startRecording(fileName, ",", channelNames, false);
     source._feed(samples);
     rec.stopRecording();
 
