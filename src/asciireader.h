@@ -21,7 +21,9 @@
 #define ASCIIREADER_H
 
 #include <QSettings>
+#include <QString>
 
+#include "samplepack.h"
 #include "abstractreader.h"
 #include "asciireadersettings.h"
 
@@ -50,6 +52,12 @@ private:
 
 private slots:
     void onDataReady() override;
+    /**
+     * Parses given line and returns sample pack.
+     *
+     * Returns `nullptr` in case of error.
+     */
+    SamplePack* parseLine(const QString& line) const;
 };
 
 #endif // ASCIIREADER_H
