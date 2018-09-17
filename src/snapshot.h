@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -27,6 +27,7 @@
 #include <QStringList>
 
 #include "channelinfomodel.h"
+#include "readonlybuffer.h"
 
 class SnapshotView;
 class MainWindow;
@@ -36,15 +37,19 @@ class Snapshot : public QObject
     Q_OBJECT
 
 public:
-    Snapshot(MainWindow* parent, QString name, ChannelInfoModel infoModel);
+    Snapshot(MainWindow* parent, QString name, ChannelInfoModel infoModel, bool saved = false);
     ~Snapshot();
 
-    QVector<QVector<QPointF>> data;
+    // TODO: yData of snapshot shouldn't be public, preferable should be handled in constructor
+    QVector<ReadOnlyBuffer*> yData;
     QAction* showAction();
     QAction* deleteAction();
 
     QString name();
     QString displayName(); ///< `name()` plus '*' if snapshot is not saved
+    unsigned numChannels() const; ///< number of channels in this snapshot
+    unsigned numSamples() const;  ///< number of samples in every channel
+    const ChannelInfoModel* infoModel() const;
     ChannelInfoModel* infoModel();
     void setName(QString name);
     QString channelName(unsigned channel);

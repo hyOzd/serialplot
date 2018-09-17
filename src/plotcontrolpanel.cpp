@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -20,6 +20,7 @@
 #include <QVariant>
 #include <QMessageBox>
 #include <QCheckBox>
+#include <QStyledItemDelegate>
 
 #include <math.h>
 
@@ -29,7 +30,9 @@
 #include "setting_defines.h"
 
 /// Confirm if #samples is being set to a value greater than this
-const int NUMSAMPLES_CONFIRM_AT = 10000;
+const int NUMSAMPLES_CONFIRM_AT = 1000000;
+/// Precision used for channel info table numbers
+const int DOUBLESP_PRECISION = 6;
 
 /// Used for scale range selection combobox
 struct Range
@@ -40,6 +43,25 @@ struct Range
 
 Q_DECLARE_METATYPE(Range);
 
+/// Used for customizing double precision in tables
+class SpinBoxDelegate : public QStyledItemDelegate
+{
+public:
+    QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option,
+                          const QModelIndex &index) const Q_DECL_OVERRIDE
+        {
+            auto w = QStyledItemDelegate::createEditor(
+                parent, option, index);
+
+            auto sp = qobject_cast<QDoubleSpinBox*>(w);
+            if (sp)
+            {
+                sp->setDecimals(DOUBLESP_PRECISION);
+            }
+            return w;
+        }
+};
+
 PlotControlPanel::PlotControlPanel(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::PlotControlPanel),
@@ -47,9 +69,15 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
     resetNamesAct(tr("Reset Names"), this),
     resetColorsAct(tr("Reset Colors"), this),
     showAllAct(tr("Show All"), this),
+    hideAllAct(tr("Hide All"), this),
+    resetGainsAct(tr("Reset All Gain"), this),
+    resetOffsetsAct(tr("Reset All Offset"), this),
     resetMenu(tr("Reset Menu"), this)
 {
     ui->setupUi(this);
+
+    delegate = new SpinBoxDelegate();
+    ui->tvChannelInfo->setItemDelegate(delegate);
 
     warnNumOfSamples = true;    // TODO: load from settings
     _numOfSamples = ui->spNumOfSamples->value();
@@ -86,8 +114,27 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
     connect(ui->spXmax, SIGNAL(valueChanged(double)),
             this, SLOT(onXScaleChanged()));
 
+    connect(ui->spXmax, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            [this](double v)
+            {
+                // set limit just a little below
+                double step = pow(10, -1 * ui->spXmin->decimals());
+                ui->spXmin->setMaximum(v - step);
+            });
+
     connect(ui->spXmin, SIGNAL(valueChanged(double)),
             this, SLOT(onXScaleChanged()));
+
+    connect(ui->spXmin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            [this](double v)
+            {
+                // set limit just a little above
+                double step = pow(10, -1 * ui->spXmax->decimals());
+                ui->spXmax->setMinimum(v + step);
+            });
+
+    connect(ui->spPlotWidth, SIGNAL(valueChanged(int)),
+            this, SLOT(onPlotWidthChanged()));
 
     // init scale range preset list
     for (int nbits = 8; nbits <= 24; nbits++) // signed binary formats
@@ -119,12 +166,19 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
     ui->colorSelector->setDisplayMode(color_widgets::ColorPreview::AllAlpha);
     ui->colorSelector->setDisabled(true);
 
-    // reset button
+    // reset buttons
+    resetAct.setToolTip(tr("Reset channel names and colors"));
     resetMenu.addAction(&resetNamesAct);
     resetMenu.addAction(&resetColorsAct);
-    resetMenu.addAction(&showAllAct);
+    resetMenu.addAction(&resetGainsAct);
+    resetMenu.addAction(&resetOffsetsAct);
     resetAct.setMenu(&resetMenu);
     ui->tbReset->setDefaultAction(&resetAct);
+
+    showAllAct.setToolTip(tr("Show all channels"));
+    hideAllAct.setToolTip(tr("Hide all channels"));
+    ui->tbShowAll->setDefaultAction(&showAllAct);
+    ui->tbHideAll->setDefaultAction(&hideAllAct);
 }
 
 PlotControlPanel::~PlotControlPanel()
@@ -275,6 +329,7 @@ void PlotControlPanel::onIndexChecked(bool checked)
 
         emit xScaleChanged(false, ui->spXmin->value(), ui->spXmax->value());
     }
+    emit plotWidthChanged(plotWidth());
 }
 
 void PlotControlPanel::onXScaleChanged()
@@ -282,7 +337,27 @@ void PlotControlPanel::onXScaleChanged()
     if (!xAxisAsIndex())
     {
         emit xScaleChanged(false, ui->spXmin->value(), ui->spXmax->value());
+        emit plotWidthChanged(plotWidth());
     }
+}
+
+double PlotControlPanel::plotWidth() const
+{
+    double value = ui->spPlotWidth->value();
+    if (!xAxisAsIndex())
+    {
+        // scale by xmin and xmax
+        auto xmax = ui->spXmax->value();
+        auto xmin = ui->spXmin->value();
+        double scale = (xmax - xmin) / _numOfSamples;
+        value *= scale;
+    }
+    return value;
+}
+
+void PlotControlPanel::onPlotWidthChanged()
+{
+    emit plotWidthChanged(plotWidth());
 }
 
 void PlotControlPanel::setChannelInfoModel(ChannelInfoModel* model)
@@ -355,13 +430,17 @@ void PlotControlPanel::setChannelInfoModel(ChannelInfoModel* model)
     connect(&resetAct, &QAction::triggered, model, &ChannelInfoModel::resetInfos);
     connect(&resetNamesAct, &QAction::triggered, model, &ChannelInfoModel::resetNames);
     connect(&resetColorsAct, &QAction::triggered, model, &ChannelInfoModel::resetColors);
-    connect(&showAllAct, &QAction::triggered, model, &ChannelInfoModel::resetVisibility);
+    connect(&resetGainsAct, &QAction::triggered, model, &ChannelInfoModel::resetGains);
+    connect(&resetOffsetsAct, &QAction::triggered, model, &ChannelInfoModel::resetOffsets);
+    connect(&showAllAct, &QAction::triggered, [model]{model->resetVisibility(true);});
+    connect(&hideAllAct, &QAction::triggered, [model]{model->resetVisibility(false);});
 }
 
 void PlotControlPanel::saveSettings(QSettings* settings)
 {
     settings->beginGroup(SettingGroup_Plot);
     settings->setValue(SG_Plot_NumOfSamples, numOfSamples());
+    settings->setValue(SG_Plot_PlotWidth, ui->spPlotWidth->value());
     settings->setValue(SG_Plot_IndexAsX, xAxisAsIndex());
     settings->setValue(SG_Plot_XMax, xMax());
     settings->setValue(SG_Plot_XMin, xMin());
@@ -376,6 +455,8 @@ void PlotControlPanel::loadSettings(QSettings* settings)
     settings->beginGroup(SettingGroup_Plot);
     ui->spNumOfSamples->setValue(
         settings->value(SG_Plot_NumOfSamples, numOfSamples()).toInt());
+    ui->spPlotWidth->setValue(
+        settings->value(SG_Plot_PlotWidth, ui->spPlotWidth->value()).toInt());
     ui->cbIndex->setChecked(
         settings->value(SG_Plot_IndexAsX, xAxisAsIndex()).toBool());
     ui->spXmax->setValue(settings->value(SG_Plot_XMax, xMax()).toDouble());

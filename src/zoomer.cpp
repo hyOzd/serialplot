@@ -28,6 +28,8 @@ Zoomer::Zoomer(QWidget* widget, bool doReplot) :
 {
     is_panning = false;
 
+    setTrackerMode(AlwaysOn);
+
     // set corner widget between the scrollbars with default background color
     auto cornerWidget = new QWidget();
     auto bgColor = cornerWidget->palette().color(QPalette::Window).name();
@@ -62,7 +64,7 @@ QwtText Zoomer::trackerTextF(const QPointF& pos) const
     QwtText b = ScrollZoomer::trackerTextF(pos);
 
     const QPolygon pa = selection();
-    if (pa.count() < 2)
+    if (!isActive() || pa.count() < 2)
     {
         return b;
     }

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -35,6 +35,7 @@
 #include <iostream>
 
 #include <plot.h>
+#include <barplot.h>
 
 #include "framebufferseries.h"
 #include "utils.h"
@@ -47,11 +48,14 @@
 Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
 #endif
 
+// TODO: depends on tab insertion order, a better solution would be to use object names
 const QMap<int, QString> panelSettingMap({
         {0, "Port"},
         {1, "DataFormat"},
         {2, "Plot"},
-        {3, "Commands"}
+        {3, "Commands"},
+        {4, "Record"},
+        {5, "Log"}
     });
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -59,15 +63,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     aboutDialog(this),
     portControl(&serialPort),
-    channelMan(1, 1, this),
-    snapshotMan(this, &channelMan),
+    secondaryPlot(NULL),
+    snapshotMan(this, &stream),
     commandPanel(&serialPort),
-    dataFormatPanel(&serialPort, &channelMan, &recorder),
-    recordPanel(&recorder, &channelMan)
+    dataFormatPanel(&serialPort),
+    recordPanel(&stream),
+    updateCheckDialog(this)
 {
     ui->setupUi(this);
 
-    plotMan = new PlotManager(ui->plotArea, channelMan.infoModel());
+    plotMan = new PlotManager(ui->plotArea, &plotMenu, &stream);
 
     ui->tabWidget->insertTab(0, &portControl, "Port");
     ui->tabWidget->insertTab(1, &dataFormatPanel, "Data Format");
@@ -80,8 +85,8 @@ MainWindow::MainWindow(QWidget *parent) :
     addToolBar(recordPanel.toolbar());
 
     ui->plotToolBar->addAction(snapshotMan.takeSnapshotAction());
-    ui->menuBar->insertMenu(ui->menuHelp->menuAction(), snapshotMan.menu());
-    ui->menuBar->insertMenu(ui->menuHelp->menuAction(), commandPanel.menu());
+    menuBar()->insertMenu(ui->menuHelp->menuAction(), snapshotMan.menu());
+    menuBar()->insertMenu(ui->menuHelp->menuAction(), commandPanel.menu());
 
     connect(&commandPanel, &CommandPanel::focusRequested, [this]()
             {
@@ -95,22 +100,41 @@ MainWindow::MainWindow(QWidget *parent) :
     setupAboutDialog();
 
     // init view menu
-    for (auto a : plotMan->menuActions())
-    {
-        ui->menuView->addAction(a);
-    }
-
-    ui->menuView->addSeparator();
-
-    QMenu* tbMenu = ui->menuView->addMenu("Toolbars");
+    ui->menuBar->insertMenu(ui->menuSecondary->menuAction(), &plotMenu);
+    plotMenu.addSeparator();
+    QMenu* tbMenu = plotMenu.addMenu("Toolbars");
     tbMenu->addAction(ui->plotToolBar->toggleViewAction());
     tbMenu->addAction(portControl.toolBar()->toggleViewAction());
 
+    // init secondary plot menu
+    auto group = new QActionGroup(this);
+    group->addAction(ui->actionVertical);
+    group->addAction(ui->actionHorizontal);
+
     // init UI signals
+
+    // Secondary plot menu signals
+    connect(ui->actionBarPlot, &QAction::triggered,
+            this, &MainWindow::showBarPlot);
+
+    connect(ui->actionVertical, &QAction::triggered,
+            [this](bool checked)
+            {
+                if (checked) ui->splitter->setOrientation(Qt::Vertical);
+            });
+
+    connect(ui->actionHorizontal, &QAction::triggered,
+            [this](bool checked)
+            {
+                if (checked) ui->splitter->setOrientation(Qt::Horizontal);
+            });
 
     // Help menu signals
     QObject::connect(ui->actionHelpAbout, &QAction::triggered,
               &aboutDialog, &QWidget::show);
+
+    QObject::connect(ui->actionCheckUpdate, &QAction::triggered,
+              &updateCheckDialog, &QWidget::show);
 
     QObject::connect(ui->actionReportBug, &QAction::triggered,
                      [](){QDesktopServices::openUrl(QUrl(BUG_REPORT_URL));});
@@ -147,28 +171,18 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&plotControlPanel, &PlotControlPanel::xScaleChanged,
             plotMan, &PlotManager::setXAxis);
 
+    connect(&plotControlPanel, &PlotControlPanel::plotWidthChanged,
+            plotMan, &PlotManager::setPlotWidth);
+
+    // plot toolbar signals
     QObject::connect(ui->actionClear, SIGNAL(triggered(bool)),
                      this, SLOT(clearPlot()));
 
     QObject::connect(snapshotMan.takeSnapshotAction(), &QAction::triggered,
                      plotMan, &PlotManager::flashSnapshotOverlay);
 
-    // init port signals
-    QObject::connect(&(this->serialPort), SIGNAL(error(QSerialPort::SerialPortError)),
-                     this, SLOT(onPortError(QSerialPort::SerialPortError)));
-
-    // init data format and reader
-    QObject::connect(&channelMan, &ChannelManager::dataAdded,
-                     plotMan, &PlotManager::replot);
-
     QObject::connect(ui->actionPause, &QAction::triggered,
-                     &channelMan, &ChannelManager::pause);
-
-    QObject::connect(&recordPanel, &RecordPanel::recordStarted,
-                     &dataFormatPanel, &DataFormatPanel::startRecording);
-
-    QObject::connect(&recordPanel, &RecordPanel::recordStopped,
-                     &dataFormatPanel, &DataFormatPanel::stopRecording);
+                     &stream, &Stream::pause);
 
     QObject::connect(ui->actionPause, &QAction::triggered,
                      [this](bool enabled)
@@ -195,26 +209,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&serialPort, &QIODevice::aboutToClose,
             &recordPanel, &RecordPanel::onPortClose);
 
-    // init data arrays and plot
+    // init plot
     numOfSamples = plotControlPanel.numOfSamples();
-    unsigned numOfChannels = dataFormatPanel.numOfChannels();
-
-    channelMan.setNumOfSamples(numOfSamples);
-    channelMan.setNumOfChannels(dataFormatPanel.numOfChannels());
-
-    connect(&dataFormatPanel, &DataFormatPanel::numOfChannelsChanged,
-            &channelMan, &ChannelManager::setNumOfChannels);
-
-    connect(&channelMan, &ChannelManager::numOfChannelsChanged,
-            this, &MainWindow::onNumOfChannelsChanged);
-
-    plotControlPanel.setChannelInfoModel(channelMan.infoModel());
-
-    // init curve list
-    for (unsigned int i = 0; i < numOfChannels; i++)
-    {
-        plotMan->addCurve(channelMan.channelName(i), channelMan.channelBuffer(i));
-    }
+    stream.setNumSamples(numOfSamples);
+    plotControlPanel.setChannelInfoModel(stream.infoModel());
 
     // init scales
     plotMan->setYAxis(plotControlPanel.autoScale(),
@@ -222,14 +220,14 @@ MainWindow::MainWindow(QWidget *parent) :
     plotMan->setXAxis(plotControlPanel.xAxisAsIndex(),
                       plotControlPanel.xMin(), plotControlPanel.xMax());
     plotMan->setNumOfSamples(numOfSamples);
+    plotMan->setPlotWidth(plotControlPanel.plotWidth());
 
     // Init sps (sample per second) counter
     spsLabel.setText("0sps");
     spsLabel.setToolTip("samples per second (per channel)");
     ui->statusBar->addPermanentWidget(&spsLabel);
-    QObject::connect(&dataFormatPanel,
-                     &DataFormatPanel::samplesPerSecondChanged,
-                     this, &MainWindow::onSpsChanged);
+    connect(&sampleCounter, &SampleCounter::spsChanged,
+            this, &MainWindow::onSpsChanged);
 
     // init demo
     QObject::connect(ui->actionDemoMode, &QAction::toggled,
@@ -237,6 +235,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(ui->actionDemoMode, &QAction::toggled,
                      plotMan, &PlotManager::showDemoIndicator);
+
+    // init stream connections
+    connect(&dataFormatPanel, &DataFormatPanel::sourceChanged,
+            this, &MainWindow::onSourceChanged);
+    onSourceChanged(dataFormatPanel.activeSource());
 
     // load default settings
     QSettings settings("serialplot", "serialplot");
@@ -279,8 +282,7 @@ void MainWindow::closeEvent(QCloseEvent * event)
         auto clickedButton = QMessageBox::warning(
             this, "Closing SerialPlot",
             "There are un-saved snapshots. If you close you will loose the data.",
-            QMessageBox::Discard | QMessageBox::Discard,
-            QMessageBox::Cancel);
+            QMessageBox::Discard, QMessageBox::Cancel);
         if (clickedButton == QMessageBox::Cancel)
         {
             event->ignore();
@@ -346,104 +348,29 @@ void MainWindow::onPortToggled(bool open)
     ui->actionDemoMode->setEnabled(!open);
 }
 
-void MainWindow::onPortError(QSerialPort::SerialPortError error)
+void MainWindow::onSourceChanged(Source* source)
 {
-    switch(error)
-    {
-        case QSerialPort::NoError :
-            break;
-        case QSerialPort::ResourceError :
-            qWarning() << "Port error: resource unavaliable; most likely device removed.";
-            if (serialPort.isOpen())
-            {
-                qWarning() << "Closing port on resource error: " << serialPort.portName();
-                portControl.togglePort();
-            }
-            portControl.loadPortList();
-            break;
-        case QSerialPort::DeviceNotFoundError:
-            qCritical() << "Device doesn't exists: " << serialPort.portName();
-            break;
-        case QSerialPort::PermissionError:
-            qCritical() << "Permission denied. Either you don't have \
-required privileges or device is already opened by another process.";
-            break;
-        case QSerialPort::OpenError:
-            qWarning() << "Device is already opened!";
-            break;
-        case QSerialPort::NotOpenError:
-            qCritical() << "Device is not open!";
-            break;
-        case QSerialPort::ParityError:
-            qCritical() << "Parity error detected.";
-            break;
-        case QSerialPort::FramingError:
-            qCritical() << "Framing error detected.";
-            break;
-        case QSerialPort::BreakConditionError:
-            qCritical() << "Break condition is detected.";
-            break;
-        case QSerialPort::WriteError:
-            qCritical() << "An error occurred while writing data.";
-            break;
-        case QSerialPort::ReadError:
-            qCritical() << "An error occurred while reading data.";
-            break;
-        case QSerialPort::UnsupportedOperationError:
-            qCritical() << "Operation is not supported.";
-            break;
-        case QSerialPort::TimeoutError:
-            qCritical() << "A timeout error occurred.";
-            break;
-        case QSerialPort::UnknownError:
-            qCritical() << "Unknown error! Error: " << serialPort.errorString();
-            break;
-        default:
-            qCritical() << "Unhandled port error: " << error;
-            break;
-    }
+    source->connectSink(&stream);
+    source->connectSink(&sampleCounter);
 }
 
 void MainWindow::clearPlot()
 {
-    for (unsigned ci = 0; ci < channelMan.numOfChannels(); ci++)
-    {
-        channelMan.channelBuffer(ci)->clear();
-    }
+    stream.clear();
     plotMan->replot();
 }
 
 void MainWindow::onNumOfSamplesChanged(int value)
 {
     numOfSamples = value;
-    channelMan.setNumOfSamples(value);
+    stream.setNumSamples(value);
     plotMan->replot();
 }
 
-void MainWindow::onNumOfChannelsChanged(unsigned value)
+void MainWindow::onSpsChanged(float sps)
 {
-    unsigned int oldNum = plotMan->numOfCurves();
-    unsigned numOfChannels = value;
-
-    if (numOfChannels > oldNum)
-    {
-        // add new channels
-        for (unsigned int i = oldNum; i < numOfChannels; i++)
-        {
-            plotMan->addCurve(channelMan.channelName(i), channelMan.channelBuffer(i));
-        }
-    }
-    else if(numOfChannels < oldNum)
-    {
-        plotMan->removeCurves(oldNum - numOfChannels);
-    }
-
-    plotMan->replot();
-}
-
-void MainWindow::onSpsChanged(unsigned sps)
-{
-    spsLabel.setText(QString::number(sps) + "sps");
+    int precision = sps < 1. ? 3 : 0;
+    spsLabel.setText(QString::number(sps, 'f', precision) + "sps");
 }
 
 bool MainWindow::isDemoRunning()
@@ -471,6 +398,48 @@ void MainWindow::enableDemo(bool enabled)
     }
 }
 
+void MainWindow::showSecondary(QWidget* wid)
+{
+    if (secondaryPlot != NULL)
+    {
+        secondaryPlot->deleteLater();
+    }
+
+    secondaryPlot = wid;
+    ui->splitter->addWidget(wid);
+    ui->splitter->setStretchFactor(0, 1);
+    ui->splitter->setStretchFactor(1, 0);
+}
+
+void MainWindow::hideSecondary()
+{
+    if (secondaryPlot == NULL)
+    {
+        qFatal("Secondary plot doesn't exist!");
+    }
+
+    secondaryPlot->deleteLater();
+    secondaryPlot = NULL;
+}
+
+void MainWindow::showBarPlot(bool show)
+{
+    if (show)
+    {
+        auto plot = new BarPlot(&stream, &plotMenu);
+        plot->setYAxis(plotControlPanel.autoScale(),
+                       plotControlPanel.yMin(),
+                       plotControlPanel.yMax());
+        connect(&plotControlPanel, &PlotControlPanel::yScaleChanged,
+                plot, &BarPlot::setYAxis);
+        showSecondary(plot);
+    }
+    else
+    {
+        hideSecondary();
+    }
+}
+
 void MainWindow::onExportCsv()
 {
     bool wasPaused = ui->actionPause->isChecked();
@@ -492,7 +461,7 @@ void MainWindow::onExportCsv()
 
 PlotViewSettings MainWindow::viewSettings() const
 {
-    return plotMan->viewSettings();
+    return plotMenu.viewSettings();
 }
 
 void MainWindow::messageHandler(QtMsgType type,
@@ -541,11 +510,12 @@ void MainWindow::saveAllSettings(QSettings* settings)
     saveMWSettings(settings);
     portControl.saveSettings(settings);
     dataFormatPanel.saveSettings(settings);
-    channelMan.saveSettings(settings);
+    stream.saveSettings(settings);
     plotControlPanel.saveSettings(settings);
-    plotMan->saveSettings(settings);
+    plotMenu.saveSettings(settings);
     commandPanel.saveSettings(settings);
     recordPanel.saveSettings(settings);
+    updateCheckDialog.saveSettings(settings);
 }
 
 void MainWindow::loadAllSettings(QSettings* settings)
@@ -553,11 +523,12 @@ void MainWindow::loadAllSettings(QSettings* settings)
     loadMWSettings(settings);
     portControl.loadSettings(settings);
     dataFormatPanel.loadSettings(settings);
-    channelMan.loadSettings(settings);
+    stream.loadSettings(settings);
     plotControlPanel.loadSettings(settings);
-    plotMan->loadSettings(settings);
+    plotMenu.loadSettings(settings);
     commandPanel.loadSettings(settings);
     recordPanel.loadSettings(settings);
+    updateCheckDialog.loadSettings(settings);
 }
 
 void MainWindow::saveMWSettings(QSettings* settings)

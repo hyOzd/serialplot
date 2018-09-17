@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -17,7 +17,7 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QActionGroup>
+#include <algorithm>
 #include <QMetaEnum>
 #include <QtDebug>
 #include "qwt_symbol.h"
@@ -27,25 +27,69 @@
 #include "utils.h"
 #include "setting_defines.h"
 
-PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject *parent) :
-    QObject(parent),
-    _plotArea(plotArea),
-    showGridAction("&Grid", this),
-    showMinorGridAction("&Minor Grid", this),
-    unzoomAction("&Unzoom", this),
-    darkBackgroundAction("&Dark Background", this),
-    showLegendAction("&Legend", this),
-    showMultiAction("Multi &Plot", this),
-    setSymbolsAction("Symbols", this)
+PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
+                         const Stream* stream, QObject* parent) :
+    QObject(parent)
 {
+    construct(plotArea, menu);
+    _stream = stream;
+    if (_stream == NULL) return;
+
+    // connect to ChannelInfoModel
+    infoModel = _stream->infoModel();
+    connect(infoModel, &QAbstractItemModel::dataChanged,
+                this, &PlotManager::onChannelInfoChanged);
+    connect(infoModel, &QAbstractItemModel::modelReset,
+            [this]()
+            {
+                onChannelInfoChanged(infoModel->index(0, 0), // start
+                                     infoModel->index(infoModel->rowCount()-1, 0), // end
+                                     {}); // roles ignored
+            });
+
+    connect(stream, &Stream::numChannelsChanged, this, &PlotManager::onNumChannelsChanged);
+    connect(stream, &Stream::dataAdded, this, &PlotManager::replot);
+
+    // add initial curves if any?
+    for (unsigned int i = 0; i < stream->numChannels(); i++)
+    {
+        addCurve(stream->channel(i)->name(), stream->channel(i)->yData());
+    }
+
+}
+
+PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
+                         Snapshot* snapshot, QObject *parent) :
+    QObject(parent)
+{
+    construct(plotArea, menu);
+
+    setNumOfSamples(snapshot->numSamples());
+    setPlotWidth(snapshot->numSamples());
+    infoModel = snapshot->infoModel();
+
+    for (unsigned ci = 0; ci < snapshot->numChannels(); ci++)
+    {
+        addCurve(snapshot->channelName(ci), snapshot->yData[ci]);
+    }
+
+    connect(infoModel, &QAbstractItemModel::dataChanged,
+            this, &PlotManager::onChannelInfoChanged);
+}
+
+void PlotManager::construct(QWidget* plotArea, PlotMenu* menu)
+{
+    _menu = menu;
+    _plotArea = plotArea;
     _autoScaled = true;
     _yMin = 0;
     _yMax = 1;
     _xAxisAsIndex = true;
     isDemoShown = false;
-    _infoModel = infoModel;
     _numOfSamples = 1;
+    _plotWidth = 1;
     showSymbols = Plot::ShowSymbolsAuto;
+    emptyPlot = NULL;
 
     // initalize layout and single widget
     isMulti = false;
@@ -53,93 +97,28 @@ PlotManager::PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel, QObject
     setupLayout(isMulti);
     addPlotWidget();
 
-    // initialize menu actions
-    showGridAction.setToolTip("Show Grid");
-    showMinorGridAction.setToolTip("Show Minor Grid");
-    unzoomAction.setToolTip("Unzoom the Plot");
-    darkBackgroundAction.setToolTip("Enable Dark Plot Background");
-    showLegendAction.setToolTip("Display the Legend on Plot");
-    showMultiAction.setToolTip("Display All Channels Separately");
-    setSymbolsAction.setToolTip("Show/Hide symbols");
+    // connect to  menu
+    connect(menu, &PlotMenu::symbolShowChanged, this, &PlotManager:: setSymbols);
 
-    showGridAction.setShortcut(QKeySequence("G"));
-    showMinorGridAction.setShortcut(QKeySequence("M"));
-
-    showGridAction.setCheckable(true);
-    showMinorGridAction.setCheckable(true);
-    darkBackgroundAction.setCheckable(true);
-    showLegendAction.setCheckable(true);
-    showMultiAction.setCheckable(true);
-
-    showGridAction.setChecked(false);
-    showMinorGridAction.setChecked(false);
-    darkBackgroundAction.setChecked(false);
-    showLegendAction.setChecked(true);
-    showMultiAction.setChecked(false);
-
-    showMinorGridAction.setEnabled(false);
-
-    // setup symbols menu
-    setSymbolsAutoAct = setSymbolsMenu.addAction("Show When Zoomed");
-    setSymbolsAutoAct->setCheckable(true);
-    setSymbolsAutoAct->setChecked(true);
-    connect(setSymbolsAutoAct, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
-            [this](bool checked)
-            {
-                if (checked) setSymbols(Plot::ShowSymbolsAuto);
-            });
-    setSymbolsShowAct = setSymbolsMenu.addAction("Always Show");
-    setSymbolsShowAct->setCheckable(true);
-    connect(setSymbolsShowAct, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
-            [this](bool checked)
-            {
-                if (checked) setSymbols(Plot::ShowSymbolsShow);
-            });
-    setSymbolsHideAct = setSymbolsMenu.addAction("Always Hide");
-    setSymbolsHideAct->setCheckable(true);
-    connect(setSymbolsHideAct, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
-            [this](bool checked)
-            {
-                if (checked) setSymbols(Plot::ShowSymbolsHide);
-            });
-    setSymbolsAction.setMenu(&setSymbolsMenu);
-
-    // add symbol actions to same group so that they appear as radio buttons
-    auto group = new QActionGroup(this);
-    group->addAction(setSymbolsAutoAct);
-    group->addAction(setSymbolsShowAct);
-    group->addAction(setSymbolsHideAct);
-
-    connect(&showGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+    connect(&menu->showGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
             this, &PlotManager::showGrid);
-    connect(&showGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
-            &showMinorGridAction, &QAction::setEnabled);
-    connect(&showMinorGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+    connect(&menu->showMinorGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
             this, &PlotManager::showMinorGrid);
-    connect(&unzoomAction, &QAction::triggered, this, &PlotManager::unzoom);
-    connect(&darkBackgroundAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+    connect(&menu->darkBackgroundAction, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
             this, &PlotManager::darkBackground);
-    connect(&showLegendAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+    connect(&menu->showLegendAction, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
             this, &PlotManager::showLegend);
-    connect(&showLegendAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
-            this, &PlotManager::showLegend);
-    connect(&showMultiAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+    connect(&menu->showMultiAction, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
             this, &PlotManager::setMulti);
+    connect(&menu->unzoomAction, &QAction::triggered,
+            this, &PlotManager::unzoom);
 
-    // connect to channel info model
-    if (_infoModel != NULL)     // TODO: remove when snapshots have infomodel
-    {
-        connect(_infoModel, &QAbstractItemModel::dataChanged,
-                this, &PlotManager::onChannelInfoChanged);
-
-        connect(_infoModel, &QAbstractItemModel::modelReset,
-                [this]()
-                {
-                    onChannelInfoChanged(_infoModel->index(0, 0), // start
-                                         _infoModel->index(_infoModel->rowCount()-1, 0), // end
-                                         {}); // roles ignored
-                });
-    }
+    // initial settings from menu actions
+    showGrid(menu->showGridAction.isChecked());
+    showMinorGrid(menu->showMinorGridAction.isChecked());
+    darkBackground(menu->darkBackgroundAction.isChecked());
+    showLegend(menu->showLegendAction.isChecked());
+    setMulti(menu->showMultiAction.isChecked());
 }
 
 PlotManager::~PlotManager()
@@ -156,6 +135,28 @@ PlotManager::~PlotManager()
     }
 
     if (scrollArea != NULL) delete scrollArea;
+    if (emptyPlot != NULL) delete emptyPlot;
+}
+
+void PlotManager::onNumChannelsChanged(unsigned value)
+{
+    unsigned int oldNum = numOfCurves();
+    unsigned numOfChannels = value;
+
+    if (numOfChannels > oldNum)
+    {
+        // add new channels
+        for (unsigned int i = oldNum; i < numOfChannels; i++)
+        {
+            addCurve(_stream->channel(i)->name(), _stream->channel(i)->yData());
+        }
+    }
+    else if(numOfChannels < oldNum)
+    {
+        removeCurves(oldNum - numOfChannels);
+    }
+
+    replot();
 }
 
 void PlotManager::onChannelInfoChanged(const QModelIndex &topLeft,
@@ -189,12 +190,28 @@ void PlotManager::onChannelInfoChanged(const QModelIndex &topLeft,
         }
     }
 
+    checkNoVisChannels();
+
     // replot single widget
     if (!isMulti)
     {
         plotWidgets[0]->updateSymbols();
         plotWidgets[0]->updateLegend();
         replot();
+    }
+}
+
+void PlotManager::checkNoVisChannels()
+{
+    // if all channels are hidden show indicator
+    bool allhidden = std::none_of(curves.cbegin(), curves.cend(),
+                                  [](QwtPlotCurve* c) {return c->isVisible();});
+
+    plotWidgets[0]->showNoChannel(allhidden);
+    if (isMulti)
+    {
+        plotWidgets[0]->showNoChannel(allhidden);
+        plotWidgets[0]->setVisible(true);
     }
 }
 
@@ -224,7 +241,9 @@ void PlotManager::setMulti(bool enabled)
         // add new widgets and attach
         for (auto curve : curves)
         {
-            curve->attach(addPlotWidget());
+            auto plot = addPlotWidget();
+            plot->setVisible(curve->isVisible());
+            curve->attach(plot);
         }
     }
     else
@@ -237,6 +256,12 @@ void PlotManager::setMulti(bool enabled)
         {
             curve->attach(plot);
         }
+    }
+
+    // will skip if no plot widgets exist (can happen during constructor)
+    if (plotWidgets.length())
+    {
+        checkNoVisChannels();
     }
 }
 
@@ -284,15 +309,17 @@ Plot* PlotManager::addPlotWidget()
     plotWidgets.append(plot);
     layout->addWidget(plot);
 
-    plot->darkBackground(darkBackgroundAction.isChecked());
-    plot->showGrid(showGridAction.isChecked());
-    plot->showMinorGrid(showMinorGridAction.isChecked());
-    plot->showLegend(showLegendAction.isChecked());
+    plot->darkBackground(_menu->darkBackgroundAction.isChecked());
+    plot->showGrid(_menu->showGridAction.isChecked());
+    plot->showMinorGrid(_menu->showMinorGridAction.isChecked());
+    plot->showLegend(_menu->showLegendAction.isChecked());
+    plot->setSymbols(_menu->showSymbols());
+
     plot->showDemoIndicator(isDemoShown);
     plot->setYAxis(_autoScaled, _yMin, _yMax);
     plot->setNumOfSamples(_numOfSamples);
-    plot->setSymbols(showSymbols);
 
+    plot->setPlotWidth(_plotWidth);
     if (_xAxisAsIndex)
     {
         plot->setXAxis(0, _numOfSamples);
@@ -305,19 +332,12 @@ Plot* PlotManager::addPlotWidget()
     return plot;
 }
 
-void PlotManager::addCurve(QString title, FrameBuffer* buffer)
+void PlotManager::addCurve(QString title, const FrameBuffer* buffer)
 {
     auto curve = new QwtPlotCurve(title);
     auto series = new FrameBufferSeries(buffer);
     series->setXAxis(_xAxisAsIndex, _xMin, _xMax);
     curve->setSamples(series);
-    _addCurve(curve);
-}
-
-void PlotManager::addCurve(QString title, QVector<QPointF> data)
-{
-    auto curve = new QwtPlotCurve(title);
-    curve->setSamples(data);
     _addCurve(curve);
 }
 
@@ -327,7 +347,7 @@ void PlotManager::_addCurve(QwtPlotCurve* curve)
     curves.append(curve);
 
     unsigned index = curves.size()-1;
-    auto color = _infoModel->color(index);
+    auto color = infoModel->color(index);
     curve->setPen(color);
 
     // create the plot for the curve if we are on multi display
@@ -367,13 +387,6 @@ unsigned PlotManager::numOfCurves()
     return curves.size();
 }
 
-void PlotManager::setTitle(unsigned index, QString title)
-{
-    curves[index]->setTitle(title);
-
-    plotWidget(index)->replot();
-}
-
 Plot* PlotManager::plotWidget(unsigned curveIndex)
 {
     if (isMulti)
@@ -392,19 +405,6 @@ void PlotManager::replot()
     {
         plot->replot();
     }
-}
-
-QList<QAction*> PlotManager::menuActions()
-{
-    QList<QAction*> actions;
-    actions << &showGridAction;
-    actions << &showMinorGridAction;
-    actions << &unzoomAction;
-    actions << &darkBackgroundAction;
-    actions << &showLegendAction;
-    actions << &showMultiAction;
-    actions << &setSymbolsAction;
-    return actions;
 }
 
 void PlotManager::showGrid(bool show)
@@ -483,7 +483,6 @@ void PlotManager::setXAxis(bool asIndex, double xMin, double xMax)
     _xMax = xMax;
     for (auto curve : curves)
     {
-        // TODO: what happens when addCurve(QVector) is used?
         FrameBufferSeries* series = static_cast<FrameBufferSeries*>(curve->data());
         series->setXAxis(asIndex, xMin, xMax);
     }
@@ -505,7 +504,7 @@ void PlotManager::flashSnapshotOverlay()
 {
     for (auto plot : plotWidgets)
     {
-        plot->flashSnapshotOverlay(darkBackgroundAction.isChecked());
+        plot->flashSnapshotOverlay(_menu->darkBackgroundAction.isChecked());
     }
 }
 
@@ -519,114 +518,11 @@ void PlotManager::setNumOfSamples(unsigned value)
     }
 }
 
-PlotViewSettings PlotManager::viewSettings() const
+void PlotManager::setPlotWidth(double width)
 {
-    return PlotViewSettings(
-        {
-            showGridAction.isChecked(),
-            showMinorGridAction.isChecked(),
-            darkBackgroundAction.isChecked(),
-            showLegendAction.isChecked(),
-            showMultiAction.isChecked(),
-            showSymbols
-        });
-}
-
-void PlotManager::setViewSettings(const PlotViewSettings& settings)
-{
-    showGridAction.setChecked(settings.showGrid);
-    showGrid(settings.showGrid);
-    showMinorGridAction.setChecked(settings.showMinorGrid);
-    showMinorGrid(settings.showMinorGrid);
-    darkBackgroundAction.setChecked(settings.darkBackground);
-    darkBackground(settings.darkBackground);
-    showLegendAction.setChecked(settings.showLegend);
-    showLegend(settings.showLegend);
-    showMultiAction.setChecked(settings.showMulti);
-    setMulti(settings.showMulti);
-
-    setSymbols(settings.showSymbols);
-    if (showSymbols == Plot::ShowSymbolsAuto)
+    _plotWidth = width;
+    for (auto plot : plotWidgets)
     {
-        setSymbolsAutoAct->setChecked(true);
+        plot->setPlotWidth(width);
     }
-    else if (showSymbols == Plot::ShowSymbolsShow)
-    {
-        setSymbolsShowAct->setChecked(true);
-    }
-    else
-    {
-        setSymbolsHideAct->setChecked(true);
-    }
-}
-
-void PlotManager::saveSettings(QSettings* settings)
-{
-    settings->beginGroup(SettingGroup_Plot);
-    settings->setValue(SG_Plot_DarkBackground, darkBackgroundAction.isChecked());
-    settings->setValue(SG_Plot_Grid, showGridAction.isChecked());
-    settings->setValue(SG_Plot_MinorGrid, showMinorGridAction.isChecked());
-    settings->setValue(SG_Plot_Legend, showLegendAction.isChecked());
-    settings->setValue(SG_Plot_MultiPlot, showMultiAction.isChecked());
-
-    QString showSymbolsStr;
-    if (showSymbols == Plot::ShowSymbolsAuto)
-    {
-        showSymbolsStr = "auto";
-    }
-    else if (showSymbols == Plot::ShowSymbolsShow)
-    {
-        showSymbolsStr = "show";
-    }
-    else
-    {
-        showSymbolsStr = "hide";
-    }
-    settings->setValue(SG_Plot_Symbols, showSymbolsStr);
-
-    settings->endGroup();
-}
-
-void PlotManager::loadSettings(QSettings* settings)
-{
-    settings->beginGroup(SettingGroup_Plot);
-    darkBackgroundAction.setChecked(
-        settings->value(SG_Plot_DarkBackground, darkBackgroundAction.isChecked()).toBool());
-    darkBackground(darkBackgroundAction.isChecked());
-    showGridAction.setChecked(
-        settings->value(SG_Plot_Grid, showGridAction.isChecked()).toBool());
-    showGrid(showGridAction.isChecked());
-    showMinorGridAction.setChecked(
-        settings->value(SG_Plot_MinorGrid, showMinorGridAction.isChecked()).toBool());
-    showMinorGridAction.setEnabled(showGridAction.isChecked());
-    showMinorGrid(showMinorGridAction.isChecked());
-    showLegendAction.setChecked(
-        settings->value(SG_Plot_Legend, showLegendAction.isChecked()).toBool());
-    showLegend(showLegendAction.isChecked());
-    showMultiAction.setChecked(
-        settings->value(SG_Plot_MultiPlot, showMultiAction.isChecked()).toBool());
-    setMulti(showMultiAction.isChecked());
-
-    QString showSymbolsStr = settings->value(SG_Plot_Symbols, QString()).toString();
-    if (showSymbolsStr == "auto")
-    {
-        setSymbols(Plot::ShowSymbolsAuto);
-        setSymbolsAutoAct->setChecked(true);
-    }
-    else if (showSymbolsStr == "show")
-    {
-        setSymbols(Plot::ShowSymbolsShow);
-        setSymbolsShowAct->setChecked(true);
-    }
-    else if (showSymbolsStr == "hide")
-    {
-        setSymbols(Plot::ShowSymbolsHide);
-        setSymbolsHideAct->setChecked(true);
-    }
-    else
-    {
-        qCritical() << "Invalid symbol setting:" << showSymbolsStr;
-    }
-
-    settings->endGroup();
 }

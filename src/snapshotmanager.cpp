@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -22,6 +22,7 @@
 #include <QKeySequence>
 #include <QFileDialog>
 #include <QFile>
+#include <QTextStream>
 #include <QVector>
 #include <QPointF>
 #include <QIcon>
@@ -31,14 +32,14 @@
 #include "snapshotmanager.h"
 
 SnapshotManager::SnapshotManager(MainWindow* mainWindow,
-                                 ChannelManager* channelMan) :
+                                 Stream* stream) :
     _menu("&Snapshots"),
     _takeSnapshotAction("&Take Snapshot", this),
     loadSnapshotAction("&Load Snapshots", this),
     clearAction("&Clear Snapshots", this)
 {
     _mainWindow = mainWindow;
-    _channelMan = channelMan;
+    _stream = stream;
 
     _takeSnapshotAction.setToolTip("Take a snapshot of current plot");
     _takeSnapshotAction.setShortcut(QKeySequence("F5"));
@@ -63,21 +64,14 @@ SnapshotManager::~SnapshotManager()
     }
 }
 
-Snapshot* SnapshotManager::makeSnapshot()
+Snapshot* SnapshotManager::makeSnapshot() const
 {
     QString name = QTime::currentTime().toString("'Snapshot ['HH:mm:ss']'");
-    auto snapshot = new Snapshot(_mainWindow, name, *(_channelMan->infoModel()));
+    auto snapshot = new Snapshot(_mainWindow, name, *(_stream->infoModel()));
 
-    unsigned numOfChannels = _channelMan->numOfChannels();
-    unsigned numOfSamples = _channelMan->numOfSamples();
-
-    for (unsigned ci = 0; ci < numOfChannels; ci++)
+    for (unsigned ci = 0; ci < _stream->numChannels(); ci++)
     {
-        snapshot->data.append(QVector<QPointF>(numOfSamples));
-        for (unsigned i = 0; i < numOfSamples; i++)
-        {
-            snapshot->data[ci][i] = QPointF(i, _channelMan->channelBuffer(ci)->sample(i));
-        }
+        snapshot->yData.append(new ReadOnlyBuffer(_stream->channel(ci)->yData()));
     }
 
     return snapshot;
@@ -158,18 +152,20 @@ void SnapshotManager::loadSnapshotFromFile(QString fileName)
     unsigned numOfChannels = channelNames.size();
 
     // read data
-    QVector<QVector<QPointF>> data(numOfChannels);
+    QVector<QVector<double>> data(numOfChannels);
+    QTextStream ts(&file);
+    QString line;
     unsigned lineNum = 1;
-    while (file.canReadLine())
+    while (ts.readLineInto(&line))
     {
         // parse line
-        auto line = QString(file.readLine());
         auto split = line.split(',');
 
         if (split.size() != (int) numOfChannels)
         {
             qCritical() << "Parsing error at line " << lineNum
                         << ": number of columns is not consistent.";
+            qCritical() << "Line " << lineNum << ": " << line;
             return;
         }
 
@@ -186,16 +182,20 @@ void SnapshotManager::loadSnapshotFromFile(QString fileName)
                             << "\" to double.";
                 return;
             }
-            data[ci].append(QPointF(lineNum-1, y));
+            data[ci].append(y);
         }
         lineNum++;
     }
 
-    ChannelInfoModel channelInfo(channelNames);
-
+    // create snapshot
     auto snapshot = new Snapshot(
-        _mainWindow, QFileInfo(fileName).baseName(), ChannelInfoModel(channelNames));
-    snapshot->data = data;
+        _mainWindow, QFileInfo(fileName).baseName(),
+        ChannelInfoModel(channelNames), true);
+
+    for (unsigned ci = 0; ci < numOfChannels; ci++)
+    {
+        snapshot->yData.append(new ReadOnlyBuffer(data[ci].data(), data[ci].size()));
+    }
 
     addSnapshot(snapshot, false);
 }

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -23,26 +23,27 @@
 SnapshotView::SnapshotView(MainWindow* parent, Snapshot* snapshot) :
     QMainWindow(parent),
     ui(new Ui::SnapshotView),
-    renameDialog(this)
+    renameDialog(this),
+    plotMenu(parent->viewSettings())
 {
     _snapshot = snapshot;
 
     ui->setupUi(this);
 
-    plotMan = new PlotManager(ui->plotArea, snapshot->infoModel(), this);
-    plotMan->setViewSettings(parent->viewSettings());
+    plotMan = new PlotManager(ui->plotArea, &plotMenu, snapshot, this);
 
     ui->menuSnapshot->insertAction(ui->actionClose, snapshot->deleteAction());
     this->setWindowTitle(snapshot->displayName());
 
     // initialize curves
-    unsigned numOfChannels = snapshot->data.size();
-    unsigned numOfSamples = snapshot->data[0].size();
-    for (unsigned ci = 0; ci < numOfChannels; ci++)
-    {
-        plotMan->addCurve(snapshot->channelName(ci), snapshot->data[ci]);
-    }
-    plotMan->setNumOfSamples(numOfSamples);
+    // unsigned numOfChannels = snapshot->data.size();
+    // unsigned numOfSamples = snapshot->data[0].size();
+    // for (unsigned ci = 0; ci < numOfChannels; ci++)
+    // {
+    //     plotMan->addCurve(snapshot->channelName(ci), snapshot->data[ci]);
+    // }
+    // plotMan->setNumOfSamples(numOfSamples);
+    // plotMan->setPlotWidth(numOfSamples);
 
     renameDialog.setWindowTitle("Rename Snapshot");
     renameDialog.setLabelText("Enter new name:");
@@ -52,11 +53,8 @@ SnapshotView::SnapshotView(MainWindow* parent, Snapshot* snapshot) :
     connect(ui->actionSave, &QAction::triggered,
             this, &SnapshotView::save);
 
-    // add 'View' menu items
-    for (auto a : plotMan->menuActions())
-    {
-        ui->menuView->addAction(a);
-    }
+    // add "View" menu
+    menuBar()->insertMenu(NULL, &plotMenu);
 }
 
 SnapshotView::~SnapshotView()

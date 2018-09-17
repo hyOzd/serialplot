@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -48,6 +48,8 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     ui->setupUi(this);
 
     serialPort = port;
+    connect(serialPort, SIGNAL(error(QSerialPort::SerialPortError)),
+            this, SLOT(onPortError(QSerialPort::SerialPortError)));
 
     // setup actions
     openAction.setCheckable(true);
@@ -129,6 +131,40 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     QObject::connect(&flowControlButtons,
                      SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
                      this, &PortControl::selectFlowControl);
+
+    // initialize signal leds
+    ui->ledDTR->setOn(true);
+    ui->ledRTS->setOn(true);
+
+    // connect output signals
+    connect(ui->pbDTR, &QPushButton::clicked, [this]()
+            {
+                // toggle DTR
+                ui->ledDTR->toggle();
+                if (serialPort->isOpen())
+                {
+                    serialPort->setDataTerminalReady(ui->ledDTR->isOn());
+                }
+            });
+
+    connect(ui->pbRTS, &QPushButton::clicked, [this]()
+            {
+                // toggle RTS
+                ui->ledRTS->toggle();
+                if (serialPort->isOpen())
+                {
+                    serialPort->setRequestToSend(ui->ledRTS->isOn());
+                }
+            });
+
+    // setup pin update leds
+    ui->ledDCD->setColor(Qt::yellow);
+    ui->ledDSR->setColor(Qt::yellow);
+    ui->ledRI->setColor(Qt::yellow);
+    ui->ledCTS->setColor(Qt::yellow);
+
+    pinUpdateTimer.setInterval(1000); // ms
+    connect(&pinUpdateTimer, &QTimer::timeout, this, &PortControl::updatePinLeds);
 
     loadPortList();
     loadBaudRateList();
@@ -221,6 +257,7 @@ void PortControl::togglePort()
 {
     if (serialPort->isOpen())
     {
+        pinUpdateTimer.stop();
         serialPort->close();
         qDebug() << "Closed port:" << serialPort->portName();
         emit portToggled(false);
@@ -257,6 +294,14 @@ void PortControl::togglePort()
             selectDataBits((QSerialPort::DataBits) dataBitsButtons.checkedId());
             selectStopBits((QSerialPort::StopBits) stopBitsButtons.checkedId());
             selectFlowControl((QSerialPort::FlowControl) flowControlButtons.checkedId());
+
+            // set output signals
+            serialPort->setDataTerminalReady(ui->ledDTR->isOn());
+            serialPort->setRequestToSend(ui->ledRTS->isOn());
+
+            // update pin signals
+            updatePinLeds();
+            pinUpdateTimer.start();
 
             qDebug() << "Opened port:" << serialPort->portName();
             emit portToggled(true);
@@ -317,6 +362,73 @@ void PortControl::onCbPortListActivated(int index)
 void PortControl::onTbPortListActivated(int index)
 {
     ui->cbPortList->setCurrentIndex(index);
+}
+
+void PortControl::onPortError(QSerialPort::SerialPortError error)
+{
+    switch(error)
+    {
+        case QSerialPort::NoError :
+            break;
+        case QSerialPort::ResourceError :
+            qWarning() << "Port error: resource unavaliable; most likely device removed.";
+            if (serialPort->isOpen())
+            {
+                qWarning() << "Closing port on resource error: " << serialPort->portName();
+                togglePort();
+            }
+            loadPortList();
+            break;
+        case QSerialPort::DeviceNotFoundError:
+            qCritical() << "Device doesn't exists: " << serialPort->portName();
+            break;
+        case QSerialPort::PermissionError:
+            qCritical() << "Permission denied. Either you don't have \
+required privileges or device is already opened by another process.";
+            break;
+        case QSerialPort::OpenError:
+            qWarning() << "Device is already opened!";
+            break;
+        case QSerialPort::NotOpenError:
+            qCritical() << "Device is not open!";
+            break;
+        case QSerialPort::ParityError:
+            qCritical() << "Parity error detected.";
+            break;
+        case QSerialPort::FramingError:
+            qCritical() << "Framing error detected.";
+            break;
+        case QSerialPort::BreakConditionError:
+            qCritical() << "Break condition is detected.";
+            break;
+        case QSerialPort::WriteError:
+            qCritical() << "An error occurred while writing data.";
+            break;
+        case QSerialPort::ReadError:
+            qCritical() << "An error occurred while reading data.";
+            break;
+        case QSerialPort::UnsupportedOperationError:
+            qCritical() << "Operation is not supported.";
+            break;
+        case QSerialPort::TimeoutError:
+            qCritical() << "A timeout error occurred.";
+            break;
+        case QSerialPort::UnknownError:
+            qCritical() << "Unknown error! Error: " << serialPort->errorString();
+            break;
+        default:
+            qCritical() << "Unhandled port error: " << error;
+            break;
+    }
+}
+
+void PortControl::updatePinLeds(void)
+{
+    auto pins = serialPort->pinoutSignals();
+    ui->ledDCD->setOn(pins & QSerialPort::DataCarrierDetectSignal);
+    ui->ledDSR->setOn(pins & QSerialPort::DataSetReadySignal);
+    ui->ledRI->setOn(pins & QSerialPort::RingIndicatorSignal);
+    ui->ledCTS->setOn(pins & QSerialPort::ClearToSendSignal);
 }
 
 QString PortControl::currentParityText()

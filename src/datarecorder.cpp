@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -19,6 +19,9 @@
 
 #include "datarecorder.h"
 
+#include <QFileInfo>
+#include <QDir>
+#include <QDateTime>
 #include <QtDebug>
 
 DataRecorder::DataRecorder(QObject *parent) :
@@ -28,12 +31,25 @@ DataRecorder::DataRecorder(QObject *parent) :
     lastNumChannels = 0;
     disableBuffering = false;
     windowsLE = false;
+    timestampEn = false;
 }
 
-bool DataRecorder::startRecording(QString fileName, QString separator, QStringList channelNames)
+bool DataRecorder::startRecording(QString fileName, QString separator,
+                                  QStringList channelNames, bool insertTime)
 {
     Q_ASSERT(!file.isOpen());
     _sep =  separator;
+    timestampEn = insertTime;
+
+    // create directory if it doesn't exist
+    {
+        QFileInfo fi(fileName);
+        if (!fi.dir().mkpath("."))
+        {
+            qCritical() << "Failed to create directory for: " << fileName;
+            return false;
+        }
+    }
 
     // open file
     file.setFileName(fileName);
@@ -47,6 +63,10 @@ bool DataRecorder::startRecording(QString fileName, QString separator, QStringLi
     // write header line
     if (!channelNames.isEmpty())
     {
+        if (timestampEn)
+        {
+            fileStream << tr("timestamp") << _sep;
+        }
         fileStream << channelNames.join(_sep);
         fileStream << le();
         lastNumChannels = channelNames.length();
@@ -54,26 +74,35 @@ bool DataRecorder::startRecording(QString fileName, QString separator, QStringLi
     return true;
 }
 
-void DataRecorder::addData(double* data, unsigned length, unsigned numOfChannels)
+void DataRecorder::feedIn(const SamplePack& data)
 {
-    Q_ASSERT(length > 0);
-    Q_ASSERT(length % numOfChannels == 0);
+    Q_ASSERT(file.isOpen());    // recorder should be disconnected before stopping recording
+    Q_ASSERT(!data.hasX());     // NYI
 
-    if (lastNumChannels != 0 && numOfChannels != lastNumChannels)
+    // check if number of channels has changed during recording and warn
+    unsigned numChannels = data.numChannels();
+    if (lastNumChannels != 0 && numChannels != lastNumChannels)
     {
         qWarning() << "Number of channels changed from " << lastNumChannels
-                   << " to " << numOfChannels <<
+                   << " to " << numChannels <<
             " during recording, CSV file is corrupted but no data will be lost.";
     }
-    lastNumChannels = numOfChannels;
+    lastNumChannels = numChannels;
 
-    unsigned numOfSamples = length / numOfChannels; // per channel
-    for (unsigned int i = 0; i < numOfSamples; i++)
+    // write data
+    qint64 timestamp;
+    if (timestampEn) timestamp = QDateTime::currentMSecsSinceEpoch();
+    unsigned numSamples = data.numSamples();
+    for (unsigned int i = 0; i < numSamples; i++)
     {
-        for (unsigned ci = 0; ci < numOfChannels; ci++)
+        if (timestampEn)
         {
-            fileStream << data[ci * numOfSamples + i];
-            if (ci != numOfChannels-1) fileStream << _sep;
+            fileStream << timestamp << _sep;
+        }
+        for (unsigned ci = 0; ci < numChannels; ci++)
+        {
+            fileStream << data.data(ci)[i];
+            if (ci != numChannels-1) fileStream << _sep;
         }
         fileStream << le();
     }

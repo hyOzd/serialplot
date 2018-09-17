@@ -14,15 +14,26 @@
    <string>SerialPlot</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QWidget" name="plotArea" native="true">
+     <widget class="QSplitter" name="splitter">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QWidget" name="plotArea" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
      </widget>
     </item>
     <item>
@@ -90,7 +101,7 @@
      <x>0</x>
      <y>0</y>
      <width>653</width>
-     <height>27</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp">
@@ -99,6 +110,7 @@
     </property>
     <addaction name="actionDemoMode"/>
     <addaction name="actionReportBug"/>
+    <addaction name="actionCheckUpdate"/>
     <addaction name="actionHelpAbout"/>
    </widget>
    <widget class="QMenu" name="menuFile">
@@ -111,13 +123,17 @@
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
-   <widget class="QMenu" name="menuView">
+   <widget class="QMenu" name="menuSecondary">
     <property name="title">
-     <string>&amp;View</string>
+     <string>Secondary</string>
     </property>
+    <addaction name="actionBarPlot"/>
+    <addaction name="separator"/>
+    <addaction name="actionHorizontal"/>
+    <addaction name="actionVertical"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuView"/>
+   <addaction name="menuSecondary"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="plotToolBar">
@@ -142,7 +158,8 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset theme="player_pause"/>
+    <iconset theme="player_pause">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Pause</string>
@@ -156,7 +173,8 @@
   </action>
   <action name="actionClear">
    <property name="icon">
-    <iconset theme="editclear"/>
+    <iconset theme="editclear">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Clear</string>
@@ -219,6 +237,38 @@
    </property>
    <property name="toolTip">
     <string>Load Settings from a File</string>
+   </property>
+  </action>
+  <action name="actionCheckUpdate">
+   <property name="text">
+    <string>&amp;Check Update</string>
+   </property>
+  </action>
+  <action name="actionBarPlot">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Bar Plot</string>
+   </property>
+  </action>
+  <action name="actionVertical">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Vertical</string>
+   </property>
+  </action>
+  <action name="actionHorizontal">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Horizontal</string>
    </property>
   </action>
  </widget>

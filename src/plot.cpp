@@ -39,6 +39,7 @@ Plot::Plot(QWidget* parent) :
     isAutoScaled = true;
     symbolSize = 0;
     numOfSamples = 1;
+    plotWidth = 1;
     showSymbols = Plot::ShowSymbolsAuto;
 
     QObject::connect(&zoomer, &Zoomer::unzoomed, this, &Plot::unzoomed);
@@ -73,6 +74,16 @@ Plot::Plot(QWidget* parent) :
     demoIndicator.setText(demoText);
     demoIndicator.hide();
     demoIndicator.attach(this);
+
+    // init no channels are visible indicator
+    QwtText noChannelText(" No Visible Channels ");
+    noChannelText.setColor(QColor("white"));
+    noChannelText.setBackgroundBrush(Qt::darkBlue);
+    noChannelText.setBorderRadius(4);
+    noChannelText.setRenderFlags(Qt::AlignHCenter | Qt::AlignVCenter);
+    noChannelIndicator.setText(noChannelText);
+    noChannelIndicator.hide();
+    noChannelIndicator.attach(this);
 }
 
 Plot::~Plot()
@@ -99,17 +110,18 @@ void Plot::setXAxis(double xMin, double xMax)
     _xMin = xMin;
     _xMax = xMax;
 
+    zoomer.setXLimits(xMin, xMax);
     zoomer.zoom(0); // unzoom
 
     // set axis
-    setAxisScale(QwtPlot::xBottom, xMin, xMax);
+    // setAxisScale(QwtPlot::xBottom, xMin, xMax);
     replot(); // Note: if we don't replot here scale at startup isn't set correctly
 
     // reset zoom base
-    auto base = zoomer.zoomBase();
-    base.setLeft(xMin);
-    base.setRight(xMax);
-    zoomer.setZoomBase(base);
+    // auto base = zoomer.zoomBase();
+    // base.setLeft(xMin);
+    // base.setRight(xMax);
+    // zoomer.setZoomBase(base);
 
     onXScaleChanged();
 }
@@ -163,6 +175,12 @@ void Plot::showDemoIndicator(bool show)
     replot();
 }
 
+void Plot::showNoChannel(bool show)
+{
+    noChannelIndicator.setVisible(show);
+    replot();
+}
+
 void Plot::unzoom()
 {
     zoomer.zoom(0);
@@ -193,36 +211,6 @@ void Plot::darkBackground(bool enabled)
     }
     updateSymbols();
     replot();
-}
-
-/*
-  Below crude drawing demostrates how color selection occurs for
-  given channel index
-
-  0°                     <--Hue Value-->                           360°
-  |* . o . + . o . * . o . + . o . * . o . + . o . * . o . + . o . |
-
-  * -> 0-3
-  + -> 4-7
-  o -> 8-15
-  . -> 16-31
-
- */
-QColor Plot::makeColor(unsigned int channelIndex)
-{
-    auto i = channelIndex;
-
-    if (i < 4)
-    {
-        return QColor::fromHsv(360*i/4, 255, 230);
-    }
-    else
-    {
-        double p = floor(log2(i));
-        double n = pow(2, p);
-        i = i - n;
-        return QColor::fromHsv(360*i/n + 360/pow(2,p+1), 255, 230);
-    }
 }
 
 void Plot::flashSnapshotOverlay(bool light)
@@ -285,7 +273,8 @@ void Plot::calcSymbolSize()
     auto scaleDist = sw->scaleDraw()->scaleMap().sDist();
     auto fullScaleDist = zoomer.zoomBase().width();
     auto zoomRate = fullScaleDist / scaleDist;
-    float samplesInView = numOfSamples / zoomRate;
+    float plotWidthNumSamp = abs(numOfSamples * plotWidth / (_xMax - _xMin));
+    float samplesInView = plotWidthNumSamp / zoomRate;
     int symDisPx = round(paintDist / samplesInView);
 
     if (symDisPx < SYMBOL_SHOW_AT_WIDTH)
@@ -330,4 +319,10 @@ void Plot::setNumOfSamples(unsigned value)
 {
     numOfSamples = value;
     onXScaleChanged();
+}
+
+void Plot::setPlotWidth(double width)
+{
+    plotWidth = width;
+    zoomer.setHViewSize(width);
 }

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -62,7 +62,7 @@ CommandEdit::CommandEdit(QWidget *parent) :
     QLineEdit(parent)
 {
     hexValidator = new HexCommandValidator(this);
-    asciiValidator = new QRegExpValidator(QRegExp("[\\x0000-\\x007F]+"));
+    asciiValidator = new QRegExpValidator(QRegExp("[\\x0000-\\x007F]+"), this);
     ascii_mode = true;
     setValidator(asciiValidator);
 }

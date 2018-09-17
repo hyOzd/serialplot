@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -33,18 +33,13 @@ class FramedReader : public AbstractReader
     Q_OBJECT
 
 public:
-    explicit FramedReader(QIODevice* device, ChannelManager* channelMan,
-                          DataRecorder* recorder, QObject *parent = 0);
+    explicit FramedReader(QIODevice* device, QObject *parent = 0);
     QWidget* settingsWidget();
-    unsigned numOfChannels();
-    void enable(bool enabled = true);
+    unsigned numChannels() const;
     /// Stores settings into a `QSettings`
     void saveSettings(QSettings* settings);
     /// Loads settings from a `QSettings`.
     void loadSettings(QSettings* settings);
-
-public slots:
-    void pause(bool);
 
 private:
     /// bit wise fields for `settingsValid` member
@@ -56,9 +51,8 @@ private:
 
     // settings related members
     FramedReaderSettings _settingsWidget;
-    unsigned _numOfChannels;
+    unsigned _numChannels;
     unsigned sampleSize;
-    bool paused;
     unsigned settingsInvalid;   /// settings are all valid if this is 0, if not no reading is done
     QByteArray syncWord;
     bool checksumEnabled;
@@ -86,7 +80,7 @@ private:
     void readFrameDataAndCheck();
 
 private slots:
-    void onDataReady();
+    void onDataReady() override;
 
     void onNumberFormatChanged(NumberFormat numberFormat);
     void onNumOfChannelsChanged(unsigned value);

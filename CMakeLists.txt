@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 Hasan Yavuz Özderya
+# Copyright © 2018 Hasan Yavuz Özderya
 #
 # This file is part of serialplot.
 #
@@ -52,10 +52,18 @@ else ()
   find_package(QtColorWidgets REQUIRED)
 endif ()
 
+set(BUILD_LEDWIDGET true CACHE BOOL "Download and build LedWidget automatically.")
+if (BUILD_LEDWIDGET)
+  include(BuildLedWidget)
+else (BUILD_LEDWIDGET)
+  include(FindLedWidget)
+endif (BUILD_LEDWIDGET)
+
 # includes
 include_directories("./src"
   ${QWT_INCLUDE_DIR}
   ${QTCOLORWIDGETS_INCLUDE_DIRS}
+  ${LEDWIDGET_INCLUDE_DIR}
   )
 
 # flags
@@ -77,6 +85,8 @@ qt5_wrap_ui(UI_FILES
   src/binarystreamreadersettings.ui
   src/asciireadersettings.ui
   src/framedreadersettings.ui
+  src/demoreadersettings.ui
+  src/updatecheckdialog.ui
   )
 
 if (WIN32)
@@ -94,7 +104,6 @@ add_executable(${PROGRAM_NAME} WIN32
   src/scrollzoomer.cpp
   src/scrollbar.cpp
   src/hidabletabwidget.cpp
-  src/framebuffer.cpp
   src/scalepicker.cpp
   src/scalezoomer.cpp
   src/portlist.cpp
@@ -111,8 +120,13 @@ add_executable(${PROGRAM_NAME} WIN32
   src/datarecorder.cpp
   src/tooltipfilter.cpp
   src/sneakylineedit.cpp
-  src/channelmanager.cpp
+  src/stream.cpp
+  src/streamchannel.cpp
   src/channelinfomodel.cpp
+  src/ringbuffer.cpp
+  src/ringbuffer.cpp
+  src/indexbuffer.cpp
+  src/readonlybuffer.cpp
   src/framebufferseries.cpp
   src/numberformatbox.cpp
   src/endiannessbox.cpp
@@ -122,10 +136,22 @@ add_executable(${PROGRAM_NAME} WIN32
   src/asciireader.cpp
   src/asciireadersettings.cpp
   src/demoreader.cpp
+  src/demoreadersettings.cpp
   src/framedreader.cpp
   src/framedreadersettings.cpp
   src/plotmanager.cpp
+  src/plotmenu.cpp
+  src/barplot.cpp
+  src/barchart.cpp
+  src/barscaledraw.cpp
   src/numberformat.cpp
+  src/updatechecker.cpp
+  src/versionnumber.cpp
+  src/updatecheckdialog.cpp
+  src/samplepack.cpp
+  src/source.cpp
+  src/sink.cpp
+  src/samplecounter.cpp
   misc/windows_icon.rc
   ${UI_FILES}
   ${RES_FILES}
@@ -135,8 +161,9 @@ add_executable(${PROGRAM_NAME} WIN32
 target_link_libraries(${PROGRAM_NAME}
   ${QWT_LIBRARY}
   ${QTCOLORWIDGETS_LIBRARIES}
+  ${LEDWIDGET_LIBRARY}
   )
-qt5_use_modules(${PROGRAM_NAME} Widgets SerialPort)
+qt5_use_modules(${PROGRAM_NAME} Widgets SerialPort Network)
 
 if (BUILD_QWT)
   add_dependencies(${PROGRAM_NAME} QWT)
@@ -145,6 +172,11 @@ endif ()
 if (BUILD_QTCOLORWIDGETS)
   add_dependencies(${PROGRAM_NAME} QCW)
 endif ()
+
+if (BUILD_LEDWIDGET)
+  add_dependencies(${PROGRAM_NAME} LEDW)
+endif (BUILD_LEDWIDGET)
+
 
 # set compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
@@ -162,13 +194,16 @@ else()
 endif()
 
 # default version
-set(VERSION_STRING "0.9.1")
+set(VERSION_STRING "0.10.0")
 set(VERSION_REVISION "0")
 
 # get revision number from mercurial and parse version string
 include(GetVersion)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_STRING=\\\"${VERSION_STRING}\\\" ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_MAJOR=${VERSION_MAJOR} ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_MINOR=${VERSION_MINOR} ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_PATCH=${VERSION_PATCH} ")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_REVISION=\\\"${VERSION_REVISION}\\\" ")
 
 # add make run target

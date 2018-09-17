@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -17,33 +17,48 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// IMPORTANT NOTE: this file will be renamed to "framebuffer.h" when
+// stream work is complete
+
 #ifndef FRAMEBUFFER_H
 #define FRAMEBUFFER_H
 
-#include <QPointF>
-#include <QRectF>
+struct Range
+{
+    double start, end;
+};
 
+/// Abstract base class for all frame buffers.
 class FrameBuffer
 {
 public:
-    FrameBuffer(size_t size);
-    ~FrameBuffer();
+    /// Placeholder virtual destructor
+    virtual ~FrameBuffer() {};
+    /// Returns size of the buffer.
+    virtual unsigned size() const = 0;
+    /// Returns a sample from given index.
+    virtual double sample(unsigned i) const = 0;
+    /// Returns minimum and maximum of the buffer values.
+    virtual Range limits() const = 0;
+};
 
-    void resize(size_t size);
-    void addSamples(double* samples, size_t size);
-    void clear(); // fill 0
+/// Common base class for index and writable frame buffers
+class ResizableBuffer : public FrameBuffer
+{
+public:
+    /// Resize the buffer.
+    ///
+    /// @important Resizing to same value is an error.
+    virtual void resize(unsigned n) = 0;
+};
 
-    // QwtSeriesData related implementations
-    size_t size() const;
-    QRectF boundingRect() const;
-    double sample(size_t i) const;
-
-private:
-    size_t _size; // size of `data`
-    double* data;
-    size_t headIndex; // indicates the actual `0` index of the ring buffer
-
-    QRectF _boundingRect;
+/// Abstract base class for writable frame buffers
+class WFrameBuffer : public ResizableBuffer
+{
+    /// Add samples to the buffer
+    virtual void addSamples(double* samples, unsigned n) = 0;
+    /// Reset all data to 0
+    virtual void clear() = 0;
 };
 
 #endif // FRAMEBUFFER_H

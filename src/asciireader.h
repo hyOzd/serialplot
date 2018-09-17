@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -21,7 +21,9 @@
 #define ASCIIREADER_H
 
 #include <QSettings>
+#include <QString>
 
+#include "samplepack.h"
 #include "abstractreader.h"
 #include "asciireadersettings.h"
 
@@ -30,32 +32,32 @@ class AsciiReader : public AbstractReader
     Q_OBJECT
 
 public:
-    explicit AsciiReader(QIODevice* device, ChannelManager* channelMan,
-                         DataRecorder* recorder, QObject *parent = 0);
+    explicit AsciiReader(QIODevice* device, QObject *parent = 0);
     QWidget* settingsWidget();
-    unsigned numOfChannels();
-    void enable(bool enabled = true);
+    unsigned numChannels() const;
+    void enable(bool enabled) override;
     /// Stores settings into a `QSettings`
     void saveSettings(QSettings* settings);
     /// Loads settings from a `QSettings`.
     void loadSettings(QSettings* settings);
 
-public slots:
-    void pause(bool);
-
 private:
     AsciiReaderSettings _settingsWidget;
-    unsigned _numOfChannels;
+    unsigned _numChannels;
     /// number of channels will be determined from incoming data
     unsigned autoNumOfChannels;
-    bool paused;
+    QChar delimiter; ///< selected column delimiter
 
-    // We may have (usually true) started reading in the middle of a
-    // line, so its a better idea to just discard first line.
-    bool discardFirstLine;
+    bool firstReadAfterEnable = false;
 
 private slots:
-    void onDataReady();
+    void onDataReady() override;
+    /**
+     * Parses given line and returns sample pack.
+     *
+     * Returns `nullptr` in case of error.
+     */
+    SamplePack* parseLine(const QString& line) const;
 };
 
 #endif // ASCIIREADER_H

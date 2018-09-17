@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -24,28 +24,33 @@
 /// If set to this value number of channels is determined from input
 #define NUMOFCHANNELS_AUTO   (0)
 
-AsciiReader::AsciiReader(QIODevice* device, ChannelManager* channelMan,
-                         DataRecorder* recorder, QObject* parent) :
-    AbstractReader(device, channelMan, recorder, parent)
+AsciiReader::AsciiReader(QIODevice* device, QObject* parent) :
+    AbstractReader(device, parent)
 {
     paused = false;
-    discardFirstLine = true;
 
-    _numOfChannels = _settingsWidget.numOfChannels();
-    autoNumOfChannels = (_numOfChannels == NUMOFCHANNELS_AUTO);
+    _numChannels = _settingsWidget.numOfChannels();
+    autoNumOfChannels = (_numChannels == NUMOFCHANNELS_AUTO);
+    delimiter = _settingsWidget.delimiter();
 
     connect(&_settingsWidget, &AsciiReaderSettings::numOfChannelsChanged,
             [this](unsigned value)
             {
-                _numOfChannels = value;
-                autoNumOfChannels = (_numOfChannels == NUMOFCHANNELS_AUTO);
+                _numChannels = value;
+                updateNumChannels(); // TODO: setting numchannels = 0, should remove all buffers
+                                     // do we want this?
+                autoNumOfChannels = (_numChannels == NUMOFCHANNELS_AUTO);
                 if (!autoNumOfChannels)
                 {
                     emit numOfChannelsChanged(value);
                 }
             });
 
-    connect(device, &QIODevice::aboutToClose, [this](){discardFirstLine=true;});
+    connect(&_settingsWidget, &AsciiReaderSettings::delimiterChanged,
+            [this](QChar d)
+            {
+                delimiter = d;
+            });
 }
 
 QWidget* AsciiReader::settingsWidget()
@@ -53,49 +58,38 @@ QWidget* AsciiReader::settingsWidget()
     return &_settingsWidget;
 }
 
-unsigned AsciiReader::numOfChannels()
+unsigned AsciiReader::numChannels() const
 {
+    // TODO: an alternative is to never set _numChannels to '0'
     // do not allow '0'
-    if (_numOfChannels == 0)
-    {
-        return 1;
-    }
-    else
-    {
-        return _numOfChannels;
-    }
+    return _numChannels == 0 ? 1 : _numChannels;
 }
 
-// TODO: this could be a part of AbstractReader
 void AsciiReader::enable(bool enabled)
 {
     if (enabled)
     {
-        discardFirstLine = true;
+        firstReadAfterEnable = true;
         QObject::connect(_device, &QIODevice::readyRead,
                          this, &AsciiReader::onDataReady);
     }
     else
     {
         QObject::disconnect(_device, 0, this, 0);
+        disconnectSinks();
     }
-}
-
-void AsciiReader::pause(bool enabled)
-{
-    paused = enabled;
 }
 
 void AsciiReader::onDataReady()
 {
     while(_device->canReadLine())
     {
-        QByteArray line = _device->readLine();
+        QString line = QString(_device->readLine());
 
         // discard only once when we just started reading
-        if (discardFirstLine)
+        if (firstReadAfterEnable)
         {
-            discardFirstLine = false;
+            firstReadAfterEnable = false;
             continue;
         }
 
@@ -116,51 +110,57 @@ void AsciiReader::onDataReady()
             continue;
         }
 
-        auto separatedValues = line.split(',');
-
-        unsigned numReadChannels; // effective number of channels to read
-        unsigned numComingChannels = separatedValues.length();
-
-        if (autoNumOfChannels)
-        {
-            // did number of channels changed?
-            if (numComingChannels != _numOfChannels)
-            {
-                _numOfChannels = numComingChannels;
-                emit numOfChannelsChanged(numComingChannels);
+        const SamplePack* samples = parseLine(line);
+        if (samples != nullptr) {
+            // update number of channels if in auto mode
+            if (autoNumOfChannels ) {
+                unsigned nc = samples->numChannels();
+                if (nc != _numChannels) {
+                    _numChannels = nc;
+                    updateNumChannels();
+                    // TODO: is `numOfChannelsChanged` signal still used?
+                    emit numOfChannelsChanged(nc);
+                }
             }
-            numReadChannels = numComingChannels;
-        }
-        else if (numComingChannels >= _numOfChannels)
-        {
-            numReadChannels = _numOfChannels;
-        }
-        else // there is missing channel data
-        {
-            numReadChannels = separatedValues.length();
-            qWarning() << "Incoming data is missing data for some channels!";
-            qWarning() << "Read line: " << line;
-        }
 
-        // parse read line
-        double* channelSamples = new double[_numOfChannels]();
-        for (unsigned ci = 0; ci < numReadChannels; ci++)
-        {
-            bool ok;
-            channelSamples[ci] = separatedValues[ci].toDouble(&ok);
-            if (!ok)
-            {
-                qWarning() << "Data parsing error for channel: " << ci;
-                qWarning() << "Read line: " << line;
-                channelSamples[ci] = 0;
-            }
+            Q_ASSERT(samples->numChannels() == _numChannels);
+
+            // commit data
+            feedOut(*samples);
         }
-
-        // commit data
-        addData(channelSamples, _numOfChannels);
-
-        delete[] channelSamples;
     }
+}
+
+SamplePack* AsciiReader::parseLine(const QString& line) const
+{
+    auto separatedValues = line.split(delimiter, QString::SkipEmptyParts);
+    unsigned numComingChannels = separatedValues.length();
+
+    // check number of channels (skipped if auto num channels is enabled)
+    if ((!numComingChannels) || (!autoNumOfChannels && numComingChannels != _numChannels))
+    {
+        qWarning() << "Line parsing error: invalid number of channels!";
+        qWarning() << "Read line: " << line;
+        return nullptr;
+    }
+
+    // parse data per channel
+    auto samples = new SamplePack(1, numComingChannels);
+    for (unsigned ci = 0; ci < numComingChannels; ci++)
+    {
+        bool ok;
+        samples->data(ci)[0] = separatedValues[ci].toDouble(&ok);
+        if (!ok)
+        {
+            qWarning() << "Data parsing error for channel: " << ci;
+            qWarning() << "Read line: " << line;
+
+            delete samples;
+            return nullptr;
+        }
+    }
+
+    return samples;
 }
 
 void AsciiReader::saveSettings(QSettings* settings)

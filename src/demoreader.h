@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -23,6 +23,7 @@
 #include <QTimer>
 
 #include "abstractreader.h"
+#include "demoreadersettings.h"
 
 /**
  * This is a special case of reader implementation and should be used
@@ -38,30 +39,26 @@ class DemoReader : public AbstractReader
     Q_OBJECT
 
 public:
-    explicit DemoReader(QIODevice* device, ChannelManager* channelMan,
-                        DataRecorder* recorder, QObject* parent = 0);
+    explicit DemoReader(QIODevice* device, QObject* parent = 0);
 
-    /// Demo reader is an exception so this function returns NULL
     QWidget* settingsWidget();
-
-    unsigned numOfChannels();
-
-    void enable(bool enabled = true);
+    unsigned numChannels() const;
+    void enable(bool enabled = true) override;
 
 public slots:
-    void pause(bool);
-
-    /// Sets the number of channels, this doesn't trigger a `numOfChannelsChanged` signal.
-    void setNumOfChannels(unsigned value);
+    void setNumChannels(unsigned value);
 
 private:
-    bool paused;
-    unsigned _numOfChannels;
+    DemoReaderSettings _settingsWidget;
+
+    unsigned _numChannels;
     QTimer timer;
     int count;
 
 private slots:
     void demoTimerTimeout();
+    void onNumChannelsChanged(unsigned value);
+    void onDataReady() override;
 };
 
 #endif // DEMOREADER_H

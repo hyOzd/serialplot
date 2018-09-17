@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -23,19 +23,16 @@
 #include "binarystreamreader.h"
 #include "floatswap.h"
 
-BinaryStreamReader::BinaryStreamReader(QIODevice* device, ChannelManager* channelMan,
-                                       DataRecorder* recorder, QObject* parent) :
-    AbstractReader(device, channelMan, recorder, parent)
+BinaryStreamReader::BinaryStreamReader(QIODevice* device, QObject* parent) :
+    AbstractReader(device, parent)
 {
     paused = false;
     skipByteRequested = false;
     skipSampleRequested = false;
 
-    _numOfChannels = _settingsWidget.numOfChannels();
+    _numChannels = _settingsWidget.numOfChannels();
     connect(&_settingsWidget, &BinaryStreamReaderSettings::numOfChannelsChanged,
-            this, &BinaryStreamReader::numOfChannelsChanged);
-    connect(&_settingsWidget, &BinaryStreamReaderSettings::numOfChannelsChanged,
-            this, &BinaryStreamReader::onNumOfChannelsChanged);
+                     this, &BinaryStreamReader::onNumOfChannelsChanged);
 
     // initial number format selection
     onNumberFormatChanged(_settingsWidget.numberFormat());
@@ -60,27 +57,9 @@ QWidget* BinaryStreamReader::settingsWidget()
     return &_settingsWidget;
 }
 
-unsigned BinaryStreamReader::numOfChannels()
+unsigned BinaryStreamReader::numChannels() const
 {
-    return _numOfChannels;
-}
-
-void BinaryStreamReader::enable(bool enabled)
-{
-    if (enabled)
-    {
-        QObject::connect(_device, &QIODevice::readyRead,
-                         this, &BinaryStreamReader::onDataReady);
-    }
-    else
-    {
-        QObject::disconnect(_device, 0, this, 0);
-    }
-}
-
-void BinaryStreamReader::pause(bool enabled)
-{
-    paused = enabled;
+    return _numChannels;
 }
 
 void BinaryStreamReader::onNumberFormatChanged(NumberFormat numberFormat)
@@ -123,17 +102,19 @@ void BinaryStreamReader::onNumberFormatChanged(NumberFormat numberFormat)
 
 void BinaryStreamReader::onNumOfChannelsChanged(unsigned value)
 {
-    _numOfChannels = value;
+    _numChannels = value;
+    updateNumChannels();
+    emit numOfChannelsChanged(value);
 }
 
 void BinaryStreamReader::onDataReady()
 {
     // a package is a set of channel data like {CHAN0_SAMPLE, CHAN1_SAMPLE...}
-    int packageSize = sampleSize * _numOfChannels;
+    int packageSize = sampleSize * _numChannels;
     int bytesAvailable = _device->bytesAvailable();
 
     // skip 1 byte if requested
-    if (bytesAvailable > 0 && skipByteRequested)
+    if (skipByteRequested && bytesAvailable > 0)
     {
         _device->read(1);
         skipByteRequested = false;
@@ -141,11 +122,11 @@ void BinaryStreamReader::onDataReady()
     }
 
     // skip 1 sample (channel) if requested
-    if (bytesAvailable >= (int) sampleSize && skipSampleRequested)
+    if (skipSampleRequested && bytesAvailable >= (int) sampleSize)
     {
         _device->read(sampleSize);
         skipSampleRequested = false;
-        bytesAvailable--;
+        bytesAvailable -= sampleSize;
     }
 
     if (bytesAvailable < packageSize) return;
@@ -160,20 +141,16 @@ void BinaryStreamReader::onDataReady()
         return;
     }
 
-    double* channelSamples = new double[numOfPackagesToRead*_numOfChannels];
-
+    // actual reading
+    SamplePack samples(numOfPackagesToRead, _numChannels);
     for (int i = 0; i < numOfPackagesToRead; i++)
     {
-        for (unsigned int ci = 0; ci < _numOfChannels; ci++)
+        for (unsigned int ci = 0; ci < _numChannels; ci++)
         {
-            // channelSamples[ci].replace(i, (this->*readSample)());
-            channelSamples[ci*numOfPackagesToRead+i] = (this->*readSample)();
+            samples.data(ci)[i] = (this->*readSample)();
         }
     }
-
-    addData(channelSamples, numOfPackagesToRead*_numOfChannels);
-
-    delete[] channelSamples;
+    feedOut(samples);
 }
 
 template<typename T> double BinaryStreamReader::readSampleAs()

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -24,6 +24,7 @@
 #include <QSettings>
 #include <QAction>
 #include <QMenu>
+#include <QStyledItemDelegate>
 
 #include "channelinfomodel.h"
 
@@ -46,6 +47,8 @@ public:
     bool   xAxisAsIndex() const;
     double xMax() const;
     double xMin() const;
+    /// Returns the plot width adjusted for x axis scaling.
+    double plotWidth() const;
 
     void setChannelInfoModel(ChannelInfoModel* model);
 
@@ -58,6 +61,7 @@ signals:
     void numOfSamplesChanged(int value);
     void yScaleChanged(bool autoScaled, double yMin = 0, double yMax = 1);
     void xScaleChanged(bool asIndex, double xMin = 0, double xMax = 1);
+    void plotWidthChanged(double width);
 
 private:
     Ui::PlotControlPanel *ui;
@@ -67,8 +71,10 @@ private:
     /// User can disable this setting in the checkbox
     bool warnNumOfSamples;
 
-    QAction resetAct, resetNamesAct, resetColorsAct, showAllAct;
+    QAction resetAct, resetNamesAct, resetColorsAct, showAllAct,
+        hideAllAct, resetGainsAct, resetOffsetsAct;
     QMenu resetMenu;
+    QStyledItemDelegate* delegate;
 
     /// Show a confirmation dialog before setting #samples to a big value
     bool askNSConfirmation(int value);
@@ -80,6 +86,7 @@ private slots:
     void onRangeSelected();
     void onIndexChecked(bool checked);
     void onXScaleChanged();
+    void onPlotWidthChanged();
 };
 
 #endif // PLOTCONTROLPANEL_H

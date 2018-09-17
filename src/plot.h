@@ -50,13 +50,12 @@ public:
     Plot(QWidget* parent = 0);
     ~Plot();
 
-    static QColor makeColor(unsigned int channelIndex);
-
 public slots:
     void showGrid(bool show = true);
     void showMinorGrid(bool show = true);
     void showLegend(bool show = true);
     void showDemoIndicator(bool show = true);
+    void showNoChannel(bool show = true);
     void unzoom();
     void darkBackground(bool enabled = true);
     void setYAxis(bool autoScaled, double yMin = 0, double yMax = 1);
@@ -72,6 +71,8 @@ public slots:
 
     void setNumOfSamples(unsigned value);
 
+    void setPlotWidth(double width);
+
 protected:
     /// update the display of symbols depending on `symbolSize`
     void updateSymbols();
@@ -81,6 +82,7 @@ private:
     double yMin, yMax;
     double _xMin, _xMax;
     unsigned numOfSamples;
+    double plotWidth;
     int symbolSize;
     Zoomer zoomer;
     ScaleZoomer sZoomer;
@@ -88,6 +90,7 @@ private:
     PlotSnapshotOverlay* snapshotOverlay;
     QwtPlotLegendItem legend;
     QwtPlotTextLabel demoIndicator;
+    QwtPlotTextLabel noChannelIndicator;
     ShowSymbols showSymbols;
 
     void resetAxes();

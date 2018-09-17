@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -26,7 +26,7 @@
 #include <QAction>
 
 #include "datarecorder.h"
-#include "channelmanager.h"
+#include "stream.h"
 
 namespace Ui {
 class RecordPanel;
@@ -37,13 +37,11 @@ class RecordPanel : public QWidget
     Q_OBJECT
 
 public:
-    explicit RecordPanel(DataRecorder* recorder, ChannelManager* channelMan,
-                         QWidget* parent = 0);
+    explicit RecordPanel(Stream* stream, QWidget* parent = 0);
     ~RecordPanel();
 
     QToolBar* toolbar();
 
-    bool isRecording();
     bool recordPaused();
 
     /// Stores settings into a `QSettings`
@@ -64,10 +62,9 @@ private:
     Ui::RecordPanel *ui;
     QToolBar recordToolBar;
     QAction recordAction;
-    QString selectedFile;
     bool overwriteSelected;
-    DataRecorder* _recorder;
-    ChannelManager* _channelMan;
+    DataRecorder recorder;
+    Stream* _stream;
 
     /**
      * @brief Increments the file name.
@@ -92,7 +89,26 @@ private:
      */
     bool confirmOverwrite(QString fileName);
 
-    void startRecording(void);
+    /// Returns filename in edit box. May be invalid!
+    QString selectedFile() const;
+    /// Sets the filename in edit box.
+    void setSelectedFile(QString f);
+
+    /**
+     * Tries to get a valid file name by handling user interactions and
+     * automatic naming (increment, timestamp etc).
+     *
+     * Returned file name can be used immediately. File name box should also be
+     * set to selected file name.
+     *
+     * @return empty if failure otherwise valid filename
+     */
+    QString getSelectedFile();
+
+    /// Formats timestamp in given text
+    QString formatTimeStamp(QString t) const;
+
+    bool startRecording(QString fileName);
     void stopRecording(void);
 
     /// Returns separator text from ui. "\t" is converted to TAB

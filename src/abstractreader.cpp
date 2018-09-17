@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -19,41 +19,27 @@
 
 #include "abstractreader.h"
 
-AbstractReader::AbstractReader(QIODevice* device, ChannelManager* channelMan,
-                               DataRecorder* recorder, QObject* parent) :
+AbstractReader::AbstractReader(QIODevice* device, QObject* parent) :
     QObject(parent)
 {
     _device = device;
-    _channelMan = channelMan;
-    _recorder = recorder;
-    recording = false;
-
-    // initialize sps counter
-    sampleCount = 0;
-    samplesPerSecond = 0;
-    QObject::connect(&spsTimer, &QTimer::timeout,
-                     this, &AbstractReader::spsTimerTimeout);
-    // TODO: start sps timer when reader is enabled
-    spsTimer.start(SPS_UPDATE_TIMEOUT * 1000);
 }
 
-void AbstractReader::spsTimerTimeout()
+void AbstractReader::pause(bool enabled)
 {
-    unsigned currentSps = samplesPerSecond;
-    samplesPerSecond = (sampleCount/numOfChannels())/SPS_UPDATE_TIMEOUT;
-    if (currentSps != samplesPerSecond)
-    {
-        emit samplesPerSecondChanged(samplesPerSecond);
-    }
-    sampleCount = 0;
+    paused = enabled;
 }
 
-void AbstractReader::addData(double* samples, unsigned length)
+void AbstractReader::enable(bool enabled)
 {
-    _channelMan->addData(samples, length);
-    if (recording)
+    if (enabled)
     {
-        _recorder->addData(samples, length, numOfChannels());
+        QObject::connect(_device, &QIODevice::readyRead,
+                         this, &AbstractReader::onDataReady);
     }
-    sampleCount += length;
+    else
+    {
+        QObject::disconnect(_device, 0, this, 0);
+        disconnectSinks();
+    }
 }

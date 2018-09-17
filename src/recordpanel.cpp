@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -23,21 +23,25 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QRegularExpression>
+#include <QCompleter>
+#include <QFileSystemModel>
+#include <QDirModel>
 #include <QtDebug>
+#include <ctime>
 
 #include "recordpanel.h"
 #include "ui_recordpanel.h"
 #include "setting_defines.h"
 
-RecordPanel::RecordPanel(DataRecorder* recorder, ChannelManager* channelMan, QWidget *parent) :
+RecordPanel::RecordPanel(Stream* stream, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::RecordPanel),
     recordToolBar(tr("Record Toolbar")),
-    recordAction(QIcon::fromTheme("media-record"), tr("Record"), this)
+    recordAction(QIcon::fromTheme("media-record"), tr("Record"), this),
+    recorder(this)
 {
     overwriteSelected = false;
-    _recorder = recorder;
-    _channelMan = channelMan;
+    _stream = stream;
 
     ui->setupUi(this);
 
@@ -58,16 +62,25 @@ RecordPanel::RecordPanel(DataRecorder* recorder, ChannelManager* channelMan, QWi
     connect(ui->cbDisableBuffering, &QCheckBox::toggled,
             [this](bool enabled)
             {
-                _recorder->disableBuffering = enabled;
+                recorder.disableBuffering = enabled;
             });
 
     connect(ui->cbWindowsLE, &QCheckBox::toggled,
             [this](bool enabled)
             {
-                _recorder->windowsLE = enabled;
+                recorder.windowsLE = enabled;
             });
 
     connect(&recordAction, &QAction::toggled, ui->cbWindowsLE, &QWidget::setDisabled);
+    connect(&recordAction, &QAction::toggled, ui->cbTimestamp, &QWidget::setDisabled);
+    connect(&recordAction, &QAction::toggled, ui->leSeparator, &QWidget::setDisabled);
+    connect(&recordAction, &QAction::toggled, ui->pbBrowse, &QWidget::setDisabled);
+
+    QCompleter *completer = new QCompleter(this);
+    // TODO: QDirModel is deprecated, use QFileSystemModel (but it doesn't work)
+    completer->setModel(new QDirModel(completer));
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    ui->leFileName->setCompleter(completer);
 }
 
 RecordPanel::~RecordPanel()
@@ -78,11 +91,6 @@ RecordPanel::~RecordPanel()
 QToolBar* RecordPanel::toolbar()
 {
     return &recordToolBar;
-}
-
-bool RecordPanel::isRecording()
-{
-    return recordAction.isChecked();
 }
 
 bool RecordPanel::recordPaused()
@@ -101,11 +109,73 @@ bool RecordPanel::selectFile()
     }
     else
     {
-        selectedFile = fileName;
-        ui->lbFileName->setText(selectedFile);
+        setSelectedFile(fileName);
         overwriteSelected = QFile::exists(fileName);
         return true;
     }
+}
+
+QString RecordPanel::selectedFile() const
+{
+    return ui->leFileName->text();
+}
+
+void RecordPanel::setSelectedFile(QString f)
+{
+    ui->leFileName->setText(f);
+}
+
+QString RecordPanel::getSelectedFile()
+{
+    if (selectedFile().isEmpty())
+    {
+        if (!selectFile()) return QString();
+    }
+
+    // assume that file name contains a time format specifier
+    if (selectedFile().contains("%"))
+    {
+        auto ts = formatTimeStamp(selectedFile());
+        if (!QFile::exists(ts) || // file doesn't exists
+            confirmOverwrite(ts)) // exists but user accepted overwrite
+        {
+            return ts;
+        }
+        return QString();
+    }
+
+    // if no timestamp and file exists try autoincrement option
+    if (!overwriteSelected && QFile::exists(selectedFile()))
+    {
+        if (ui->cbAutoIncrement->isChecked())
+        {
+            if (!incrementFileName()) return QString();
+        }
+        else
+        {
+            if (!confirmOverwrite(selectedFile()))
+                return QString();
+        }
+    }
+
+    return selectedFile();
+}
+
+QString RecordPanel::formatTimeStamp(QString t) const
+{
+    auto maxSize = t.size() + 1024;
+    auto r = new char[maxSize];
+
+    time_t rawtime;
+    struct tm * timeinfo;
+
+    time(&rawtime);
+    timeinfo = localtime (&rawtime);
+    strftime(r, maxSize, t.toLatin1().data(), timeinfo);
+
+    auto rs = QString(r);
+    delete r;
+    return rs;
 }
 
 void RecordPanel::onRecord(bool start)
@@ -126,22 +196,11 @@ void RecordPanel::onRecord(bool start)
     }
 
     // check file name
-    if (!canceled && selectedFile.isEmpty() && !selectFile())
+    QString fn;
+    if (!canceled)
     {
-        canceled = true;
-    }
-
-    if (!canceled && !overwriteSelected && QFile::exists(selectedFile))
-    {
-        if (ui->cbAutoIncrement->isChecked())
-        {
-            // TODO: should we increment even if user selected to replace?
-            canceled = !incrementFileName();
-        }
-        else
-        {
-            canceled = !confirmOverwrite(selectedFile);
-        }
+        fn = getSelectedFile();
+        canceled = fn.isEmpty();
     }
 
     if (canceled)
@@ -151,13 +210,15 @@ void RecordPanel::onRecord(bool start)
     else
     {
         overwriteSelected = false;
-        startRecording();
+        // TODO: show more visible error message when recording fails
+        if (!startRecording(fn))
+            recordAction.setChecked(false);
     }
 }
 
 bool RecordPanel::incrementFileName(void)
 {
-    QFileInfo fileInfo(selectedFile);
+    QFileInfo fileInfo(selectedFile());
 
     QString base = fileInfo.completeBaseName();
     QRegularExpression regex("(.*?)(\\d+)(?!.*\\d)(.*)");
@@ -192,10 +253,9 @@ bool RecordPanel::incrementFileName(void)
     }
     else
     {
-        selectedFile = autoFileName;
+        setSelectedFile(autoFileName);
     }
 
-    ui->lbFileName->setText(selectedFile);
     return true;
 }
 
@@ -222,7 +282,7 @@ bool RecordPanel::confirmOverwrite(QString fileName)
     }
     else if (mb.clickedButton() == bOverwrite)
     {
-        selectedFile = fileName;
+        setSelectedFile(fileName);
         return true;
     }
     else                    // select button
@@ -231,21 +291,29 @@ bool RecordPanel::confirmOverwrite(QString fileName)
     }
 }
 
-void RecordPanel::startRecording(void)
+bool RecordPanel::startRecording(QString fileName)
 {
     QStringList channelNames;
     if (ui->cbHeader->isChecked())
     {
-        channelNames = _channelMan->infoModel()->channelNames();
+        channelNames = _stream->infoModel()->channelNames();
     }
-    _recorder->startRecording(selectedFile, getSeparator(), channelNames);
-    emit recordStarted();
+    if (recorder.startRecording(fileName, getSeparator(),
+                                channelNames, ui->cbTimestamp->isChecked()))
+    {
+        _stream->connectFollower(&recorder);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 void RecordPanel::stopRecording(void)
 {
-    emit recordStopped();
-    _recorder->stopRecording();
+    recorder.stopRecording();
+    _stream->disconnectFollower(&recorder);
 }
 
 void RecordPanel::onPortClose()
@@ -272,6 +340,7 @@ void RecordPanel::saveSettings(QSettings* settings)
     settings->setValue(SG_Record_StopOnClose, ui->cbStopOnClose->isChecked());
     settings->setValue(SG_Record_Header, ui->cbHeader->isChecked());
     settings->setValue(SG_Record_DisableBuffering, ui->cbDisableBuffering->isChecked());
+    settings->setValue(SG_Record_Timestamp, ui->cbTimestamp->isChecked());
     settings->setValue(SG_Record_Separator, ui->leSeparator->text());
     settings->endGroup();
 }
@@ -289,6 +358,8 @@ void RecordPanel::loadSettings(QSettings* settings)
         settings->value(SG_Record_Header, ui->cbHeader->isChecked()).toBool());
     ui->cbDisableBuffering->setChecked(
         settings->value(SG_Record_DisableBuffering, ui->cbDisableBuffering->isChecked()).toBool());
+    ui->cbTimestamp->setChecked(
+        settings->value(SG_Record_Timestamp, ui->cbTimestamp->isChecked()).toBool());
     ui->leSeparator->setText(settings->value(SG_Record_Separator, ui->leSeparator->text()).toString());
     settings->endGroup();
 }

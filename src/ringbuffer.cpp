@@ -1,5 +1,5 @@
 /*
-  Copyright © 2015 Hasan Yavuz Özderya
+  Copyright © 2017 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -17,33 +17,56 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "framebuffer.h"
+#include <QtGlobal>
 
-FrameBuffer::FrameBuffer(size_t size)
+#include "ringbuffer.h"
+
+RingBuffer::RingBuffer(unsigned n)
 {
-    _size = size;
+    _size = n;
     data = new double[_size]();
     headIndex = 0;
 
-    _boundingRect.setCoords(0, 0, size, 0);
+    limInvalid = false;
+    limCache = {0, 0};
 }
 
-FrameBuffer::~FrameBuffer()
+RingBuffer::~RingBuffer()
 {
     delete[] data;
 }
 
-void FrameBuffer::resize(size_t size)
+unsigned RingBuffer::size() const
 {
-    int offset = size - _size;
+    return _size;
+}
+
+double RingBuffer::sample(unsigned i) const
+{
+    unsigned index = headIndex + i;
+    if (index >= _size) index -= _size;
+    return data[index];
+}
+
+Range RingBuffer::limits() const
+{
+    if (limInvalid) updateLimits();
+    return limCache;
+}
+
+void RingBuffer::resize(unsigned n)
+{
+    Q_ASSERT(n != _size);
+
+    int offset = (int) n - (int) _size;
     if (offset == 0) return;
 
-    double* newData = new double[size];
+    double* newData = new double[n];
 
     // move data to new array
     int fill_start = offset > 0 ? offset : 0;
 
-    for (int i = fill_start; i < int(size); i++)
+    for (int i = fill_start; i < int(n); i++)
     {
         newData[i] = sample(i - offset);
     }
@@ -57,26 +80,26 @@ void FrameBuffer::resize(size_t size)
         }
     }
 
-    // data is ready, clean and re-point
+    // data is ready, clean up and re-point
     delete data;
     data = newData;
     headIndex = 0;
-    _size = size;
+    _size = n;
 
-    // update the bounding rectangle
-    _boundingRect.setRight(_size);
+    // invalidate bounding rectangle
+    limInvalid = true;
 }
 
-void FrameBuffer::addSamples(double* samples, size_t size)
+void RingBuffer::addSamples(double* samples, unsigned n)
 {
-    unsigned shift = size;
+    unsigned shift = n;
     if (shift < _size)
     {
         unsigned x = _size - headIndex; // distance of `head` to end
 
         if (shift <= x) // there is enough room at the end of array
         {
-            for (size_t i = 0; i < shift; i++)
+            for (unsigned i = 0; i < shift; i++)
             {
                 data[i+headIndex] = samples[i];
             }
@@ -92,63 +115,58 @@ void FrameBuffer::addSamples(double* samples, size_t size)
         }
         else // there isn't enough room
         {
-            for (size_t i = 0; i < x; i++) // fill the end part
+            for (unsigned i = 0; i < x; i++) // fill the end part
             {
                 data[i+headIndex] = samples[i];
             }
-            for (size_t i = 0; i < (shift-x); i++) // continue from the beginning
+            for (unsigned i = 0; i < (shift-x); i++) // continue from the beginning
             {
                 data[i] = samples[i+x];
             }
             headIndex = shift-x;
         }
     }
-    else // number of new samples equal or bigger than current size
+    else // number of new samples equal or bigger than current size (doesn't fit)
     {
         int x = shift - _size;
-        for (size_t i = 0; i < _size; i++)
+        for (unsigned i = 0; i < _size; i++)
         {
             data[i] = samples[i+x];
         }
         headIndex = 0;
     }
 
-    // update bounding rectangle
-    double minValue = data[0];
-    double maxValue = data[0];
-    for (size_t i = 0; i < _size; i++)
+    // invalidate cache
+    limInvalid = true;
+}
+
+void RingBuffer::clear()
+{
+    for (unsigned i=0; i < _size; i++)
     {
-        if (data[i] > maxValue)
+        data[i] = 0.;
+    }
+
+    limCache = {0, 0};
+    limInvalid = false;
+}
+
+void RingBuffer::updateLimits() const
+{
+    limCache.start = data[0];
+    limCache.end = data[0];
+
+    for (unsigned i = 0; i < _size; i++)
+    {
+        if (data[i] > limCache.end)
         {
-            maxValue = data[i];
+            limCache.end = data[i];
         }
-        else if (data[i] < minValue)
+        else if (data[i] < limCache.start)
         {
-            minValue = data[i];
+            limCache.start = data[i];
         }
     }
-    _boundingRect.setTop(minValue);
-    _boundingRect.setBottom(maxValue);
-}
 
-void FrameBuffer::clear()
-{
-    for (size_t i=0; i < _size; i++) data[i] = 0.;
-}
-
-size_t FrameBuffer::size() const
-{
-    return _size;
-}
-
-QRectF FrameBuffer::boundingRect() const
-{
-    return _boundingRect;
-}
-
-double FrameBuffer::sample(size_t i) const
-{
-    size_t index = headIndex + i;
-    if (index >= _size) index -= _size;
-    return data[index];
+    limInvalid = false;
 }

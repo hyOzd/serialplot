@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -26,52 +26,34 @@
 #include <QVBoxLayout>
 #include <QList>
 #include <QSettings>
-#include <QAction>
 #include <QMenu>
 
 #include <qwt_plot_curve.h>
 #include "plot.h"
 #include "framebufferseries.h"
-#include "channelinfomodel.h"
-
-struct PlotViewSettings
-{
-    bool showGrid;
-    bool showMinorGrid;
-    bool darkBackground;
-    bool showLegend;
-    bool showMulti;
-    Plot::ShowSymbols showSymbols;
-};
+#include "stream.h"
+#include "snapshot.h"
+#include "plotmenu.h"
 
 class PlotManager : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit PlotManager(QWidget* plotArea, ChannelInfoModel* infoModel = NULL, QObject *parent = 0);
+    explicit PlotManager(QWidget* plotArea, PlotMenu* menu,
+                         const Stream* stream = NULL,
+                         QObject *parent = 0);
+    explicit PlotManager(QWidget* plotArea, PlotMenu* menu,
+                         Snapshot* snapshot,
+                         QObject *parent = 0);
     ~PlotManager();
     /// Add a new curve with title and buffer. A color is
     /// automatically chosen for curve.
-    void addCurve(QString title, FrameBuffer* buffer);
-    /// Alternative of `addCurve` for static curve data (snapshots).
-    void addCurve(QString title, QVector<QPointF> data);
-    /// Set the displayed title for a curve
-    void setTitle(unsigned index, QString title);
+    void addCurve(QString title, const FrameBuffer* buffer);
     /// Removes curves from the end
     void removeCurves(unsigned number);
     /// Returns current number of curves known by plot manager
     unsigned numOfCurves();
-    /// Returns the list of actions to be inserted into the `View` menu
-    QList<QAction*> menuActions();
-    /// Returns current status of menu actions
-    PlotViewSettings viewSettings() const;
-    /// Set the current state of view
-    void setViewSettings(const PlotViewSettings& settings);
-    /// Stores plot settings into a `QSettings`.
-    void saveSettings(QSettings* settings);
-    /// Loads plot settings from a `QSettings`.
-    void loadSettings(QSettings* settings);
 
 public slots:
     /// Enable/Disable multiple plot display
@@ -88,15 +70,20 @@ public slots:
     void flashSnapshotOverlay();
     /// Should be called to update zoom base
     void setNumOfSamples(unsigned value);
+    /// Maximum width of X axis (limit of hscroll)
+    void setPlotWidth(double width);
 
 private:
     bool isMulti;
     QWidget* _plotArea;
+    PlotMenu* _menu;
     QVBoxLayout* layout; ///< layout of the `plotArea`
     QScrollArea* scrollArea;
     QList<QwtPlotCurve*> curves;
     QList<Plot*> plotWidgets;
-    ChannelInfoModel* _infoModel;
+    Plot* emptyPlot;  ///< for displaying when all channels are hidden
+    const Stream* _stream;       ///< attached stream, can be `NULL`
+    const ChannelInfoModel* infoModel;
     bool isDemoShown;
     bool _autoScaled;
     double _yMin;
@@ -105,21 +92,12 @@ private:
     double _xMin;
     double _xMax;
     unsigned _numOfSamples;
+    double _plotWidth;
     Plot::ShowSymbols showSymbols;
 
-    // menu actions
-    QAction showGridAction;
-    QAction showMinorGridAction;
-    QAction unzoomAction;
-    QAction darkBackgroundAction;
-    QAction showLegendAction;
-    QAction showMultiAction;
-    QAction setSymbolsAction;
-    QMenu setSymbolsMenu;
-    QAction* setSymbolsAutoAct;
-    QAction* setSymbolsShowAct;
-    QAction* setSymbolsHideAct;
-
+    /// Common constructor
+    void construct(QWidget* plotArea, PlotMenu* menu);
+    /// Setups the layout for multi or single plot
     void setupLayout(bool multiPlot);
     /// Inserts a new plot widget to the current layout.
     Plot* addPlotWidget();
@@ -127,7 +105,8 @@ private:
     Plot* plotWidget(unsigned curveIndex);
     /// Common part of overloaded `addCurve` functions
     void _addCurve(QwtPlotCurve* curve);
-    void setSymbols(Plot::ShowSymbols shown);
+    /// Check and make sure "no visible channels" text is shown
+    void checkNoVisChannels();
 
 private slots:
     void showGrid(bool show = true);
@@ -135,7 +114,9 @@ private slots:
     void showLegend(bool show = true);
     void unzoom();
     void darkBackground(bool enabled = true);
+    void setSymbols(Plot::ShowSymbols shown);
 
+    void onNumChannelsChanged(unsigned value);
     void onChannelInfoChanged(const QModelIndex & topLeft,
                               const QModelIndex & bottomRight,
                               const QVector<int> & roles = QVector<int> ());

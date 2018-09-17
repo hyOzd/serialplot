@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -24,8 +24,7 @@
 #include <QAction>
 #include <QMenu>
 
-#include "framebuffer.h"
-#include "channelmanager.h"
+#include "stream.h"
 #include "snapshot.h"
 
 class MainWindow;
@@ -35,7 +34,7 @@ class SnapshotManager : public QObject
     Q_OBJECT
 
 public:
-    SnapshotManager(MainWindow* mainWindow, ChannelManager* channelMan);
+    SnapshotManager(MainWindow* mainWindow, Stream* stream);
     ~SnapshotManager();
 
     QMenu* menu();
@@ -43,13 +42,13 @@ public:
 
     /// Creates a dynamically allocated snapshot object but doesn't record it in snapshots list.
     /// @note Caller is responsible for deletion of the returned `Snapshot` object.
-    Snapshot* makeSnapshot();
+    Snapshot* makeSnapshot() const;
 
     bool isAllSaved(); ///< returns `true` if all snapshots are saved to a file
 
 private:
     MainWindow* _mainWindow;
-    ChannelManager* _channelMan;
+    Stream* _stream;
 
     QList<Snapshot*> snapshots;
 
