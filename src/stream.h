@@ -51,9 +51,8 @@ public:
     Stream(unsigned nc = 0, bool x = false, unsigned ns = 0);
     ~Stream();
 
-    // implementations for `Source`
-    virtual bool hasX() const;
-    virtual unsigned numChannels() const;
+    bool hasX() const;
+    unsigned numChannels() const;
 
     unsigned numSamples() const;
     const StreamChannel* channel(unsigned index) const;

@@ -50,11 +50,17 @@ public:
     const ChannelInfoModel* info() const;
     void setX(const FrameBuffer* x);
 
+    /// Returns sample value for closest X
+    double findValue(double x) const;
+
 private:
     unsigned _index;
     const FrameBuffer* _x;
     FrameBuffer* _y;
     ChannelInfoModel* _info;
+
+    /// Finds index of closest X in `xData`
+    int findIndex(double x) const;
 };
 
 #endif // STREAMCHANNEL_H

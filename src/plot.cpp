@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -31,9 +31,9 @@
 static const int SYMBOL_SHOW_AT_WIDTH = 5;
 static const int SYMBOL_SIZE_MAX = 7;
 
-Plot::Plot(QWidget* parent) :
+Plot::Plot(const Stream* stream, QWidget* parent) :
     QwtPlot(parent),
-    zoomer(this->canvas(), false),
+    zoomer(this->canvas(), stream, false),
     sZoomer(this, &zoomer)
 {
     isAutoScaled = true;

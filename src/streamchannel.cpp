@@ -17,6 +17,7 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <limits>
 #include "streamchannel.h"
 
 StreamChannel::StreamChannel(unsigned i, const FrameBuffer* x,
@@ -42,3 +43,35 @@ const FrameBuffer* StreamChannel::yData() const {return _y;}
 FrameBuffer* StreamChannel::yData() {return _y;}
 const ChannelInfoModel* StreamChannel::info() const {return _info;}
 void StreamChannel::setX(const FrameBuffer* x) {_x = x;};
+
+double StreamChannel::findValue(double x) const
+{
+    int index = findIndex(x);
+    if (index >= 0)
+        return _y->sample(index);
+    else
+        return std::numeric_limits<double>::quiet_NaN();
+}
+
+int StreamChannel::findIndex(double x) const
+{
+    // TODO: optimize, implement in `framebuffer`
+    bool first = true;
+    for (int i = _x->size()-1; i > 0; i--)
+    {
+        double val = _x->sample(i);
+        if (x >= val)
+        {
+            // TODO: optional linear approx. method
+            // check if previous sample (bigger one) is actually closer
+            if (!first && (x - val) > (_x->sample(i + 1) - x))
+            {
+                ++i;
+            }
+
+            return i;
+        }
+        first = false;
+    }
+    return -1;
+}

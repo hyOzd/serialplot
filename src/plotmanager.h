@@ -41,7 +41,7 @@ class PlotManager : public QObject
 
 public:
     explicit PlotManager(QWidget* plotArea, PlotMenu* menu,
-                         const Stream* stream = NULL,
+                         const Stream* stream = nullptr,
                          QObject *parent = 0);
     explicit PlotManager(QWidget* plotArea, PlotMenu* menu,
                          Snapshot* snapshot,
@@ -82,7 +82,7 @@ private:
     QList<QwtPlotCurve*> curves;
     QList<Plot*> plotWidgets;
     Plot* emptyPlot;  ///< for displaying when all channels are hidden
-    const Stream* _stream;       ///< attached stream, can be `NULL`
+    const Stream* _stream;       ///< attached stream, can be `nullptr`
     const ChannelInfoModel* infoModel;
     bool isDemoShown;
     bool _autoScaled;

@@ -31,9 +31,9 @@ PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
                          const Stream* stream, QObject* parent) :
     QObject(parent)
 {
-    construct(plotArea, menu);
     _stream = stream;
-    if (_stream == NULL) return;
+    construct(plotArea, menu);
+    if (_stream == nullptr) return;
 
     // connect to ChannelInfoModel
     infoModel = _stream->infoModel();
@@ -62,6 +62,7 @@ PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
                          Snapshot* snapshot, QObject *parent) :
     QObject(parent)
 {
+    _stream = nullptr;
     construct(plotArea, menu);
 
     setNumOfSamples(snapshot->numSamples());
@@ -305,7 +306,7 @@ void PlotManager::setupLayout(bool multiPlot)
 
 Plot* PlotManager::addPlotWidget()
 {
-    auto plot = new Plot();
+    auto plot = new Plot(_stream);
     plotWidgets.append(plot);
     layout->addWidget(plot);
 

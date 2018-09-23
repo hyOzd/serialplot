@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -23,10 +23,11 @@
 
 #include <QMouseEvent>
 
-Zoomer::Zoomer(QWidget* widget, bool doReplot) :
+Zoomer::Zoomer(QWidget* widget, const Stream* stream, bool doReplot) :
     ScrollZoomer(widget)
 {
     is_panning = false;
+    _stream = stream;
 
     setTrackerMode(AlwaysOn);
 
@@ -100,6 +101,31 @@ QRegion Zoomer::rubberBandMask() const
     }
     const QRect r = QRect(pa.first(), pa.last()).normalized().adjusted(0, 0, 1, 1);
     return QRegion(r);
+}
+
+void Zoomer::drawTracker(QPainter* painter) const
+{
+    ScrollZoomer::drawTracker(painter);
+    auto x = invTransform(trackerPosition()).x();
+    qDebug() <<  x;
+    if (_stream != nullptr && _stream->numChannels())
+    {
+        qDebug() << findValues(x);
+    }
+    return;
+}
+
+QVector<double> Zoomer::findValues(double x) const
+{
+    unsigned nc = _stream->numChannels();
+    QVector<double> r(nc);
+    for (unsigned ci = 0; ci < nc; ci++)
+    {
+        auto chan = _stream->channel(ci);
+        double val = chan->findValue(x);
+        r[ci] = val;
+    }
+    return r;
 }
 
 void Zoomer::widgetMousePressEvent(QMouseEvent* mouseEvent)

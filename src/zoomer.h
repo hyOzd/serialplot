@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -20,16 +20,19 @@
 #ifndef ZOOMER_H
 #define ZOOMER_H
 
-#include <scrollzoomer.h>
+#include <QVector>
+
+#include "scrollzoomer.h"
+#include "stream.h"
 
 class Zoomer : public ScrollZoomer
 {
     Q_OBJECT
 
 public:
-    Zoomer(QWidget *, bool doReplot=true);
+    Zoomer(QWidget*, const Stream* stream, bool doReplot=true);
     void zoom(int up);
-    void zoom( const QRectF & );
+    void zoom(const QRectF&);
 
 signals:
     void unzoomed();
@@ -39,6 +42,8 @@ protected:
     QwtText trackerTextF(const QPointF &pos) const;
     /// Re-implemented for alpha background
     void drawRubberBand(QPainter* painter) const;
+    /// Re-implemented to draw sample values
+    void drawTracker(QPainter* painter) const;
     /// Re-implemented for alpha background (masking is basically disabled)
     QRegion rubberBandMask() const;
     /// Overloaded for panning
@@ -51,6 +56,9 @@ protected:
 private:
     bool is_panning;
     QPointF pan_point;
+    const Stream* _stream;
+
+    QVector<double> findValues(double x) const;
 };
 
 #endif // ZOOMER_H
