@@ -105,18 +105,43 @@ QRegion Zoomer::rubberBandMask() const
 
 void Zoomer::drawTracker(QPainter* painter) const
 {
-    ScrollZoomer::drawTracker(painter);
-    auto x = invTransform(trackerPosition()).x();
-    qDebug() <<  x;
+    // ScrollZoomer::drawTracker(painter);
     if (_stream != nullptr && _stream->numChannels())
     {
-        qDebug() << findValues(x);
+        drawValues(painter);
     }
     return;
 }
 
+void Zoomer::drawValues(QPainter* painter) const
+{
+    painter->save();
+
+    double x = invTransform(trackerPosition()).x();
+    auto values = findValues(x);
+    qDebug() <<  x << ":" << values; // TODO: cleanup
+
+    // draw vertical line
+    painter->setPen(Qt::white);
+    const QRect pRect = pickArea().boundingRect().toRect();
+    int px = trackerPosition().x();
+    painter->drawLine(px, pRect.top(), px, pRect.bottom());
+
+    for (auto val : values)
+    {
+        if (!std::isnan(val))
+        {
+            painter->drawText(transform(QPointF(x, val)),
+                              QString("%1").arg(val));
+        }
+    }
+
+    painter->restore();
+}
+
 QVector<double> Zoomer::findValues(double x) const
 {
+    // TODO: process only channel(s) of this plot
     unsigned nc = _stream->numChannels();
     QVector<double> r(nc);
     for (unsigned ci = 0; ci < nc; ci++)
@@ -126,6 +151,12 @@ QVector<double> Zoomer::findValues(double x) const
         r[ci] = val;
     }
     return r;
+}
+
+QRect Zoomer::trackerRect(const QFont& font) const
+{
+    // TODO: optimize tracker area for masking instead of returning whole plot size
+    return pickArea().boundingRect().toRect();
 }
 
 void Zoomer::widgetMousePressEvent(QMouseEvent* mouseEvent)

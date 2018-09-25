@@ -39,11 +39,13 @@ signals:
 
 protected:
     /// Re-implemented to display selection size in the tracker text.
-    QwtText trackerTextF(const QPointF &pos) const;
+    QwtText trackerTextF(const QPointF &pos) const override;
+    /// Re-implemented for sample value tracker
+    QRect trackerRect(const QFont&) const override;
     /// Re-implemented for alpha background
-    void drawRubberBand(QPainter* painter) const;
+    void drawRubberBand(QPainter* painter) const override;
     /// Re-implemented to draw sample values
-    void drawTracker(QPainter* painter) const;
+    void drawTracker(QPainter* painter) const override;
     /// Re-implemented for alpha background (masking is basically disabled)
     QRegion rubberBandMask() const;
     /// Overloaded for panning
@@ -58,6 +60,9 @@ private:
     QPointF pan_point;
     const Stream* _stream;
 
+    /// Draw sample values
+    void drawValues(QPainter* painter) const;
+    /// Find sample values for given X value
     QVector<double> findValues(double x) const;
 };
 
