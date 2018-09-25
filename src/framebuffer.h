@@ -61,4 +61,24 @@ class WFrameBuffer : public ResizableBuffer
     virtual void clear() = 0;
 };
 
+/**
+ * Abstract base class for X buffers.
+ *
+ * These buffers only contain increasing or equal (to previous) values.
+ */
+class XFrameBuffer : public ResizableBuffer
+{
+public:
+    enum Index {OUT_OF_RANGE = -1};
+
+    /**
+     * Finds index for given value.
+     *
+     * If given value is bigger than max or smaller than minimum
+     * returns `OUT_OF_RANGE`. If it's in between values, smaller
+     * index is returned (not closer one).
+     */
+    virtual int findIndex(double value) const = 0;
+};
+
 #endif // FRAMEBUFFER_H

@@ -31,7 +31,8 @@ Stream::Stream(unsigned nc, bool x, unsigned ns) :
     _hasx = x;
     if (x)
     {
-        xData = new RingBuffer(ns);
+        // TODO: implement XRingBuffer (binary search)
+        Q_ASSERT(false);
     }
     else
     {
@@ -118,7 +119,8 @@ void Stream::setNumChannels(unsigned nc, bool x)
     {
         if (x)
         {
-            xData = new RingBuffer(_numSamples);
+            // TODO: implement XRingBuffer (binary search)
+            Q_ASSERT(false);
         }
         else
         {
@@ -191,7 +193,9 @@ void Stream::feedIn(const SamplePack& pack)
     unsigned ns = pack.numSamples();
     if (_hasx)
     {
-        static_cast<RingBuffer*>(xData)->addSamples(pack.xData(), ns);
+        // TODO: implement XRingBuffer (binary search)
+        Q_ASSERT(false);
+        // static_cast<RingBuffer*>(xData)->addSamples(pack.xData(), ns);
     }
 
     // modified pack that gain and offset is applied to

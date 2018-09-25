@@ -93,7 +93,7 @@ private:
     bool _paused;
 
     bool _hasx;
-    ResizableBuffer* xData;
+    XFrameBuffer* xData;
     QList<StreamChannel*> channels;
 
     ChannelInfoModel _infoModel;

@@ -35,7 +35,7 @@ public:
      * @param info channel info model
      */
     StreamChannel(unsigned i,
-                  const FrameBuffer* x,
+                  const XFrameBuffer* x,
                   FrameBuffer* y,
                   ChannelInfoModel* info);
     ~StreamChannel();
@@ -44,18 +44,18 @@ public:
     QString name() const;
     QColor color() const;
     bool visible() const;
-    const FrameBuffer* xData() const;
+    const XFrameBuffer* xData() const;
     FrameBuffer* yData();
     const FrameBuffer* yData() const;
     const ChannelInfoModel* info() const;
-    void setX(const FrameBuffer* x);
+    void setX(const XFrameBuffer* x);
 
     /// Returns sample value for closest X
     double findValue(double x) const;
 
 private:
     unsigned _index;
-    const FrameBuffer* _x;
+    const XFrameBuffer* _x;
     FrameBuffer* _y;
     ChannelInfoModel* _info;
 
