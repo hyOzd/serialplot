@@ -19,8 +19,7 @@
 
 #include "zoomer.h"
 #include <qwt_plot.h>
-#include <QtDebug>
-
+#include <QPen>
 #include <QMouseEvent>
 
 Zoomer::Zoomer(QWidget* widget, const Stream* stream, bool doReplot) :
@@ -119,20 +118,29 @@ void Zoomer::drawValues(QPainter* painter) const
 
     double x = invTransform(trackerPosition()).x();
     auto values = findValues(x);
-    qDebug() <<  x << ":" << values; // TODO: cleanup
 
     // draw vertical line
-    painter->setPen(Qt::white);
+    auto linePen = QPen(Qt::DotLine);
+    linePen.setColor(Qt::white);
+    painter->setPen(linePen);
     const QRect pRect = pickArea().boundingRect().toRect();
     int px = trackerPosition().x();
     painter->drawLine(px, pRect.top(), px, pRect.bottom());
 
-    for (auto val : values)
+    // draw sample values
+    for (int ci = 0; ci < values.size(); ci++)
     {
+        double val = values[ci];
         if (!std::isnan(val))
         {
-            painter->drawText(transform(QPointF(x, val)),
-                              QString("%1").arg(val));
+            auto p = transform(QPointF(x, val));
+
+            painter->setBrush(_stream->channel(ci)->color());
+            painter->setPen(Qt::NoPen);
+            painter->drawEllipse(p, 4, 4);
+
+            painter->setPen(Qt::white);
+            painter->drawText(p, QString("%1").arg(val));
         }
     }
 
