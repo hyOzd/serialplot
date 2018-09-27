@@ -44,38 +44,31 @@ FrameBuffer* StreamChannel::yData() {return _y;}
 const ChannelInfoModel* StreamChannel::info() const {return _info;}
 void StreamChannel::setX(const XFrameBuffer* x) {_x = x;};
 
-#include <QtDebug>
-
 double StreamChannel::findValue(double x) const
 {
-    // int index = findIndex(x);
     int index = _x->findIndex(x);
-    qDebug() << x << ":" << index;
+    Q_ASSERT(index < (int) _x->size());
+
     if (index >= 0)
-        return _y->sample(index);
-    else
-        return std::numeric_limits<double>::quiet_NaN();
-}
-
-int StreamChannel::findIndex(double x) const
-{
-    // TODO: optimize, implement in `framebuffer`
-    bool first = true;
-    for (int i = _x->size()-1; i > 0; i--)
     {
-        double val = _x->sample(i);
-        if (x >= val)
+        // can't do estimation for last sample
+        if (index == (int) _x->size() - 1)
         {
-            // TODO: optional linear approx. method
-            // check if previous sample (bigger one) is actually closer
-            if (!first && (x - val) > (_x->sample(i + 1) - x))
-            {
-                ++i;
-            }
-
-            return i;
+            return _y->sample(index);
         }
-        first = false;
+        else
+        {
+            // calculate middle of the line
+            double prev_x = _x->sample(index);
+            double next_x = _x->sample(index+1);
+            double ratio = (x - prev_x) / (next_x - prev_x);
+            double prev_y = _y->sample(index);
+            double next_y = _y->sample(index+1);
+            return ratio * (next_y - prev_y) + prev_y;
+        }
     }
-    return -1;
+    else
+    {
+        return std::numeric_limits<double>::quiet_NaN();
+    }
 }

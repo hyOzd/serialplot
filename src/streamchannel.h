@@ -50,7 +50,12 @@ public:
     const ChannelInfoModel* info() const;
     void setX(const XFrameBuffer* x);
 
-    /// Returns sample value for closest X
+    /**
+     * Returns sample value for `x`.
+     *
+     * If `x` is out of range `NaN` is returned. A calculated (linear)
+     * value is returned when `x` is in between two data points.
+     */
     double findValue(double x) const;
 
 private:
@@ -58,9 +63,6 @@ private:
     const XFrameBuffer* _x;
     FrameBuffer* _y;
     ChannelInfoModel* _info;
-
-    /// Finds index of closest X in `xData`
-    int findIndex(double x) const;
 };
 
 #endif // STREAMCHANNEL_H
