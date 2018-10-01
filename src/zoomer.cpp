@@ -21,6 +21,9 @@
 #include <qwt_plot.h>
 #include <QPen>
 #include <QMouseEvent>
+#include <QtMath>
+
+static const int VALUE_POINT_DIAM = 4;
 
 Zoomer::Zoomer(QWidget* widget, const Stream* stream, bool doReplot) :
     ScrollZoomer(widget)
@@ -139,7 +142,7 @@ void Zoomer::drawValues(QPainter* painter) const
 
             painter->setBrush(_stream->channel(ci)->color());
             painter->setPen(Qt::NoPen);
-            painter->drawEllipse(p, 4, 4);
+            painter->drawEllipse(p, VALUE_POINT_DIAM, VALUE_POINT_DIAM);
 
             painter->setPen(Qt::white);
             painter->drawText(p, QString("%1").arg(val));
@@ -171,9 +174,19 @@ QRect Zoomer::trackerRect(const QFont& font) const
     }
     else
     {
-        // TODO: optimize tracker area for masking instead of returning whole plot size
-        return pickArea().boundingRect().toRect();
+        return valueTrackerRect(font);
     }
+}
+
+QRect Zoomer::valueTrackerRect(const QFont& font) const
+{
+    // TODO: consider using actual tracker values for width calculation
+    const int textWidth = qCeil(QwtText("-8.8888888").textSize(font).width());
+    const int width = textWidth + VALUE_POINT_DIAM;
+    const int x = trackerPosition().x() - VALUE_POINT_DIAM;
+    const auto pickRect = pickArea().boundingRect();
+
+    return QRect(x, pickRect.y(), width, pickRect.height());
 }
 
 void Zoomer::widgetMousePressEvent(QMouseEvent* mouseEvent)

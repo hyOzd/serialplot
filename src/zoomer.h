@@ -21,6 +21,7 @@
 #define ZOOMER_H
 
 #include <QVector>
+#include <QRect>
 
 #include "scrollzoomer.h"
 #include "stream.h"
@@ -64,6 +65,8 @@ private:
     void drawValues(QPainter* painter) const;
     /// Find sample values for given X value
     QVector<double> findValues(double x) const;
+    /// Returns trackerRect for value tracker
+    QRect valueTrackerRect(const QFont& font) const;
 };
 
 #endif // ZOOMER_H
