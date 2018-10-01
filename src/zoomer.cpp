@@ -24,6 +24,7 @@
 #include <QtMath>
 
 static const int VALUE_POINT_DIAM = 4;
+static const int VALUE_TEXT_MARGIN = VALUE_POINT_DIAM + 2;
 
 Zoomer::Zoomer(QWidget* widget, const Stream* stream, bool doReplot) :
     ScrollZoomer(widget)
@@ -145,7 +146,10 @@ void Zoomer::drawValues(QPainter* painter) const
             painter->drawEllipse(p, VALUE_POINT_DIAM, VALUE_POINT_DIAM);
 
             painter->setPen(Qt::white);
-            painter->drawText(p, QString("%1").arg(val));
+            // We give a very small (1x1) rectangle but disable clipping
+            painter->drawText(QRectF(p.x() + VALUE_TEXT_MARGIN, p.y(), 1, 1),
+                              Qt::AlignVCenter | Qt::TextDontClip,
+                              QString("%1").arg(val));
         }
     }
 
@@ -182,7 +186,7 @@ QRect Zoomer::valueTrackerRect(const QFont& font) const
 {
     // TODO: consider using actual tracker values for width calculation
     const int textWidth = qCeil(QwtText("-8.8888888").textSize(font).width());
-    const int width = textWidth + VALUE_POINT_DIAM;
+    const int width = textWidth + VALUE_POINT_DIAM + VALUE_TEXT_MARGIN;
     const int x = trackerPosition().x() - VALUE_POINT_DIAM;
     const auto pickRect = pickArea().boundingRect();
 
