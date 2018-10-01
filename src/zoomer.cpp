@@ -104,12 +104,14 @@ QRegion Zoomer::rubberBandMask() const
 
 void Zoomer::drawTracker(QPainter* painter) const
 {
-    // ScrollZoomer::drawTracker(painter);
-    if (_stream != nullptr && _stream->numChannels())
+    if (isActive())
+    {
+        QwtPlotZoomer::drawTracker(painter);
+    }
+    else if (_stream != nullptr && _stream->numChannels())
     {
         drawValues(painter);
     }
-    return;
 }
 
 void Zoomer::drawValues(QPainter* painter) const
@@ -163,8 +165,15 @@ QVector<double> Zoomer::findValues(double x) const
 
 QRect Zoomer::trackerRect(const QFont& font) const
 {
-    // TODO: optimize tracker area for masking instead of returning whole plot size
-    return pickArea().boundingRect().toRect();
+    if (isActive())
+    {
+        return QwtPlotZoomer::trackerRect(font);
+    }
+    else
+    {
+        // TODO: optimize tracker area for masking instead of returning whole plot size
+        return pickArea().boundingRect().toRect();
+    }
 }
 
 void Zoomer::widgetMousePressEvent(QMouseEvent* mouseEvent)
