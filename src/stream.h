@@ -48,7 +48,7 @@ public:
      * @param x has X data input
      * @param ns number of samples
      */
-    Stream(unsigned nc = 0, bool x = false, unsigned ns = 0);
+    Stream(unsigned nc = 1, bool x = false, unsigned ns = 2);
     ~Stream();
 
     bool hasX() const;
@@ -78,9 +78,12 @@ signals:
     void dataAdded(); ///< emitted when data added to channel man.
 
 public slots:
-    // TODO: these won't be public
-    // void setNumChannels(unsigned number);
+    /// Change number of samples (buffer size)
     void setNumSamples(unsigned value);
+
+    /// Change X axis style
+    /// @note Ignored when X is provided by source (hasX == true)
+    void setXAxis(bool asIndex, double min, double max);
 
     /// When paused data feed is ignored
     void pause(bool paused);
@@ -98,6 +101,9 @@ private:
 
     ChannelInfoModel _infoModel;
 
+    bool xAsIndex;
+    double xMin, xMax;
+
     /**
      * Applies gain and offset to given pack.
      *
@@ -110,6 +116,9 @@ private:
      * @return modified data
      */
     const SamplePack* applyGainOffset(const SamplePack& pack) const;
+
+    /// Returns a new virtual X buffer for settings
+    XFrameBuffer* makeXBuffer() const;
 };
 
 

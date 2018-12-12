@@ -19,7 +19,6 @@
 
 #include <algorithm>
 #include <QMetaEnum>
-#include <QtDebug>
 #include "qwt_symbol.h"
 
 #include "plot.h"
@@ -53,7 +52,7 @@ PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
     // add initial curves if any?
     for (unsigned int i = 0; i < stream->numChannels(); i++)
     {
-        addCurve(stream->channel(i)->name(), stream->channel(i)->yData());
+        addCurve(stream->channel(i)->name(), stream->channel(i)->xData(), stream->channel(i)->yData());
     }
 
 }
@@ -71,7 +70,7 @@ PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
 
     for (unsigned ci = 0; ci < snapshot->numChannels(); ci++)
     {
-        addCurve(snapshot->channelName(ci), snapshot->yData[ci]);
+        addCurve(snapshot->channelName(ci), snapshot->xData[ci], snapshot->yData[ci]);
     }
 
     connect(infoModel, &QAbstractItemModel::dataChanged,
@@ -149,7 +148,7 @@ void PlotManager::onNumChannelsChanged(unsigned value)
         // add new channels
         for (unsigned int i = oldNum; i < numOfChannels; i++)
         {
-            addCurve(_stream->channel(i)->name(), _stream->channel(i)->yData());
+            addCurve(_stream->channel(i)->name(), _stream->channel(i)->xData(), _stream->channel(i)->yData());
         }
     }
     else if(numOfChannels < oldNum)
@@ -333,11 +332,10 @@ Plot* PlotManager::addPlotWidget()
     return plot;
 }
 
-void PlotManager::addCurve(QString title, const FrameBuffer* buffer)
+void PlotManager::addCurve(QString title, const XFrameBuffer* xBuf, const FrameBuffer* yBuf)
 {
     auto curve = new QwtPlotCurve(title);
-    auto series = new FrameBufferSeries(buffer);
-    series->setXAxis(_xAxisAsIndex, _xMin, _xMax);
+    auto series = new FrameBufferSeries(xBuf, yBuf);
     curve->setSamples(series);
     _addCurve(curve);
 }
@@ -482,10 +480,13 @@ void PlotManager::setXAxis(bool asIndex, double xMin, double xMax)
     _xAxisAsIndex = asIndex;
     _xMin = xMin;
     _xMax = xMax;
+
+    int ci = 0;
     for (auto curve : curves)
     {
         FrameBufferSeries* series = static_cast<FrameBufferSeries*>(curve->data());
-        series->setXAxis(asIndex, xMin, xMax);
+        series->setX(_stream->channel(ci)->xData());
+        ci++;
     }
     for (auto plot : plotWidgets)
     {

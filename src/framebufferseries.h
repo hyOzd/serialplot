@@ -35,10 +35,9 @@
 class FrameBufferSeries : public QwtSeriesData<QPointF>
 {
 public:
-    FrameBufferSeries(const FrameBuffer* buffer);
+    FrameBufferSeries(const XFrameBuffer* x, const FrameBuffer* y);
 
-    /// Behavior of X axis
-    void setXAxis(bool asIndex, double xmin, double xmax);
+    void setX(const XFrameBuffer* x);
 
     // QwtSeriesData implementations
     size_t size() const;
@@ -47,10 +46,8 @@ public:
     void setRectOfInterest(const QRectF& rect);
 
 private:
-    const FrameBuffer* _buffer;
-    bool xAsIndex;
-    double _xmin;
-    double _xmax;
+    const XFrameBuffer* _x;
+    const FrameBuffer* _y;
 
     int int_index_start; ///< starting index of "rectangle of interest"
     int int_index_end;   ///< ending index of "rectangle of interest"

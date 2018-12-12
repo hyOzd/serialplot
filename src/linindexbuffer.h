@@ -26,17 +26,19 @@
 /// intermediate values are calculated linearly.
 ///
 /// @note This buffer isn't for storing data.
-class LinIndexBuffer : public ResizableBuffer
+class LinIndexBuffer : public XFrameBuffer
 {
 public:
     LinIndexBuffer(unsigned n, Range lim);
     LinIndexBuffer(unsigned n, double min, double max) :
         LinIndexBuffer(n, {min, max}) {};
 
-    unsigned size() const;
-    double sample(unsigned i) const;
-    Range limits() const;
-    void resize(unsigned n);
+    unsigned size() const override;
+    double sample(unsigned i) const override;
+    Range limits() const override;
+    void resize(unsigned n) override;
+    int findIndex(double value) const override;
+
     /// Sets minimum and maximum sample values of the buffer.
     void setLimits(Range lim);
 

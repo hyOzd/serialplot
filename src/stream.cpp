@@ -20,12 +20,17 @@
 #include "stream.h"
 #include "ringbuffer.h"
 #include "indexbuffer.h"
+#include "linindexbuffer.h"
 
 Stream::Stream(unsigned nc, bool x, unsigned ns) :
     _infoModel(nc)
 {
     _numSamples = ns;
     _paused = false;
+
+    xAsIndex = true;
+    xMin = 0;
+    xMax = 1;
 
     // create xdata buffer
     _hasx = x;
@@ -36,7 +41,7 @@ Stream::Stream(unsigned nc, bool x, unsigned ns) :
     }
     else
     {
-        xData = new IndexBuffer(ns);
+        xData = makeXBuffer();
     }
 
     // create channels
@@ -124,7 +129,7 @@ void Stream::setNumChannels(unsigned nc, bool x)
         }
         else
         {
-            xData = new IndexBuffer(_numSamples);
+            xData = makeXBuffer();
         }
 
         for (auto c : channels)
@@ -142,6 +147,18 @@ void Stream::setNumChannels(unsigned nc, bool x)
     }
 
     Sink::setNumChannels(nc, x);
+}
+
+XFrameBuffer* Stream::makeXBuffer() const
+{
+    if (xAsIndex)
+    {
+        return new IndexBuffer(_numSamples);
+    }
+    else
+    {
+        return new LinIndexBuffer(_numSamples, xMin, xMax);
+    }
 }
 
 const SamplePack* Stream::applyGainOffset(const SamplePack& pack) const
@@ -238,6 +255,24 @@ void Stream::setNumSamples(unsigned value)
     for (auto c : channels)
     {
         static_cast<RingBuffer*>(c->yData())->resize(value);
+    }
+}
+
+void Stream::setXAxis(bool asIndex, double min, double max)
+{
+    xAsIndex = asIndex;
+    xMin = min;
+    xMax = max;
+
+    // Note that x axis scaling is ignored when X is provided from source as data
+    // TODO: assert (UI options for x axis should be disabled)
+    if (!hasX())
+    {
+        xData = makeXBuffer();
+        for (auto c : channels)
+        {
+            c->setX(xData);
+        }
     }
 }
 

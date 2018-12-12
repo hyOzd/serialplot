@@ -49,7 +49,7 @@ public:
     ~PlotManager();
     /// Add a new curve with title and buffer. A color is
     /// automatically chosen for curve.
-    void addCurve(QString title, const FrameBuffer* buffer);
+    void addCurve(QString title, const XFrameBuffer* xBuf, const FrameBuffer* yBuf);
     /// Removes curves from the end
     void removeCurves(unsigned number);
     /// Returns current number of curves known by plot manager
