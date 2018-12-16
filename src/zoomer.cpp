@@ -130,8 +130,8 @@ void Zoomer::drawValues(QPainter* painter) const
     auto values = findValues(x);
 
     // draw vertical line
-    auto linePen = QPen(Qt::DotLine);
-    linePen.setColor(Qt::white);
+    auto linePen = rubberBandPen();
+    linePen.setStyle(Qt::DotLine);
     painter->setPen(linePen);
     const QRect pRect = pickArea().boundingRect().toRect();
     int px = trackerPosition().x();
@@ -151,7 +151,7 @@ void Zoomer::drawValues(QPainter* painter) const
             painter->setPen(Qt::NoPen);
             painter->drawEllipse(p, VALUE_POINT_DIAM, VALUE_POINT_DIAM);
 
-            painter->setPen(Qt::white);
+            painter->setPen(rubberBandPen());
             // We give a very small (1x1) rectangle but disable clipping
             painter->drawText(QRectF(p.x() + VALUE_TEXT_MARGIN, p.y(), 1, 1),
                               Qt::AlignVCenter | Qt::TextDontClip,
