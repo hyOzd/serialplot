@@ -26,11 +26,10 @@
 static const int VALUE_POINT_DIAM = 4;
 static const int VALUE_TEXT_MARGIN = VALUE_POINT_DIAM + 2;
 
-Zoomer::Zoomer(QWidget* widget, const Stream* stream, bool doReplot) :
+Zoomer::Zoomer(QWidget* widget, bool doReplot) :
     ScrollZoomer(widget)
 {
     is_panning = false;
-    _stream = stream;
 
     setTrackerMode(AlwaysOn);
 
@@ -61,6 +60,11 @@ void Zoomer::zoom( const QRectF & rect)
     }
 
     ScrollZoomer::zoom(rect);
+}
+
+void Zoomer::setDispChannels(QVector<const StreamChannel*> channels)
+{
+    dispChannels = channels;
 }
 
 QwtText Zoomer::trackerTextF(const QPointF& pos) const
@@ -112,7 +116,7 @@ void Zoomer::drawTracker(QPainter* painter) const
     {
         QwtPlotZoomer::drawTracker(painter);
     }
-    else if (_stream != nullptr && _stream->numChannels())
+    else if (dispChannels.length())
     {
         drawValues(painter);
     }
@@ -136,12 +140,14 @@ void Zoomer::drawValues(QPainter* painter) const
     // draw sample values
     for (int ci = 0; ci < values.size(); ci++)
     {
+        if (!dispChannels[ci]->visible()) continue;
+
         double val = values[ci];
         if (!std::isnan(val))
         {
             auto p = transform(QPointF(x, val));
 
-            painter->setBrush(_stream->channel(ci)->color());
+            painter->setBrush(dispChannels[ci]->color());
             painter->setPen(Qt::NoPen);
             painter->drawEllipse(p, VALUE_POINT_DIAM, VALUE_POINT_DIAM);
 
@@ -158,16 +164,17 @@ void Zoomer::drawValues(QPainter* painter) const
 
 QVector<double> Zoomer::findValues(double x) const
 {
-    // TODO: process only channel(s) of this plot
-    unsigned nc = _stream->numChannels();
-    QVector<double> r(nc);
+    unsigned nc = dispChannels.length();
+    QVector<double> result(nc);
     for (unsigned ci = 0; ci < nc; ci++)
     {
-        auto chan = _stream->channel(ci);
-        double val = chan->findValue(x);
-        r[ci] = val;
+        if (dispChannels[ci]->visible())
+        {
+            result[ci] = dispChannels[ci]->findValue(x);
+        }
+
     }
-    return r;
+    return result;
 }
 
 QRect Zoomer::trackerRect(const QFont& font) const

@@ -47,8 +47,11 @@ public:
         ShowSymbolsHide
     };
 
-    Plot(const Stream* stream, QWidget* parent = 0);
+    Plot(QWidget* parent = 0);
     ~Plot();
+
+    /// Set displayed channels for value tracking (can be null)
+    void setDispChannels(QVector<const StreamChannel*> channels);
 
 public slots:
     void showGrid(bool show = true);

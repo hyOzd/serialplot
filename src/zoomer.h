@@ -24,16 +24,18 @@
 #include <QRect>
 
 #include "scrollzoomer.h"
-#include "stream.h"
+#include "streamchannel.h"
 
 class Zoomer : public ScrollZoomer
 {
     Q_OBJECT
 
 public:
-    Zoomer(QWidget*, const Stream* stream, bool doReplot=true);
+    Zoomer(QWidget*, bool doReplot=true);
     void zoom(int up);
     void zoom(const QRectF&);
+    /// Set displayed channels for value tracking (can be null)
+    void setDispChannels(QVector<const StreamChannel*> channels);
 
 signals:
     void unzoomed();
@@ -59,7 +61,8 @@ protected:
 private:
     bool is_panning;
     QPointF pan_point;
-    const Stream* _stream;
+    /// displayed channels for value tracking
+    QVector<const StreamChannel*> dispChannels;
 
     /// Draw sample values
     void drawValues(QPainter* painter) const;

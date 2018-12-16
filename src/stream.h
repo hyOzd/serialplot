@@ -57,6 +57,7 @@ public:
     unsigned numSamples() const;
     const StreamChannel* channel(unsigned index) const;
     StreamChannel* channel(unsigned index);
+    QVector<const StreamChannel*> allChannels() const;
     const ChannelInfoModel* infoModel() const;
     ChannelInfoModel* infoModel();
 

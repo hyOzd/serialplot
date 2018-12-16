@@ -87,6 +87,16 @@ StreamChannel* Stream::channel(unsigned index)
     return const_cast<StreamChannel*>(static_cast<const Stream&>(*this).channel(index));
 }
 
+QVector<const StreamChannel*> Stream::allChannels() const
+{
+    QVector<const StreamChannel*> result(numChannels());
+    for (unsigned ci = 0; ci < numChannels(); ci++)
+    {
+        result[ci] = channel(ci);
+    }
+    return result;
+}
+
 const ChannelInfoModel* Stream::infoModel() const
 {
     return &_infoModel;

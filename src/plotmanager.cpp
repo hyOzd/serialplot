@@ -54,7 +54,6 @@ PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
     {
         addCurve(stream->channel(i)->name(), stream->channel(i)->xData(), stream->channel(i)->yData());
     }
-
 }
 
 PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
@@ -94,8 +93,6 @@ void PlotManager::construct(QWidget* plotArea, PlotMenu* menu)
     // initalize layout and single widget
     isMulti = false;
     scrollArea = NULL;
-    setupLayout(isMulti);
-    addPlotWidget();
 
     // connect to  menu
     connect(menu, &PlotMenu::symbolShowChanged, this, &PlotManager:: setSymbols);
@@ -217,8 +214,6 @@ void PlotManager::checkNoVisChannels()
 
 void PlotManager::setMulti(bool enabled)
 {
-    if (enabled == isMulti) return;
-
     isMulti = enabled;
 
     // detach all curves
@@ -239,17 +234,25 @@ void PlotManager::setMulti(bool enabled)
     if (isMulti)
     {
         // add new widgets and attach
+        int i = 0;
         for (auto curve : curves)
         {
             auto plot = addPlotWidget();
             plot->setVisible(curve->isVisible());
+            plot->setDispChannels(QVector<const StreamChannel*>(1, _stream->channel(i)));
             curve->attach(plot);
+            i++;
         }
     }
     else
     {
         // add a single widget
         auto plot = addPlotWidget();
+
+        if (_stream != nullptr)
+        {
+            plot->setDispChannels(_stream->allChannels());
+        }
 
         // attach all curves
         for (auto curve : curves)
@@ -305,7 +308,7 @@ void PlotManager::setupLayout(bool multiPlot)
 
 Plot* PlotManager::addPlotWidget()
 {
-    auto plot = new Plot(_stream);
+    auto plot = new Plot();
     plotWidgets.append(plot);
     layout->addWidget(plot);
 
@@ -355,10 +358,12 @@ void PlotManager::_addCurve(QwtPlotCurve* curve)
     {
         // create a new plot widget
         plot = addPlotWidget();
+        plot->setDispChannels(QVector<const StreamChannel*>(1, _stream->channel(index)));
     }
     else
     {
         plot = plotWidgets[0];
+        plot->setDispChannels(_stream->allChannels());
     }
 
     // show the curve

@@ -31,9 +31,9 @@
 static const int SYMBOL_SHOW_AT_WIDTH = 5;
 static const int SYMBOL_SIZE_MAX = 7;
 
-Plot::Plot(const Stream* stream, QWidget* parent) :
+Plot::Plot(QWidget* parent) :
     QwtPlot(parent),
-    zoomer(this->canvas(), stream, false),
+    zoomer(this->canvas(), false),
     sZoomer(this, &zoomer)
 {
     isAutoScaled = true;
@@ -89,6 +89,11 @@ Plot::Plot(const Stream* stream, QWidget* parent) :
 Plot::~Plot()
 {
     if (snapshotOverlay != NULL) delete snapshotOverlay;
+}
+
+void Plot::setDispChannels(QVector<const StreamChannel*> channels)
+{
+    zoomer.setDispChannels(channels);
 }
 
 void Plot::setYAxis(bool autoScaled, double yAxisMin, double yAxisMax)
