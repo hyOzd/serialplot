@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -79,6 +79,9 @@ private:
     /// Show a confirmation dialog before setting #samples to a big value
     bool askNSConfirmation(int value);
 
+    /// Set the color displayed by color selector button
+    void setSelectorColor(QColor color);
+
 private slots:
     void onNumOfSamples(int value);
     void onAutoScaleChecked(bool checked);
@@ -87,6 +90,7 @@ private slots:
     void onIndexChecked(bool checked);
     void onXScaleChanged();
     void onPlotWidthChanged();
+    void onColorSelect();
 };
 
 #endif // PLOTCONTROLPANEL_H

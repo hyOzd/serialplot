@@ -1,5 +1,5 @@
 #
-# Copyright © 2018 Hasan Yavuz Özderya
+# Copyright © 2019 Hasan Yavuz Özderya
 #
 # This file is part of serialplot.
 #
@@ -44,22 +44,10 @@ else (BUILD_QWT)
     find_package(Qwt 6.1 REQUIRED)
 endif (BUILD_QWT)
 
-# If set, cmake will download QtColorWidgets over git, build and use it as a static library.
-set(BUILD_QTCOLORWIDGETS true CACHE BOOL "Download and build QtColorWidgets library automatically.")
-if (BUILD_QTCOLORWIDGETS)
-  include(BuildQColorWidgets)
-else ()
-  find_package(QtColorWidgets REQUIRED)
-endif ()
-
 # includes
 include_directories("./src"
   ${QWT_INCLUDE_DIR}
-  ${QTCOLORWIDGETS_INCLUDE_DIRS}
   )
-
-# flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${QTCOLORWIDGETS_FLAGS}")
 
 # wrap UI and resource files
 qt5_wrap_ui(UI_FILES
@@ -153,16 +141,11 @@ add_executable(${PROGRAM_NAME} WIN32
 # Use the Widgets module from Qt 5.
 target_link_libraries(${PROGRAM_NAME}
   ${QWT_LIBRARY}
-  ${QTCOLORWIDGETS_LIBRARIES}
   )
 qt5_use_modules(${PROGRAM_NAME} Widgets SerialPort Network)
 
 if (BUILD_QWT)
   add_dependencies(${PROGRAM_NAME} QWT)
-endif ()
-
-if (BUILD_QTCOLORWIDGETS)
-  add_dependencies(${PROGRAM_NAME} QCW)
 endif ()
 
 # set compiler flags

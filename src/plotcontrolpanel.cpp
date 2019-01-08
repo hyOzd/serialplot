@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -21,10 +21,10 @@
 #include <QMessageBox>
 #include <QCheckBox>
 #include <QStyledItemDelegate>
+#include <QColorDialog>
 
 #include <math.h>
 
-#include "color_selector.hpp"
 #include "plotcontrolpanel.h"
 #include "ui_plotcontrolpanel.h"
 #include "setting_defines.h"
@@ -162,9 +162,9 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
                      this, SLOT(onRangeSelected()));
 
     // color selector starts disabled until a channel is selected
-    ui->colorSelector->setColor(QColor(0,0,0,0));
-    ui->colorSelector->setDisplayMode(color_widgets::ColorPreview::AllAlpha);
-    ui->colorSelector->setDisabled(true);
+    ui->pbColorSel->setDisabled(true);
+    setSelectorColor(QColor(0,0,0,0));
+    connect(ui->pbColorSel, &QPushButton::clicked, this, &PlotControlPanel::onColorSelect);
 
     // reset buttons
     resetAct.setToolTip(tr("Reset channel names and colors"));
@@ -239,6 +239,30 @@ bool PlotControlPanel::askNSConfirmation(int value)
     mb.setCheckBox(cb);
 
     return mb.exec() == QMessageBox::Apply;
+}
+
+void PlotControlPanel::setSelectorColor(QColor color)
+{
+    ui->pbColorSel->setStyleSheet(QString("background-color: %1;").arg(color.name()));
+}
+
+void PlotControlPanel::onColorSelect()
+{
+    auto selection = ui->tvChannelInfo->selectionModel()->currentIndex();
+    // no selection
+    if (!selection.isValid()) return;
+
+    // current color
+    auto model = ui->tvChannelInfo->model();
+    QColor color = model->data(selection, Qt::ForegroundRole).value<QColor>();
+
+    // show dialog
+    color = QColorDialog::getColor(color, this);
+
+    if (color.isValid())        // color is set to invalid if user cancels
+    {
+        ui->tvChannelInfo->model()->setData(selection, color, Qt::ForegroundRole);
+    }
 }
 
 void PlotControlPanel::onAutoScaleChecked(bool checked)
@@ -373,19 +397,16 @@ void PlotControlPanel::setChannelInfoModel(ChannelInfoModel* model)
 
                 if (current.isValid())
                 {
-                    ui->colorSelector->setEnabled(true);
+                    ui->pbColorSel->setEnabled(true);
                     auto model = ui->tvChannelInfo->model();
                     color = model->data(current, Qt::ForegroundRole).value<QColor>();
                 }
                 else
                 {
-                    ui->colorSelector->setDisabled(true);
+                    ui->pbColorSel->setDisabled(true);
                 }
 
-                // temporarily block signals because `setColor` emits `colorChanged`
-                bool wasBlocked = ui->colorSelector->blockSignals(true);
-                ui->colorSelector->setColor(color);
-                ui->colorSelector->blockSignals(wasBlocked);
+                setSelectorColor(color);
             });
 
     connect(ui->tvChannelInfo->selectionModel(), &QItemSelectionModel::selectionChanged,
@@ -393,20 +414,9 @@ void PlotControlPanel::setChannelInfoModel(ChannelInfoModel* model)
             {
                 if (!selected.length())
                 {
-                    ui->colorSelector->setDisabled(true);
-
-                    // temporarily block signals because `setColor` emits `colorChanged`
-                    bool wasBlocked = ui->colorSelector->blockSignals(true);
-                    ui->colorSelector->setColor(QColor(0,0,0,0));
-                    ui->colorSelector->blockSignals(wasBlocked);
+                    ui->pbColorSel->setDisabled(true);
+                    setSelectorColor(QColor(0,0,0,0));
                 }
-            });
-
-    connect(ui->colorSelector, &color_widgets::ColorSelector::colorChanged,
-            [this](QColor color)
-            {
-                auto index = ui->tvChannelInfo->selectionModel()->currentIndex();
-                ui->tvChannelInfo->model()->setData(index, color, Qt::ForegroundRole);
             });
 
     connect(model, &QAbstractItemModel::dataChanged,
@@ -419,11 +429,7 @@ void PlotControlPanel::setChannelInfoModel(ChannelInfoModel* model)
 
                 auto mod = ui->tvChannelInfo->model();
                 QColor color = mod->data(current, Qt::ForegroundRole).value<QColor>();
-
-                // temporarily block signals because `setColor` emits `colorChanged`
-                bool wasBlocked = ui->colorSelector->blockSignals(true);
-                ui->colorSelector->setColor(color);
-                ui->colorSelector->blockSignals(wasBlocked);
+                setSelectorColor(color);
             });
 
     // reset actions
