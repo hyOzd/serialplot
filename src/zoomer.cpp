@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -19,9 +19,12 @@
 
 #include "zoomer.h"
 #include <qwt_plot.h>
-#include <QtDebug>
-
+#include <QPen>
 #include <QMouseEvent>
+#include <QtMath>
+
+static const int VALUE_POINT_DIAM = 4;
+static const int VALUE_TEXT_MARGIN = VALUE_POINT_DIAM + 2;
 
 Zoomer::Zoomer(QWidget* widget, bool doReplot) :
     ScrollZoomer(widget)
@@ -57,6 +60,11 @@ void Zoomer::zoom( const QRectF & rect)
     }
 
     ScrollZoomer::zoom(rect);
+}
+
+void Zoomer::setDispChannels(QVector<const StreamChannel*> channels)
+{
+    dispChannels = channels;
 }
 
 QwtText Zoomer::trackerTextF(const QPointF& pos) const
@@ -100,6 +108,96 @@ QRegion Zoomer::rubberBandMask() const
     }
     const QRect r = QRect(pa.first(), pa.last()).normalized().adjusted(0, 0, 1, 1);
     return QRegion(r);
+}
+
+void Zoomer::drawTracker(QPainter* painter) const
+{
+    if (isActive())
+    {
+        QwtPlotZoomer::drawTracker(painter);
+    }
+    else if (dispChannels.length())
+    {
+        drawValues(painter);
+    }
+}
+
+void Zoomer::drawValues(QPainter* painter) const
+{
+    painter->save();
+
+    double x = invTransform(trackerPosition()).x();
+    auto values = findValues(x);
+
+    // draw vertical line
+    auto linePen = rubberBandPen();
+    linePen.setStyle(Qt::DotLine);
+    painter->setPen(linePen);
+    const QRect pRect = pickArea().boundingRect().toRect();
+    int px = trackerPosition().x();
+    painter->drawLine(px, pRect.top(), px, pRect.bottom());
+
+    // draw sample values
+    for (int ci = 0; ci < values.size(); ci++)
+    {
+        if (!dispChannels[ci]->visible()) continue;
+
+        double val = values[ci];
+        if (!std::isnan(val))
+        {
+            auto p = transform(QPointF(x, val));
+
+            painter->setBrush(dispChannels[ci]->color());
+            painter->setPen(Qt::NoPen);
+            painter->drawEllipse(p, VALUE_POINT_DIAM, VALUE_POINT_DIAM);
+
+            painter->setPen(rubberBandPen());
+            // We give a very small (1x1) rectangle but disable clipping
+            painter->drawText(QRectF(p.x() + VALUE_TEXT_MARGIN, p.y(), 1, 1),
+                              Qt::AlignVCenter | Qt::TextDontClip,
+                              QString("%1").arg(val));
+        }
+    }
+
+    painter->restore();
+}
+
+QVector<double> Zoomer::findValues(double x) const
+{
+    unsigned nc = dispChannels.length();
+    QVector<double> result(nc);
+    for (unsigned ci = 0; ci < nc; ci++)
+    {
+        if (dispChannels[ci]->visible())
+        {
+            result[ci] = dispChannels[ci]->findValue(x);
+        }
+
+    }
+    return result;
+}
+
+QRect Zoomer::trackerRect(const QFont& font) const
+{
+    if (isActive())
+    {
+        return QwtPlotZoomer::trackerRect(font);
+    }
+    else
+    {
+        return valueTrackerRect(font);
+    }
+}
+
+QRect Zoomer::valueTrackerRect(const QFont& font) const
+{
+    // TODO: consider using actual tracker values for width calculation
+    const int textWidth = qCeil(QwtText("-8.8888888").textSize(font).width());
+    const int width = textWidth + VALUE_POINT_DIAM + VALUE_TEXT_MARGIN;
+    const int x = trackerPosition().x() - VALUE_POINT_DIAM;
+    const auto pickRect = pickArea().boundingRect();
+
+    return QRect(x, pickRect.y(), width, pickRect.height());
 }
 
 void Zoomer::widgetMousePressEvent(QMouseEvent* mouseEvent)

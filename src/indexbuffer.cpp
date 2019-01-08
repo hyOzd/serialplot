@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -46,4 +46,16 @@ double IndexBuffer::sample(unsigned i) const
 Range IndexBuffer::limits() const
 {
     return Range{0, _size-1.};
+}
+
+int IndexBuffer::findIndex(double value) const
+{
+    if (value < 0 || value > size() - 1)
+    {
+        return OUT_OF_RANGE;
+    }
+    else
+    {
+        return value;
+    }
 }

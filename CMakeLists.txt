@@ -106,6 +106,7 @@ add_executable(${PROGRAM_NAME} WIN32
   src/ringbuffer.cpp
   src/ringbuffer.cpp
   src/indexbuffer.cpp
+  src/linindexbuffer.cpp
   src/readonlybuffer.cpp
   src/framebufferseries.cpp
   src/numberformatbox.cpp

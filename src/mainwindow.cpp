@@ -169,6 +169,9 @@ MainWindow::MainWindow(QWidget *parent) :
             plotMan, &PlotManager::setYAxis);
 
     connect(&plotControlPanel, &PlotControlPanel::xScaleChanged,
+            &stream, &Stream::setXAxis);
+
+    connect(&plotControlPanel, &PlotControlPanel::xScaleChanged,
             plotMan, &PlotManager::setXAxis);
 
     connect(&plotControlPanel, &PlotControlPanel::plotWidthChanged,
@@ -215,6 +218,9 @@ MainWindow::MainWindow(QWidget *parent) :
     plotControlPanel.setChannelInfoModel(stream.infoModel());
 
     // init scales
+    stream.setXAxis(plotControlPanel.xAxisAsIndex(),
+                    plotControlPanel.xMin(), plotControlPanel.xMax());
+
     plotMan->setYAxis(plotControlPanel.autoScale(),
                       plotControlPanel.yMin(), plotControlPanel.yMax());
     plotMan->setXAxis(plotControlPanel.xAxisAsIndex(),

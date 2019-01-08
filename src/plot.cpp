@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -89,6 +89,11 @@ Plot::Plot(QWidget* parent) :
 Plot::~Plot()
 {
     if (snapshotOverlay != NULL) delete snapshotOverlay;
+}
+
+void Plot::setDispChannels(QVector<const StreamChannel*> channels)
+{
+    zoomer.setDispChannels(channels);
 }
 
 void Plot::setYAxis(bool autoScaled, double yAxisMin, double yAxisMax)

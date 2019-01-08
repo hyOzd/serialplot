@@ -71,6 +71,7 @@ Snapshot* SnapshotManager::makeSnapshot() const
 
     for (unsigned ci = 0; ci < _stream->numChannels(); ci++)
     {
+        snapshot->xData.append(new IndexBuffer(_stream->numSamples()));
         snapshot->yData.append(new ReadOnlyBuffer(_stream->channel(ci)->yData()));
     }
 
@@ -194,6 +195,7 @@ void SnapshotManager::loadSnapshotFromFile(QString fileName)
 
     for (unsigned ci = 0; ci < numOfChannels; ci++)
     {
+        snapshot->xData.append(new IndexBuffer(data[ci].size()));
         snapshot->yData.append(new ReadOnlyBuffer(data[ci].data(), data[ci].size()));
     }
 

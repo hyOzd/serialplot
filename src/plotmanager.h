@@ -41,7 +41,7 @@ class PlotManager : public QObject
 
 public:
     explicit PlotManager(QWidget* plotArea, PlotMenu* menu,
-                         const Stream* stream = NULL,
+                         const Stream* stream = nullptr,
                          QObject *parent = 0);
     explicit PlotManager(QWidget* plotArea, PlotMenu* menu,
                          Snapshot* snapshot,
@@ -49,7 +49,7 @@ public:
     ~PlotManager();
     /// Add a new curve with title and buffer. A color is
     /// automatically chosen for curve.
-    void addCurve(QString title, const FrameBuffer* buffer);
+    void addCurve(QString title, const XFrameBuffer* xBuf, const FrameBuffer* yBuf);
     /// Removes curves from the end
     void removeCurves(unsigned number);
     /// Returns current number of curves known by plot manager
@@ -82,7 +82,7 @@ private:
     QList<QwtPlotCurve*> curves;
     QList<Plot*> plotWidgets;
     Plot* emptyPlot;  ///< for displaying when all channels are hidden
-    const Stream* _stream;       ///< attached stream, can be `NULL`
+    const Stream* _stream;       ///< attached stream, can be `nullptr`
     const ChannelInfoModel* infoModel;
     bool isDemoShown;
     bool _autoScaled;

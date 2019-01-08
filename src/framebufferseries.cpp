@@ -20,75 +20,64 @@
 #include <math.h>
 #include "framebufferseries.h"
 
-FrameBufferSeries::FrameBufferSeries(const FrameBuffer* buffer)
+FrameBufferSeries::FrameBufferSeries(const XFrameBuffer* x, const FrameBuffer* y)
 {
-    xAsIndex = true;
-    _xmin = 0;
-    _xmax = 1;
-    _buffer = buffer;
+    _x = x;
+    _y = y;
+
     int_index_start = 0;
-    int_index_end = _buffer->size();
+    int_index_end = _y->size();
 }
 
-void FrameBufferSeries::setXAxis(bool asIndex, double xmin, double xmax)
+void FrameBufferSeries::setX(const XFrameBuffer* x)
 {
-    xAsIndex = asIndex;
-    _xmin = xmin;
-    _xmax = xmax;
+    _x = x;
 }
 
 size_t FrameBufferSeries::size() const
 {
-    return int_index_end - int_index_start;
+    return int_index_end - int_index_start + 1;
 }
 
 QPointF FrameBufferSeries::sample(size_t i) const
 {
     i += int_index_start;
-    if (xAsIndex)
-    {
-        return QPointF(i, _buffer->sample(i));
-    }
-    else
-    {
-        return QPointF(i * (_xmax - _xmin) / _buffer->size() + _xmin, _buffer->sample(i));
-    }
+    return QPointF(_x->sample(i), _y->sample(i));
 }
 
 QRectF FrameBufferSeries::boundingRect() const
 {
     QRectF rect;
-    auto yLim = _buffer->limits();
+    auto yLim = _y->limits();
+    auto xLim = _x->limits();
     rect.setBottom(yLim.start);
     rect.setTop(yLim.end);
-    if (xAsIndex)
-    {
-        rect.setLeft(0);
-        rect.setRight(size());
-    }
-    else
-    {
-        rect.setLeft(_xmin);
-        rect.setRight(_xmax);
-    }
+    rect.setLeft(xLim.start);
+    rect.setRight(xLim.end);
+
     return rect.normalized();
 }
 
 void FrameBufferSeries::setRectOfInterest(const QRectF& rect)
 {
-    if (xAsIndex)
+    int_index_start = _x->findIndex(rect.left());
+    int_index_end = _x->findIndex(rect.right());
+
+    if (int_index_start == XFrameBuffer::OUT_OF_RANGE)
     {
-        int_index_start = floor(rect.left())-1;
-        int_index_end = ceil(rect.right())+1;
+        int_index_start = 0;
     }
-    else
+    else if (int_index_start > 0)
     {
-        double xsize = _xmax - _xmin;
-        size_t bsize = _buffer->size();
-        int_index_start =  floor(bsize * (rect.left()-_xmin) / xsize)-1;
-        int_index_end = ceil(bsize * (rect.right()-_xmin) / xsize)+1;
+        int_index_start -= 1;
     }
 
-    int_index_start = std::max(int_index_start, 0);
-    int_index_end = std::min((int) _buffer->size(), int_index_end);
+    if (int_index_end == XFrameBuffer::OUT_OF_RANGE)
+    {
+        int_index_end = _x->size()-1;
+    }
+    else if (int_index_end < (int)_x->size()-1)
+    {
+        int_index_end += 1;
+    }
 }
