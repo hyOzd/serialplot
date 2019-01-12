@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -30,6 +30,7 @@ const char SettingGroup_Channels[] = "Channels";
 const char SettingGroup_Plot[] = "Plot";
 const char SettingGroup_Commands[] = "Commands";
 const char SettingGroup_Record[] = "Record";
+const char SettingGroup_TextView[] = "TextView";
 const char SettingGroup_UpdateCheck[] = "UpdateCheck";
 
 // mainwindow setting keys
@@ -111,6 +112,10 @@ const char SG_Record_Header[]           = "header";
 const char SG_Record_Separator[]        = "separator";
 const char SG_Record_DisableBuffering[] = "disableBuffering";
 const char SG_Record_Timestamp[]        = "timestamp";
+
+// text view settings keys
+const char SG_TextView_NumLines[] = "numLines";
+const char SG_TextView_Decimals[] = "decimals";
 
 // update check settings keys
 const char SG_UpdateCheck_Periodic[]  = "periodicCheck";

@@ -71,7 +71,8 @@ SOURCES += \
     src/recordpanel.cpp \
     src/updatechecker.cpp \
     src/updatecheckdialog.cpp \
-    src/demoreadersettings.cpp
+    src/demoreadersettings.cpp \
+    src/datatextview.cpp
 
 HEADERS += \
     src/mainwindow.h \
@@ -114,7 +115,8 @@ HEADERS += \
     src/recordpanel.h \
     src/updatechecker.h \
     src/updatecheckdialog.h \
-    src/demoreadersettings.h
+    src/demoreadersettings.h \
+    src/datatextview.h
 
 FORMS += \
     src/mainwindow.ui \
@@ -132,7 +134,8 @@ FORMS += \
     src/asciireadersettings.ui \
     src/recordpanel.ui \
     src/updatecheckdialog.ui \
-    src/demoreadersettings.ui
+    src/demoreadersettings.ui \
+    src/datatextview.ui
 
 INCLUDEPATH += qmake/ src/
 

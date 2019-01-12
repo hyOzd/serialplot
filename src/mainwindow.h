@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -46,6 +46,7 @@
 #include "plotmenu.h"
 #include "updatecheckdialog.h"
 #include "samplecounter.h"
+#include "datatextview.h"
 
 namespace Ui {
 class MainWindow;
@@ -89,6 +90,7 @@ private:
     RecordPanel recordPanel;
     PlotControlPanel plotControlPanel;
     PlotMenu plotMenu;
+    DataTextView textView;
     UpdateCheckDialog updateCheckDialog;
 
     /// Returns true if demo is running
