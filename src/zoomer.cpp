@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -124,9 +124,12 @@ void Zoomer::drawTracker(QPainter* painter) const
 
 void Zoomer::drawValues(QPainter* painter) const
 {
+    auto tpos = trackerPosition();
+    if (tpos.x() < 0) return;   // cursor not on window
+
     painter->save();
 
-    double x = invTransform(trackerPosition()).x();
+    double x = invTransform(tpos).x();
     auto values = findValues(x);
 
     // draw vertical line
@@ -134,7 +137,7 @@ void Zoomer::drawValues(QPainter* painter) const
     linePen.setStyle(Qt::DotLine);
     painter->setPen(linePen);
     const QRect pRect = pickArea().boundingRect().toRect();
-    int px = trackerPosition().x();
+    int px = tpos.x();
     painter->drawLine(px, pRect.top(), px, pRect.bottom());
 
     // draw sample values
