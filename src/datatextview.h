@@ -38,6 +38,11 @@ public:
     explicit DataTextView(Stream* stream, QWidget *parent = 0);
     ~DataTextView();
 
+    /// Stores settings into a `QSettings`
+    void saveSettings(QSettings* settings);
+    /// Loads settings from a `QSettings`.
+    void loadSettings(QSettings* settings);
+
 protected:
     void addData(const SamplePack& data);
 

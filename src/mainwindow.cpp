@@ -524,6 +524,7 @@ void MainWindow::saveAllSettings(QSettings* settings)
     plotMenu.saveSettings(settings);
     commandPanel.saveSettings(settings);
     recordPanel.saveSettings(settings);
+    textView.saveSettings(settings);
     updateCheckDialog.saveSettings(settings);
 }
 
@@ -537,6 +538,7 @@ void MainWindow::loadAllSettings(QSettings* settings)
     plotMenu.loadSettings(settings);
     commandPanel.loadSettings(settings);
     recordPanel.loadSettings(settings);
+    textView.loadSettings(settings);
     updateCheckDialog.loadSettings(settings);
 }
 

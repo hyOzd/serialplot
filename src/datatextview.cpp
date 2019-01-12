@@ -20,6 +20,7 @@
 #include "datatextview.h"
 #include "ui_datatextview.h"
 
+#include "setting_defines.h"
 #include "utils.h"
 
 class DataTextViewSink : public Sink
@@ -88,4 +89,22 @@ void DataTextView::addData(const SamplePack& data)
         }
         ui->textView->appendPlainText(str);
     }
+}
+
+void DataTextView::saveSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_Plot);
+    settings->setValue(SG_TextView_NumLines, ui->spNumLines->value());
+    settings->setValue(SG_TextView_Decimals, ui->spDecimals->value());
+    settings->endGroup();
+}
+
+void DataTextView::loadSettings(QSettings* settings)
+{
+    settings->beginGroup(SettingGroup_Plot);
+    ui->spNumLines->setValue(
+        settings->value(SG_TextView_NumLines, ui->spNumLines->value()).toInt());
+    ui->spDecimals->setValue(
+        settings->value(SG_TextView_Decimals, ui->spDecimals->value()).toInt());
+    settings->endGroup();
 }
