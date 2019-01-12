@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -55,7 +55,8 @@ const QMap<int, QString> panelSettingMap({
         {2, "Plot"},
         {3, "Commands"},
         {4, "Record"},
-        {5, "Log"}
+        {5, "TextView"},
+        {6, "Log"}
     });
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -68,6 +69,7 @@ MainWindow::MainWindow(QWidget *parent) :
     commandPanel(&serialPort),
     dataFormatPanel(&serialPort),
     recordPanel(&stream),
+    textView(&stream),
     updateCheckDialog(this)
 {
     ui->setupUi(this);
@@ -79,6 +81,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tabWidget->insertTab(2, &plotControlPanel, "Plot");
     ui->tabWidget->insertTab(3, &commandPanel, "Commands");
     ui->tabWidget->insertTab(4, &recordPanel, "Record");
+    ui->tabWidget->insertTab(5, &textView, "Text View");
     ui->tabWidget->setCurrentIndex(0);
     auto tbPortControl = portControl.toolBar();
     addToolBar(tbPortControl);
