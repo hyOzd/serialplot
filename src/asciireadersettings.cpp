@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -21,6 +21,7 @@
 #include <QRegularExpression>
 
 #include "utils.h"
+#include "defines.h"
 #include "setting_defines.h"
 
 #include "asciireadersettings.h"
@@ -34,6 +35,8 @@ AsciiReaderSettings::AsciiReaderSettings(QWidget *parent) :
 
     auto validator = new QRegularExpressionValidator(QRegularExpression("[^\\d]?"), this);
     ui->leDelimiter->setValidator(validator);
+
+    ui->spNumOfChannels->setMaximum(MAX_NUM_CHANNELS);
 
     connect(ui->rbComma, &QAbstractButton::toggled,
             this, &AsciiReaderSettings::delimiterToggled);

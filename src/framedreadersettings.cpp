@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -20,6 +20,7 @@
 #include <QButtonGroup>
 
 #include "utils.h"
+#include "defines.h"
 #include "setting_defines.h"
 #include "framedreadersettings.h"
 #include "ui_framedreadersettings.h"
@@ -32,6 +33,7 @@ FramedReaderSettings::FramedReaderSettings(QWidget *parent) :
 
     ui->leSyncWord->setMode(false); // hex mode
     ui->leSyncWord->setText("AA BB");
+    ui->spNumOfChannels->setMaximum(MAX_NUM_CHANNELS);
 
     connect(ui->cbChecksum, &QCheckBox::toggled,
             [this](bool enabled)
