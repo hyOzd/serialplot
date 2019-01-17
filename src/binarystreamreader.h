@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -60,10 +60,11 @@ private:
      */
     template<typename T> double readSampleAs();
 
+    unsigned readData() override;
+
 private slots:
     void onNumberFormatChanged(NumberFormat numberFormat);
     void onNumOfChannelsChanged(unsigned value);
-    void onDataReady() override;
 };
 
 #endif // BINARYSTREAMREADER_H

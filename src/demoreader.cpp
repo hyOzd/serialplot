@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -53,8 +53,9 @@ void DemoReader::enable(bool enabled)
     else
     {
         timer.stop();
-        disconnectSinks();
     }
+
+    AbstractReader::enable(enabled);
 }
 
 unsigned DemoReader::numChannels() const
@@ -91,7 +92,8 @@ void DemoReader::onNumChannelsChanged(unsigned value)
     updateNumChannels();
 }
 
-void DemoReader::onDataReady()
+unsigned DemoReader::readData()
 {
     // intentionally empty, required by AbstractReader
+    return 0;
 }

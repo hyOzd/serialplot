@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -50,8 +50,10 @@ private:
 
     bool firstReadAfterEnable = false;
 
+    unsigned readData() override;
+
 private slots:
-    void onDataReady() override;
+
     /**
      * Parses given line and returns sample pack.
      *

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -23,6 +23,7 @@ AbstractReader::AbstractReader(QIODevice* device, QObject* parent) :
     QObject(parent)
 {
     _device = device;
+    numBytesRead = 0;
 }
 
 void AbstractReader::pause(bool enabled)
@@ -42,4 +43,9 @@ void AbstractReader::enable(bool enabled)
         QObject::disconnect(_device, 0, this, 0);
         disconnectSinks();
     }
+}
+
+void AbstractReader::onDataReady()
+{
+    numBytesRead += readData();
 }

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -107,50 +107,58 @@ void BinaryStreamReader::onNumOfChannelsChanged(unsigned value)
     emit numOfChannelsChanged(value);
 }
 
-void BinaryStreamReader::onDataReady()
+unsigned BinaryStreamReader::readData()
 {
     // a package is a set of channel data like {CHAN0_SAMPLE, CHAN1_SAMPLE...}
-    int packageSize = sampleSize * _numChannels;
-    int bytesAvailable = _device->bytesAvailable();
+    unsigned packageSize = sampleSize * _numChannels;
+    unsigned bytesAvailable = _device->bytesAvailable();
+    unsigned totalRead = 0;
 
     // skip 1 byte if requested
     if (skipByteRequested && bytesAvailable > 0)
     {
         _device->read(1);
+        totalRead++;
         skipByteRequested = false;
         bytesAvailable--;
     }
 
     // skip 1 sample (channel) if requested
-    if (skipSampleRequested && bytesAvailable >= (int) sampleSize)
+    if (skipSampleRequested && bytesAvailable >= sampleSize)
     {
         _device->read(sampleSize);
+        totalRead += sampleSize;
         skipSampleRequested = false;
         bytesAvailable -= sampleSize;
     }
 
-    if (bytesAvailable < packageSize) return;
+    if (bytesAvailable < packageSize) return totalRead;
 
-    int numOfPackagesToRead =
+    unsigned numOfPackagesToRead =
         (bytesAvailable - (bytesAvailable % packageSize)) / packageSize;
+    unsigned numBytesToRead = numOfPackagesToRead * packageSize;
+
+    totalRead += numBytesToRead;
 
     if (paused)
     {
         // read and discard data
-        _device->read(numOfPackagesToRead*packageSize);
-        return;
+        _device->read(numBytesToRead);
+        return totalRead;
     }
 
     // actual reading
     SamplePack samples(numOfPackagesToRead, _numChannels);
-    for (int i = 0; i < numOfPackagesToRead; i++)
+    for (unsigned i = 0; i < numOfPackagesToRead; i++)
     {
-        for (unsigned int ci = 0; ci < _numChannels; ci++)
+        for (unsigned ci = 0; ci < _numChannels; ci++)
         {
             samples.data(ci)[i] = (this->*readSample)();
         }
     }
     feedOut(samples);
+
+    return totalRead;
 }
 
 template<typename T> double BinaryStreamReader::readSampleAs()
