@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -366,6 +366,13 @@ void PortControl::onTbPortListActivated(int index)
 
 void PortControl::onPortError(QSerialPort::SerialPortError error)
 {
+#ifdef Q_OS_UNIX
+    // For suppressing "Invalid argument" errors that happens with pseudo terminals
+    auto isPtsInvalidArgErr = [this] () -> bool {
+        return serialPort->portName().contains("pts/") && serialPort->errorString().contains("Invalid argument");
+    };
+#endif
+
     switch(error)
     {
         case QSerialPort::NoError :
@@ -408,12 +415,22 @@ required privileges or device is already opened by another process.";
             qCritical() << "An error occurred while reading data.";
             break;
         case QSerialPort::UnsupportedOperationError:
+#ifdef Q_OS_UNIX
+            // Qt 5.5 gives "Invalid argument" with 'UnsupportedOperationError'
+            if (isPtsInvalidArgErr())
+                break;
+#endif
             qCritical() << "Operation is not supported.";
             break;
         case QSerialPort::TimeoutError:
             qCritical() << "A timeout error occurred.";
             break;
         case QSerialPort::UnknownError:
+#ifdef Q_OS_UNIX
+            // Qt 5.2 gives "Invalid argument" with 'UnknownError'
+            if (isPtsInvalidArgErr())
+                break;
+#endif
             qCritical() << "Unknown error! Error: " << serialPort->errorString();
             break;
         default:
