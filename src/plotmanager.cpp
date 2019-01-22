@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -358,12 +358,24 @@ void PlotManager::_addCurve(QwtPlotCurve* curve)
     {
         // create a new plot widget
         plot = addPlotWidget();
-        plot->setDispChannels(QVector<const StreamChannel*>(1, _stream->channel(index)));
     }
     else
     {
         plot = plotWidgets[0];
-        plot->setDispChannels(_stream->allChannels());
+    }
+
+    if (_stream != nullptr)     // not displaying snapshot
+    {
+        QVector<const StreamChannel*> dispChannels;
+        if (isMulti)
+        {
+            dispChannels = QVector<const StreamChannel*>(1, _stream->channel(index));
+        }
+        else
+        {
+            dispChannels = _stream->allChannels();
+        }
+        plot->setDispChannels(dispChannels);
     }
 
     // show the curve
