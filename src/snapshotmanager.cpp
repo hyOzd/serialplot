@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -157,8 +157,16 @@ void SnapshotManager::loadSnapshotFromFile(QString fileName)
     QTextStream ts(&file);
     QString line;
     unsigned lineNum = 1;
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 5, 0)
     while (ts.readLineInto(&line))
     {
+#else
+    while (true)
+    {
+        line = ts.readLine();
+        if (line.isNull()) break;
+#endif
         // parse line
         auto split = line.split(',');
 
