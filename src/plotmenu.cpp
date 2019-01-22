@@ -212,7 +212,7 @@ void PlotMenu::loadSettings(QSettings* settings)
     {
         setSymbolsHideAct.setChecked(true);
     }
-    else
+    else if (!showSymbolsStr.isEmpty())
     {
         qCritical() << "Invalid symbol setting:" << showSymbolsStr;
     }
