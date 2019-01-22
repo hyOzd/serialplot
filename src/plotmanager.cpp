@@ -74,6 +74,9 @@ PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
 
     connect(infoModel, &QAbstractItemModel::dataChanged,
             this, &PlotManager::onChannelInfoChanged);
+
+    // TODO: remove when snapshot view supports multi display
+    checkNoVisChannels();
 }
 
 void PlotManager::construct(QWidget* plotArea, PlotMenu* menu)
