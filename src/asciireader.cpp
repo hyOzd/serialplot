@@ -127,6 +127,7 @@ void AsciiReader::onDataReady()
 
             // commit data
             feedOut(*samples);
+            delete samples;
         }
     }
 }
