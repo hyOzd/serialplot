@@ -388,6 +388,16 @@ void PlotManager::_addCurve(QwtPlotCurve* curve)
 
 void PlotManager::removeCurves(unsigned number)
 {
+    if (_stream != nullptr)     // not displaying snapshot
+    {
+        if (! isMulti)
+        {
+            QVector<const StreamChannel*> dispChannels;
+            dispChannels = _stream->allChannels();
+            plotWidgets[0]->setDispChannels(dispChannels);
+        }
+    }
+
     for (unsigned i = 0; i < number; i++)
     {
         if (!curves.isEmpty())
