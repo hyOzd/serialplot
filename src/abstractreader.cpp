@@ -23,7 +23,7 @@ AbstractReader::AbstractReader(QIODevice* device, QObject* parent) :
     QObject(parent)
 {
     _device = device;
-    numBytesRead = 0;
+    bytesRead = 0;
 }
 
 void AbstractReader::pause(bool enabled)
@@ -47,5 +47,12 @@ void AbstractReader::enable(bool enabled)
 
 void AbstractReader::onDataReady()
 {
-    numBytesRead += readData();
+    bytesRead += readData();
+}
+
+unsigned AbstractReader::getBytesRead()
+{
+    unsigned r = bytesRead;
+    bytesRead = 0;
+    return r;
 }

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -22,7 +22,6 @@
 
 #include <QWidget>
 #include <QButtonGroup>
-#include <QTimer>
 #include <QSerialPort>
 #include <QList>
 #include <QSettings>
@@ -50,6 +49,8 @@ public:
     unsigned numChannels() const;
     /// Returns active source (reader)
     Source* activeSource();
+    /// Reads and 'zero's number of bytes read from current reader
+    unsigned getBytesRead();
     /// Stores data format panel settings into a `QSettings`
     void saveSettings(QSettings* settings);
     /// Loads data format panel settings from a `QSettings`.

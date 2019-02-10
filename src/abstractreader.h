@@ -49,6 +49,9 @@ public:
     /// None of the current readers support X channel at the moment
     bool hasX() const final { return false; };
 
+    /// Read and 'zero' the byte counter
+    unsigned getBytesRead();
+
 signals:
     // TODO: should we keep this?
     void numOfChannelsChanged(unsigned);
@@ -78,7 +81,7 @@ protected:
     virtual unsigned readData() = 0;
 
 private:
-    unsigned numBytesRead;
+    unsigned bytesRead;
 
 private slots:
     void onDataReady();

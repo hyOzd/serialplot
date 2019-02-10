@@ -231,9 +231,16 @@ MainWindow::MainWindow(QWidget *parent) :
     plotMan->setNumOfSamples(numOfSamples);
     plotMan->setPlotWidth(plotControlPanel.plotWidth());
 
+    // init bps (bits per second) counter
+    bpsLabel.setText("0bps");
+    bpsLabel.setToolTip(tr("bits per second"));
+    ui->statusBar->addPermanentWidget(&bpsLabel);
+    connect(&bpsTimer, &QTimer::timeout,
+            this, &MainWindow::onBpsTimeout);
+
     // Init sps (sample per second) counter
     spsLabel.setText("0sps");
-    spsLabel.setToolTip("samples per second (per channel)");
+    spsLabel.setToolTip(tr("samples per second (per channel)"));
     ui->statusBar->addPermanentWidget(&spsLabel);
     connect(&sampleCounter, &SampleCounter::spsChanged,
             this, &MainWindow::onSpsChanged);
@@ -355,6 +362,18 @@ void MainWindow::onPortToggled(bool open)
     // make sure demo mode is disabled
     if (open && isDemoRunning()) enableDemo(false);
     ui->actionDemoMode->setEnabled(!open);
+
+    if (open)
+    {
+        bpsTimer.start(1000);
+    }
+    else
+    {
+        bpsTimer.stop();
+        // if not cleared last displayed value is stuck
+        bpsLabel.setText("0bps");
+        spsLabel.setText("0sps");
+    }
 }
 
 void MainWindow::onSourceChanged(Source* source)
@@ -380,6 +399,12 @@ void MainWindow::onSpsChanged(float sps)
 {
     int precision = sps < 1. ? 3 : 0;
     spsLabel.setText(QString::number(sps, 'f', precision) + "sps");
+}
+
+void MainWindow::onBpsTimeout()
+{
+    unsigned bits = dataFormatPanel.getBytesRead() * 8;
+    bpsLabel.setText(QString("%1bps").arg(bits));
 }
 
 bool MainWindow::isDemoRunning()

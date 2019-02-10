@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -128,6 +128,11 @@ void DataFormatPanel::selectReader(AbstractReader* reader)
 
     currentReader = reader;
     emit sourceChanged(currentReader);
+}
+
+unsigned DataFormatPanel::getBytesRead()
+{
+    return currentReader->getBytesRead();
 }
 
 void DataFormatPanel::saveSettings(QSettings* settings)

@@ -83,8 +83,11 @@ private:
     QWidget* secondaryPlot;
     SnapshotManager snapshotMan;
     SampleCounter sampleCounter;
+    /// bit counter timer
+    QTimer bpsTimer;
 
     QLabel spsLabel;
+    QLabel bpsLabel;
     CommandPanel commandPanel;
     DataFormatPanel dataFormatPanel;
     RecordPanel recordPanel;
@@ -119,6 +122,7 @@ private slots:
 
     void clearPlot();
     void onSpsChanged(float sps);
+    void onBpsTimeout();
     void enableDemo(bool enabled);
     void showBarPlot(bool show);
 
