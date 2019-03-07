@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -46,6 +46,9 @@ public:
 
     QSerialPort* serialPort;
     QToolBar* toolBar();
+
+    /// Returns maximum bit rate for current baud rate
+    unsigned maxBitRate() const;
 
     /// Stores port settings into a `QSettings`
     void saveSettings(QSettings* settings);

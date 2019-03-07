@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -451,6 +451,27 @@ QString PortControl::currentFlowControlText()
     {
         return "none";
     }
+}
+
+unsigned PortControl::maxBitRate() const
+{
+    float baud = serialPort->baudRate();
+    float dataBits = serialPort->dataBits();
+    float parityBits = serialPort->parity() == QSerialPort::NoParity ? 0 : 1;
+
+    float stopBits;
+    if (serialPort->stopBits() == QSerialPort::OneAndHalfStop)
+    {
+        stopBits = 1.5;
+    }
+    else
+    {
+        stopBits = serialPort->stopBits();
+    }
+
+    float frame_size = 1 /* start bit */ + dataBits + parityBits + stopBits;
+
+    return float(baud) / frame_size;
 }
 
 void PortControl::saveSettings(QSettings* settings)
