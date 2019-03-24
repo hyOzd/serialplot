@@ -76,7 +76,7 @@ private:
     /// Returns currently selected flow control as text to be saved in settings
     QString currentFlowControlText();
 
-public slots:
+private slots:
     void loadPortList();
     void loadBaudRateList();
     void togglePort();
@@ -88,7 +88,6 @@ public slots:
     void selectStopBits(int stopBits); // stopBits must be one of QSerialPort::StopBits
     void selectFlowControl(int flowControl); // flowControl must be one of QSerialPort::FlowControl
 
-private slots:
     void openActionTriggered(bool checked);
     void onCbPortListActivated(int index);
     void onTbPortListActivated(int index);
