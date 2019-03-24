@@ -550,7 +550,7 @@ void PortControl::loadSettings(QSettings* settings)
     parityButtons.button(paritySetting)->setChecked(true);
 
     // load number of bits
-    int dataBits = settings->value(SG_Port_Parity, dataBitsButtons.checkedId()).toInt();
+    int dataBits = settings->value(SG_Port_DataBits, dataBitsButtons.checkedId()).toInt();
     if (dataBits >=5 && dataBits <= 8)
     {
         dataBitsButtons.button((QSerialPort::DataBits) dataBits)->setChecked(true);
