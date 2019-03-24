@@ -36,10 +36,13 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context,
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    QApplication::setApplicationName("SerialPlot");
+    QApplication::setApplicationVersion(VERSION_STRING);
     MainWindow w;
     pMainWindow = &w;
 
     qInstallMessageHandler(messageHandler);
+    w.handleCommandLineOptions(a);
 
     ToolTipFilter ttf;
     a.installEventFilter(&ttf);

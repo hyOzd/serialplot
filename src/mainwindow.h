@@ -64,6 +64,7 @@ public:
 
     void messageHandler(QtMsgType type, const QMessageLogContext &context,
                         const QString &msg);
+    void handleCommandLineOptions(const QCoreApplication &app);
 
 private:
     Ui::MainWindow *ui;

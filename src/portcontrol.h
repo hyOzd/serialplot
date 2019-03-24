@@ -47,6 +47,10 @@ public:
     QSerialPort* serialPort;
     QToolBar* toolBar();
 
+    void selectPort(QString portName);
+    void selectBaudrate(QString baudRate);
+    void openPort();
+
     /// Stores port settings into a `QSettings`
     void saveSettings(QSettings* settings);
     /// Loads port settings from a `QSettings`. If open serial port is closed.
@@ -80,9 +84,9 @@ private slots:
     void loadPortList();
     void loadBaudRateList();
     void togglePort();
-    void selectPort(QString portName);
+    void _selectPort(QString portName);
 
-    void selectBaudRate(QString baudRate);
+    void _selectBaudRate(QString baudRate);
     void selectParity(int parity); // parity must be one of QSerialPort::Parity
     void selectDataBits(int dataBits); // bits must be one of QSerialPort::DataBits
     void selectStopBits(int stopBits); // stopBits must be one of QSerialPort::StopBits

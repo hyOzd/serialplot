@@ -29,6 +29,8 @@
 #include <QDesktopServices>
 #include <QMap>
 #include <QtDebug>
+#include <QCommandLineParser>
+#include <QFileInfo>
 #include <qwt_plot.h>
 #include <limits.h>
 #include <cmath>
@@ -614,5 +616,57 @@ void MainWindow::onLoadSettings()
     {
         QSettings settings(fileName, QSettings::IniFormat);
         loadAllSettings(&settings);
+    }
+}
+
+void MainWindow::handleCommandLineOptions(const QCoreApplication &app)
+{
+    QCommandLineParser parser;
+    parser.setSingleDashWordOptionMode(QCommandLineParser::ParseAsCompactedShortOptions);
+    parser.setApplicationDescription("Small and simple software for plotting data from serial port in realtime.");
+    parser.addHelpOption();
+    parser.addVersionOption();
+
+    QCommandLineOption loadOpt({"l", "load"}, "Load settings from file.", "filename");
+    QCommandLineOption portOpt({"p", "port"}, "Set port name.", "port name");
+    QCommandLineOption baudrateOpt({"b" ,"baudrate"}, "Set port baudrate speed.", "baudrate speed");
+    QCommandLineOption openPortOpt({"o", "open"}, "Open serial port.");
+
+    parser.addOption(loadOpt);
+    parser.addOption(portOpt);
+    parser.addOption(baudrateOpt);
+    parser.addOption(openPortOpt);
+
+    parser.process(app);
+
+    if (parser.isSet(loadOpt))
+    {
+        QString fileName = parser.value(loadOpt);
+        QFileInfo fileInfo(fileName);
+
+        if (fileInfo.exists() && fileInfo.isFile())
+        {
+            QSettings settings(fileName, QSettings::IniFormat);
+            loadAllSettings(&settings);
+        }
+        else
+        {
+            qWarning() << "Ini file not exist";
+        }
+    }
+
+    if (parser.isSet(portOpt))
+    {
+        portControl.selectPort(parser.value(portOpt));
+    }
+
+    if (parser.isSet(baudrateOpt))
+    {
+        portControl.selectBaudrate(parser.value(baudrateOpt));
+    }
+
+    if (parser.isSet(openPortOpt))
+    {
+        portControl.openPort();
     }
 }
