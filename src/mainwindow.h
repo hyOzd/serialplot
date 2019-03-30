@@ -64,7 +64,6 @@ public:
 
     void messageHandler(QtMsgType type, const QMessageLogContext &context,
                         const QString &msg);
-    void handleCommandLineOptions(const QCoreApplication &app);
 
 private:
     Ui::MainWindow *ui;
@@ -93,6 +92,8 @@ private:
     PlotMenu plotMenu;
     DataTextView textView;
     UpdateCheckDialog updateCheckDialog;
+
+    void handleCommandLineOptions(const QCoreApplication &app);
 
     /// Returns true if demo is running
     bool isDemoRunning();

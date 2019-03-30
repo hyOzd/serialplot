@@ -270,6 +270,8 @@ MainWindow::MainWindow(QWidget *parent) :
                 this->ui->tabWidget->setCurrentWidget(&commandPanel);
                 this->ui->tabWidget->showTabs();
             });
+
+    handleCommandLineOptions(*QApplication::instance());
 }
 
 MainWindow::~MainWindow()

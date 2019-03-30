@@ -42,7 +42,6 @@ int main(int argc, char *argv[])
     pMainWindow = &w;
 
     qInstallMessageHandler(messageHandler);
-    w.handleCommandLineOptions(a);
 
     ToolTipFilter ttf;
     a.installEventFilter(&ttf);
