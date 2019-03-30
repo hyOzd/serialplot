@@ -253,7 +253,7 @@ MainWindow::MainWindow(QWidget *parent) :
     onSourceChanged(dataFormatPanel.activeSource());
 
     // load default settings
-    QSettings settings("serialplot", "serialplot");
+    QSettings settings(PROGRAM_NAME_STRING, PROGRAM_NAME_STRING);
     loadAllSettings(&settings);
 
     // ensure command panel has 1 command if none loaded
@@ -302,7 +302,7 @@ void MainWindow::closeEvent(QCloseEvent * event)
     }
 
     // save settings
-    QSettings settings("serialplot", "serialplot");
+    QSettings settings(PROGRAM_NAME_STRING, PROGRAM_NAME_STRING);
     saveAllSettings(&settings);
     settings.sync();
 
