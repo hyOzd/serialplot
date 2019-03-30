@@ -314,6 +314,13 @@ void PortControl::selectListedPort(QString portName)
 {
     // portName may be coming from combobox
     portName = portName.split(" ")[0];
+
+    QSerialPortInfo portInfo(portName);
+    if (portInfo.isNull())
+    {
+        qWarning() << "Device doesn't exists:" << portName;
+    }
+
     // has selection actually changed
     if (portName != serialPort->portName())
     {
