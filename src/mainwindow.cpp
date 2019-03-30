@@ -631,7 +631,7 @@ void MainWindow::handleCommandLineOptions(const QCoreApplication &app)
 
     QCommandLineOption loadOpt({"l", "load"}, "Load settings from file.", "filename");
     QCommandLineOption portOpt({"p", "port"}, "Set port name.", "port name");
-    QCommandLineOption baudrateOpt({"b" ,"baudrate"}, "Set port baudrate speed.", "baudrate speed");
+    QCommandLineOption baudrateOpt({"b" ,"baudrate"}, "Set port baud rate.", "baud rate");
     QCommandLineOption openPortOpt({"o", "open"}, "Open serial port.");
 
     parser.addOption(loadOpt);

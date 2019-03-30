@@ -79,10 +79,10 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
                      this, &PortControl::onTbPortListActivated);
     QObject::connect(ui->cbPortList,
                      SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
-                     this, &PortControl::_selectPort);
+                     this, &PortControl::selectListedPort);
     QObject::connect(&tbPortList,
                      SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
-                     this, &PortControl::_selectPort);
+                     this, &PortControl::selectListedPort);
 
     // setup buttons
     ui->pbOpenPort->setDefaultAction(&openAction);
@@ -310,7 +310,7 @@ void PortControl::togglePort()
     openAction.setChecked(serialPort->isOpen());
 }
 
-void PortControl::_selectPort(QString portName)
+void PortControl::selectListedPort(QString portName)
 {
     // portName may be coming from combobox
     portName = portName.split(" ")[0];
@@ -476,15 +476,13 @@ void PortControl::selectPort(QString portName)
     if (portIndex < 0) // not in list, add to model and update the selections
     {
         portList.appendRow(new PortListItem(portName));
-        ui->cbPortList->setCurrentIndex(portList.rowCount()-1);
-        tbPortList.setCurrentIndex(portList.rowCount()-1);
+        portIndex = portList.rowCount()-1;
     }
-    else
-    {
-        ui->cbPortList->setCurrentIndex(portIndex);
-        tbPortList.setCurrentIndex(portIndex);
-    }
-    _selectPort(portName);
+
+    ui->cbPortList->setCurrentIndex(portIndex);
+    tbPortList.setCurrentIndex(portIndex);
+
+    selectListedPort(portName);
 }
 
 void PortControl::selectBaudrate(QString baudRate)

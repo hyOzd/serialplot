@@ -84,7 +84,7 @@ private slots:
     void loadPortList();
     void loadBaudRateList();
     void togglePort();
-    void _selectPort(QString portName);
+    void selectListedPort(QString portName);
 
     void _selectBaudRate(QString baudRate);
     void selectParity(int parity); // parity must be one of QSerialPort::Parity
