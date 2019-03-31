@@ -62,8 +62,7 @@ public:
 
     PlotViewSettings viewSettings() const;
 
-    void messageHandler(QtMsgType type, const QMessageLogContext &context,
-                        const QString &msg);
+    void messageHandler(QtMsgType type, const QString &logString, const QString &msg);
 
 private:
     Ui::MainWindow *ui;

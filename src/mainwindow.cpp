@@ -478,43 +478,15 @@ PlotViewSettings MainWindow::viewSettings() const
 }
 
 void MainWindow::messageHandler(QtMsgType type,
-                                const QMessageLogContext &context,
+                                const QString &logString,
                                 const QString &msg)
 {
-    QString logString;
-
-    switch (type)
-    {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
-        case QtInfoMsg:
-            logString = "[Info] " + msg;
-            break;
-#endif
-        case QtDebugMsg:
-            logString = "[Debug] " + msg;
-            break;
-        case QtWarningMsg:
-            logString = "[Warning] " + msg;
-            break;
-        case QtCriticalMsg:
-            logString = "[Error] " + msg;
-            break;
-        case QtFatalMsg:
-            logString = "[Fatal] " + msg;
-            break;
-    }
-
-    if (ui != NULL) ui->ptLog->appendPlainText(logString);
-    std::cerr << logString.toStdString() << std::endl;
+    if (ui != NULL)
+        ui->ptLog->appendPlainText(logString);
 
     if (type != QtDebugMsg && ui != NULL)
     {
         ui->statusBar->showMessage(msg, 5000);
-    }
-
-    if (type == QtFatalMsg)
-    {
-        __builtin_trap();
     }
 }
 
