@@ -35,6 +35,7 @@
 #include <limits.h>
 #include <cmath>
 #include <iostream>
+#include <cstdlib>
 
 #include <plot.h>
 #include <barplot.h>
@@ -253,8 +254,10 @@ MainWindow::MainWindow(QWidget *parent) :
     onSourceChanged(dataFormatPanel.activeSource());
 
     // load default settings
-    QSettings settings(PROGRAM_NAME_STRING, PROGRAM_NAME_STRING);
+    QSettings settings(PROGRAM_NAME, PROGRAM_NAME);
     loadAllSettings(&settings);
+
+    handleCommandLineOptions(*QApplication::instance());
 
     // ensure command panel has 1 command if none loaded
     if (!commandPanel.numOfCommands())
@@ -270,8 +273,6 @@ MainWindow::MainWindow(QWidget *parent) :
                 this->ui->tabWidget->setCurrentWidget(&commandPanel);
                 this->ui->tabWidget->showTabs();
             });
-
-    handleCommandLineOptions(*QApplication::instance());
 }
 
 MainWindow::~MainWindow()
@@ -304,7 +305,7 @@ void MainWindow::closeEvent(QCloseEvent * event)
     }
 
     // save settings
-    QSettings settings(PROGRAM_NAME_STRING, PROGRAM_NAME_STRING);
+    QSettings settings(PROGRAM_NAME, PROGRAM_NAME);
     saveAllSettings(&settings);
     settings.sync();
 
@@ -601,21 +602,21 @@ void MainWindow::handleCommandLineOptions(const QCoreApplication &app)
     parser.addHelpOption();
     parser.addVersionOption();
 
-    QCommandLineOption loadOpt({"l", "load"}, "Load settings from file.", "filename");
+    QCommandLineOption configOpt({"c", "config"}, "Load configuration from file.", "filename");
     QCommandLineOption portOpt({"p", "port"}, "Set port name.", "port name");
     QCommandLineOption baudrateOpt({"b" ,"baudrate"}, "Set port baud rate.", "baud rate");
     QCommandLineOption openPortOpt({"o", "open"}, "Open serial port.");
 
-    parser.addOption(loadOpt);
+    parser.addOption(configOpt);
     parser.addOption(portOpt);
     parser.addOption(baudrateOpt);
     parser.addOption(openPortOpt);
 
     parser.process(app);
 
-    if (parser.isSet(loadOpt))
+    if (parser.isSet(configOpt))
     {
-        QString fileName = parser.value(loadOpt);
+        QString fileName = parser.value(configOpt);
         QFileInfo fileInfo(fileName);
 
         if (fileInfo.exists() && fileInfo.isFile())
@@ -625,7 +626,8 @@ void MainWindow::handleCommandLineOptions(const QCoreApplication &app)
         }
         else
         {
-            qWarning() << "Ini file not exist";
+            qCritical() << "Configuration file not exist. Closing application.";
+            std::exit(1);
         }
     }
 

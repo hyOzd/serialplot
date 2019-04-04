@@ -70,7 +70,7 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context,
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    QApplication::setApplicationName(PROGRAM_NAME_STRING);
+    QApplication::setApplicationName(PROGRAM_NAME);
     QApplication::setApplicationVersion(VERSION_STRING);
 
     qInstallMessageHandler(messageHandler);
