@@ -19,27 +19,63 @@
 
 #include <QApplication>
 #include <QtGlobal>
+#include <iostream>
 
 #include "mainwindow.h"
 #include "tooltipfilter.h"
 #include "version.h"
 
-MainWindow* pMainWindow;
+MainWindow* pMainWindow = nullptr;
 
 void messageHandler(QtMsgType type, const QMessageLogContext &context,
                     const QString &msg)
 {
-    // TODO: don't call MainWindow::messageHandler if window is destroyed
-    pMainWindow->messageHandler(type, context, msg);
+    QString logString;
+
+    switch (type)
+    {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
+        case QtInfoMsg:
+            logString = "[Info] " + msg;
+            break;
+#endif
+        case QtDebugMsg:
+            logString = "[Debug] " + msg;
+            break;
+        case QtWarningMsg:
+            logString = "[Warning] " + msg;
+            break;
+        case QtCriticalMsg:
+            logString = "[Error] " + msg;
+            break;
+        case QtFatalMsg:
+            logString = "[Fatal] " + msg;
+            break;
+    }
+
+    std::cerr << logString.toStdString() << std::endl;
+
+    if (pMainWindow != nullptr)
+    {
+        // TODO: don't call MainWindow::messageHandler if window is destroyed
+        pMainWindow->messageHandler(type, logString, msg);
+    }
+
+    if (type == QtFatalMsg)
+    {
+        __builtin_trap();
+    }
 }
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    MainWindow w;
-    pMainWindow = &w;
+    QApplication::setApplicationName(PROGRAM_NAME);
+    QApplication::setApplicationVersion(VERSION_STRING);
 
     qInstallMessageHandler(messageHandler);
+    MainWindow w;
+    pMainWindow = &w;
 
     ToolTipFilter ttf;
     a.installEventFilter(&ttf);

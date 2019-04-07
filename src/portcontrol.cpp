@@ -79,10 +79,10 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
                      this, &PortControl::onTbPortListActivated);
     QObject::connect(ui->cbPortList,
                      SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
-                     this, &PortControl::selectPort);
+                     this, &PortControl::selectListedPort);
     QObject::connect(&tbPortList,
                      SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
-                     this, &PortControl::selectPort);
+                     this, &PortControl::selectListedPort);
 
     // setup buttons
     ui->pbOpenPort->setDefaultAction(&openAction);
@@ -91,7 +91,7 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     // setup baud rate selection widget
     QObject::connect(ui->cbBaudRate,
                      SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
-                     this, &PortControl::selectBaudRate);
+                     this, &PortControl::_selectBaudRate);
 
     // setup parity selection buttons
     parityButtons.addButton(ui->rbNoParity, (int) QSerialPort::NoParity);
@@ -198,7 +198,7 @@ void PortControl::loadBaudRateList()
     }
 }
 
-void PortControl::selectBaudRate(QString baudRate)
+void PortControl::_selectBaudRate(QString baudRate)
 {
     if (serialPort->isOpen())
     {
@@ -289,7 +289,7 @@ void PortControl::togglePort()
         if (serialPort->open(QIODevice::ReadWrite))
         {
             // set port settings
-            selectBaudRate(ui->cbBaudRate->currentText());
+            _selectBaudRate(ui->cbBaudRate->currentText());
             selectParity((QSerialPort::Parity) parityButtons.checkedId());
             selectDataBits((QSerialPort::DataBits) dataBitsButtons.checkedId());
             selectStopBits((QSerialPort::StopBits) stopBitsButtons.checkedId());
@@ -310,10 +310,17 @@ void PortControl::togglePort()
     openAction.setChecked(serialPort->isOpen());
 }
 
-void PortControl::selectPort(QString portName)
+void PortControl::selectListedPort(QString portName)
 {
     // portName may be coming from combobox
     portName = portName.split(" ")[0];
+
+    QSerialPortInfo portInfo(portName);
+    if (portInfo.isNull())
+    {
+        qWarning() << "Device doesn't exists:" << portName;
+    }
+
     // has selection actually changed
     if (portName != serialPort->portName())
     {
@@ -470,6 +477,43 @@ QString PortControl::currentFlowControlText()
     }
 }
 
+void PortControl::selectPort(QString portName)
+{
+    int portIndex = portList.indexOfName(portName);
+    if (portIndex < 0) // not in list, add to model and update the selections
+    {
+        portList.appendRow(new PortListItem(portName));
+        portIndex = portList.rowCount()-1;
+    }
+
+    ui->cbPortList->setCurrentIndex(portIndex);
+    tbPortList.setCurrentIndex(portIndex);
+
+    selectListedPort(portName);
+}
+
+void PortControl::selectBaudrate(QString baudRate)
+{
+    int baudRateIndex = ui->cbBaudRate->findText(baudRate);
+    if (baudRateIndex < 0)
+    {
+        ui->cbBaudRate->setCurrentText(baudRate);
+    }
+    else
+    {
+        ui->cbBaudRate->setCurrentIndex(baudRateIndex);
+    }
+    _selectBaudRate(baudRate);
+}
+
+void PortControl::openPort()
+{
+    if (!serialPort->isOpen())
+    {
+        openAction.trigger();
+    }
+}
+
 void PortControl::saveSettings(QSettings* settings)
 {
     settings->beginGroup(SettingGroup_Port);
@@ -511,7 +555,7 @@ void PortControl::loadSettings(QSettings* settings)
     parityButtons.button(paritySetting)->setChecked(true);
 
     // load number of bits
-    int dataBits = settings->value(SG_Port_Parity, dataBitsButtons.checkedId()).toInt();
+    int dataBits = settings->value(SG_Port_DataBits, dataBitsButtons.checkedId()).toInt();
     if (dataBits >=5 && dataBits <= 8)
     {
         dataBitsButtons.button((QSerialPort::DataBits) dataBits)->setChecked(true);

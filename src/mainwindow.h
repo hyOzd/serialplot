@@ -62,8 +62,7 @@ public:
 
     PlotViewSettings viewSettings() const;
 
-    void messageHandler(QtMsgType type, const QMessageLogContext &context,
-                        const QString &msg);
+    void messageHandler(QtMsgType type, const QString &logString, const QString &msg);
 
 private:
     Ui::MainWindow *ui;
@@ -92,6 +91,8 @@ private:
     PlotMenu plotMenu;
     DataTextView textView;
     UpdateCheckDialog updateCheckDialog;
+
+    void handleCommandLineOptions(const QCoreApplication &app);
 
     /// Returns true if demo is running
     bool isDemoRunning();
