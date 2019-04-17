@@ -45,6 +45,8 @@ private:
     DataFormatPanel* _dataFormatPanel;
     QTimer bpsTimer;
 
+    uint64_t prevBytesRead;
+
 private slots:
     void onBpsTimeout();
     void onPortToggled(bool open);

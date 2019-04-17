@@ -20,6 +20,7 @@
 #ifndef DATAFORMATPANEL_H
 #define DATAFORMATPANEL_H
 
+#include <stdint.h>
 #include <QWidget>
 #include <QButtonGroup>
 #include <QSerialPort>
@@ -49,8 +50,8 @@ public:
     unsigned numChannels() const;
     /// Returns active source (reader)
     Source* activeSource();
-    /// Reads and 'zero's number of bytes read from current reader
-    unsigned getBytesRead();
+    /// Returns total number of bytes read
+    uint64_t bytesRead();
     /// Stores data format panel settings into a `QSettings`
     void saveSettings(QSettings* settings);
     /// Loads data format panel settings from a `QSettings`.
@@ -78,6 +79,7 @@ private:
     void selectReader(AbstractReader* reader);
 
     bool paused;
+    uint64_t _bytesRead;
 
     DemoReader demoReader;
     AbstractReader* readerBeforeDemo;

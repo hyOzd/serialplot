@@ -39,6 +39,7 @@ DataFormatPanel::DataFormatPanel(QSerialPort* port, QWidget *parent) :
     serialPort = port;
     paused = false;
     readerBeforeDemo = nullptr;
+    _bytesRead = 0;
 
     // initalize default reader
     currentReader = &bsReader;
@@ -130,9 +131,10 @@ void DataFormatPanel::selectReader(AbstractReader* reader)
     emit sourceChanged(currentReader);
 }
 
-unsigned DataFormatPanel::getBytesRead()
+uint64_t DataFormatPanel::bytesRead()
 {
-    return currentReader->getBytesRead();
+    _bytesRead += currentReader->getBytesRead();
+    return _bytesRead;
 }
 
 void DataFormatPanel::saveSettings(QSettings* settings)

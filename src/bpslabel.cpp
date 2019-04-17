@@ -29,6 +29,7 @@ BPSLabel::BPSLabel(PortControl* portControl,
 {
     _portControl = portControl;
     _dataFormatPanel = dataFormatPanel;
+    prevBytesRead = 0;
 
     setText("0bps");
     setToolTip(tr(BPS_TOOLTIP));
@@ -42,7 +43,11 @@ BPSLabel::BPSLabel(PortControl* portControl,
 
 void BPSLabel::onBpsTimeout()
 {
-    unsigned bits = _dataFormatPanel->getBytesRead() * 8;
+    uint64_t curBytesRead = _dataFormatPanel->bytesRead();
+    uint64_t bytesRead = curBytesRead - prevBytesRead;
+    prevBytesRead = curBytesRead;
+
+    unsigned bits = bytesRead * 8;
     unsigned maxBps = _portControl->maxBitRate();
     QString str;
     if (bits >= maxBps)
