@@ -59,9 +59,6 @@ const QMap<int, QString> panelSettingMap({
         {6, "Log"}
     });
 
-const char* BPS_TOOLTIP = "bits per second";
-const char* BPS_TOOLTIP_ERR = "Maximum baud rate may be reached!";
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -73,7 +70,8 @@ MainWindow::MainWindow(QWidget *parent) :
     dataFormatPanel(&serialPort),
     recordPanel(&stream),
     textView(&stream),
-    updateCheckDialog(this)
+    updateCheckDialog(this),
+    bpsLabel(&portControl, &dataFormatPanel, this)
 {
     ui->setupUi(this);
 
@@ -235,11 +233,7 @@ MainWindow::MainWindow(QWidget *parent) :
     plotMan->setPlotWidth(plotControlPanel.plotWidth());
 
     // init bps (bits per second) counter
-    bpsLabel.setText("0bps");
-    bpsLabel.setToolTip(tr(BPS_TOOLTIP));
     ui->statusBar->addPermanentWidget(&bpsLabel);
-    connect(&bpsTimer, &QTimer::timeout,
-            this, &MainWindow::onBpsTimeout);
 
     // Init sps (sample per second) counter
     spsLabel.setText("0sps");
@@ -366,16 +360,8 @@ void MainWindow::onPortToggled(bool open)
     if (open && isDemoRunning()) enableDemo(false);
     ui->actionDemoMode->setEnabled(!open);
 
-    if (open)
+    if (!open)
     {
-        bpsTimer.start(1000);
-    }
-    else
-    {
-        bpsTimer.stop();
-        // if not cleared last displayed value is stuck
-        bpsLabel.setText("0bps");
-        bpsLabel.setToolTip(tr(BPS_TOOLTIP));
         spsLabel.setText("0sps");
     }
 }
@@ -403,25 +389,6 @@ void MainWindow::onSpsChanged(float sps)
 {
     int precision = sps < 1. ? 3 : 0;
     spsLabel.setText(QString::number(sps, 'f', precision) + "sps");
-}
-
-void MainWindow::onBpsTimeout()
-{
-    unsigned bits = dataFormatPanel.getBytesRead() * 8;
-    unsigned maxBps = portControl.maxBitRate();
-    QString str;
-    if (bits >= maxBps)
-    {
-        // TODO: an icon for bps warning
-        str = QString(tr("!%1/%2bps")).arg(bits).arg(maxBps);
-        bpsLabel.setToolTip(tr(BPS_TOOLTIP_ERR));
-    }
-    else
-    {
-        str = QString(tr("%1bps")).arg(bits);
-        bpsLabel.setToolTip(tr(BPS_TOOLTIP));
-    }
-    bpsLabel.setText(str);
 }
 
 bool MainWindow::isDemoRunning()

@@ -47,6 +47,7 @@
 #include "updatecheckdialog.h"
 #include "samplecounter.h"
 #include "datatextview.h"
+#include "bpslabel.h"
 
 namespace Ui {
 class MainWindow;
@@ -83,11 +84,8 @@ private:
     QWidget* secondaryPlot;
     SnapshotManager snapshotMan;
     SampleCounter sampleCounter;
-    /// bit counter timer
-    QTimer bpsTimer;
 
     QLabel spsLabel;
-    QLabel bpsLabel;
     CommandPanel commandPanel;
     DataFormatPanel dataFormatPanel;
     RecordPanel recordPanel;
@@ -95,6 +93,7 @@ private:
     PlotMenu plotMenu;
     DataTextView textView;
     UpdateCheckDialog updateCheckDialog;
+    BPSLabel bpsLabel;
 
     /// Returns true if demo is running
     bool isDemoRunning();
@@ -122,7 +121,6 @@ private slots:
 
     void clearPlot();
     void onSpsChanged(float sps);
-    void onBpsTimeout();
     void enableDemo(bool enabled);
     void showBarPlot(bool show);
 

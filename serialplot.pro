@@ -72,7 +72,8 @@ SOURCES += \
     src/updatechecker.cpp \
     src/updatecheckdialog.cpp \
     src/demoreadersettings.cpp \
-    src/datatextview.cpp
+    src/datatextview.cpp \
+    src/bpslabel.cpp
 
 HEADERS += \
     src/mainwindow.h \
@@ -116,7 +117,8 @@ HEADERS += \
     src/updatechecker.h \
     src/updatecheckdialog.h \
     src/demoreadersettings.h \
-    src/datatextview.h
+    src/datatextview.h \
+    src/bpslabel.h
 
 FORMS += \
     src/mainwindow.ui \
