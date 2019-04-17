@@ -242,6 +242,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&sampleCounter, &SampleCounter::spsChanged,
             this, &MainWindow::onSpsChanged);
 
+    bpsLabel.setMinimumWidth(70);
+    bpsLabel.setAlignment(Qt::AlignRight);
+    spsLabel.setMinimumWidth(70);
+    spsLabel.setAlignment(Qt::AlignRight);
+
     // init demo
     QObject::connect(ui->actionDemoMode, &QAction::toggled,
                      this, &MainWindow::enableDemo);
