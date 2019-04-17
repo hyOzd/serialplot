@@ -47,6 +47,7 @@
 #include "updatecheckdialog.h"
 #include "samplecounter.h"
 #include "datatextview.h"
+#include "bpslabel.h"
 
 namespace Ui {
 class MainWindow;
@@ -91,6 +92,7 @@ private:
     PlotMenu plotMenu;
     DataTextView textView;
     UpdateCheckDialog updateCheckDialog;
+    BPSLabel bpsLabel;
 
     void handleCommandLineOptions(const QCoreApplication &app);
 

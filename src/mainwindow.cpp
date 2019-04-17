@@ -73,7 +73,8 @@ MainWindow::MainWindow(QWidget *parent) :
     dataFormatPanel(&serialPort),
     recordPanel(&stream),
     textView(&stream),
-    updateCheckDialog(this)
+    updateCheckDialog(this),
+    bpsLabel(&portControl, &dataFormatPanel, this)
 {
     ui->setupUi(this);
 
@@ -234,12 +235,20 @@ MainWindow::MainWindow(QWidget *parent) :
     plotMan->setNumOfSamples(numOfSamples);
     plotMan->setPlotWidth(plotControlPanel.plotWidth());
 
+    // init bps (bits per second) counter
+    ui->statusBar->addPermanentWidget(&bpsLabel);
+
     // Init sps (sample per second) counter
     spsLabel.setText("0sps");
-    spsLabel.setToolTip("samples per second (per channel)");
+    spsLabel.setToolTip(tr("samples per second (per channel)"));
     ui->statusBar->addPermanentWidget(&spsLabel);
     connect(&sampleCounter, &SampleCounter::spsChanged,
             this, &MainWindow::onSpsChanged);
+
+    bpsLabel.setMinimumWidth(70);
+    bpsLabel.setAlignment(Qt::AlignRight);
+    spsLabel.setMinimumWidth(70);
+    spsLabel.setAlignment(Qt::AlignRight);
 
     // init demo
     QObject::connect(ui->actionDemoMode, &QAction::toggled,
@@ -360,6 +369,11 @@ void MainWindow::onPortToggled(bool open)
     // make sure demo mode is disabled
     if (open && isDemoRunning()) enableDemo(false);
     ui->actionDemoMode->setEnabled(!open);
+
+    if (!open)
+    {
+        spsLabel.setText("0sps");
+    }
 }
 
 void MainWindow::onSourceChanged(Source* source)
