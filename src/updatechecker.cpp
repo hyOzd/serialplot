@@ -118,7 +118,7 @@ bool UpdateChecker::parseData(const QJsonDocument& data, QList<FileInfo>& files)
 
     if (!data.isObject()) return false;
 
-    auto values = data.object()["values"];
+    auto values = data.object().value("values");
     if (values == QJsonValue::Undefined || !values.isArray()) return false;
 
     for (auto value : values.toArray())
