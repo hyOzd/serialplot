@@ -1,5 +1,5 @@
 #
-# Copyright © 2016 Hasan Yavuz Özderya
+# Copyright © 2019 Hasan Yavuz Özderya
 #
 # This file is part of serialplot.
 #
@@ -21,7 +21,8 @@ include(ExternalProject)
 
 ExternalProject_Add(QWT
   PREFIX qwt
-  SVN_REPOSITORY svn://svn.code.sf.net/p/qwt/code/branches/qwt-6.1
+  # SVN_REPOSITORY svn://svn.code.sf.net/p/qwt/code/branches/qwt-6.1
+  URL https://sourceforge.net/projects/qwt/files/qwt/6.1.4/qwt-6.1.4.tar.bz2
   # disable QwtDesigner plugin and enable static build
   PATCH_COMMAND sed -i -r -e "s/QWT_CONFIG\\s*\\+=\\s*QwtDesigner/#&/"
                           -e "s/QWT_CONFIG\\s*\\+=\\s*QwtDll/#&/"
