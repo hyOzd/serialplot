@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -21,6 +21,7 @@
 #define ZOOMER_H
 
 #include <QVector>
+#include <QList>
 #include <QRect>
 
 #include "scrollzoomer.h"
@@ -64,10 +65,10 @@ private:
     /// displayed channels for value tracking
     QVector<const StreamChannel*> dispChannels;
 
+    /// Get a list of visible channels
+    QList<const StreamChannel*> visChannels() const;
     /// Draw sample values
     void drawValues(QPainter* painter) const;
-    /// Find sample values for given X value
-    QVector<double> findValues(double x) const;
     /// Returns trackerRect for value tracker
     QRect valueTrackerRect(const QFont& font) const;
 };

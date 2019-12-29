@@ -122,15 +122,51 @@ void Zoomer::drawTracker(QPainter* painter) const
     }
 }
 
+QList<const StreamChannel*> Zoomer::visChannels() const
+{
+    QList<const StreamChannel*> result;
+
+    for (unsigned ci = 0; ci < (unsigned) dispChannels.length(); ci++)
+    {
+        if (dispChannels[ci]->visible())
+            result.append(dispChannels[ci]);
+    }
+
+    return result;
+}
+
 void Zoomer::drawValues(QPainter* painter) const
 {
+    struct ChannelValue
+    {
+        const StreamChannel* ch;
+        double value;
+    };
+
     auto tpos = trackerPosition();
     if (tpos.x() < 0) return;   // cursor not on window
 
-    painter->save();
-
+    // find Y values for current cursor X position
     double x = invTransform(tpos).x();
-    auto values = findValues(x);
+    auto channels = visChannels();
+    QList<ChannelValue> values;
+    for (auto ch : channels)
+    {
+        double value = ch->findValue(x);
+        if (!std::isnan(value))
+            values.append({ch, value});
+    }
+
+    // TODO should keep?
+    if (values.isEmpty())
+    {
+        qDebug() << "no value to draw??";
+        return;
+    }
+
+    // TODO layout
+
+    painter->save();
 
     // draw vertical line
     auto linePen = rubberBandPen();
@@ -141,43 +177,25 @@ void Zoomer::drawValues(QPainter* painter) const
     painter->drawLine(px, pRect.top(), px, pRect.bottom());
 
     // draw sample values
-    for (int ci = 0; ci < values.size(); ci++)
+    for (auto value : values)
     {
-        if (!dispChannels[ci]->visible()) continue;
+        double val = value.value;
+        auto ch = value.ch;
 
-        double val = values[ci];
-        if (!std::isnan(val))
-        {
-            auto p = transform(QPointF(x, val));
+        auto point = transform(QPointF(x, val));
 
-            painter->setBrush(dispChannels[ci]->color());
-            painter->setPen(Qt::NoPen);
-            painter->drawEllipse(p, VALUE_POINT_DIAM, VALUE_POINT_DIAM);
+        painter->setBrush(ch->color());
+        painter->setPen(Qt::NoPen);
+        painter->drawEllipse(point, VALUE_POINT_DIAM, VALUE_POINT_DIAM);
 
-            painter->setPen(rubberBandPen());
-            // We give a very small (1x1) rectangle but disable clipping
-            painter->drawText(QRectF(p.x() + VALUE_TEXT_MARGIN, p.y(), 1, 1),
-                              Qt::AlignVCenter | Qt::TextDontClip,
-                              QString("%1").arg(val));
-        }
+        painter->setPen(rubberBandPen());
+        // We give a very small (1x1) rectangle but disable clipping
+        painter->drawText(QRectF(point.x() + VALUE_TEXT_MARGIN, point.y(), 1, 1),
+                          Qt::AlignVCenter | Qt::TextDontClip,
+                          QString("%1").arg(val));
     }
 
     painter->restore();
-}
-
-QVector<double> Zoomer::findValues(double x) const
-{
-    unsigned nc = dispChannels.length();
-    QVector<double> result(nc);
-    for (unsigned ci = 0; ci < nc; ci++)
-    {
-        if (dispChannels[ci]->visible())
-        {
-            result[ci] = dispChannels[ci]->findValue(x);
-        }
-
-    }
-    return result;
 }
 
 QRect Zoomer::trackerRect(const QFont& font) const
