@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -22,6 +22,7 @@
 #include <QPen>
 #include <QMouseEvent>
 #include <QtMath>
+#include <algorithm>
 
 static const int VALUE_POINT_DIAM = 4;
 static const int VALUE_TEXT_MARGIN = VALUE_POINT_DIAM + 2;
@@ -135,14 +136,120 @@ QList<const StreamChannel*> Zoomer::visChannels() const
     return result;
 }
 
-void Zoomer::drawValues(QPainter* painter) const
+const double ValueLabelHeight = 12; // TODO: calculate
+
+struct ChannelValue
 {
-    struct ChannelValue
+    const StreamChannel* ch;
+    double value;
+    double y;
+    double top() const {return y;};
+    double bottom() const {return y + ValueLabelHeight;};
+};
+
+static void layoutValues(QList<ChannelValue>& values)
+{
+    typedef ChannelValue LayItem;
+    typedef QList<LayItem*> LayItemList;
+
+    struct LayGroup
     {
-        const StreamChannel* ch;
-        double value;
+        struct VRange {double top, bottom;};
+        LayItemList items;
+        LayGroup(LayItem* initialItem) {items.append(initialItem);}
+        unsigned numItems() const {return items.size();}
+        double top() const {return items.first()->top();}
+        double bottom() const {return items.last()->bottom();}
+        VRange vRange() const {return {top(), bottom()};}
+        double overlap(const LayGroup* otrGroup) const
+            {
+                auto myr = vRange();
+                auto otr = otrGroup->vRange();
+
+                double a = myr.bottom - otr.top;
+                double b = otr.bottom - myr.top;
+                if (a > 0 and b > 0)
+                {
+                    return std::min(a, b);
+                }
+                return 0;
+            }
+        void moveBy(double y) {for (auto it : items) it->y += y;}
+        void join(LayGroup* other)
+            {
+                // assumes other group is below this one and they overlap
+                double ovr_h = overlap(other);
+
+                // groups are moved less if they have more items and vice versa
+                double ratio = double(numItems()) / double(numItems() + other->numItems());
+                double self_off = ovr_h * (1. - ratio);
+
+                // make sure we don't go out of screen (above) after the shift
+                double final_top = top() - self_off;
+                if (final_top < 0)
+                    self_off += final_top;
+
+                // move groups
+                moveBy(-self_off);                // up
+                other->moveBy(ovr_h - self_off);  // down
+
+                // finalize the merge by gettin items from other
+                do
+                {
+                    items.append(other->items.takeFirst());
+                } while (!other->items.isEmpty());
+            }
     };
 
+    // create initial groups (1 group per item)
+    QList<LayGroup*> groups;
+    for (auto& val : values)
+        groups.append(new LayGroup(&val));
+
+    // sort groups according to their items position
+    struct {
+        bool operator()(LayGroup* a, LayGroup* b) const
+            {
+                return a->top() < b->top();
+            }
+    } compTops;
+
+    std::sort(groups.begin(), groups.end(), compTops);
+
+    // do spacing
+    bool somethingOverlaps = true;
+    while (somethingOverlaps and groups.size() > 1)
+    {
+        somethingOverlaps = false;
+        for (int i = 0; i < groups.size() - 1; i++)
+        {
+            auto a = groups[i];
+            auto b = groups[i + 1];
+
+            // make sure nothing is over the top
+            if (a->top() < 0)
+                a->moveBy(-a->top());
+
+            // join if groups overlap
+            if (a->overlap(b))
+            {
+                somethingOverlaps = true;
+                a->join(b);
+                delete groups.takeAt(i + 1);
+                break;
+            }
+        }
+    }
+
+    // cleanup
+    do
+    {
+        delete groups.takeFirst();
+    } while (!groups.isEmpty());
+};
+
+void Zoomer::drawValues(QPainter* painter) const
+{
     auto tpos = trackerPosition();
     if (tpos.x() < 0) return;   // cursor not on window
 
@@ -154,17 +261,19 @@ void Zoomer::drawValues(QPainter* painter) const
     {
         double value = ch->findValue(x);
         if (!std::isnan(value))
-            values.append({ch, value});
+        {
+            auto point = transform(QPointF(x, value));
+            values.append({ch, value, double(point.y())});
+        }
     }
 
     // TODO should keep?
     if (values.isEmpty())
     {
-        qDebug() << "no value to draw??";
         return;
     }
 
-    // TODO layout
+    layoutValues(values);
 
     painter->save();
 
@@ -190,7 +299,7 @@ void Zoomer::drawValues(QPainter* painter) const
 
         painter->setPen(rubberBandPen());
         // We give a very small (1x1) rectangle but disable clipping
-        painter->drawText(QRectF(point.x() + VALUE_TEXT_MARGIN, point.y(), 1, 1),
+        painter->drawText(QRectF(point.x() + VALUE_TEXT_MARGIN, value.y, 1, 1),
                           Qt::AlignVCenter | Qt::TextDontClip,
                           QString("%1").arg(val));
     }
