@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -159,6 +159,7 @@ void FramedReader::onNumOfChannelsChanged(unsigned value)
     _numChannels = value;
     checkSettings();
     reset();
+    updateNumChannels();
     emit numOfChannelsChanged(value);
 }
 
