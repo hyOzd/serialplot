@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -454,7 +454,8 @@ TEST_CASE("ChunkedBuffer created empty", "[memory]")
     ChunkedBuffer b;
 
     REQUIRE(b.size() == 0);
-    REQUIRE(b.boundingRect() == QRectF(0,0,0,0));
+    REQUIRE(b.limits().start == 0);
+    REQUIRE(b.limits().end == 0);
 }
 
 TEST_CASE("ChunkedBuffer adding data and clearing", "[memory]")
@@ -467,24 +468,28 @@ TEST_CASE("ChunkedBuffer adding data and clearing", "[memory]")
     b.addSamples(samples, N);
 
     REQUIRE(b.size() == N);
-    REQUIRE(b.boundingRect() == QRectF(0,10,N,9));
+    REQUIRE(b.limits().start == 1);
+    REQUIRE(b.limits().end == 10);
 
     // add data to fill the chunk
     double samples2[CHUNK_SIZE-N] = {0};
     b.addSamples(samples2, CHUNK_SIZE-N);
     REQUIRE(b.size() == CHUNK_SIZE);
-    REQUIRE(b.boundingRect() == QRectF(0,10,CHUNK_SIZE,10));
+    REQUIRE(b.limits().start == 0);
+    REQUIRE(b.limits().end == 10);
 
     // add data for second chunk
     b.addSamples(samples, N);
     REQUIRE(b.size() == CHUNK_SIZE+N);
-    REQUIRE(b.boundingRect() == QRectF(0,10,CHUNK_SIZE+N,10));
+    REQUIRE(b.limits().start == 0);
+    REQUIRE(b.limits().end == 10);
 
     // add more data to make it 4 chunks
     double samples3[CHUNK_SIZE*3-N] = {0};
     b.addSamples(samples3, CHUNK_SIZE*3-N);
     REQUIRE(b.size() == CHUNK_SIZE*4);
-    REQUIRE(b.boundingRect() == QRectF(0,10,CHUNK_SIZE*4,10));
+    REQUIRE(b.limits().start == 0);
+    REQUIRE(b.limits().end == 10);
 
     // clear
     b.clear();

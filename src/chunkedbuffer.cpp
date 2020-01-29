@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -36,11 +36,11 @@ ChunkedBuffer::~ChunkedBuffer()
     }
 }
 
-void ChunkedBuffer::addSamples(double* samples, size_t size)
+void ChunkedBuffer::addSamples(double* samples, unsigned n)
 {
     size_t i = 0;
 
-    while (i < size)
+    while (i < n)
     {
         // select chunk to add data
         auto chunk = chunks.last();
@@ -50,12 +50,12 @@ void ChunkedBuffer::addSamples(double* samples, size_t size)
         }
 
         // add data to chunk
-        size_t c = std::min(chunk->left(), (size - i));
+        size_t c = std::min(chunk->left(), (n - i));
         chunk->addSamples(&samples[i], c);
         i += c;
     }
 
-    _size += size;
+    _size += n;
 }
 
 void ChunkedBuffer::clear()
@@ -81,12 +81,12 @@ DataChunk* ChunkedBuffer::addNewChunk()
     return chunk;
 }
 
-size_t ChunkedBuffer::size() const
+unsigned ChunkedBuffer::size() const
 {
     return _size;
 }
 
-QRectF ChunkedBuffer::boundingRect() const
+Range ChunkedBuffer::limits() const
 {
     // TODO: it should be possible to cache boundingRect and only
     // update on 'addSamples' and when dropping chunks
@@ -100,12 +100,17 @@ QRectF ChunkedBuffer::boundingRect() const
         ymax = std::max(ymax, c->max());
     }
 
-    return QRectF(0, ymax, _size, (ymax-ymin));
+    return {ymin, ymax};
 }
 
-double ChunkedBuffer::sample(size_t i) const
+double ChunkedBuffer::sample(unsigned i) const
 {
     int chunk_index = i / CHUNK_SIZE;
     int chunk_offset = i % CHUNK_SIZE;
     return chunks[chunk_index]->sample(chunk_offset);
+}
+
+void ChunkedBuffer::resize(unsigned n)
+{
+    // TODO what to do for ChunkedBuffer::resize
 }

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -25,22 +25,23 @@
 #include <QVector>
 
 #include "datachunk.h"
+#include "framebuffer.h"
 
 #define CHUNK_SIZE (1024)
 
-class ChunkedBuffer
+class ChunkedBuffer : public WFrameBuffer
 {
 public:
     ChunkedBuffer();
     ~ChunkedBuffer();
 
-    void addSamples(double* samples, size_t size);
-    void clear();
-
-    // QwtSeriesData related implementations
-    size_t size() const;
-    QRectF boundingRect() const;
-    double sample(size_t i) const;
+    // FrameBuffer related implementations
+    virtual unsigned size() const;
+    virtual double sample(unsigned i) const;
+    virtual Range limits() const;
+    virtual void resize(unsigned n);
+    virtual void addSamples(double* samples, unsigned n);
+    virtual void clear();
 
 private:
     size_t _size; // size of `data`
