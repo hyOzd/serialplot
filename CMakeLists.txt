@@ -1,5 +1,5 @@
 #
-# Copyright © 2018 Hasan Yavuz Özderya
+# Copyright © 2019 Hasan Yavuz Özderya
 #
 # This file is part of serialplot.
 #
@@ -44,30 +44,10 @@ else (BUILD_QWT)
     find_package(Qwt 6.1 REQUIRED)
 endif (BUILD_QWT)
 
-# If set, cmake will download QtColorWidgets over git, build and use it as a static library.
-set(BUILD_QTCOLORWIDGETS true CACHE BOOL "Download and build QtColorWidgets library automatically.")
-if (BUILD_QTCOLORWIDGETS)
-  include(BuildQColorWidgets)
-else ()
-  find_package(QtColorWidgets REQUIRED)
-endif ()
-
-set(BUILD_LEDWIDGET true CACHE BOOL "Download and build LedWidget automatically.")
-if (BUILD_LEDWIDGET)
-  include(BuildLedWidget)
-else (BUILD_LEDWIDGET)
-  include(FindLedWidget)
-endif (BUILD_LEDWIDGET)
-
 # includes
 include_directories("./src"
   ${QWT_INCLUDE_DIR}
-  ${QTCOLORWIDGETS_INCLUDE_DIRS}
-  ${LEDWIDGET_INCLUDE_DIR}
   )
-
-# flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${QTCOLORWIDGETS_FLAGS}")
 
 # wrap UI and resource files
 qt5_wrap_ui(UI_FILES
@@ -87,6 +67,7 @@ qt5_wrap_ui(UI_FILES
   src/framedreadersettings.ui
   src/demoreadersettings.ui
   src/updatecheckdialog.ui
+  src/datatextview.ui
   )
 
 if (WIN32)
@@ -126,6 +107,7 @@ add_executable(${PROGRAM_NAME} WIN32
   src/ringbuffer.cpp
   src/ringbuffer.cpp
   src/indexbuffer.cpp
+  src/linindexbuffer.cpp
   src/readonlybuffer.cpp
   src/framebufferseries.cpp
   src/numberformatbox.cpp
@@ -152,6 +134,9 @@ add_executable(${PROGRAM_NAME} WIN32
   src/source.cpp
   src/sink.cpp
   src/samplecounter.cpp
+  src/ledwidget.cpp
+  src/datatextview.cpp
+  src/bpslabel.cpp
   misc/windows_icon.rc
   ${UI_FILES}
   ${RES_FILES}
@@ -160,23 +145,12 @@ add_executable(${PROGRAM_NAME} WIN32
 # Use the Widgets module from Qt 5.
 target_link_libraries(${PROGRAM_NAME}
   ${QWT_LIBRARY}
-  ${QTCOLORWIDGETS_LIBRARIES}
-  ${LEDWIDGET_LIBRARY}
   )
 qt5_use_modules(${PROGRAM_NAME} Widgets SerialPort Network)
 
 if (BUILD_QWT)
   add_dependencies(${PROGRAM_NAME} QWT)
 endif ()
-
-if (BUILD_QTCOLORWIDGETS)
-  add_dependencies(${PROGRAM_NAME} QCW)
-endif ()
-
-if (BUILD_LEDWIDGET)
-  add_dependencies(${PROGRAM_NAME} LEDW)
-endif (BUILD_LEDWIDGET)
-
 
 # set compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
@@ -205,6 +179,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_MAJOR=${VERSION_MAJOR} ")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_MINOR=${VERSION_MINOR} ")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_PATCH=${VERSION_PATCH} ")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_REVISION=\\\"${VERSION_REVISION}\\\" ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPROGRAM_NAME=\\\"${PROGRAM_NAME}\\\" ")
 
 # add make run target
 add_custom_target(run

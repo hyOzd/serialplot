@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -79,8 +79,9 @@ private:
     /// @note should be called only if there are enough bytes on device
     void readFrameDataAndCheck();
 
+    unsigned readData() override;
+
 private slots:
-    void onDataReady() override;
 
     void onNumberFormatChanged(NumberFormat numberFormat);
     void onNumOfChannelsChanged(unsigned value);

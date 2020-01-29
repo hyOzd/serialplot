@@ -17,42 +17,39 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "abstractreader.h"
+#ifndef BPSLABEL_H
+#define BPSLABEL_H
 
-AbstractReader::AbstractReader(QIODevice* device, QObject* parent) :
-    QObject(parent)
-{
-    _device = device;
-    bytesRead = 0;
-}
+#include <QLabel>
+#include <QTimer>
 
-void AbstractReader::pause(bool enabled)
-{
-    paused = enabled;
-}
+#include "portcontrol.h"
+#include "dataformatpanel.h"
 
-void AbstractReader::enable(bool enabled)
+/**
+ * Displays bits per second read from device.
+ *
+ * Displays a warning if maximum bit rate is reached.
+ */
+class BPSLabel : public QLabel
 {
-    if (enabled)
-    {
-        QObject::connect(_device, &QIODevice::readyRead,
-                         this, &AbstractReader::onDataReady);
-    }
-    else
-    {
-        QObject::disconnect(_device, 0, this, 0);
-        disconnectSinks();
-    }
-}
+    Q_OBJECT
 
-void AbstractReader::onDataReady()
-{
-    bytesRead += readData();
-}
+public:
+    explicit BPSLabel(PortControl* portControl,
+                      DataFormatPanel* dataFormatPanel,
+                      QWidget *parent = 0);
 
-unsigned AbstractReader::getBytesRead()
-{
-    unsigned r = bytesRead;
-    bytesRead = 0;
-    return r;
-}
+private:
+    PortControl* _portControl;
+    DataFormatPanel* _dataFormatPanel;
+    QTimer bpsTimer;
+
+    uint64_t prevBytesRead;
+
+private slots:
+    void onBpsTimeout();
+    void onPortToggled(bool open);
+};
+
+#endif // BPSLABEL_H

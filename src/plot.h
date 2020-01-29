@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -49,6 +49,9 @@ public:
 
     Plot(QWidget* parent = 0);
     ~Plot();
+
+    /// Set displayed channels for value tracking (can be null)
+    void setDispChannels(QVector<const StreamChannel*> channels);
 
 public slots:
     void showGrid(bool show = true);

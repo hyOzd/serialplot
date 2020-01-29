@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>704</width>
-    <height>195</height>
+    <height>220</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -69,9 +69,9 @@
          <enum>QLayout::SetMaximumSize</enum>
         </property>
         <item>
-         <widget class="color_widgets::ColorSelector" name="colorSelector" native="true">
+         <widget class="QPushButton" name="pbColorSel">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -87,6 +87,15 @@
             <width>20</width>
             <height>20</height>
            </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(70, 141, 255);</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="flat">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -411,14 +420,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>color_widgets::ColorSelector</class>
-   <extends>QWidget</extends>
-   <header>color_selector.hpp</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

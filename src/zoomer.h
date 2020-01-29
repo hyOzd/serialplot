@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -20,25 +20,36 @@
 #ifndef ZOOMER_H
 #define ZOOMER_H
 
-#include <scrollzoomer.h>
+#include <QVector>
+#include <QList>
+#include <QRect>
+
+#include "scrollzoomer.h"
+#include "streamchannel.h"
 
 class Zoomer : public ScrollZoomer
 {
     Q_OBJECT
 
 public:
-    Zoomer(QWidget *, bool doReplot=true);
+    Zoomer(QWidget*, bool doReplot=true);
     void zoom(int up);
-    void zoom( const QRectF & );
+    void zoom(const QRectF&);
+    /// Set displayed channels for value tracking (can be null)
+    void setDispChannels(QVector<const StreamChannel*> channels);
 
 signals:
     void unzoomed();
 
 protected:
     /// Re-implemented to display selection size in the tracker text.
-    QwtText trackerTextF(const QPointF &pos) const;
+    QwtText trackerTextF(const QPointF &pos) const override;
+    /// Re-implemented for sample value tracker
+    QRect trackerRect(const QFont&) const override;
     /// Re-implemented for alpha background
-    void drawRubberBand(QPainter* painter) const;
+    void drawRubberBand(QPainter* painter) const override;
+    /// Re-implemented to draw sample values
+    void drawTracker(QPainter* painter) const override;
     /// Re-implemented for alpha background (masking is basically disabled)
     QRegion rubberBandMask() const;
     /// Overloaded for panning
@@ -51,6 +62,15 @@ protected:
 private:
     bool is_panning;
     QPointF pan_point;
+    /// displayed channels for value tracking
+    QVector<const StreamChannel*> dispChannels;
+
+    /// Get a list of visible channels
+    QList<const StreamChannel*> visChannels() const;
+    /// Draw sample values
+    void drawValues(QPainter* painter) const;
+    /// Returns trackerRect for value tracker
+    QRect valueTrackerRect(const QFont& font) const;
 };
 
 #endif // ZOOMER_H

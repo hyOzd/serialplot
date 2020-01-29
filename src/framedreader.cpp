@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -159,6 +159,7 @@ void FramedReader::onNumOfChannelsChanged(unsigned value)
     _numChannels = value;
     checkSettings();
     reset();
+    updateNumChannels();
     emit numOfChannelsChanged(value);
 }
 
@@ -184,9 +185,11 @@ void FramedReader::onFrameSizeChanged(unsigned value)
     reset();
 }
 
-void FramedReader::onDataReady()
+unsigned FramedReader::readData()
 {
-    if (settingsInvalid) return;
+    unsigned numBytesRead = 0;
+
+    if (settingsInvalid) return numBytesRead;
 
     // loop until we run out of bytes or more bytes is required
     unsigned bytesAvailable;
@@ -196,6 +199,7 @@ void FramedReader::onDataReady()
         {
             char c;
             _device->getChar(&c);
+            numBytesRead++;
             if (c == syncWord[sync_i]) // correct sync byte?
             {
                 sync_i++;
@@ -213,6 +217,7 @@ void FramedReader::onDataReady()
         {
             frameSize = 0;
             _device->getChar((char*) &frameSize);
+            numBytesRead++;
 
             if (frameSize == 0) // check size
             {
@@ -242,10 +247,13 @@ void FramedReader::onDataReady()
             else // read data bytes and checksum
             {
                 readFrameDataAndCheck();
+                numBytesRead += checksumEnabled ? frameSize+1 : frameSize;
                 reset();
             }
         }
     }
+
+    return numBytesRead;
 }
 
 void FramedReader::reset()
@@ -263,7 +271,7 @@ void FramedReader::readFrameDataAndCheck()
     // if paused just read and waste data
     if (paused)
     {
-        _device->read((checksumEnabled ? frameSize+1 : frameSize));
+        _device->read(checksumEnabled ? frameSize+1 : frameSize);
         return;
     }
 

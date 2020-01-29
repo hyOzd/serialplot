@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -49,6 +49,9 @@ public:
     /// None of the current readers support X channel at the moment
     bool hasX() const final { return false; };
 
+    /// Read and 'zero' the byte counter
+    unsigned getBytesRead();
+
 signals:
     // TODO: should we keep this?
     void numOfChannelsChanged(unsigned);
@@ -63,12 +66,25 @@ public slots:
     void pause(bool enabled);
 
 protected:
+    /// Reader should read from this device in `readData()` function.
     QIODevice* _device;
+
+    /// Reader should check this variable to determine if reading is
+    /// paused in `readData()`
     bool paused;
 
-protected slots:
-    /// all derived readers has to override this function
-    virtual void onDataReady() = 0;
+    /**
+     * Called when `readyRead` is signaled by the device. This is
+     * where the implementors should read the data and return the
+     * exact number of bytes read from the device.
+     */
+    virtual unsigned readData() = 0;
+
+private:
+    unsigned bytesRead;
+
+private slots:
+    void onDataReady();
 };
 
 #endif // ABSTRACTREADER_H

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -19,7 +19,6 @@
 
 #include <algorithm>
 #include <QMetaEnum>
-#include <QtDebug>
 #include "qwt_symbol.h"
 
 #include "plot.h"
@@ -31,9 +30,9 @@ PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
                          const Stream* stream, QObject* parent) :
     QObject(parent)
 {
-    construct(plotArea, menu);
     _stream = stream;
-    if (_stream == NULL) return;
+    construct(plotArea, menu);
+    if (_stream == nullptr) return;
 
     // connect to ChannelInfoModel
     infoModel = _stream->infoModel();
@@ -53,15 +52,15 @@ PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
     // add initial curves if any?
     for (unsigned int i = 0; i < stream->numChannels(); i++)
     {
-        addCurve(stream->channel(i)->name(), stream->channel(i)->yData());
+        addCurve(stream->channel(i)->name(), stream->channel(i)->xData(), stream->channel(i)->yData());
     }
-
 }
 
 PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
                          Snapshot* snapshot, QObject *parent) :
     QObject(parent)
 {
+    _stream = nullptr;
     construct(plotArea, menu);
 
     setNumOfSamples(snapshot->numSamples());
@@ -70,11 +69,14 @@ PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
 
     for (unsigned ci = 0; ci < snapshot->numChannels(); ci++)
     {
-        addCurve(snapshot->channelName(ci), snapshot->yData[ci]);
+        addCurve(snapshot->channelName(ci), snapshot->xData[ci], snapshot->yData[ci]);
     }
 
     connect(infoModel, &QAbstractItemModel::dataChanged,
             this, &PlotManager::onChannelInfoChanged);
+
+    // TODO: remove when snapshot view supports multi display
+    checkNoVisChannels();
 }
 
 void PlotManager::construct(QWidget* plotArea, PlotMenu* menu)
@@ -94,8 +96,6 @@ void PlotManager::construct(QWidget* plotArea, PlotMenu* menu)
     // initalize layout and single widget
     isMulti = false;
     scrollArea = NULL;
-    setupLayout(isMulti);
-    addPlotWidget();
 
     // connect to  menu
     connect(menu, &PlotMenu::symbolShowChanged, this, &PlotManager:: setSymbols);
@@ -148,7 +148,7 @@ void PlotManager::onNumChannelsChanged(unsigned value)
         // add new channels
         for (unsigned int i = oldNum; i < numOfChannels; i++)
         {
-            addCurve(_stream->channel(i)->name(), _stream->channel(i)->yData());
+            addCurve(_stream->channel(i)->name(), _stream->channel(i)->xData(), _stream->channel(i)->yData());
         }
     }
     else if(numOfChannels < oldNum)
@@ -217,8 +217,6 @@ void PlotManager::checkNoVisChannels()
 
 void PlotManager::setMulti(bool enabled)
 {
-    if (enabled == isMulti) return;
-
     isMulti = enabled;
 
     // detach all curves
@@ -239,17 +237,25 @@ void PlotManager::setMulti(bool enabled)
     if (isMulti)
     {
         // add new widgets and attach
+        int i = 0;
         for (auto curve : curves)
         {
             auto plot = addPlotWidget();
             plot->setVisible(curve->isVisible());
+            plot->setDispChannels(QVector<const StreamChannel*>(1, _stream->channel(i)));
             curve->attach(plot);
+            i++;
         }
     }
     else
     {
         // add a single widget
         auto plot = addPlotWidget();
+
+        if (_stream != nullptr)
+        {
+            plot->setDispChannels(_stream->allChannels());
+        }
 
         // attach all curves
         for (auto curve : curves)
@@ -332,11 +338,10 @@ Plot* PlotManager::addPlotWidget()
     return plot;
 }
 
-void PlotManager::addCurve(QString title, const FrameBuffer* buffer)
+void PlotManager::addCurve(QString title, const XFrameBuffer* xBuf, const FrameBuffer* yBuf)
 {
     auto curve = new QwtPlotCurve(title);
-    auto series = new FrameBufferSeries(buffer);
-    series->setXAxis(_xAxisAsIndex, _xMin, _xMax);
+    auto series = new FrameBufferSeries(xBuf, yBuf);
     curve->setSamples(series);
     _addCurve(curve);
 }
@@ -362,6 +367,20 @@ void PlotManager::_addCurve(QwtPlotCurve* curve)
         plot = plotWidgets[0];
     }
 
+    if (_stream != nullptr)     // not displaying snapshot
+    {
+        QVector<const StreamChannel*> dispChannels;
+        if (isMulti)
+        {
+            dispChannels = QVector<const StreamChannel*>(1, _stream->channel(index));
+        }
+        else
+        {
+            dispChannels = _stream->allChannels();
+        }
+        plot->setDispChannels(dispChannels);
+    }
+
     // show the curve
     curve->attach(plot);
     plot->replot();
@@ -369,6 +388,16 @@ void PlotManager::_addCurve(QwtPlotCurve* curve)
 
 void PlotManager::removeCurves(unsigned number)
 {
+    if (_stream != nullptr)     // not displaying snapshot
+    {
+        if (! isMulti)
+        {
+            QVector<const StreamChannel*> dispChannels;
+            dispChannels = _stream->allChannels();
+            plotWidgets[0]->setDispChannels(dispChannels);
+        }
+    }
+
     for (unsigned i = 0; i < number; i++)
     {
         if (!curves.isEmpty())
@@ -481,10 +510,13 @@ void PlotManager::setXAxis(bool asIndex, double xMin, double xMax)
     _xAxisAsIndex = asIndex;
     _xMin = xMin;
     _xMax = xMax;
+
+    int ci = 0;
     for (auto curve : curves)
     {
         FrameBufferSeries* series = static_cast<FrameBufferSeries*>(curve->data());
-        series->setXAxis(asIndex, xMin, xMax);
+        series->setX(_stream->channel(ci)->xData());
+        ci++;
     }
     for (auto plot : plotWidgets)
     {

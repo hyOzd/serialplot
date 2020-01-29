@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -70,21 +70,20 @@ void AsciiReader::enable(bool enabled)
     if (enabled)
     {
         firstReadAfterEnable = true;
-        QObject::connect(_device, &QIODevice::readyRead,
-                         this, &AsciiReader::onDataReady);
     }
-    else
-    {
-        QObject::disconnect(_device, 0, this, 0);
-        disconnectSinks();
-    }
+
+    AbstractReader::enable(enabled);
 }
 
-void AsciiReader::onDataReady()
+unsigned AsciiReader::readData()
 {
+    unsigned numBytesRead = 0;
+
     while(_device->canReadLine())
     {
-        QString line = QString(_device->readLine());
+        QByteArray bytes = _device->readLine();
+        QString line = QString(bytes);
+        numBytesRead += bytes.size();
 
         // discard only once when we just started reading
         if (firstReadAfterEnable)
@@ -127,8 +126,11 @@ void AsciiReader::onDataReady()
 
             // commit data
             feedOut(*samples);
+            delete samples;
         }
     }
+
+    return numBytesRead;
 }
 
 SamplePack* AsciiReader::parseLine(const QString& line) const

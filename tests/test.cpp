@@ -224,6 +224,14 @@ TEST_CASE("LinIndexBuffer", "[memory, buffer]")
 
     REQUIRE(buf.sample(0) == -5.0);
     REQUIRE(buf.sample(19) == 5.0);
+
+    buf.resize(10);
+    buf.setLimits({0., 3.});
+    REQUIRE(buf.findIndex(0.01) == 0);
+    REQUIRE(buf.findIndex(1.51) == 4);
+    REQUIRE(buf.findIndex(2.99) == 8);
+    REQUIRE(buf.findIndex(3.01) == XFrameBuffer::OUT_OF_RANGE);
+    REQUIRE(buf.findIndex(-0.01) == XFrameBuffer::OUT_OF_RANGE);
 }
 
 TEST_CASE("RingBuffer sizing", "[memory, buffer]")

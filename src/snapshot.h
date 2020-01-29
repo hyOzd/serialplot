@@ -28,6 +28,7 @@
 
 #include "channelinfomodel.h"
 #include "readonlybuffer.h"
+#include "indexbuffer.h"
 
 class SnapshotView;
 class MainWindow;
@@ -40,7 +41,8 @@ public:
     Snapshot(MainWindow* parent, QString name, ChannelInfoModel infoModel, bool saved = false);
     ~Snapshot();
 
-    // TODO: yData of snapshot shouldn't be public, preferable should be handled in constructor
+    // TODO: yData and xData of snapshot shouldn't be public, preferable should be handled in constructor
+    QVector<IndexBuffer*> xData;
     QVector<ReadOnlyBuffer*> yData;
     QAction* showAction();
     QAction* deleteAction();

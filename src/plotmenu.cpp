@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -66,7 +66,7 @@ PlotMenu::PlotMenu(QWidget* parent) :
     setSymbolsMenu.addAction(&setSymbolsAutoAct);
     setSymbolsAutoAct.setCheckable(true);
     setSymbolsAutoAct.setChecked(true);
-    connect(&setSymbolsAutoAct, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+    connect(&setSymbolsAutoAct, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
             [this](bool checked)
             {
                 if (checked) emit symbolShowChanged(Plot::ShowSymbolsAuto);
@@ -74,18 +74,18 @@ PlotMenu::PlotMenu(QWidget* parent) :
 
     setSymbolsMenu.addAction(&setSymbolsShowAct);
     setSymbolsShowAct.setCheckable(true);
-    connect(&setSymbolsShowAct, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+    connect(&setSymbolsShowAct, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
             [this](bool checked)
             {
-                if (checked) symbolShowChanged(Plot::ShowSymbolsShow);
+                if (checked) emit symbolShowChanged(Plot::ShowSymbolsShow);
             });
 
     setSymbolsMenu.addAction(&setSymbolsHideAct);
     setSymbolsHideAct.setCheckable(true);
-    connect(&setSymbolsHideAct, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+    connect(&setSymbolsHideAct, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
             [this](bool checked)
             {
-                if (checked) symbolShowChanged(Plot::ShowSymbolsHide);
+                if (checked) emit symbolShowChanged(Plot::ShowSymbolsHide);
             });
 
     // add symbol actions to same group so that they appear as radio buttons
@@ -202,20 +202,17 @@ void PlotMenu::loadSettings(QSettings* settings)
     QString showSymbolsStr = settings->value(SG_Plot_Symbols, QString()).toString();
     if (showSymbolsStr == "auto")
     {
-        // setSymbols(Plot::ShowSymbolsAuto);
         setSymbolsAutoAct.setChecked(true);
     }
     else if (showSymbolsStr == "show")
     {
-        // setSymbols(Plot::ShowSymbolsShow);
         setSymbolsShowAct.setChecked(true);
     }
     else if (showSymbolsStr == "hide")
     {
-        // setSymbols(Plot::ShowSymbolsHide);
         setSymbolsHideAct.setChecked(true);
     }
-    else
+    else if (!showSymbolsStr.isEmpty())
     {
         qCritical() << "Invalid symbol setting:" << showSymbolsStr;
     }

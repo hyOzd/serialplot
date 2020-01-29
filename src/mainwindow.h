@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -46,6 +46,8 @@
 #include "plotmenu.h"
 #include "updatecheckdialog.h"
 #include "samplecounter.h"
+#include "datatextview.h"
+#include "bpslabel.h"
 
 namespace Ui {
 class MainWindow;
@@ -61,8 +63,7 @@ public:
 
     PlotViewSettings viewSettings() const;
 
-    void messageHandler(QtMsgType type, const QMessageLogContext &context,
-                        const QString &msg);
+    void messageHandler(QtMsgType type, const QString &logString, const QString &msg);
 
 private:
     Ui::MainWindow *ui;
@@ -89,7 +90,11 @@ private:
     RecordPanel recordPanel;
     PlotControlPanel plotControlPanel;
     PlotMenu plotMenu;
+    DataTextView textView;
     UpdateCheckDialog updateCheckDialog;
+    BPSLabel bpsLabel;
+
+    void handleCommandLineOptions(const QCoreApplication &app);
 
     /// Returns true if demo is running
     bool isDemoRunning();

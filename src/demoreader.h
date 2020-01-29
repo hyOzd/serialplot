@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -55,10 +55,11 @@ private:
     QTimer timer;
     int count;
 
+    unsigned readData() override;
+
 private slots:
     void demoTimerTimeout();
     void onNumChannelsChanged(unsigned value);
-    void onDataReady() override;
 };
 
 #endif // DEMOREADER_H

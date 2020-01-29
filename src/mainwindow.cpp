@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -29,10 +29,13 @@
 #include <QDesktopServices>
 #include <QMap>
 #include <QtDebug>
+#include <QCommandLineParser>
+#include <QFileInfo>
 #include <qwt_plot.h>
 #include <limits.h>
 #include <cmath>
 #include <iostream>
+#include <cstdlib>
 
 #include <plot.h>
 #include <barplot.h>
@@ -55,7 +58,8 @@ const QMap<int, QString> panelSettingMap({
         {2, "Plot"},
         {3, "Commands"},
         {4, "Record"},
-        {5, "Log"}
+        {5, "TextView"},
+        {6, "Log"}
     });
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -68,7 +72,9 @@ MainWindow::MainWindow(QWidget *parent) :
     commandPanel(&serialPort),
     dataFormatPanel(&serialPort),
     recordPanel(&stream),
-    updateCheckDialog(this)
+    textView(&stream),
+    updateCheckDialog(this),
+    bpsLabel(&portControl, &dataFormatPanel, this)
 {
     ui->setupUi(this);
 
@@ -79,6 +85,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tabWidget->insertTab(2, &plotControlPanel, "Plot");
     ui->tabWidget->insertTab(3, &commandPanel, "Commands");
     ui->tabWidget->insertTab(4, &recordPanel, "Record");
+    ui->tabWidget->insertTab(5, &textView, "Text View");
     ui->tabWidget->setCurrentIndex(0);
     auto tbPortControl = portControl.toolBar();
     addToolBar(tbPortControl);
@@ -169,6 +176,9 @@ MainWindow::MainWindow(QWidget *parent) :
             plotMan, &PlotManager::setYAxis);
 
     connect(&plotControlPanel, &PlotControlPanel::xScaleChanged,
+            &stream, &Stream::setXAxis);
+
+    connect(&plotControlPanel, &PlotControlPanel::xScaleChanged,
             plotMan, &PlotManager::setXAxis);
 
     connect(&plotControlPanel, &PlotControlPanel::plotWidthChanged,
@@ -215,6 +225,9 @@ MainWindow::MainWindow(QWidget *parent) :
     plotControlPanel.setChannelInfoModel(stream.infoModel());
 
     // init scales
+    stream.setXAxis(plotControlPanel.xAxisAsIndex(),
+                    plotControlPanel.xMin(), plotControlPanel.xMax());
+
     plotMan->setYAxis(plotControlPanel.autoScale(),
                       plotControlPanel.yMin(), plotControlPanel.yMax());
     plotMan->setXAxis(plotControlPanel.xAxisAsIndex(),
@@ -222,12 +235,20 @@ MainWindow::MainWindow(QWidget *parent) :
     plotMan->setNumOfSamples(numOfSamples);
     plotMan->setPlotWidth(plotControlPanel.plotWidth());
 
+    // init bps (bits per second) counter
+    ui->statusBar->addPermanentWidget(&bpsLabel);
+
     // Init sps (sample per second) counter
     spsLabel.setText("0sps");
-    spsLabel.setToolTip("samples per second (per channel)");
+    spsLabel.setToolTip(tr("samples per second (per channel)"));
     ui->statusBar->addPermanentWidget(&spsLabel);
     connect(&sampleCounter, &SampleCounter::spsChanged,
             this, &MainWindow::onSpsChanged);
+
+    bpsLabel.setMinimumWidth(70);
+    bpsLabel.setAlignment(Qt::AlignRight);
+    spsLabel.setMinimumWidth(70);
+    spsLabel.setAlignment(Qt::AlignRight);
 
     // init demo
     QObject::connect(ui->actionDemoMode, &QAction::toggled,
@@ -242,8 +263,10 @@ MainWindow::MainWindow(QWidget *parent) :
     onSourceChanged(dataFormatPanel.activeSource());
 
     // load default settings
-    QSettings settings("serialplot", "serialplot");
+    QSettings settings(PROGRAM_NAME, PROGRAM_NAME);
     loadAllSettings(&settings);
+
+    handleCommandLineOptions(*QApplication::instance());
 
     // ensure command panel has 1 command if none loaded
     if (!commandPanel.numOfCommands())
@@ -291,7 +314,7 @@ void MainWindow::closeEvent(QCloseEvent * event)
     }
 
     // save settings
-    QSettings settings("serialplot", "serialplot");
+    QSettings settings(PROGRAM_NAME, PROGRAM_NAME);
     saveAllSettings(&settings);
     settings.sync();
 
@@ -346,6 +369,11 @@ void MainWindow::onPortToggled(bool open)
     // make sure demo mode is disabled
     if (open && isDemoRunning()) enableDemo(false);
     ui->actionDemoMode->setEnabled(!open);
+
+    if (!open)
+    {
+        spsLabel.setText("0sps");
+    }
 }
 
 void MainWindow::onSourceChanged(Source* source)
@@ -465,43 +493,15 @@ PlotViewSettings MainWindow::viewSettings() const
 }
 
 void MainWindow::messageHandler(QtMsgType type,
-                                const QMessageLogContext &context,
+                                const QString &logString,
                                 const QString &msg)
 {
-    QString logString;
-
-    switch (type)
-    {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
-        case QtInfoMsg:
-            logString = "[Info] " + msg;
-            break;
-#endif
-        case QtDebugMsg:
-            logString = "[Debug] " + msg;
-            break;
-        case QtWarningMsg:
-            logString = "[Warning] " + msg;
-            break;
-        case QtCriticalMsg:
-            logString = "[Error] " + msg;
-            break;
-        case QtFatalMsg:
-            logString = "[Fatal] " + msg;
-            break;
-    }
-
-    if (ui != NULL) ui->ptLog->appendPlainText(logString);
-    std::cerr << logString.toStdString() << std::endl;
+    if (ui != NULL)
+        ui->ptLog->appendPlainText(logString);
 
     if (type != QtDebugMsg && ui != NULL)
     {
         ui->statusBar->showMessage(msg, 5000);
-    }
-
-    if (type == QtFatalMsg)
-    {
-        __builtin_trap();
     }
 }
 
@@ -515,6 +515,7 @@ void MainWindow::saveAllSettings(QSettings* settings)
     plotMenu.saveSettings(settings);
     commandPanel.saveSettings(settings);
     recordPanel.saveSettings(settings);
+    textView.saveSettings(settings);
     updateCheckDialog.saveSettings(settings);
 }
 
@@ -528,6 +529,7 @@ void MainWindow::loadAllSettings(QSettings* settings)
     plotMenu.loadSettings(settings);
     commandPanel.loadSettings(settings);
     recordPanel.loadSettings(settings);
+    textView.loadSettings(settings);
     updateCheckDialog.loadSettings(settings);
 }
 
@@ -603,5 +605,58 @@ void MainWindow::onLoadSettings()
     {
         QSettings settings(fileName, QSettings::IniFormat);
         loadAllSettings(&settings);
+    }
+}
+
+void MainWindow::handleCommandLineOptions(const QCoreApplication &app)
+{
+    QCommandLineParser parser;
+    parser.setSingleDashWordOptionMode(QCommandLineParser::ParseAsCompactedShortOptions);
+    parser.setApplicationDescription("Small and simple software for plotting data from serial port in realtime.");
+    parser.addHelpOption();
+    parser.addVersionOption();
+
+    QCommandLineOption configOpt({"c", "config"}, "Load configuration from file.", "filename");
+    QCommandLineOption portOpt({"p", "port"}, "Set port name.", "port name");
+    QCommandLineOption baudrateOpt({"b" ,"baudrate"}, "Set port baud rate.", "baud rate");
+    QCommandLineOption openPortOpt({"o", "open"}, "Open serial port.");
+
+    parser.addOption(configOpt);
+    parser.addOption(portOpt);
+    parser.addOption(baudrateOpt);
+    parser.addOption(openPortOpt);
+
+    parser.process(app);
+
+    if (parser.isSet(configOpt))
+    {
+        QString fileName = parser.value(configOpt);
+        QFileInfo fileInfo(fileName);
+
+        if (fileInfo.exists() && fileInfo.isFile())
+        {
+            QSettings settings(fileName, QSettings::IniFormat);
+            loadAllSettings(&settings);
+        }
+        else
+        {
+            qCritical() << "Configuration file not exist. Closing application.";
+            std::exit(1);
+        }
+    }
+
+    if (parser.isSet(portOpt))
+    {
+        portControl.selectPort(parser.value(portOpt));
+    }
+
+    if (parser.isSet(baudrateOpt))
+    {
+        portControl.selectBaudrate(parser.value(baudrateOpt));
+    }
+
+    if (parser.isSet(openPortOpt))
+    {
+        portControl.openPort();
     }
 }

@@ -1,5 +1,7 @@
 #include <QtGlobal>
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 12, 0))
+
 template <> inline float qbswap<float>(float source)
 {
     float result;
@@ -11,3 +13,5 @@ template <> inline float qbswap<float>(float source)
     t[3] = s[0];
     return result;
 }
+
+#endif

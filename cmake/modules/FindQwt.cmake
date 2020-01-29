@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 Hasan Yavuz Özderya
+# Copyright © 2019 Hasan Yavuz Özderya
 #
 # This file is part of serialplot.
 #
@@ -66,8 +66,7 @@ endif(qwt_roots)
 
 if(QWT_ROOT)
   set(QWT_INCLUDE_DIR "${QWT_ROOT}/include")
-  find_library(QWT_LIBRARY "qwt-qt5"
-	PATHS "${QWT_ROOT}/lib")
+  find_library(QWT_LIBRARY NAMES "qwt-qt5" "qwt" PATHS "${QWT_ROOT}/lib")
 else (QWT_ROOT)
   ## Look into system locations
   find_path(QWT_INCLUDE_DIR qwt_plot.h PATHS /usr/include/qwt)
@@ -90,7 +89,7 @@ else (QWT_ROOT)
 	endif(qwt_version_string)
   endif (QWT_INCLUDE_DIR)
   # look into system locations for lib file
-  find_library(QWT_LIBRARY "qwt-qt5" PATHS /usr/lib)
+  find_library(QWT_LIBRARY NAMES "qwt-qt5" "qwt" PATHS /usr/lib)
 endif(QWT_ROOT)
 
 # set version variables
@@ -103,8 +102,24 @@ if(QWT_VERSION)
 	QWT_PATCH_VERSION ${QWT_VERSION})
 endif(QWT_VERSION)
 
+# check Qwt library 'Qt' version
+if (QWT_LIBRARY)
+  include(GetPrerequisites)
+  GET_PREREQUISITES(${QWT_LIBRARY} qwt_lib_deps 0 0 "" "")
+  set(qwt_is_qt5 FALSE)
+  foreach (dep ${qwt_lib_deps})
+    if (${dep} MATCHES "libQt5Gui")
+      set(qwt_is_qt5 TRUE)
+    endif()
+  endforeach ()
+  if (NOT qwt_is_qt5)
+    message(WARNING "Found qwt library (${QWT_LIBRARY}) isn't compiled with Qt5!")
+    LIST_PREREQUISITES(${QWT_LIBRARY})
+  endif()
+endif (QWT_LIBRARY)
+
 # set QWT_FOUND
-if(QWT_INCLUDE_DIR AND QWT_LIBRARY)
+if(QWT_INCLUDE_DIR AND QWT_LIBRARY AND qwt_is_qt5)
   set(QWT_INCLUDE_DIRS ${QWT_INCLUDE_DIR})
   set(QWT_LIBRARIES ${QWT_LIBRARY})
   set(QWT_FOUND true)
@@ -114,6 +129,9 @@ endif()
 
 # errors
 if(NOT QWT_FOUND)
+  unset(QWT_INCLUDE_DIR CACHE)
+  unset(QWT_LIBRARY CACHE)
+
   if(Qwt_FIND_QUIET)
 	message(WARNING "Couldn't find Qwt.")
   elseif(Qwt_FIND_REQUIRED)

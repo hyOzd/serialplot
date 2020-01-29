@@ -26,15 +26,16 @@
 /// sample value.
 ///
 /// @note This buffer isn't for storing data.
-class IndexBuffer : public ResizableBuffer
+class IndexBuffer : public XFrameBuffer
 {
 public:
     IndexBuffer(unsigned n);
 
-    unsigned size() const;
-    double sample(unsigned i) const;
-    Range limits() const;
-    void resize(unsigned n);
+    unsigned size() const override;
+    double sample(unsigned i) const override;
+    Range limits() const override;
+    void resize(unsigned n) override;
+    int findIndex(double value) const override;
 
 private:
     unsigned _size;

@@ -48,16 +48,16 @@ public:
      * @param x has X data input
      * @param ns number of samples
      */
-    Stream(unsigned nc = 0, bool x = false, unsigned ns = 0);
+    Stream(unsigned nc = 1, bool x = false, unsigned ns = 2);
     ~Stream();
 
-    // implementations for `Source`
-    virtual bool hasX() const;
-    virtual unsigned numChannels() const;
+    bool hasX() const;
+    unsigned numChannels() const;
 
     unsigned numSamples() const;
     const StreamChannel* channel(unsigned index) const;
     StreamChannel* channel(unsigned index);
+    QVector<const StreamChannel*> allChannels() const;
     const ChannelInfoModel* infoModel() const;
     ChannelInfoModel* infoModel();
 
@@ -79,9 +79,12 @@ signals:
     void dataAdded(); ///< emitted when data added to channel man.
 
 public slots:
-    // TODO: these won't be public
-    // void setNumChannels(unsigned number);
+    /// Change number of samples (buffer size)
     void setNumSamples(unsigned value);
+
+    /// Change X axis style
+    /// @note Ignored when X is provided by source (hasX == true)
+    void setXAxis(bool asIndex, double min, double max);
 
     /// When paused data feed is ignored
     void pause(bool paused);
@@ -94,10 +97,13 @@ private:
     bool _paused;
 
     bool _hasx;
-    ResizableBuffer* xData;
+    XFrameBuffer* xData;
     QList<StreamChannel*> channels;
 
     ChannelInfoModel _infoModel;
+
+    bool xAsIndex;
+    double xMin, xMax;
 
     /**
      * Applies gain and offset to given pack.
@@ -111,6 +117,9 @@ private:
      * @return modified data
      */
     const SamplePack* applyGainOffset(const SamplePack& pack) const;
+
+    /// Returns a new virtual X buffer for settings
+    XFrameBuffer* makeXBuffer() const;
 };
 
 

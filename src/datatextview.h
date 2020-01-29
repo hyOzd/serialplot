@@ -17,49 +17,41 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ASCIIREADER_H
-#define ASCIIREADER_H
+#ifndef DATATEXTVIEW_H
+#define DATATEXTVIEW_H
 
-#include <QSettings>
-#include <QString>
+#include <QWidget>
 
-#include "samplepack.h"
-#include "abstractreader.h"
-#include "asciireadersettings.h"
+#include "stream.h"
 
-class AsciiReader : public AbstractReader
+namespace Ui {
+class DataTextView;
+}
+
+class DataTextViewSink;
+
+class DataTextView : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit AsciiReader(QIODevice* device, QObject *parent = 0);
-    QWidget* settingsWidget();
-    unsigned numChannels() const;
-    void enable(bool enabled) override;
+    explicit DataTextView(Stream* stream, QWidget *parent = 0);
+    ~DataTextView();
+
     /// Stores settings into a `QSettings`
     void saveSettings(QSettings* settings);
     /// Loads settings from a `QSettings`.
     void loadSettings(QSettings* settings);
 
+protected:
+    void addData(const SamplePack& data);
+
+    friend DataTextViewSink;
+
 private:
-    AsciiReaderSettings _settingsWidget;
-    unsigned _numChannels;
-    /// number of channels will be determined from incoming data
-    unsigned autoNumOfChannels;
-    QChar delimiter; ///< selected column delimiter
-
-    bool firstReadAfterEnable = false;
-
-    unsigned readData() override;
-
-private slots:
-
-    /**
-     * Parses given line and returns sample pack.
-     *
-     * Returns `nullptr` in case of error.
-     */
-    SamplePack* parseLine(const QString& line) const;
+    Ui::DataTextView *ui;
+    DataTextViewSink* sink;
+    Stream* _stream;
 };
 
-#endif // ASCIIREADER_H
+#endif // DATATEXTVIEW_H

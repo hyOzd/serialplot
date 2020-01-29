@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -79,10 +79,10 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
                      this, &PortControl::onTbPortListActivated);
     QObject::connect(ui->cbPortList,
                      SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
-                     this, &PortControl::selectPort);
+                     this, &PortControl::selectListedPort);
     QObject::connect(&tbPortList,
                      SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
-                     this, &PortControl::selectPort);
+                     this, &PortControl::selectListedPort);
 
     // setup buttons
     ui->pbOpenPort->setDefaultAction(&openAction);
@@ -91,7 +91,7 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     // setup baud rate selection widget
     QObject::connect(ui->cbBaudRate,
                      SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
-                     this, &PortControl::selectBaudRate);
+                     this, &PortControl::_selectBaudRate);
 
     // setup parity selection buttons
     parityButtons.addButton(ui->rbNoParity, (int) QSerialPort::NoParity);
@@ -198,7 +198,7 @@ void PortControl::loadBaudRateList()
     }
 }
 
-void PortControl::selectBaudRate(QString baudRate)
+void PortControl::_selectBaudRate(QString baudRate)
 {
     if (serialPort->isOpen())
     {
@@ -289,7 +289,7 @@ void PortControl::togglePort()
         if (serialPort->open(QIODevice::ReadWrite))
         {
             // set port settings
-            selectBaudRate(ui->cbBaudRate->currentText());
+            _selectBaudRate(ui->cbBaudRate->currentText());
             selectParity((QSerialPort::Parity) parityButtons.checkedId());
             selectDataBits((QSerialPort::DataBits) dataBitsButtons.checkedId());
             selectStopBits((QSerialPort::StopBits) stopBitsButtons.checkedId());
@@ -310,10 +310,17 @@ void PortControl::togglePort()
     openAction.setChecked(serialPort->isOpen());
 }
 
-void PortControl::selectPort(QString portName)
+void PortControl::selectListedPort(QString portName)
 {
     // portName may be coming from combobox
     portName = portName.split(" ")[0];
+
+    QSerialPortInfo portInfo(portName);
+    if (portInfo.isNull())
+    {
+        qWarning() << "Device doesn't exists:" << portName;
+    }
+
     // has selection actually changed
     if (portName != serialPort->portName())
     {
@@ -366,6 +373,13 @@ void PortControl::onTbPortListActivated(int index)
 
 void PortControl::onPortError(QSerialPort::SerialPortError error)
 {
+#ifdef Q_OS_UNIX
+    // For suppressing "Invalid argument" errors that happens with pseudo terminals
+    auto isPtsInvalidArgErr = [this] () -> bool {
+        return serialPort->portName().contains("pts/") && serialPort->errorString().contains("Invalid argument");
+    };
+#endif
+
     switch(error)
     {
         case QSerialPort::NoError :
@@ -408,12 +422,22 @@ required privileges or device is already opened by another process.";
             qCritical() << "An error occurred while reading data.";
             break;
         case QSerialPort::UnsupportedOperationError:
+#ifdef Q_OS_UNIX
+            // Qt 5.5 gives "Invalid argument" with 'UnsupportedOperationError'
+            if (isPtsInvalidArgErr())
+                break;
+#endif
             qCritical() << "Operation is not supported.";
             break;
         case QSerialPort::TimeoutError:
             qCritical() << "A timeout error occurred.";
             break;
         case QSerialPort::UnknownError:
+#ifdef Q_OS_UNIX
+            // Qt 5.2 gives "Invalid argument" with 'UnknownError'
+            if (isPtsInvalidArgErr())
+                break;
+#endif
             qCritical() << "Unknown error! Error: " << serialPort->errorString();
             break;
         default:
@@ -451,6 +475,64 @@ QString PortControl::currentFlowControlText()
     {
         return "none";
     }
+}
+
+void PortControl::selectPort(QString portName)
+{
+    int portIndex = portList.indexOfName(portName);
+    if (portIndex < 0) // not in list, add to model and update the selections
+    {
+        portList.appendRow(new PortListItem(portName));
+        portIndex = portList.rowCount()-1;
+    }
+
+    ui->cbPortList->setCurrentIndex(portIndex);
+    tbPortList.setCurrentIndex(portIndex);
+
+    selectListedPort(portName);
+}
+
+void PortControl::selectBaudrate(QString baudRate)
+{
+    int baudRateIndex = ui->cbBaudRate->findText(baudRate);
+    if (baudRateIndex < 0)
+    {
+        ui->cbBaudRate->setCurrentText(baudRate);
+    }
+    else
+    {
+        ui->cbBaudRate->setCurrentIndex(baudRateIndex);
+    }
+    _selectBaudRate(baudRate);
+}
+
+void PortControl::openPort()
+{
+    if (!serialPort->isOpen())
+    {
+        openAction.trigger();
+    }
+}
+
+unsigned PortControl::maxBitRate() const
+{
+    float baud = serialPort->baudRate();
+    float dataBits = serialPort->dataBits();
+    float parityBits = serialPort->parity() == QSerialPort::NoParity ? 0 : 1;
+
+    float stopBits;
+    if (serialPort->stopBits() == QSerialPort::OneAndHalfStop)
+    {
+        stopBits = 1.5;
+    }
+    else
+    {
+        stopBits = serialPort->stopBits();
+    }
+
+    float frame_size = 1 /* start bit */ + dataBits + parityBits + stopBits;
+
+    return float(baud) / frame_size;
 }
 
 void PortControl::saveSettings(QSettings* settings)
@@ -494,7 +576,7 @@ void PortControl::loadSettings(QSettings* settings)
     parityButtons.button(paritySetting)->setChecked(true);
 
     // load number of bits
-    int dataBits = settings->value(SG_Port_Parity, dataBitsButtons.checkedId()).toInt();
+    int dataBits = settings->value(SG_Port_DataBits, dataBitsButtons.checkedId()).toInt();
     if (dataBits >=5 && dataBits <= 8)
     {
         dataBitsButtons.button((QSerialPort::DataBits) dataBits)->setChecked(true);

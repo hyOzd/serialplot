@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2019 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -17,4 +17,12 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const char* BUG_REPORT_URL = "https://bitbucket.org/hyOzd/serialplot/issues/new";
+#ifndef DEFINES_H
+#define DEFINES_H
+
+const char BUG_REPORT_URL[] = "https://bitbucket.org/hyOzd/serialplot/issues/new";
+
+/// Maximum number of channels that can be set by user
+const unsigned MAX_NUM_CHANNELS = 64;
+
+#endif  // DEFINES_H

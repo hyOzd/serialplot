@@ -1,5 +1,5 @@
  /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2018 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -18,12 +18,14 @@
 */
 
 #include <QtGlobal>
+#include <algorithm>
 
 #include "linindexbuffer.h"
 
 LinIndexBuffer::LinIndexBuffer(unsigned n, Range lim)
 {
-    Q_ASSERT(n > 0);
+    // Note that calculation of _step would cause divide by 0
+    Q_ASSERT(n > 1);
 
     _size = n;
     setLimits(lim);
@@ -48,6 +50,18 @@ void LinIndexBuffer::resize(unsigned n)
 {
     _size = n;
     setLimits(_limits);         // called to update `_step`
+}
+
+int LinIndexBuffer::findIndex(double value) const
+{
+    if (value < _limits.start || value > _limits.end)
+    {
+        return OUT_OF_RANGE;
+    }
+
+    int r = (value - _limits.start) / _step;
+    // Note: we are limiting return value because of floating point in-accuracies
+    return std::min<int>(std::max<int>(r, 0), (_size-1));
 }
 
 void LinIndexBuffer::setLimits(Range lim)
