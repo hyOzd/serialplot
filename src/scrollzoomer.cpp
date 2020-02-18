@@ -67,9 +67,26 @@ ScrollZoomer::~ScrollZoomer()
 
 void ScrollZoomer::setXLimits(double min, double max)
 {
+    // store current align state to be used when setting zoom base
+    if ((zoomRect().right() > xMax) || (abs(zoomRect().right() - xMax) < 0.001))
+    {
+        zbAlign = AlignZoomBase::Right;
+    }
+    else if (zoomRect().left() < xMin || (zoomRect().left() - xMin < 0.001))
+    {
+        zbAlign = AlignZoomBase::Left;
+    }
+    else
+    {
+        zbAlign = AlignZoomBase::Center;
+    }
+
     xMin = min;
     xMax = max;
+
     setZoomBase();
+    zbAlign = AlignZoomBase::Center;
+    rescale();
 }
 
 void ScrollZoomer::setHViewSize(double size)
@@ -85,15 +102,49 @@ void ScrollZoomer::setZoomBase(bool doReplot)
     QwtPlotZoomer::setZoomBase(doReplot);
     auto zb = zoomBase();
     auto zs = zoomStack();
-    zb.setRight(xMax);
-    if ((xMax - xMin) < hViewSize)
+
+    double zbWidth;             // final zoom base width
+    if (hViewSize > (xMax - xMin))
     {
-        zb.setLeft(xMin);
+        zbWidth = xMax - xMin;
     }
     else
     {
-        zb.setLeft(xMax-hViewSize);
+        zbWidth = hViewSize;
     }
+
+    // TODO: fix snapping, xlimits is already changed we should compare to previous values
+    // keep right
+    // if (abs(zb.right() - xMax) < 0.001)
+    if (zbAlign == AlignZoomBase::Right)
+    {
+        zb.setWidth(zbWidth);
+        zb.moveRight(xMax);
+    } // keep left
+    // else if (zb.left() == xMin)
+    else if (zbAlign == AlignZoomBase::Left)
+    {
+        zb.setWidth(zbWidth);
+        zb.moveRight(xMin);
+    }
+    else // keep center
+    {
+        // resize the zoom base
+        double widthDiff = zb.width() - zbWidth;
+        zb.setLeft(zb.left() + widthDiff / 2.);
+        zb.setRight(zb.right() - widthDiff / 2.);
+
+        // don't let it go out of limits
+        if (zb.right() > xMax)
+        {
+            zb.moveRight(xMax);
+        }
+        else if (zb.left() < xMin)
+        {
+            zb.moveLeft(xMin);
+        }
+    }
+
     zs[0] = zb;
     setZoomStack(zs);
 }

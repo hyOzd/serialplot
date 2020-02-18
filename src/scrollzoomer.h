@@ -67,9 +67,16 @@ private Q_SLOTS:
     void scrollBarMoved( Qt::Orientation o, double min, double max );
 
 private:
+    enum class AlignZoomBase
+    {
+        Right, Center, Left
+    };
+
     QRectF d_limits;
     double xMin, xMax;
     double hViewSize;
+    /// used for aligning zoom base during xlimits change
+    AlignZoomBase zbAlign;
 
     bool needScrollBar( Qt::Orientation ) const;
     int oppositeAxis( int ) const;

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -116,7 +116,7 @@ void Plot::setXAxis(double xMin, double xMax)
     _xMax = xMax;
 
     zoomer.setXLimits(xMin, xMax);
-    zoomer.zoom(0); // unzoom
+    zoomer.setZoomBase();
 
     // set axis
     // setAxisScale(QwtPlot::xBottom, xMin, xMax);
