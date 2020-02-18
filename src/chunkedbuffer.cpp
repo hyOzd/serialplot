@@ -36,6 +36,7 @@ ChunkedBuffer::~ChunkedBuffer()
     }
 }
 
+// TODO: we should have a max size for chunkedbuffer
 void ChunkedBuffer::addSamples(double* samples, unsigned n)
 {
     size_t i = 0;
@@ -105,6 +106,8 @@ Range ChunkedBuffer::limits() const
 
 double ChunkedBuffer::sample(unsigned i) const
 {
+    Q_ASSERT(i < _size);
+
     int chunk_index = i / CHUNK_SIZE;
     int chunk_offset = i % CHUNK_SIZE;
     return chunks[chunk_index]->sample(chunk_offset);
