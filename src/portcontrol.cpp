@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -23,6 +23,7 @@
 #include <QSerialPortInfo>
 #include <QKeySequence>
 #include <QLabel>
+#include <QLineEdit>
 #include <QMap>
 #include <QtDebug>
 
@@ -185,6 +186,15 @@ void PortControl::loadPortList()
     {
         ui->cbPortList->setCurrentIndex(index);
         tbPortList.setCurrentIndex(index);
+    }
+
+    if (portList.rowCount() == 0)
+    {
+        ui->cbPortList->lineEdit()->setPlaceholderText(tr("No port found - enter name"));
+    }
+    else
+    {
+        ui->cbPortList->lineEdit()->setPlaceholderText(tr("Select port or enter name"));
     }
 }
 
