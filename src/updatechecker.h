@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -44,31 +44,18 @@ public slots:
     void cancelCheck();
 
 private:
-    enum class FileArch
-    {
-        unknown,
-        _i386,
-        amd64,
-        arm
-    };
-
-    struct FileInfo
-    {
-        QString name;
-        QString link;
-        bool hasVersion;
-        VersionNumber version;
-        FileArch arch;
-    };
-
     QNetworkAccessManager nam;
     QNetworkReply* activeReply;
 
-    /// Parses json and creates a list of files
-    bool parseData(const QJsonDocument& data, QList<FileInfo>& files) const;
-    /// Finds the update file in the file list. Returns `-1` if no new version
-    /// is found.
-    bool findUpdate(const QList<FileInfo>& files, FileInfo& foundFile) const;
+    /**
+     * Parses json and finds the update file (if it exists)
+     * @param foundUpdate set to true if a new update found
+     * @param foundVersion is set to the new version number
+     * @param fileLink is set to download url
+     * @return true if parsing is successful
+     */
+    bool findUpdate(const QJsonDocument& data, bool &foundUpdate,
+                    VersionNumber& foundVersion, QString &fileLink) const;
 
 private slots:
     void onReqFinished(QNetworkReply* reply);

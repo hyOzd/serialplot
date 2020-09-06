@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -35,6 +35,7 @@ UpdateCheckDialog::UpdateCheckDialog(QWidget *parent) :
             {
                 lastCheck = QDate::currentDate();
                 ui->label->setText(QString("Update check failed.\n") + errorMessage);
+                qCritical() << "Update error:" << errorMessage;
             });
 
     connect(&updateChecker, &UpdateChecker::checkFinished,

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -27,9 +27,7 @@
 
 #include "updatechecker.h"
 
-// This link returns the list of downloads in JSON format. Note that we only use
-// the first page because results are sorted new to old.
-const char BB_DOWNLOADS_URL[] = "https://api.bitbucket.org/2.0/repositories/hyozd/serialplot/downloads?fields=values.name,values.links.self.href";
+const char UPDATES_INFO_URL[] = "https://serialplot.ozderya.net/downloads/updates.json";
 
 UpdateChecker::UpdateChecker(QObject *parent) :
     QObject(parent), nam(this)
@@ -49,7 +47,7 @@ void UpdateChecker::checkUpdate()
 {
     if (isChecking()) return;
 
-    auto req = QNetworkRequest(QUrl(BB_DOWNLOADS_URL));
+    auto req = QNetworkRequest(QUrl(UPDATES_INFO_URL));
     activeReply = nam.get(req);
 }
 
@@ -74,19 +72,22 @@ void UpdateChecker::onReqFinished(QNetworkReply* reply)
         }
         else
         {
-            QList<FileInfo> files;
-            if (!parseData(data, files))
+            bool updateFound;
+            VersionNumber newVersion;
+            QString link;
+
+            if (!findUpdate(data, updateFound, newVersion, link))
             {
-                // TODO: emit detailed data contents for logging
                 emit checkFailed("Data parsing error.");
+                qCritical() << "Parsing the update info file failed:";
+                qCritical() << data;
             }
             else
             {
-                FileInfo updateFile;
-                if (findUpdate(files, updateFile))
+                if (updateFound)
                 {
                     emit checkFinished(
-                        true, updateFile.version.toString(), updateFile.link);
+                        true, newVersion.toString(), link);
                 }
                 else
                 {
@@ -99,124 +100,101 @@ void UpdateChecker::onReqFinished(QNetworkReply* reply)
     activeReply = NULL;
 }
 
-bool UpdateChecker::parseData(const QJsonDocument& data, QList<FileInfo>& files) const
+bool UpdateChecker::findUpdate(const QJsonDocument& data, bool& foundUpdate,
+                               VersionNumber& foundVersion, QString& fileLink) const
 {
-    /* Data is expected to be in this form:
-
-    {
-       "values": [
-       {
-         "name": "serialplot-0.9.1-x86_64.AppImage",
-         "links": {
-           "self": {
-             "href": "https://api.bitbucket.org/2.0/repositories/hyOzd/serialplot/downloads/serialplot-0.9.1-x86_64.AppImage"
-            }
-          }
-       }, ... ]
+    /* Data is expected to be in this format:
+----
+{
+  "latest" : {
+    "linux" : "0.11",
+    "windows" : "0.11",
+  },
+  "releases" : {
+    "0.11" : {
+      "files" : {
+        "linux" : "https://serialplot.ozderya.net/downloads/serialplot_v0.11.appimage",
+        "windows" : "https://serialplot.ozderya.net/downloads/serialplot_v0.11.exe",
+      }
     }
+  }
+}
+----
     */
 
-    if (!data.isObject()) return false;
-
-    auto values = data.object().value("values");
-    if (values == QJsonValue::Undefined || !values.isArray()) return false;
-
-    for (auto value : values.toArray())
-    {
-        if (!value.isObject()) return false;
-
-        auto name = value.toObject().value("name");
-        if (name.isUndefined() || !name.isString())
-             return false;
-
-        auto links = value.toObject().value("links");
-        if (links.isUndefined() || !links.isObject())
-            return false;
-
-        auto self = links.toObject().value("self");
-        if (self.isUndefined() || !self.isObject())
-            return false;
-
-        auto href = self.toObject().value("href");
-        if (href.isUndefined() || !href.isString())
-            return false;
-
-        FileInfo finfo;
-        finfo.name = name.toString();
-        finfo.link = href.toString();
-        finfo.hasVersion = VersionNumber::extract(name.toString(), finfo.version);
-
-        if (finfo.name.contains("amd64") ||
-            finfo.name.contains("x86_64") ||
-            finfo.name.contains("win64"))
-        {
-            finfo.arch = FileArch::amd64;
-        }
-        else if (finfo.name.contains("win32") ||
-                 finfo.name.contains("i386"))
-        {
-            finfo.arch = FileArch::_i386;
-        }
-        else
-        {
-            finfo.arch = FileArch::unknown;
-        }
-
-        files += finfo;
-    }
-
-    return true;
-}
-
-bool UpdateChecker::findUpdate(const QList<FileInfo>& files, FileInfo& foundFile) const
-{
-    QList<FileInfo> fflist;
-
-    // filter the file list according to extension and version number
-    for (int i = 0; i < files.length(); i++)
-    {
-        // file type to look
+    // release type to look
 #if defined(Q_OS_WIN)
-        const char ext[] = ".exe";
-#else  // of course linux
-        const char ext[] = ".appimage";
-#endif
 
-        // file architecture to look
 #if defined(Q_PROCESSOR_X86_64)
-        const FileArch arch = FileArch::amd64;
+    const char release_type[] = "windows";
 #elif defined(Q_PROCESSOR_X86_32)
-        const FileArch arch = FileArch::_i386;
-#elif defined(Q_PROCESSOR_ARM)
-        const FileArch arch = FileArch::arm;
+    const char release_type[] = "windows_32";
 #else
-        #error Unknown architecture for update file detection.
+#error Unknown architecture for update file detection.
 #endif
 
-        // filter the file list
-        auto file = files[i];
-        if (file.name.contains(ext, Qt::CaseInsensitive) &&
-            file.arch == arch &&
-            file.hasVersion && file.version > CurrentVersion)
-        {
-            fflist += file;
-        }
-    }
+#else  // assume linux
 
-    // sort and find most up to date file
-    if (!fflist.empty())
-    {
-        std::sort(fflist.begin(), fflist.end(),
-                  [](const FileInfo& a, const FileInfo& b)
-                  {
-                      return a.version > b.version;
-                  });
+#if defined(Q_PROCESSOR_X86_64)
+    const char release_type[] = "linux";
+#elif defined(Q_PROCESSOR_X86_32)
+    const char release_type[] = "linux_32";
+#elif defined(Q_PROCESSOR_ARM)
+    const char release_type[] = "arm";
+#else
+#error Unknown architecture for update file detection.
+#endif
 
-        foundFile = fflist[0];
-        return true;
-    }
-    else
+#endif
+
+    foundUpdate = false;
+
+    if (!data.isObject())
     {
+        qCritical("JSON data invalid.");
         return false;
     }
+
+    // find latest version for this release type
+    auto latest = data.object().value("latest");
+    if (latest == QJsonValue::Undefined || !latest.isObject())
+    {
+        qCritical("JSON data \"latest\" field is missing.");
+        return false;
+    }
+
+    auto latest_rel = latest.toObject().value(release_type);
+    if (latest_rel == QJsonValue::Undefined || !latest_rel.isString())
+    {
+        qDebug() << "No update found for " << release_type;
+        return true;
+    }
+
+    VersionNumber latest_vn;
+    if (!VersionNumber::extract(latest_rel.toString(), latest_vn))
+    {
+        qCritical() << "Failed to parse version number: " << latest_vn.toString();
+        return false;
+    }
+
+    if (!(latest_vn > CurrentVersion))
+    {
+        qDebug() << "No update.";
+        return true;
+    }
+
+    // find the file link
+    auto link = data.object().value("releases").toObject()[latest_rel.toString()]\
+                .toObject().value("files").toObject().value(release_type);
+    if (link == QJsonValue::Undefined || !link.isString())
+    {
+        qCritical() << "Link not found!";
+        return false;
+    }
+
+    fileLink = link.toString();
+    foundVersion = latest_vn;
+    qDebug() << "New update:" << latest_vn.toString() << fileLink;
+    foundUpdate = true;
+    return true;
 }
