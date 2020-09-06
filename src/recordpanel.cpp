@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -32,6 +32,7 @@
 #include "recordpanel.h"
 #include "ui_recordpanel.h"
 #include "setting_defines.h"
+#include "utils.h"
 
 RecordPanel::RecordPanel(Stream* stream, QWidget *parent) :
     QWidget(parent),
@@ -70,6 +71,13 @@ RecordPanel::RecordPanel(Stream* stream, QWidget *parent) :
             {
                 recorder.windowsLE = enabled;
             });
+
+    connect(ui->spDecimals, SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
+            [this](int decimals)
+            {
+                recorder.setDecimals(decimals);
+            });
+
 
     connect(&recordAction, &QAction::toggled, ui->cbWindowsLE, &QWidget::setDisabled);
     connect(&recordAction, &QAction::toggled, ui->cbTimestamp, &QWidget::setDisabled);
@@ -342,6 +350,7 @@ void RecordPanel::saveSettings(QSettings* settings)
     settings->setValue(SG_Record_DisableBuffering, ui->cbDisableBuffering->isChecked());
     settings->setValue(SG_Record_Timestamp, ui->cbTimestamp->isChecked());
     settings->setValue(SG_Record_Separator, ui->leSeparator->text());
+    settings->setValue(SG_Record_Decimals, ui->spDecimals->text());
     settings->endGroup();
 }
 
@@ -361,5 +370,6 @@ void RecordPanel::loadSettings(QSettings* settings)
     ui->cbTimestamp->setChecked(
         settings->value(SG_Record_Timestamp, ui->cbTimestamp->isChecked()).toBool());
     ui->leSeparator->setText(settings->value(SG_Record_Separator, ui->leSeparator->text()).toString());
+    ui->spDecimals->setValue(settings->value(SG_Record_Decimals, ui->spDecimals->value()).toInt());
     settings->endGroup();
 }

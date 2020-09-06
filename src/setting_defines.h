@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -112,6 +112,7 @@ const char SG_Record_Header[]           = "header";
 const char SG_Record_Separator[]        = "separator";
 const char SG_Record_DisableBuffering[] = "disableBuffering";
 const char SG_Record_Timestamp[]        = "timestamp";
+const char SG_Record_Decimals[]         = "decimals";
 
 // text view settings keys
 const char SG_TextView_NumLines[] = "numLines";

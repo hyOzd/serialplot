@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -32,6 +32,13 @@ DataRecorder::DataRecorder(QObject *parent) :
     disableBuffering = false;
     windowsLE = false;
     timestampEn = false;
+
+    fileStream.setRealNumberNotation(QTextStream::FixedNotation);
+}
+
+void DataRecorder::setDecimals(unsigned decimals)
+{
+    fileStream.setRealNumberPrecision(decimals);
 }
 
 bool DataRecorder::startRecording(QString fileName, QString separator,

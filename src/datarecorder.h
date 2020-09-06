@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -48,6 +48,11 @@ public:
      * a corrupted file. Care must be taken at higher (UI) levels.
      */
     bool windowsLE;
+
+    /**
+     * Set floating point number precision.
+     */
+    void setDecimals(unsigned decimals);
 
     /**
      * @brief Starts recording data to a file in CSV format.
