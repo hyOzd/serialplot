@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -114,6 +114,8 @@ private:
     /// Returns separator text from ui. "\t" is converted to TAB
     /// character.
     QString getSeparator() const;
+
+    DataRecorder::TimestampOption currentTimestampOption() const;
 
 private slots:
     /**

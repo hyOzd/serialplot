@@ -89,6 +89,14 @@ RecordPanel::RecordPanel(Stream* stream, QWidget *parent) :
     completer->setModel(new QDirModel(completer));
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     ui->leFileName->setCompleter(completer);
+
+    // setup timestamp selection
+    ui->cbTimestampFormat->addItem(tr("seconds only"),
+                                (int) DataRecorder::TimestampOption::seconds);
+    ui->cbTimestampFormat->addItem(tr("seconds with precision"),
+                                (int) DataRecorder::TimestampOption::seconds_precision);
+    ui->cbTimestampFormat->addItem(tr("milliseconds"),
+                                (int) DataRecorder::TimestampOption::milliseconds);
 }
 
 RecordPanel::~RecordPanel()
@@ -302,12 +310,13 @@ bool RecordPanel::confirmOverwrite(QString fileName)
 bool RecordPanel::startRecording(QString fileName)
 {
     QStringList channelNames;
+
     if (ui->cbHeader->isChecked())
     {
         channelNames = _stream->infoModel()->channelNames();
     }
-    if (recorder.startRecording(fileName, getSeparator(),
-                                channelNames, ui->cbTimestamp->isChecked()))
+
+    if (recorder.startRecording(fileName, getSeparator(), channelNames, currentTimestampOption()))
     {
         _stream->connectFollower(&recorder);
         return true;
@@ -340,6 +349,18 @@ QString RecordPanel::getSeparator() const
     return sep;
 }
 
+DataRecorder::TimestampOption RecordPanel::currentTimestampOption() const
+{
+    if (ui->cbTimestamp->isChecked())
+    {
+        return static_cast<DataRecorder::TimestampOption>(ui->cbTimestampFormat->currentData().toInt());
+    }
+    else
+    {
+        return DataRecorder::TimestampOption::disabled;
+    }
+}
+
 void RecordPanel::saveSettings(QSettings* settings)
 {
     settings->beginGroup(SettingGroup_Record);
@@ -348,9 +369,28 @@ void RecordPanel::saveSettings(QSettings* settings)
     settings->setValue(SG_Record_StopOnClose, ui->cbStopOnClose->isChecked());
     settings->setValue(SG_Record_Header, ui->cbHeader->isChecked());
     settings->setValue(SG_Record_DisableBuffering, ui->cbDisableBuffering->isChecked());
-    settings->setValue(SG_Record_Timestamp, ui->cbTimestamp->isChecked());
     settings->setValue(SG_Record_Separator, ui->leSeparator->text());
     settings->setValue(SG_Record_Decimals, ui->spDecimals->text());
+    settings->setValue(SG_Record_Timestamp, ui->cbTimestamp->isChecked());
+
+    QString tsFormatStr;
+    auto tsOpt = static_cast<DataRecorder::TimestampOption>(ui->cbTimestampFormat->currentData().toInt());
+    switch (tsOpt)
+    {
+        case DataRecorder::TimestampOption::seconds:
+            tsFormatStr = "seconds";
+            break;
+        case DataRecorder::TimestampOption::seconds_precision:
+            tsFormatStr = "seconds_with_precision";
+            break;
+        case DataRecorder::TimestampOption::milliseconds:
+            tsFormatStr = "milliseconds";
+            break;
+        default:
+            Q_ASSERT(false);
+    }
+    settings->setValue(SG_Record_TimestampFormat, tsFormatStr);
+
     settings->endGroup();
 }
 
@@ -367,9 +407,37 @@ void RecordPanel::loadSettings(QSettings* settings)
         settings->value(SG_Record_Header, ui->cbHeader->isChecked()).toBool());
     ui->cbDisableBuffering->setChecked(
         settings->value(SG_Record_DisableBuffering, ui->cbDisableBuffering->isChecked()).toBool());
-    ui->cbTimestamp->setChecked(
-        settings->value(SG_Record_Timestamp, ui->cbTimestamp->isChecked()).toBool());
     ui->leSeparator->setText(settings->value(SG_Record_Separator, ui->leSeparator->text()).toString());
     ui->spDecimals->setValue(settings->value(SG_Record_Decimals, ui->spDecimals->value()).toInt());
+    ui->cbTimestamp->setChecked(
+        settings->value(SG_Record_Timestamp, ui->cbTimestamp->isChecked()).toBool());
+
+    // load timestamp format
+    QString tsFormatStr = settings->value(SG_Record_TimestampFormat, "").toString();
+    DataRecorder::TimestampOption tsOpt = DataRecorder::TimestampOption::disabled; // invalid case
+    if (tsFormatStr == "seconds")
+    {
+        tsOpt = DataRecorder::TimestampOption::seconds;
+    }
+    else if (tsFormatStr == "seconds_with_precision")
+    {
+        tsOpt = DataRecorder::TimestampOption::seconds_precision;
+    }
+    else if (tsFormatStr == "milliseconds")
+    {
+        tsOpt = DataRecorder::TimestampOption::milliseconds;
+    }
+    else
+    {
+        qCritical() << "Invalid timestamp format option:" << tsFormatStr;
+    }
+
+    // find index of loaded option from combobox and select it
+    int i = ui->cbTimestampFormat->findData((int) tsOpt);
+    if (i >= 0)
+    {
+        ui->cbTimestampFormat->setCurrentIndex(i);
+    }
+
     settings->endGroup();
 }

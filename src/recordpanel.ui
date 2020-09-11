@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>627</width>
-    <height>207</height>
+    <height>209</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -146,23 +146,6 @@
        <item row="4" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>Decimals:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="spDecimals">
-           <property name="toolTip">
-            <string>Number of digits after comma</string>
-           </property>
-           <property name="value">
-            <number>6</number>
-           </property>
-          </widget>
-         </item>
-         <item>
           <spacer name="horizontalSpacer_3">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -203,6 +186,33 @@
           <string>,</string>
          </property>
         </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Decimals:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="spDecimals">
+         <property name="toolTip">
+          <string>Number of digits after comma</string>
+         </property>
+         <property name="value">
+          <number>6</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Timestamp In:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="cbTimestampFormat"/>
        </item>
        <item>
         <spacer name="horizontalSpacer">

@@ -112,6 +112,7 @@ const char SG_Record_Header[]           = "header";
 const char SG_Record_Separator[]        = "separator";
 const char SG_Record_DisableBuffering[] = "disableBuffering";
 const char SG_Record_Timestamp[]        = "timestamp";
+const char SG_Record_TimestampFormat[]  = "timestampFormat";
 const char SG_Record_Decimals[]         = "decimals";
 
 // text view settings keys

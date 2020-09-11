@@ -36,6 +36,11 @@ class DataRecorder : public QObject, public Sink
 {
     Q_OBJECT
 public:
+    enum class TimestampOption
+    {
+        disabled, seconds, seconds_precision, milliseconds
+    };
+
     explicit DataRecorder(QObject *parent = 0);
 
     /// Disables file buffering
@@ -67,7 +72,7 @@ public:
      * @return false if file operation fails (read only etc.)
      */
     bool startRecording(QString fileName, QString separator,
-                        QStringList channelNames, bool insertTime);
+                        QStringList channelNames, TimestampOption ts);
 
     /**
      * @brief Adds data to a channel.
@@ -99,7 +104,10 @@ private:
     QFile file;
     QTextStream fileStream;
     QString _sep;
-    bool timestampEn;
+    TimestampOption timestampOpt;
+
+    /// Returns formatted timestamp
+    QString formatTimestamp() const;
 
     /// Returns the selected line ending.
     const char* le() const;

@@ -31,7 +31,7 @@ DataRecorder::DataRecorder(QObject *parent) :
     lastNumChannels = 0;
     disableBuffering = false;
     windowsLE = false;
-    timestampEn = false;
+    timestampOpt = TimestampOption::disabled;
 
     fileStream.setRealNumberNotation(QTextStream::FixedNotation);
 }
@@ -42,11 +42,11 @@ void DataRecorder::setDecimals(unsigned decimals)
 }
 
 bool DataRecorder::startRecording(QString fileName, QString separator,
-                                  QStringList channelNames, bool insertTime)
+                                  QStringList channelNames, TimestampOption ts)
 {
     Q_ASSERT(!file.isOpen());
     _sep =  separator;
-    timestampEn = insertTime;
+    timestampOpt = ts;
 
     // create directory if it doesn't exist
     {
@@ -70,7 +70,7 @@ bool DataRecorder::startRecording(QString fileName, QString separator,
     // write header line
     if (!channelNames.isEmpty())
     {
-        if (timestampEn)
+        if (timestampOpt != TimestampOption::disabled)
         {
             fileStream << tr("timestamp") << _sep;
         }
@@ -97,14 +97,12 @@ void DataRecorder::feedIn(const SamplePack& data)
     lastNumChannels = numChannels;
 
     // write data
-    qint64 timestamp;
-    if (timestampEn) timestamp = QDateTime::currentMSecsSinceEpoch();
     unsigned numSamples = data.numSamples();
     for (unsigned int i = 0; i < numSamples; i++)
     {
-        if (timestampEn)
+        if (timestampOpt != TimestampOption::disabled)
         {
-            fileStream << timestamp << _sep;
+            fileStream << formatTimestamp() << _sep;
         }
         for (unsigned ci = 0; ci < numChannels; ci++)
         {
@@ -123,6 +121,30 @@ void DataRecorder::stopRecording()
 
     file.close();
     lastNumChannels = 0;
+}
+
+QString DataRecorder::formatTimestamp() const
+{
+    Q_ASSERT(timestampOpt != TimestampOption::disabled);
+
+    qint64 ms;
+
+    switch (timestampOpt)
+    {
+        case TimestampOption::seconds:
+            return QString::number(QDateTime::currentSecsSinceEpoch());
+            break;
+        case TimestampOption::seconds_precision:
+            ms = QDateTime::currentMSecsSinceEpoch();
+            return QString("%1.%2").arg(ms / 1000).arg(ms % 1000);
+            break;
+        case TimestampOption::milliseconds:
+            return QString::number(QDateTime::currentMSecsSinceEpoch());
+            break;
+        default:
+            Q_ASSERT(false);
+            return QString();
+    }
 }
 
 const char* DataRecorder::le() const
