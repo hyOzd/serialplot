@@ -1,5 +1,5 @@
 #
-# Copyright © 2019 Hasan Yavuz Özderya
+# Copyright © 2020 Hasan Yavuz Özderya
 #
 # This file is part of serialplot.
 #
@@ -150,6 +150,9 @@ qt5_use_modules(${PROGRAM_NAME} Widgets SerialPort Network)
 
 if (BUILD_QWT)
   add_dependencies(${PROGRAM_NAME} QWT)
+else ()
+  # prebuilt versions of Qwt needs Svg
+  qt5_use_modules(${PROGRAM_NAME} Svg)
 endif ()
 
 # set compiler flags

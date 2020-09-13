@@ -1,5 +1,5 @@
 #
-# Copyright © 2019 Hasan Yavuz Özderya
+# Copyright © 2020 Hasan Yavuz Özderya
 #
 # This file is part of serialplot.
 #
@@ -102,8 +102,15 @@ if(QWT_VERSION)
 	QWT_PATCH_VERSION ${QWT_VERSION})
 endif(QWT_VERSION)
 
-# check Qwt library 'Qt' version
-if (QWT_LIBRARY)
+# is Qwt library static
+if (QWT_LIBRARY MATCHES "libqwt.a")
+  set(qwt_is_static TRUE)
+else()
+  set(qwt_is_static FALSE)
+endif()
+
+# check Qwt library 'Qt' version unless it's a static library
+if (QWT_LIBRARY AND (NOT qwt_is_static))
   include(GetPrerequisites)
   GET_PREREQUISITES(${QWT_LIBRARY} qwt_lib_deps 0 0 "" "")
   set(qwt_is_qt5 FALSE)
@@ -119,7 +126,7 @@ if (QWT_LIBRARY)
 endif (QWT_LIBRARY)
 
 # set QWT_FOUND
-if(QWT_INCLUDE_DIR AND QWT_LIBRARY AND qwt_is_qt5)
+if(QWT_INCLUDE_DIR AND QWT_LIBRARY AND (qwt_is_static OR qwt_is_qt5))
   set(QWT_INCLUDE_DIRS ${QWT_INCLUDE_DIR})
   set(QWT_LIBRARIES ${QWT_LIBRARY})
   set(QWT_FOUND true)
