@@ -26,8 +26,7 @@
 #include <functional>
 
 #include "updatechecker.h"
-
-const char UPDATES_INFO_URL[] = "https://serialplot.ozderya.net/downloads/updates.json";
+#include "defines.h"
 
 UpdateChecker::UpdateChecker(QObject *parent) :
     QObject(parent), nam(this)

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -20,7 +20,9 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
-const char BUG_REPORT_URL[] = "https://bitbucket.org/hyOzd/serialplot/issues/new";
+const char BUG_REPORT_URL[] = "https://todo.sr.ht/~hyozd/serialplot";
+
+const char UPDATES_INFO_URL[] = "https://serialplot.ozderya.net/downloads/updates.json";
 
 /// Maximum number of channels that can be set by user
 const unsigned MAX_NUM_CHANNELS = 64;

@@ -273,7 +273,7 @@ elseif (WIN32)
   string(REPLACE "/" "\\\\" CPACK_PACKAGE_ICON ${CPACK_PACKAGE_ICON})
   set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/COPYING")
   set(CPACK_NSIS_MENU_LINKS
-    "https://bitbucket.org/hyOzd/serialplot" "SerialPlot source code on bitbucket.org")
+    "https://hg.sr.ht/~hyozd/serialplot/" "SerialPlot source code on sourcehut.org")
   set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL true)
 endif (UNIX)
 
