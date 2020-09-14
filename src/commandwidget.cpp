@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -31,10 +31,6 @@ CommandWidget::CommandWidget(QWidget *parent) :
     _sendAction(this)
 {
     ui->setupUi(this);
-
-#ifdef Q_OS_WIN
-    ui->pbDelete->setIcon(QIcon(":/icons/list-remove"));
-#endif // Q_OS_WIN
 
     connect(ui->pbDelete, &QPushButton::clicked, this, &CommandWidget::onDeleteClicked);
     connect(ui->pbSend, &QPushButton::clicked, this, &CommandWidget::onSendClicked);

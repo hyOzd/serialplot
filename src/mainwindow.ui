@@ -101,7 +101,7 @@
      <x>0</x>
      <y>0</y>
      <width>653</width>
-     <height>24</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp">
@@ -173,7 +173,7 @@
   </action>
   <action name="actionClear">
    <property name="icon">
-    <iconset theme="editclear">
+    <iconset theme="edit-clear">
      <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">

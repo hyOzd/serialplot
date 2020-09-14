@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -19,6 +19,7 @@
 
 #include <QApplication>
 #include <QtGlobal>
+#include <QIcon>
 #include <iostream>
 
 #include "mainwindow.h"
@@ -72,6 +73,11 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     QApplication::setApplicationName(PROGRAM_NAME);
     QApplication::setApplicationVersion(VERSION_STRING);
+
+#ifdef Q_OS_WIN
+    QIcon::setFallbackSearchPaths(QIcon::fallbackSearchPaths() << ":icons");
+    QIcon::setThemeName("tango");
+#endif
 
     qInstallMessageHandler(messageHandler);
     MainWindow w;

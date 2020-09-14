@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -35,10 +35,6 @@ CommandPanel::CommandPanel(QSerialPort* port, QWidget *parent) :
     auto layout = new QVBoxLayout();
     layout->setSpacing(0);
     ui->scrollAreaWidgetContents->setLayout(layout);
-
-#ifdef Q_OS_WIN
-    ui->pbNew->setIcon(QIcon(":/icons/list-add"));
-#endif // Q_OS_WIN
 
     connect(ui->pbNew, &QPushButton::clicked, this, &CommandPanel::newCommand);
     connect(&_newCommandAction, &QAction::triggered, this, &CommandPanel::newCommand);

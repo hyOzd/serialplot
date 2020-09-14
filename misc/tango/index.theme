@@ -1,0 +1,8 @@
+[Icon Theme]
+Name=Tango
+Comment=Tango Icon Theme
+Inherits=default
+Directories=32x32/actions 
+
+[32x32/actions]
+Size=32
