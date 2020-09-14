@@ -171,7 +171,7 @@ else()
 endif()
 
 # default version
-set(VERSION_STRING "0.10.0")
+set(VERSION_STRING "0.11.0")
 set(VERSION_REVISION "0")
 
 # get revision number from mercurial and parse version string
