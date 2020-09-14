@@ -50,7 +50,7 @@ WORKDIR /mxe
 # there is a recent bug, 'mesa' fails to build
 RUN git checkout 3735aa8020609e680ca6867e3f4835d8a06efa9b
 
-RUN make -j8 qt5 cmake qwt
+RUN make -j8 qt5 cmake qwt nsis
 
 ENV PATH="${PATH}:/mxe/usr/bin/:/mxe/usr/i686-w64-mingw32.static/qt5/bin/"
 
@@ -58,8 +58,8 @@ WORKDIR /serialplot
 ADD . /serialplot
 WORKDIR ./build_docker_mxe
 RUN i686-w64-mingw32.static-cmake \
--DBUILD_QWT=false \
+    -DBUILD_QWT=false \
     -DQWT_LIBRARY=/mxe/usr/i686-w64-mingw32.static/qt5/lib/libqwt.a \
     -DQWT_INCLUDE_DIR=/mxe/usr/i686-w64-mingw32.static/qt5/include/ \
     ../
-RUN make -j8
+RUN make -j8 package
