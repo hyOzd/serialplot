@@ -65,10 +65,13 @@ void UpdateChecker::onReqFinished(QNetworkReply* reply)
     else
     {
         QJsonParseError error;
-        auto data = QJsonDocument::fromJson(reply->readAll(), &error);
+        auto data = reply->readAll();
+        auto json = QJsonDocument::fromJson(data, &error);
         if (error.error != QJsonParseError::NoError)
         {
-            emit checkFailed(QString("JSon parsing error: ") + error.errorString());
+            emit checkFailed(QString("JSon parsing error at %1: ").arg(error.offset)
+                             + error.errorString());
+            qCritical() << data;
         }
         else
         {
@@ -76,11 +79,11 @@ void UpdateChecker::onReqFinished(QNetworkReply* reply)
             VersionNumber newVersion;
             QString link;
 
-            if (!findUpdate(data, updateFound, newVersion, link))
+            if (!findUpdate(json, updateFound, newVersion, link))
             {
-                emit checkFailed("Data parsing error.");
+                emit checkFailed("JSON parsing error.");
                 qCritical() << "Parsing the update info file failed:";
-                qCritical() << data;
+                qCritical() << json;
             }
             else
             {
