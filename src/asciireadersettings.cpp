@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -112,7 +112,7 @@ void AsciiReaderSettings::customDelimiterChanged(const QString text)
 
 void AsciiReaderSettings::filterTextChanged(const QString text)
 {
-    if (!text.isEmpty()) emit filterChanged(text);
+    emit filterChanged(text);
 }
 
 void AsciiReaderSettings::saveSettings(QSettings* settings)
@@ -191,10 +191,7 @@ void AsciiReaderSettings::loadSettings(QSettings* settings)
     }
 
     auto filterPrefixS = settings->value(SG_ASCII_FilterPrefix, ui->filterPrefix->text()).toString();
-    if (!filterPrefixS.isEmpty())
-    {
-        ui->filterPrefix->setText(filterPrefixS);
-    }
+    ui->filterPrefix->setText(filterPrefixS);
 
     settings->endGroup();
 }
