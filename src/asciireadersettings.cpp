@@ -142,6 +142,7 @@ void AsciiReaderSettings::saveSettings(QSettings* settings)
 
     settings->setValue(SG_ASCII_Delimiter, delimiterS);
     settings->setValue(SG_ASCII_CustomDelimiter, ui->leDelimiter->text());
+    settings->setValue(SG_ASCII_FilterPrefix, ui->filterPrefix->text());
 
     settings->endGroup();
 }
@@ -187,6 +188,12 @@ void AsciiReaderSettings::loadSettings(QSettings* settings)
     else
     {
         ui->rbOtherDelimiter->setChecked(true);
+    }
+
+    auto filterPrefixS = settings->value(SG_ASCII_FilterPrefix, ui->filterPrefix->text()).toString();
+    if (!filterPrefixS.isEmpty())
+    {
+        ui->filterPrefix->setText(filterPrefixS);
     }
 
     settings->endGroup();
