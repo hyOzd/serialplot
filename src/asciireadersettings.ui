@@ -61,13 +61,6 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Column Delimiter:</string>
-     </property>
-    </widget>
-   </item>
    <item row="2" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
@@ -127,6 +120,23 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Column Delimiter:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Filter by prefix:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLineEdit" name="filterPrefix"/>
    </item>
   </layout>
  </widget>

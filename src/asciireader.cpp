@@ -51,6 +51,11 @@ AsciiReader::AsciiReader(QIODevice* device, QObject* parent) :
             {
                 delimiter = d;
             });
+    connect(&_settingsWidget, &AsciiReaderSettings::filterChanged,
+            [this](QString f)
+            {
+                filter = f;
+            });
 }
 
 QWidget* AsciiReader::settingsWidget()
@@ -107,6 +112,18 @@ unsigned AsciiReader::readData()
         if (line.isEmpty())
         {
             continue;
+        }
+
+        // Skip lines that don't match if filter prefix is set.
+        // Cut off the filter prefix from matching lines.
+        if (!filter.isEmpty())
+        {
+            if (!line.startsWith(filter))
+            {
+                continue;
+            }
+
+            line = line.replace(filter, "").trimmed();
         }
 
         const SamplePack* samples = parseLine(line);

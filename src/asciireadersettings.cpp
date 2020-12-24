@@ -48,6 +48,9 @@ AsciiReaderSettings::AsciiReaderSettings(QWidget *parent) :
             this, &AsciiReaderSettings::delimiterToggled);
     connect(ui->leDelimiter, &QLineEdit::textChanged,
             this, &AsciiReaderSettings::customDelimiterChanged);
+    connect(ui->filterPrefix, &QLineEdit::textChanged,
+            this, &AsciiReaderSettings::filterTextChanged);
+
 
     // Note: if directly connected we get a runtime warning on incompatible signal arguments
     connect(ui->spNumOfChannels, SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
@@ -105,6 +108,11 @@ void AsciiReaderSettings::customDelimiterChanged(const QString text)
     {
         if (!text.isEmpty()) emit delimiterChanged(text.at(0));
     }
+}
+
+void AsciiReaderSettings::filterTextChanged(const QString text)
+{
+    if (!text.isEmpty()) emit filterChanged(text);
 }
 
 void AsciiReaderSettings::saveSettings(QSettings* settings)

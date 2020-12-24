@@ -47,6 +47,7 @@ signals:
     void numOfChannelsChanged(unsigned);
     /// Signaled only with a valid delimiter
     void delimiterChanged(QChar);
+    void filterChanged(QString);
 
 private:
     Ui::AsciiReaderSettings *ui;
@@ -54,6 +55,7 @@ private:
 private slots:
     void delimiterToggled(bool checked);
     void customDelimiterChanged(const QString text);
+    void filterTextChanged(const QString filter);
 };
 
 #endif // ASCIIREADERSETTINGS_H

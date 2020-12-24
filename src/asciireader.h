@@ -47,6 +47,7 @@ private:
     /// number of channels will be determined from incoming data
     unsigned autoNumOfChannels;
     QChar delimiter; ///< selected column delimiter
+    QString filter; ///< selected ASCII mode filter prefix
 
     bool firstReadAfterEnable = false;
 
