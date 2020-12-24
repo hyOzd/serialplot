@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>493</width>
+    <width>562</width>
     <height>171</height>
    </rect>
   </property>
@@ -58,6 +58,13 @@
      </property>
      <property name="maximum">
       <number>32</number>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Column Delimiter:</string>
      </property>
     </widget>
    </item>
@@ -121,22 +128,65 @@
      </item>
     </layout>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Column Delimiter:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
+   <item row="4" column="0">
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Filter by prefix:</string>
+      <string>Filter by Prefix:</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="1">
-    <widget class="QLineEdit" name="filterPrefix"/>
+   <item row="4" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QRadioButton" name="rbFilterDisabled">
+       <property name="text">
+        <string>Disabled</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="rbFilterInclude">
+       <property name="toolTip">
+        <string>Only read lines that starts with prefix</string>
+       </property>
+       <property name="text">
+        <string>Include</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="rbFilterExclude">
+       <property name="toolTip">
+        <string>Do not read lines that starts with prefix</string>
+       </property>
+       <property name="text">
+        <string>Exclude</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="leFilterPrefix">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>Prefix text used to filter incoming data</string>
+       </property>
+       <property name="placeholderText">
+        <string>prefix text</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

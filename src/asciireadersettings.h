@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -23,6 +23,7 @@
 #include <QWidget>
 #include <QSettings>
 #include <QChar>
+#include <QButtonGroup>
 
 namespace Ui {
 class AsciiReaderSettings;
@@ -33,6 +34,12 @@ class AsciiReaderSettings : public QWidget
     Q_OBJECT
 
 public:
+
+    enum class FilterMode
+    {
+        disabled, include, exclude
+    };
+
     explicit AsciiReaderSettings(QWidget *parent = 0);
     ~AsciiReaderSettings();
 
@@ -47,15 +54,19 @@ signals:
     void numOfChannelsChanged(unsigned);
     /// Signaled only with a valid delimiter
     void delimiterChanged(QChar);
-    void filterChanged(QString);
+    void filterChanged(FilterMode, QString);
 
 private:
     Ui::AsciiReaderSettings *ui;
 
+    QButtonGroup delimiterButtons;
+    QButtonGroup filterButtons;
+
+    FilterMode filterMode() const;
+
 private slots:
     void delimiterToggled(bool checked);
     void customDelimiterChanged(const QString text);
-    void filterTextChanged(const QString filter);
 };
 
 #endif // ASCIIREADERSETTINGS_H

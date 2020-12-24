@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -47,7 +47,8 @@ private:
     /// number of channels will be determined from incoming data
     unsigned autoNumOfChannels;
     QChar delimiter; ///< selected column delimiter
-    QString filter; ///< selected ASCII mode filter prefix
+    AsciiReaderSettings::FilterMode filterMode;
+    QString filterText; ///< selected ASCII mode filter prefix
 
     bool firstReadAfterEnable = false;
 
