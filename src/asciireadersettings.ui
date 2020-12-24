@@ -150,7 +150,7 @@
      <item>
       <widget class="QRadioButton" name="rbFilterInclude">
        <property name="toolTip">
-        <string>Only read lines that starts with prefix</string>
+        <string>Only read lines that start with prefix</string>
        </property>
        <property name="text">
         <string>Include</string>
@@ -160,7 +160,7 @@
      <item>
       <widget class="QRadioButton" name="rbFilterExclude">
        <property name="toolTip">
-        <string>Do not read lines that starts with prefix</string>
+        <string>Do not read lines that start with prefix</string>
        </property>
        <property name="text">
         <string>Exclude</string>
