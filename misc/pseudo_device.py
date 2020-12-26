@@ -54,6 +54,7 @@ def ascii_test(port):
         data = ",".join([str(num) for num in data])
         print("<< " + data, end="\r")
         os.write(port, bytes(prefix + data + "\r\n", 'ASCII'))
+        # os.write(port, bytes("##comment: test\r\n", 'ASCII'))
         time.sleep(0.1)
 
 def float_test(port):

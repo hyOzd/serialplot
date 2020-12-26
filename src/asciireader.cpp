@@ -55,7 +55,7 @@ AsciiReader::AsciiReader(QIODevice* device, QObject* parent) :
             [this](AsciiReaderSettings::FilterMode mode, QString prefix)
             {
                 filterMode = mode;
-                filterText = prefix;
+                filterPrefix = prefix;
             });
 }
 
@@ -119,12 +119,12 @@ unsigned AsciiReader::readData()
         {
             // skip lines that match the prefix
             case AsciiReaderSettings::FilterMode::exclude:
-                if (line.startsWith(filterText)) continue;
+                if (line.startsWith(filterPrefix)) continue;
                 break;
             // skip lines that doesn't match, and cut off prefix
             case AsciiReaderSettings::FilterMode::include:
-                if (!line.startsWith(filterText)) continue;
-                line = line.replace(filterText, "").trimmed();
+                if (!line.startsWith(filterPrefix)) continue;
+                line = line.remove(0, filterPrefix.length()).trimmed();
                 break;
             case AsciiReaderSettings::FilterMode::disabled:
                 break;

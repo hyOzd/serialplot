@@ -48,7 +48,7 @@ private:
     unsigned autoNumOfChannels;
     QChar delimiter; ///< selected column delimiter
     AsciiReaderSettings::FilterMode filterMode;
-    QString filterText; ///< selected ASCII mode filter prefix
+    QString filterPrefix; ///< selected ASCII mode filter prefix
 
     bool firstReadAfterEnable = false;
 
