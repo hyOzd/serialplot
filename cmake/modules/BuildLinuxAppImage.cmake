@@ -37,6 +37,6 @@ add_custom_target(
     COMMAND
         ${CMAKE_COMMAND} -E env PATH=${QT_INSTALL_PREFIX}/bin:$ENV{PATH} ${LINUXDEPLOYQT_TOOL}
             ${APPIMAGE_DIR}/${PROGRAM_NAME} -appimage
-            -always-overwrite -bundle-non-qt-libs -verbose=2
+            -always-overwrite -bundle-non-qt-libs -unsupported-allow-new-glibc -verbose=2
     WORKING_DIRECTORY
         ${CMAKE_CURRENT_BINARY_DIR})
