@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -38,6 +38,16 @@ AsciiReaderSettings::AsciiReaderSettings(QWidget *parent) :
 
     ui->spNumOfChannels->setMaximum(MAX_NUM_CHANNELS);
 
+    delimiterButtons.addButton(ui->rbComma);
+    delimiterButtons.addButton(ui->rbSpace);
+    delimiterButtons.addButton(ui->rbTab);
+    delimiterButtons.addButton(ui->rbOtherDelimiter);
+
+    filterButtons.addButton(ui->rbFilterDisabled, (int) FilterMode::disabled);
+    filterButtons.addButton(ui->rbFilterInclude, (int) FilterMode::include);
+    filterButtons.addButton(ui->rbFilterExclude, (int) FilterMode::exclude);
+
+    // delimiter buttons signals
     connect(ui->rbComma, &QAbstractButton::toggled,
             this, &AsciiReaderSettings::delimiterToggled);
     connect(ui->rbSpace, &QAbstractButton::toggled,
@@ -48,6 +58,26 @@ AsciiReaderSettings::AsciiReaderSettings(QWidget *parent) :
             this, &AsciiReaderSettings::delimiterToggled);
     connect(ui->leDelimiter, &QLineEdit::textChanged,
             this, &AsciiReaderSettings::customDelimiterChanged);
+
+    // filter buttons signals
+    connect(ui->rbFilterDisabled, &QAbstractButton::toggled,
+            [this] (bool checked)
+            {
+                ui->leFilterPrefix->setDisabled(checked);
+            });
+
+    connect(&filterButtons,
+            SELECT<int, bool>::OVERLOAD_OF(&QButtonGroup::buttonToggled),
+            [this](int id, bool checked)
+            {
+                emit filterChanged(static_cast<FilterMode>(id), ui->leFilterPrefix->text());
+            });
+
+    connect(ui->leFilterPrefix, &QLineEdit::textChanged,
+            [this] (QString text)
+            {
+                emit filterChanged(filterMode(), text);
+            });
 
     // Note: if directly connected we get a runtime warning on incompatible signal arguments
     connect(ui->spNumOfChannels, SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
@@ -65,6 +95,11 @@ AsciiReaderSettings::~AsciiReaderSettings()
 unsigned AsciiReaderSettings::numOfChannels() const
 {
     return ui->spNumOfChannels->value();
+}
+
+AsciiReaderSettings::FilterMode AsciiReaderSettings::filterMode() const
+{
+    return static_cast<FilterMode>(filterButtons.checkedId());
 }
 
 QChar AsciiReaderSettings::delimiter() const
@@ -135,6 +170,23 @@ void AsciiReaderSettings::saveSettings(QSettings* settings)
     settings->setValue(SG_ASCII_Delimiter, delimiterS);
     settings->setValue(SG_ASCII_CustomDelimiter, ui->leDelimiter->text());
 
+    // save filter
+    QString filterModeS;
+    switch (filterMode())
+    {
+        case FilterMode::disabled:
+            filterModeS = "disabled";
+            break;
+        case FilterMode::include:
+            filterModeS = "include";
+            break;
+        case FilterMode::exclude:
+            filterModeS = "exclude";
+            break;
+    }
+    settings->setValue(SG_ASCII_FilterMode, filterModeS);
+    settings->setValue(SG_ASCII_FilterPrefix, ui->leFilterPrefix->text());
+
     settings->endGroup();
 }
 
@@ -180,6 +232,26 @@ void AsciiReaderSettings::loadSettings(QSettings* settings)
     {
         ui->rbOtherDelimiter->setChecked(true);
     }
+
+    // load filter
+    FilterMode filterModeE = filterMode();
+    auto filterModeS = settings->value(SG_ASCII_FilterMode, "");
+    if (filterModeS == "disabled")
+    {
+        filterModeE = FilterMode::disabled;
+    }
+    else if (filterModeS == "include")
+    {
+        filterModeE = FilterMode::include;
+    }
+    else if (filterModeS == "exclude")
+    {
+        filterModeE = FilterMode::exclude;
+    }
+    filterButtons.button(static_cast<int>(filterModeE))->setChecked(true);
+
+    auto filterPrefixS = settings->value(SG_ASCII_FilterPrefix, ui->leFilterPrefix->text()).toString();
+    ui->leFilterPrefix->setText(filterPrefixS);
 
     settings->endGroup();
 }

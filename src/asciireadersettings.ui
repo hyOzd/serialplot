@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>493</width>
+    <width>562</width>
     <height>171</height>
    </rect>
   </property>
@@ -123,6 +123,66 @@
        </property>
        <property name="text">
         <string>|</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Filter by Prefix:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QRadioButton" name="rbFilterDisabled">
+       <property name="text">
+        <string>Disabled</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="rbFilterInclude">
+       <property name="toolTip">
+        <string>Only read lines that start with prefix</string>
+       </property>
+       <property name="text">
+        <string>Include</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="rbFilterExclude">
+       <property name="toolTip">
+        <string>Do not read lines that start with prefix</string>
+       </property>
+       <property name="text">
+        <string>Exclude</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="leFilterPrefix">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>Prefix text used to filter incoming data</string>
+       </property>
+       <property name="placeholderText">
+        <string>prefix text</string>
        </property>
       </widget>
      </item>

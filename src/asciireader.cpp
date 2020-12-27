@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2020 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -50,6 +50,12 @@ AsciiReader::AsciiReader(QIODevice* device, QObject* parent) :
             [this](QChar d)
             {
                 delimiter = d;
+            });
+    connect(&_settingsWidget, &AsciiReaderSettings::filterChanged,
+            [this](AsciiReaderSettings::FilterMode mode, QString prefix)
+            {
+                filterMode = mode;
+                filterPrefix = prefix;
             });
 }
 
@@ -107,6 +113,21 @@ unsigned AsciiReader::readData()
         if (line.isEmpty())
         {
             continue;
+        }
+
+        switch (filterMode)
+        {
+            // skip lines that match the prefix
+            case AsciiReaderSettings::FilterMode::exclude:
+                if (line.startsWith(filterPrefix)) continue;
+                break;
+            // skip lines that doesn't match, and cut off prefix
+            case AsciiReaderSettings::FilterMode::include:
+                if (!line.startsWith(filterPrefix)) continue;
+                line = line.remove(0, filterPrefix.length()).trimmed();
+                break;
+            case AsciiReaderSettings::FilterMode::disabled:
+                break;
         }
 
         const SamplePack* samples = parseLine(line);

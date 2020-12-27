@@ -6,7 +6,7 @@
 #
 # Currently this script only outputs ASCII(comma separated) data.
 #
-# Copyright © 2018 Hasan Yavuz Özderya
+# Copyright © 2020 Hasan Yavuz Özderya
 #
 # This file is part of serialplot.
 #
@@ -46,13 +46,15 @@ def ascii_test(port):
     """Put ASCII test data through pseudo terminal."""
     print("\n")
     nc = 4 # number of channels
+    prefix = ""
     for i in range(0, 1000):
         data = []
         for ci in range(0, nc):
             data.append(i*(ci+1))
         data = ",".join([str(num) for num in data])
         print("<< " + data, end="\r")
-        os.write(port, bytes(data + "\r\n", 'ASCII'))
+        os.write(port, bytes(prefix + data + "\r\n", 'ASCII'))
+        # os.write(port, bytes("##comment: test\r\n", 'ASCII'))
         time.sleep(0.1)
 
 def float_test(port):
@@ -126,8 +128,8 @@ def run():
     try:
         # float_sine(master)
         # frame_test(master)
-        # ascii_test(master)
-        ascii_test_str(master)
+        ascii_test(master)
+        # ascii_test_str(master)
     finally:
         # close the pseudo terminal files
         os.close(master)
