@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2021 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -242,7 +242,10 @@ void PlotManager::setMulti(bool enabled)
         {
             auto plot = addPlotWidget();
             plot->setVisible(curve->isVisible());
-            plot->setDispChannels(QVector<const StreamChannel*>(1, _stream->channel(i)));
+            if (_stream != nullptr)
+            {
+                plot->setDispChannels(QVector<const StreamChannel*>(1, _stream->channel(i)));
+            }
             curve->attach(plot);
             i++;
         }
