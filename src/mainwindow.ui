@@ -274,7 +274,7 @@
   </action>
   <action name="actionExportSvg">
    <property name="text">
-    <string>Export &amp;SVG</string>
+    <string>E&amp;xport SVG</string>
    </property>
   </action>
  </widget>

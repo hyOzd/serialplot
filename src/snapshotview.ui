@@ -69,7 +69,7 @@
   </action>
   <action name="actionExportSvg">
    <property name="text">
-    <string>Export as &amp;SVG</string>
+    <string>E&amp;xport SVG</string>
    </property>
    <property name="toolTip">
     <string>Export snapshot as SVG</string>

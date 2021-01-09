@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2021 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -74,7 +74,6 @@ public slots:
     void setNumOfSamples(unsigned value);
     /// Maximum width of X axis (limit of hscroll)
     void setPlotWidth(double width);
-
 
 private:
     bool isMulti;

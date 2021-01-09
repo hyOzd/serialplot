@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2021 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -54,7 +54,7 @@ SnapshotView::SnapshotView(MainWindow* parent, Snapshot* snapshot) :
             this, &SnapshotView::save);
 
     connect(ui->actionExportSvg, &QAction::triggered,
-             this, &SnapshotView::exportSvg);
+            this, &SnapshotView::exportSvg);
 
     // add "View" menu
     menuBar()->insertMenu(NULL, &plotMenu);
@@ -95,6 +95,7 @@ void SnapshotView::save()
 
     _snapshot->save(fileName);
 
+    // saving changes snapshots name
     setWindowTitle(_snapshot->displayName());
 }
 
@@ -104,7 +105,4 @@ void SnapshotView::exportSvg()
     if (fileName.isNull()) return; // user canceled
 
     plotMan->exportSvg(fileName);
-
-    setWindowTitle(_snapshot->displayName());
-
 }
