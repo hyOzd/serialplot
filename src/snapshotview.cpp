@@ -90,18 +90,22 @@ void SnapshotView::renameSnapshot(QString name)
 
 void SnapshotView::save()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Export CSV File"));
+    QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Export CSV File"), _snapshot->name() + ".csv", "CSV (*.csv)");
+
     if (fileName.isNull()) return; // user canceled
 
     _snapshot->save(fileName);
 
-    // saving changes snapshots name
+    // saving changes snapshots display name (* is no more)
     setWindowTitle(_snapshot->displayName());
 }
 
 void SnapshotView::exportSvg()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Export SVG File"));
+    QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Export SVG File(s)"), _snapshot->name() + ".svg", "Images (*.svg)");
+
     if (fileName.isNull()) return; // user canceled
 
     plotMan->exportSvg(fileName);

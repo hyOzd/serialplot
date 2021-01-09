@@ -55,7 +55,7 @@ public:
     /// Returns current number of curves known by plot manager
     unsigned numOfCurves();
     /// export SVG
-    void exportSvg (QString prefix);
+    void exportSvg (QString fileName) const;
 
 public slots:
     /// Enable/Disable multiple plot display

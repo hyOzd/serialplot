@@ -564,19 +564,28 @@ void PlotManager::setPlotWidth(double width)
     }
 }
 
-void PlotManager::exportSvg(QString prefix)
+void PlotManager::exportSvg(QString fileName) const
 {
-    QString fileName = prefix;
+    QString baseName, suffix;
+
+    baseName = fileName.section('.', 0, 0);
+    suffix = "." + fileName.section('.', 1, 1);
+
+    // if suffix is empty make sure it is svg
+    if (suffix.size() == 1)
+    {
+        suffix = ".svg";
+    }
 
     for (int i=0; i < plotWidgets.size(); i++)
     {
         if (plotWidgets.size() > 1)
-            fileName = prefix + "-" + QString::number(i);
+            fileName = baseName + "-" + _stream->channel(i)->name() + suffix;
 
         auto plot = plotWidgets.at(i);
 
         QSvgGenerator gen;
-        gen.setFileName(fileName + ".svg");
+        gen.setFileName(fileName);
         gen.setSize(plot->size());
         gen.setViewBox(plot->rect());
 

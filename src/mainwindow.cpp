@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2021 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -495,7 +495,8 @@ void MainWindow::onExportSvg()
     bool wasPaused = ui->actionPause->isChecked();
     ui->actionPause->setChecked(true); // pause plotting
 
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Export SVG File(s)"));
+    QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Export SVG File(s)"), QString(), "Images (*.svg)");
 
     if (fileName.isNull())  // user canceled export
     {
