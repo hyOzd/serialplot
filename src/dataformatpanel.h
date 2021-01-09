@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2021 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -27,6 +27,7 @@
 #include <QList>
 #include <QSettings>
 #include <QtGlobal>
+#include <QButtonGroup>
 
 #include "binarystreamreader.h"
 #include "asciireader.h"
@@ -67,6 +68,7 @@ signals:
 
 private:
     Ui::DataFormatPanel *ui;
+    QButtonGroup readerSelectButtons;
 
     QSerialPort* serialPort;
 

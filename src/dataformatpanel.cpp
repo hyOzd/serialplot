@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2021 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -48,6 +48,10 @@ DataFormatPanel::DataFormatPanel(QSerialPort* port, QWidget *parent) :
     ui->horizontalLayout->addWidget(bsReader.settingsWidget(), 1);
 
     // initalize reader selection buttons
+    readerSelectButtons.addButton(ui->rbBinary);
+    readerSelectButtons.addButton(ui->rbAscii);
+    readerSelectButtons.addButton(ui->rbFramed);
+
     connect(ui->rbBinary, &QRadioButton::toggled, [this](bool checked)
             {
                 if (checked) selectReader(&bsReader);
