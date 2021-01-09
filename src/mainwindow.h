@@ -126,6 +126,7 @@ private slots:
     void showBarPlot(bool show);
 
     void onExportCsv();
+    void onExportSvg();
     void onSaveSettings();
     void onLoadSettings();
 };

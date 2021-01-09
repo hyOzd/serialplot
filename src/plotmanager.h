@@ -54,6 +54,8 @@ public:
     void removeCurves(unsigned number);
     /// Returns current number of curves known by plot manager
     unsigned numOfCurves();
+    /// export SVG
+    void exportSvg (QString prefix);
 
 public slots:
     /// Enable/Disable multiple plot display
@@ -72,6 +74,7 @@ public slots:
     void setNumOfSamples(unsigned value);
     /// Maximum width of X axis (limit of hscroll)
     void setPlotWidth(double width);
+
 
 private:
     bool isMulti;

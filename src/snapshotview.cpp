@@ -53,6 +53,9 @@ SnapshotView::SnapshotView(MainWindow* parent, Snapshot* snapshot) :
     connect(ui->actionSave, &QAction::triggered,
             this, &SnapshotView::save);
 
+    connect(ui->actionExportSvg, &QAction::triggered,
+             this, &SnapshotView::exportSvg);
+
     // add "View" menu
     menuBar()->insertMenu(NULL, &plotMenu);
 }
@@ -93,4 +96,15 @@ void SnapshotView::save()
     _snapshot->save(fileName);
 
     setWindowTitle(_snapshot->displayName());
+}
+
+void SnapshotView::exportSvg()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export SVG File"));
+    if (fileName.isNull()) return; // user canceled
+
+    plotMan->exportSvg(fileName);
+
+    setWindowTitle(_snapshot->displayName());
+
 }

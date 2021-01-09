@@ -120,6 +120,7 @@
     <addaction name="actionSaveSettings"/>
     <addaction name="actionLoadSettings"/>
     <addaction name="actionExportCsv"/>
+    <addaction name="actionExportSvg"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -269,6 +270,11 @@
    </property>
    <property name="text">
     <string>Horizontal</string>
+   </property>
+  </action>
+  <action name="actionExportSvg">
+   <property name="text">
+    <string>Export &amp;SVG</string>
    </property>
   </action>
  </widget>

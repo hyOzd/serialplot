@@ -35,6 +35,7 @@
     </property>
     <addaction name="actionRename"/>
     <addaction name="actionSave"/>
+    <addaction name="actionExportSvg"/>
     <addaction name="actionClose"/>
    </widget>
    <addaction name="menuSnapshot"/>
@@ -64,6 +65,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+W</string>
+   </property>
+  </action>
+  <action name="actionExportSvg">
+   <property name="text">
+    <string>Export as &amp;SVG</string>
+   </property>
+   <property name="toolTip">
+    <string>Export snapshot as SVG</string>
    </property>
   </action>
  </widget>
