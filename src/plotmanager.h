@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2021 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -54,6 +54,8 @@ public:
     void removeCurves(unsigned number);
     /// Returns current number of curves known by plot manager
     unsigned numOfCurves();
+    /// export SVG
+    void exportSvg (QString fileName) const;
 
 public slots:
     /// Enable/Disable multiple plot display

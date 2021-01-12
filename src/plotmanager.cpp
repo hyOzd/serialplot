@@ -19,7 +19,9 @@
 
 #include <algorithm>
 #include <QMetaEnum>
-#include "qwt_symbol.h"
+#include <QSvgGenerator>
+#include <qwt_symbol.h>
+#include <qwt_plot_renderer.h>
 
 #include "plot.h"
 #include "plotmanager.h"
@@ -559,5 +561,38 @@ void PlotManager::setPlotWidth(double width)
     for (auto plot : plotWidgets)
     {
         plot->setPlotWidth(width);
+    }
+}
+
+void PlotManager::exportSvg(QString fileName) const
+{
+    QString baseName, suffix;
+
+    baseName = fileName.section('.', 0, 0);
+    suffix = "." + fileName.section('.', 1, 1);
+
+    // if suffix is empty make sure it is svg
+    if (suffix.size() == 1)
+    {
+        suffix = ".svg";
+    }
+
+    for (int i=0; i < plotWidgets.size(); i++)
+    {
+        if (plotWidgets.size() > 1)
+            fileName = baseName + "-" + _stream->channel(i)->name() + suffix;
+
+        auto plot = plotWidgets.at(i);
+
+        QSvgGenerator gen;
+        gen.setFileName(fileName);
+        gen.setSize(plot->size());
+        gen.setViewBox(plot->rect());
+
+        QwtPlotRenderer renderer;
+        QPainter painter;
+        painter.begin(&gen);
+        renderer.render(plot, &painter, plot->rect());
+        painter.end();
     }
 }

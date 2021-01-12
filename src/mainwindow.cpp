@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2021 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -149,6 +149,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // File menu signals
     QObject::connect(ui->actionExportCsv, &QAction::triggered,
                      this, &MainWindow::onExportCsv);
+
+    QObject::connect(ui->actionExportSvg, &QAction::triggered,
+                     this, &MainWindow::onExportSvg);
 
     QObject::connect(ui->actionSaveSettings, &QAction::triggered,
                      this, &MainWindow::onSaveSettings);
@@ -484,6 +487,24 @@ void MainWindow::onExportCsv()
         Snapshot* snapshot = snapshotMan.makeSnapshot();
         snapshot->save(fileName);
         delete snapshot;
+    }
+}
+
+void MainWindow::onExportSvg()
+{
+    bool wasPaused = ui->actionPause->isChecked();
+    ui->actionPause->setChecked(true); // pause plotting
+
+    QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Export SVG File(s)"), QString(), "Images (*.svg)");
+
+    if (fileName.isNull())  // user canceled export
+    {
+        ui->actionPause->setChecked(wasPaused);
+    }
+    else
+    {
+        plotMan->exportSvg(fileName);
     }
 }
 

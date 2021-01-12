@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2021 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -53,6 +53,9 @@ SnapshotView::SnapshotView(MainWindow* parent, Snapshot* snapshot) :
     connect(ui->actionSave, &QAction::triggered,
             this, &SnapshotView::save);
 
+    connect(ui->actionExportSvg, &QAction::triggered,
+            this, &SnapshotView::exportSvg);
+
     // add "View" menu
     menuBar()->insertMenu(NULL, &plotMenu);
 }
@@ -87,10 +90,23 @@ void SnapshotView::renameSnapshot(QString name)
 
 void SnapshotView::save()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Export CSV File"));
+    QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Export CSV File"), _snapshot->name() + ".csv", "CSV (*.csv)");
+
     if (fileName.isNull()) return; // user canceled
 
     _snapshot->save(fileName);
 
+    // saving changes snapshots display name (* is no more)
     setWindowTitle(_snapshot->displayName());
+}
+
+void SnapshotView::exportSvg()
+{
+    QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Export SVG File(s)"), _snapshot->name() + ".svg", "Images (*.svg)");
+
+    if (fileName.isNull()) return; // user canceled
+
+    plotMan->exportSvg(fileName);
 }

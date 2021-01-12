@@ -63,6 +63,7 @@ private slots:
     void showRenameDialog();
     void renameSnapshot(QString name);
     void save();
+    void exportSvg();
 };
 
 #endif // SNAPSHOTVIEW_H
