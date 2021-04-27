@@ -1,5 +1,5 @@
 /*
-  Copyright © 2020 Hasan Yavuz Özderya
+  Copyright © 2021 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -572,11 +572,29 @@ void PortControl::loadSettings(QSettings* settings)
         if (index > -1) ui->cbPortList->setCurrentIndex(index);
     }
 
-    // load baud rate setting if it exists in baud rate list
+    // load baud rate setting
     QString baudSetting = settings->value(
         SG_Port_BaudRate, ui->cbBaudRate->currentText()).toString();
     int baudIndex = ui->cbBaudRate->findText(baudSetting);
-    if (baudIndex > -1) ui->cbBaudRate->setCurrentIndex(baudIndex);
+    if (baudIndex > -1)
+    {
+        ui->cbBaudRate->setCurrentIndex(baudIndex);
+    }
+    else
+    {
+        // validate
+        bool ok;
+        int r = baudSetting.toUInt(&ok);
+        if (ok && r > 0)
+        {
+            ui->cbBaudRate->insertItem(0, baudSetting);
+            ui->cbBaudRate->setCurrentIndex(0);
+        }
+        else
+        {
+            qCritical() << "Invalid baud setting: " << baudSetting;
+        }
+    }
 
     // load parity setting
     QString parityText =
