@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2021 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -212,6 +212,8 @@ void FramedReaderSettings::loadSettings(QSettings* settings)
         settings->value(SG_CustomFrame_FrameSize, ui->spSize->value()).toInt());
     ui->rbFixedSize->setChecked(
         settings->value(SG_CustomFrame_FixedSize, ui->rbFixedSize->isChecked()).toBool());
+    // Note: need to emit here, no signal will be emitted since 'rbFixedSize' is already unchecked
+    emit frameSizeChanged(frameSize());
 
     // load checksum
     ui->cbChecksum->setChecked(

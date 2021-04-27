@@ -1,5 +1,5 @@
 /*
-  Copyright © 2020 Hasan Yavuz Özderya
+  Copyright © 2021 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -126,7 +126,7 @@ void FramedReader::checkSettings()
     }
 
     // check if fixed frame size is multiple of a sample set size
-    if (!hasSizeByte && frameSize % (_numChannels * sampleSize) != 0)
+    if (!hasSizeByte && (frameSize % (_numChannels * sampleSize) != 0))
     {
         settingsInvalid |= FRAMESIZE_INVALID;
     }
