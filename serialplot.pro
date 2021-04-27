@@ -102,7 +102,7 @@ HEADERS += \
     src/mainwindow.h \
     src/utils.h \
     src/portcontrol.h \
-    src/floatswap.h \
+    src/byteswap.h \
     src/plot.h \
     src/hidabletabwidget.h \
     src/framebuffer.h \

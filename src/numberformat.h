@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2021 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -31,6 +31,7 @@ enum NumberFormat
     NumberFormat_int16,
     NumberFormat_int32,
     NumberFormat_float,
+    NumberFormat_double,
     NumberFormat_INVALID ///< used for error cases
 };
 

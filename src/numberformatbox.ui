@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>440</width>
+    <width>522</width>
     <height>22</height>
    </rect>
   </property>
@@ -99,6 +99,16 @@
      </property>
      <property name="text">
       <string>float</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="rbDouble">
+     <property name="toolTip">
+      <string>8 bytes double precision floating point number</string>
+     </property>
+     <property name="text">
+      <string>double</string>
      </property>
     </widget>
    </item>

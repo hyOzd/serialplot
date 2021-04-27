@@ -6,7 +6,7 @@
 #
 # Currently this script only outputs ASCII(comma separated) data.
 #
-# Copyright © 2020 Hasan Yavuz Özderya
+# Copyright © 2021 Hasan Yavuz Özderya
 #
 # This file is part of serialplot.
 #
@@ -74,7 +74,20 @@ def float_sine(port):
     while True:
         sin = math.sin(2 * math.pi * i / period)
         # cos = math.sin(2 * math.pi * (i / period + 1 / 4))
-        data = struct.pack('ff', sin, -sin)
+        data = struct.pack('>ff', sin, -sin)
+        os.write(port, data)
+        i = (i + 1) % period
+        time.sleep(0.1)
+
+def double_sine(port):
+    """Puts 2 channel sine and cosine wafeform through pseudo terminal
+    continuously."""
+    i = 0
+    period = 200
+    while True:
+        sin = math.sin(2 * math.pi * i / period)
+        # cos = math.sin(2 * math.pi * (i / period + 1 / 4))
+        data = struct.pack('>dd', sin, -sin)
         os.write(port, data)
         i = (i + 1) % period
         time.sleep(0.1)
@@ -127,8 +140,9 @@ def run():
 
     try:
         # float_sine(master)
+        double_sine(master)
         # frame_test(master)
-        ascii_test(master)
+        # ascii_test(master)
         # ascii_test_str(master)
     finally:
         # close the pseudo terminal files

@@ -19,7 +19,7 @@
 
 #include <QtDebug>
 #include <QtEndian>
-#include "floatswap.h"
+#include "byteswap.h"
 
 #include "framedreader.h"
 
@@ -77,32 +77,36 @@ void FramedReader::onNumberFormatChanged(NumberFormat numberFormat)
     switch(numberFormat)
     {
         case NumberFormat_uint8:
-            sampleSize = 1;
+            sampleSize = sizeof(quint8);
             readSample = &FramedReader::readSampleAs<quint8>;
             break;
         case NumberFormat_int8:
-            sampleSize = 1;
+            sampleSize = sizeof(qint8);
             readSample = &FramedReader::readSampleAs<qint8>;
             break;
         case NumberFormat_uint16:
-            sampleSize = 2;
+            sampleSize = sizeof(quint16);
             readSample = &FramedReader::readSampleAs<quint16>;
             break;
         case NumberFormat_int16:
-            sampleSize = 2;
+            sampleSize = sizeof(qint16);
             readSample = &FramedReader::readSampleAs<qint16>;
             break;
         case NumberFormat_uint32:
-            sampleSize = 4;
+            sampleSize = sizeof(quint32);
             readSample = &FramedReader::readSampleAs<quint32>;
             break;
         case NumberFormat_int32:
-            sampleSize = 4;
+            sampleSize = sizeof(qint32);
             readSample = &FramedReader::readSampleAs<qint32>;
             break;
         case NumberFormat_float:
-            sampleSize = 4;
+            sampleSize = sizeof(float);
             readSample = &FramedReader::readSampleAs<float>;
+            break;
+        case NumberFormat_double:
+            sampleSize = sizeof(double);
+            readSample = &FramedReader::readSampleAs<double>;
             break;
         case NumberFormat_INVALID:
             Q_ASSERT(1); // never

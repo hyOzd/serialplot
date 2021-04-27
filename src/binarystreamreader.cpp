@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2021 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -21,7 +21,7 @@
 #include <QtDebug>
 
 #include "binarystreamreader.h"
-#include "floatswap.h"
+#include "byteswap.h"
 
 BinaryStreamReader::BinaryStreamReader(QIODevice* device, QObject* parent) :
     AbstractReader(device, parent)
@@ -67,32 +67,36 @@ void BinaryStreamReader::onNumberFormatChanged(NumberFormat numberFormat)
     switch(numberFormat)
     {
         case NumberFormat_uint8:
-            sampleSize = 1;
+            sampleSize = sizeof(quint8);
             readSample = &BinaryStreamReader::readSampleAs<quint8>;
             break;
         case NumberFormat_int8:
-            sampleSize = 1;
+            sampleSize = sizeof(qint8);
             readSample = &BinaryStreamReader::readSampleAs<qint8>;
             break;
         case NumberFormat_uint16:
-            sampleSize = 2;
+            sampleSize = sizeof(quint16);
             readSample = &BinaryStreamReader::readSampleAs<quint16>;
             break;
         case NumberFormat_int16:
-            sampleSize = 2;
+            sampleSize = sizeof(qint16);
             readSample = &BinaryStreamReader::readSampleAs<qint16>;
             break;
         case NumberFormat_uint32:
-            sampleSize = 4;
+            sampleSize = sizeof(quint32);
             readSample = &BinaryStreamReader::readSampleAs<quint32>;
             break;
         case NumberFormat_int32:
-            sampleSize = 4;
+            sampleSize = sizeof(qint32);
             readSample = &BinaryStreamReader::readSampleAs<qint32>;
             break;
         case NumberFormat_float:
-            sampleSize = 4;
+            sampleSize = sizeof(float);
             readSample = &BinaryStreamReader::readSampleAs<float>;
+            break;
+        case NumberFormat_double:
+            sampleSize = sizeof(double);
+            readSample = &BinaryStreamReader::readSampleAs<double>;
             break;
         case NumberFormat_INVALID:
             Q_ASSERT(1); // never
