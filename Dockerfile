@@ -1,17 +1,15 @@
-FROM ubuntu:trusty
+FROM ubuntu:bionic
 
 # Install build dependencies
 RUN apt-get update
 RUN apt-get -y install software-properties-common
-RUN add-apt-repository -y ppa:beineri/opt-qt597-trusty
-RUN add-apt-repository -y ppa:george-edison55/cmake-3.x
-RUN apt-get update
-RUN apt-get -y install build-essential mesa-common-dev qt59base qt59serialport cmake mercurial subversion git wget libfuse2
+RUN add-apt-repository -y ppa:beineri/opt-qt-5.15.2-bionic
+RUN apt-get -y install build-essential mesa-common-dev qt515base qt515serialport qt515svg cmake mercurial subversion git wget libfuse2
 
 # Define environment variable
-ENV PATH /opt/qt59/bin/:$PATH
+ENV PATH /opt/qt515/bin/:$PATH
 
 WORKDIR /serialplot
 ADD . /serialplot
 WORKDIR ./build_docker
-RUN cmake ../ && make appimage
+RUN cmake ../ && make -j appimage
