@@ -388,6 +388,7 @@ void PlotManager::_addCurve(QwtPlotCurve* curve)
 
     // show the curve
     curve->attach(plot);
+    checkNoVisChannels();
     plot->replot();
 }
 
