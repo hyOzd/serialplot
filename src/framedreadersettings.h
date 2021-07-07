@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2021 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -23,6 +23,7 @@
 #include <QWidget>
 #include <QByteArray>
 #include <QSettings>
+#include <QButtonGroup>
 
 #include "numberformatbox.h"
 #include "endiannessbox.h"
@@ -36,6 +37,11 @@ class FramedReaderSettings : public QWidget
     Q_OBJECT
 
 public:
+    enum class SizeFieldType
+    {
+        Fixed, Field1Byte, Field2Byte
+    };
+
     explicit FramedReaderSettings(QWidget *parent = 0);
     ~FramedReaderSettings();
 
@@ -45,7 +51,8 @@ public:
     NumberFormat numberFormat();
     Endianness endianness();
     QByteArray syncWord();
-    unsigned frameSize(); /// If frame bye is enabled `0` is returned
+    SizeFieldType sizeFieldType() const;
+    unsigned fixedFrameSize() const;
     bool isChecksumEnabled();
     bool isDebugModeEnabled();
     /// Save settings into a `QSettings`
@@ -57,8 +64,10 @@ signals:
     /// If sync word is invalid (empty or 1 nibble missing at the end)
     /// signaled with an empty array
     void syncWordChanged(QByteArray);
+    /// 'size' field is only valid with 'Fixed' type
+    void sizeFieldChanged(SizeFieldType type, unsigned size);
     /// `0` indicates frame size byte is enabled
-    void frameSizeChanged(unsigned);
+    void fixedFrameSizeChanged(unsigned);
     void checksumChanged(bool);
     void numOfChannelsChanged(unsigned);
     void numberFormatChanged(NumberFormat);
@@ -66,6 +75,7 @@ signals:
 
 private:
     Ui::FramedReaderSettings *ui;
+    QButtonGroup fbGroup;
 
 private slots:
     void onSyncWordEdited();

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2021 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -57,6 +57,7 @@ private:
     QByteArray syncWord;
     bool checksumEnabled;
     bool hasSizeByte;
+    bool isSizeField2B;         /// size field is 2 bytes
     unsigned frameSize;
     bool debugModeEnabled;
 
@@ -86,7 +87,7 @@ private slots:
     void onNumberFormatChanged(NumberFormat numberFormat);
     void onNumOfChannelsChanged(unsigned value);
     void onSyncWordChanged(QByteArray);
-    void onFrameSizeChanged(unsigned);
+    void onSizeFieldChanged(FramedReaderSettings::SizeFieldType, unsigned);
 };
 
 #endif // FRAMEDREADER_H

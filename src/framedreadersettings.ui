@@ -67,7 +67,7 @@
      <item row="2" column="0">
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>Frame Size:</string>
+        <string>Payload Size:</string>
        </property>
       </widget>
      </item>
@@ -100,15 +100,25 @@
         </widget>
        </item>
        <item>
-        <widget class="QRadioButton" name="rbSizeByte">
+        <widget class="QRadioButton" name="rbSize1Byte">
          <property name="toolTip">
-          <string>First byte after the 'frame start' bytes should be the size of the frame. Not counting itself and checksum.</string>
+          <string>First byte after the 'frame start' bytes should be the size of the frame payload. Only counting following bytes but excluding the checksum.</string>
          </property>
          <property name="text">
-          <string>First byte of the payload is size</string>
+          <string>1 byte size field</string>
          </property>
          <property name="checked">
           <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="rbSize2Byte">
+         <property name="toolTip">
+          <string>First 2 bytes after the 'frame start' bytes should be the size of the frame payload. Only counting following bytes but excluding the checksum.</string>
+         </property>
+         <property name="text">
+          <string>2 byte size field</string>
          </property>
         </widget>
        </item>

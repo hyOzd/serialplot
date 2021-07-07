@@ -17,8 +17,6 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QButtonGroup>
-
 #include "utils.h"
 #include "defines.h"
 #include "setting_defines.h"
@@ -27,7 +25,8 @@
 
 FramedReaderSettings::FramedReaderSettings(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::FramedReaderSettings)
+    ui(new Ui::FramedReaderSettings),
+    fbGroup(this)
 {
     ui->setupUi(this);
 
@@ -44,21 +43,38 @@ FramedReaderSettings::FramedReaderSettings(QWidget *parent) :
     connect(ui->cbDebugMode, &QCheckBox::toggled,
             this, &FramedReaderSettings::debugModeChanged);
 
-    connect(ui->rbFixedSize, &QRadioButton::toggled,
-            ui->spSize, &QWidget::setEnabled);
+    {
+        // add frame size selection buttons to the same fbGroup
+        // fbGroup = new QButtonGroup(this);
+        fbGroup.addButton(ui->rbFixedSize, (int) SizeFieldType::Fixed);
+        fbGroup.addButton(ui->rbSize1Byte, (int) SizeFieldType::Field1Byte);
+        fbGroup.addButton(ui->rbSize2Byte, (int) SizeFieldType::Field2Byte);
 
-    connect(ui->rbFixedSize, &QRadioButton::toggled,
-            [this](bool checked)
-            {
-                emit frameSizeChanged(frameSize());
-            });
+        connect(&fbGroup, static_cast<void(QButtonGroup::*)(int, bool)>(&QButtonGroup::buttonToggled),
+                [this](int id, bool enabled)
+                {
+                    if (!enabled) return;
+                    if (id == static_cast<int>(SizeFieldType::Fixed))
+                    {
+                        emit sizeFieldChanged(SizeFieldType::Fixed, ui->spSize->value());
+                    }
+                    else
+                    {
+                        emit sizeFieldChanged(static_cast<SizeFieldType>(id), 0);
+                    }
+                });
 
-    // Note: if directly connected we get a runtime warning on incompatible signal arguments
-    connect(ui->spSize, SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
-            [this](int value)
-            {
-                emit frameSizeChanged(value);
-            });
+        // Enable/disable size text field
+        connect(ui->rbFixedSize, &QRadioButton::toggled,
+                ui->spSize, &QWidget::setEnabled);
+
+        connect(ui->spSize, SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
+                [this](int value)
+                {
+                    if (ui->rbFixedSize->isChecked())
+                        emit sizeFieldChanged(SizeFieldType::Fixed, value);
+                });
+    }
 
     connect(ui->spNumOfChannels, SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
             [this](int value)
@@ -71,11 +87,6 @@ FramedReaderSettings::FramedReaderSettings(QWidget *parent) :
 
     connect(ui->nfBox, SIGNAL(selectionChanged(NumberFormat)),
             this, SIGNAL(numberFormatChanged(NumberFormat)));
-
-    // add frame size selection buttons to same group
-    QButtonGroup* group = new QButtonGroup(this);
-    group->addButton(ui->rbFixedSize);
-    group->addButton(ui->rbSizeByte);
 }
 
 FramedReaderSettings::~FramedReaderSettings()
@@ -132,16 +143,14 @@ void FramedReaderSettings::onSyncWordEdited()
     emit syncWordChanged(syncWord());
 }
 
-unsigned FramedReaderSettings::frameSize()
+FramedReaderSettings::SizeFieldType FramedReaderSettings::sizeFieldType() const
 {
-    if (ui->rbFixedSize->isChecked())
-    {
-        return ui->spSize->value();
-    }
-    else
-    {
-        return 0; // frame byte is enabled
-    }
+    return static_cast<SizeFieldType>(fbGroup.checkedId());
+}
+
+unsigned FramedReaderSettings::fixedFrameSize() const
+{
+    return ui->spSize->value();
 }
 
 bool FramedReaderSettings::isChecksumEnabled()
@@ -162,8 +171,21 @@ void FramedReaderSettings::saveSettings(QSettings* settings)
     settings->setValue(SG_CustomFrame_Endianness,
                        endianness() == LittleEndian ? "little" : "big");
     settings->setValue(SG_CustomFrame_FrameStart, ui->leSyncWord->text());
-    settings->setValue(SG_CustomFrame_FixedSize, ui->rbFixedSize->isChecked());
-    settings->setValue(SG_CustomFrame_FrameSize, ui->spSize->value());
+    QString sizeFieldStr;
+    if (sizeFieldType() == SizeFieldType::Field1Byte)
+    {
+        sizeFieldStr = "field1byte";
+    }
+    else if (sizeFieldType() == SizeFieldType::Field2Byte)
+    {
+        sizeFieldStr = "field2byte";
+    }
+    else
+    {
+        sizeFieldStr = "fixed";
+    }
+    settings->setValue(SG_CustomFrame_SizeFieldType, sizeFieldStr);
+    settings->setValue(SG_CustomFrame_FixedFrameSize, fixedFrameSize());
     settings->setValue(SG_CustomFrame_Checksum, ui->cbChecksum->isChecked());
     settings->setValue(SG_CustomFrame_DebugMode, ui->cbDebugMode->isChecked());
     settings->endGroup();
@@ -207,13 +229,23 @@ void FramedReaderSettings::loadSettings(QSettings* settings)
         ui->leSyncWord->setText(frameStartSetting);
     }
 
-    // load frame size
+    // load frame size type and fixed value
     ui->spSize->setValue(
-        settings->value(SG_CustomFrame_FrameSize, ui->spSize->value()).toInt());
-    ui->rbFixedSize->setChecked(
-        settings->value(SG_CustomFrame_FixedSize, ui->rbFixedSize->isChecked()).toBool());
-    // Note: need to emit here, no signal will be emitted since 'rbFixedSize' is already unchecked
-    emit frameSizeChanged(frameSize());
+        settings->value(SG_CustomFrame_FixedFrameSize, ui->spSize->value()).toInt());
+
+    QString sizeFieldStr = settings->value(SG_CustomFrame_SizeFieldType, "").toString();
+    if (sizeFieldStr == "fixed")
+    {
+        ui->rbFixedSize->setChecked(true);
+    }
+    else if (sizeFieldStr == "field1byte")
+    {
+        ui->rbSize1Byte->setChecked(true);
+    }
+    else if (sizeFieldStr == "field2byte")
+    {
+        ui->rbSize2Byte->setChecked(true);
+    } // ignore invalid value
 
     // load checksum
     ui->cbChecksum->setChecked(

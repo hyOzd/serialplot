@@ -102,25 +102,32 @@ def uint32_test(port, little):
         time.sleep(0.05)
         i = i+1 if i <= maxi else 0
 
-def frame_test(port, fixed_size=False, hasChecksum=True):
+def frame_test(port, sizefield=False, hasChecksum=True):
     """Sends binary data in framed format."""
-    SYNCWORD = [0xAA, 0xBB]
+    SYNCWORD = bytes([0xAA, 0xBB])
     NUMSAMPLES = 10
     SIZE = NUMSAMPLES * 4 # integer
-    if fixed_size:
-        HEADER = bytes(SYNCWORD)
-    else:
-        HEADER = bytes(SYNCWORD + [SIZE])
+
+    HEADER = struct.pack('{}s'.format(len(SYNCWORD)), SYNCWORD)
+    if sizefield == 1:
+        HEADER += struct.pack('B', SIZE)
+    elif sizefield == 2:
+        HEADER += struct.pack('H', SIZE)
+
+    print(HEADER)
+
     i = 0
     checksum = 0
     bytesent = 0
     while True:
-        if i > 100: i = 0
+        if i > 1000: i = 0
         if bytesent == 0: # beginning of a frame?
+            time.sleep(0.1)
             os.write(port, HEADER)
-        os.write(port, struct.pack('<I', i))
+        data = struct.pack('<I', i)
+        os.write(port, data)
         bytesent += 4
-        checksum += i
+        checksum += sum(data)
         i += 1
         if bytesent == SIZE: # end of a frame
             if hasChecksum:
@@ -128,7 +135,6 @@ def frame_test(port, fixed_size=False, hasChecksum=True):
                 os.write(port, data)
             checksum = 0
             bytesent = 0
-        time.sleep(0.1)
 
 def run():
     # create the pseudo terminal
@@ -140,8 +146,8 @@ def run():
 
     try:
         # float_sine(master)
-        double_sine(master)
-        # frame_test(master)
+        # double_sine(master)
+        frame_test(master)
         # ascii_test(master)
         # ascii_test_str(master)
     finally:

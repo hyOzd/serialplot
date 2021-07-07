@@ -31,8 +31,9 @@ FramedReader::FramedReader(QIODevice* device, QObject* parent) :
     // initial settings
     settingsInvalid = 0;
     _numChannels = _settingsWidget.numOfChannels();
-    hasSizeByte = _settingsWidget.frameSize() == 0;
-    frameSize = _settingsWidget.frameSize();
+    hasSizeByte = (_settingsWidget.sizeFieldType() != FramedReaderSettings::SizeFieldType::Fixed);
+    isSizeField2B = (_settingsWidget.sizeFieldType() == FramedReaderSettings::SizeFieldType::Field2Byte);
+    frameSize = _settingsWidget.fixedFrameSize();
     syncWord = _settingsWidget.syncWord();
     checksumEnabled = _settingsWidget.isChecksumEnabled();
     onNumberFormatChanged(_settingsWidget.numberFormat());
@@ -49,8 +50,8 @@ FramedReader::FramedReader(QIODevice* device, QObject* parent) :
     connect(&_settingsWidget, &FramedReaderSettings::syncWordChanged,
             this, &FramedReader::onSyncWordChanged);
 
-    connect(&_settingsWidget, &FramedReaderSettings::frameSizeChanged,
-            this, &FramedReader::onFrameSizeChanged);
+    connect(&_settingsWidget, &FramedReaderSettings::sizeFieldChanged,
+            this, &FramedReader::onSizeFieldChanged);
 
     connect(&_settingsWidget, &FramedReaderSettings::checksumChanged,
             [this](bool enabled){checksumEnabled = enabled; reset();});
@@ -174,17 +175,19 @@ void FramedReader::onSyncWordChanged(QByteArray word)
     reset();
 }
 
-void FramedReader::onFrameSizeChanged(unsigned value)
+void FramedReader::onSizeFieldChanged(FramedReaderSettings::SizeFieldType fieldType, unsigned size)
 {
-    if (value == 0)
+    if (fieldType == FramedReaderSettings::SizeFieldType::Fixed)
     {
-        hasSizeByte = true;
+        hasSizeByte = false;
+        frameSize = size;
     }
     else
     {
-        hasSizeByte = false;
-        frameSize = value;
+        hasSizeByte = true;
+        isSizeField2B = (fieldType == FramedReaderSettings::SizeFieldType::Field2Byte);
     }
+
     checkSettings();
     reset();
 }
@@ -219,13 +222,35 @@ unsigned FramedReader::readData()
         }
         else if (hasSizeByte && !gotSize) // skipped if fixed frame size
         {
-            frameSize = 0;
-            _device->getChar((char*) &frameSize);
-            numBytesRead++;
-
-            if (frameSize == 0) // check size
+            // read size field (1 or 2 bytes)
+            if (isSizeField2B)
             {
-                qCritical() << "Frame size is 0!";
+                if (bytesAvailable < 2) break;
+
+                uint16_t frameSize16 = 0;
+                _device->read((char*) &frameSize16, sizeof(frameSize16));
+                numBytesRead += sizeof(frameSize16);
+
+                if (_settingsWidget.endianness() == LittleEndian)
+                {
+                    frameSize = qFromLittleEndian(frameSize16);
+                }
+                else
+                {
+                    frameSize = qFromBigEndian(frameSize16);
+                }
+            }
+            else
+            {
+                frameSize = 0;
+                _device->getChar((char*) &frameSize);
+                numBytesRead++;
+            }
+
+            // validate the size field
+            if (frameSize == 0)
+            {
+                qCritical() << "Frame size is read as 0!";
                 reset();
             }
             else if (frameSize % (_numChannels * sampleSize) != 0)

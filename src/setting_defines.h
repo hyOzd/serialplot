@@ -1,5 +1,5 @@
 /*
-  Copyright © 2020 Hasan Yavuz Özderya
+  Copyright © 2021 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -67,8 +67,8 @@ const char SG_ASCII_FilterPrefix[] = "filterPrefix";
 // framed reader keys
 const char SG_CustomFrame_NumOfChannels[] = "numOfChannels";
 const char SG_CustomFrame_FrameStart[] = "frameStart";
-const char SG_CustomFrame_FixedSize[] = "fixedSize";
-const char SG_CustomFrame_FrameSize[] = "frameSize";
+const char SG_CustomFrame_SizeFieldType[] = "fixedSize";
+const char SG_CustomFrame_FixedFrameSize[] = "frameSize";
 const char SG_CustomFrame_NumberFormat[] = "numberFormat";
 const char SG_CustomFrame_Endianness[] = "endianness";
 const char SG_CustomFrame_Checksum[] = "checksum";
