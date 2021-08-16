@@ -47,8 +47,7 @@ public:
                          Snapshot* snapshot,
                          QObject *parent = 0);
     ~PlotManager();
-    /// Add a new curve with title and buffer. A color is
-    /// automatically chosen for curve.
+    /// Add a new curve with title and buffer.
     void addCurve(QString title, const XFrameBuffer* xBuf, const FrameBuffer* yBuf);
     /// Removes curves from the end
     void removeCurves(unsigned number);
@@ -96,6 +95,7 @@ private:
     unsigned _numOfSamples;
     double _plotWidth;
     Plot::ShowSymbols showSymbols;
+    bool inScaleSync; ///< scaleSync is in progress
 
     /// Common constructor
     void construct(QWidget* plotArea, PlotMenu* menu);
@@ -122,6 +122,9 @@ private slots:
     void onChannelInfoChanged(const QModelIndex & topLeft,
                               const QModelIndex & bottomRight,
                               const QVector<int> & roles = QVector<int> ());
+
+    /// Synchronize Y axes to be the same width (so that X axes are in line)
+    void syncScales();
 };
 
 #endif // PLOTMANAGER_H

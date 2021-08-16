@@ -94,6 +94,7 @@ void PlotManager::construct(QWidget* plotArea, PlotMenu* menu)
     _plotWidth = 1;
     showSymbols = Plot::ShowSymbolsAuto;
     emptyPlot = NULL;
+    inScaleSync = false;
 
     // initalize layout and single widget
     isMulti = false;
@@ -189,6 +190,7 @@ void PlotManager::onChannelInfoChanged(const QModelIndex &topLeft,
             {
                 plotWidgets[ci]->replot();
             }
+            syncScales();
         }
     }
 
@@ -269,6 +271,10 @@ void PlotManager::setMulti(bool enabled)
         }
     }
 
+
+    // Note: direct call doesn't work presumably because widgets are not ready
+    QMetaObject::invokeMethod(this, "syncScales", Qt::QueuedConnection);
+
     // will skip if no plot widgets exist (can happen during constructor)
     if (plotWidgets.length())
     {
@@ -340,7 +346,51 @@ Plot* PlotManager::addPlotWidget()
         plot->setXAxis(_xMin, _xMax);
     }
 
+    if (isMulti)
+    {
+        connect(plot->axisWidget(QwtPlot::yLeft), &QwtScaleWidget::scaleDivChanged,
+                this, &PlotManager::syncScales);
+    }
+
     return plot;
+}
+
+// Taken from Qwt "plotmatrix" playground example
+void PlotManager::syncScales()
+{
+    if (inScaleSync) return;
+
+    inScaleSync = true;
+
+    // find maximum extent
+    double maxExtent = 0;
+    for (auto plot : plotWidgets)
+    {
+        if (!plot->isVisible()) continue;
+
+        QwtScaleWidget* scaleWidget = plot->axisWidget(QwtPlot::yLeft);
+        QwtScaleDraw* scaleDraw = scaleWidget->scaleDraw();
+        scaleDraw->setMinimumExtent(0);
+
+        const double extent = scaleDraw->extent(scaleWidget->font());
+        if (extent > maxExtent)
+            maxExtent = extent;
+    }
+
+    // apply maximum extent
+    for (auto plot : plotWidgets)
+    {
+        QwtScaleWidget* scaleWidget = plot->axisWidget(QwtPlot::yLeft);
+        scaleWidget->scaleDraw()->setMinimumExtent(maxExtent);
+        scaleWidget->updateGeometry();
+    }
+
+    for (auto plot : plotWidgets)
+    {
+        plot->replot();
+    }
+
+    inScaleSync = false;
 }
 
 void PlotManager::addCurve(QString title, const XFrameBuffer* xBuf, const FrameBuffer* yBuf)
@@ -440,6 +490,7 @@ void PlotManager::replot()
     {
         plot->replot();
     }
+    if (isMulti) syncScales();
 }
 
 void PlotManager::showGrid(bool show)
