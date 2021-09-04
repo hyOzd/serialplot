@@ -93,6 +93,7 @@ void PlotManager::construct(QWidget* plotArea, PlotMenu* menu)
     _numOfSamples = 1;
     _plotWidth = 1;
     showSymbols = Plot::ShowSymbolsAuto;
+    lineWidth = 0;
     emptyPlot = NULL;
     inScaleSync = false;
 
@@ -102,6 +103,7 @@ void PlotManager::construct(QWidget* plotArea, PlotMenu* menu)
 
     // connect to  menu
     connect(menu, &PlotMenu::symbolShowChanged, this, &PlotManager:: setSymbols);
+    connect(menu, &PlotMenu::lineWidthChanged, this, &PlotManager::setLineWidth);
 
     connect(&menu->showGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
             this, &PlotManager::showGrid);
@@ -176,7 +178,7 @@ void PlotManager::onChannelInfoChanged(const QModelIndex &topLeft,
         bool visible = topLeft.sibling(ci, ChannelInfoModel::COLUMN_VISIBILITY).data(Qt::CheckStateRole).toBool();
 
         curves[ci]->setTitle(name);
-        curves[ci]->setPen(color);
+        curves[ci]->setPen(color, lineWidth);
         curves[ci]->setVisible(visible);
         curves[ci]->setItemAttribute(QwtPlotItem::Legend, visible);
 
@@ -549,6 +551,14 @@ void PlotManager::setSymbols(Plot::ShowSymbols shown)
     {
         plot->setSymbols(shown);
     }
+}
+
+void PlotManager::setLineWidth(Plot::LineWidths lw)
+{
+    //Set Line Width correctly
+    lineWidth = lw;
+    //Update Plot
+    onChannelInfoChanged(infoModel->index(0, 0), infoModel->index(infoModel->rowCount()-1, 0), {});
 }
 
 void PlotManager::setYAxis(bool autoScaled, double yAxisMin, double yAxisMax)

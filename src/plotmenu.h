@@ -56,6 +56,11 @@ public:
     QAction setSymbolsAutoAct;
     QAction setSymbolsShowAct;
     QAction setSymbolsHideAct;
+    QAction setLineWidthAction;
+    QMenu setLineWidthMenu;
+    QAction setLineWidth0Act;
+    QAction setLineWidth1Act;
+    QAction setLineWidth2Act;
 
     /// Returns a bundle of current view settings (menu selections)
     PlotViewSettings viewSettings() const;
@@ -68,6 +73,7 @@ public:
 
 signals:
     void symbolShowChanged(Plot::ShowSymbols shown);
+    void lineWidthChanged(Plot::LineWidths lw);
 };
 
 #endif // PLOTMENU_H

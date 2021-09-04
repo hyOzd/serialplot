@@ -32,7 +32,11 @@ PlotMenu::PlotMenu(QWidget* parent) :
     setSymbolsAction("&Symbols", this),
     setSymbolsAutoAct("Show When &Zoomed", this),
     setSymbolsShowAct("Always &Show", this),
-    setSymbolsHideAct("Always &Hide", this)
+    setSymbolsHideAct("Always &Hide", this),
+    setLineWidthAction("Line Width", this),
+    setLineWidth0Act("0.0", this),
+    setLineWidth1Act("1.0", this),
+    setLineWidth2Act("2.0", this)
 {
     showGridAction.setToolTip("Show Grid");
     showMinorGridAction.setToolTip("Show Minor Grid");
@@ -41,6 +45,7 @@ PlotMenu::PlotMenu(QWidget* parent) :
     showLegendAction.setToolTip("Display the Legend on Plot");
     showMultiAction.setToolTip("Display All Channels Separately");
     setSymbolsAction.setToolTip("Show/Hide symbols");
+    setLineWidthAction.setToolTip("Set Line Width");
 
     showGridAction.setShortcut(QKeySequence("G"));
     showMinorGridAction.setShortcut(QKeySequence("M"));
@@ -96,6 +101,39 @@ PlotMenu::PlotMenu(QWidget* parent) :
 
     setSymbolsAction.setMenu(&setSymbolsMenu);
 
+    setLineWidthMenu.addAction(&setLineWidth0Act);
+    setLineWidth0Act.setCheckable(true);
+    setLineWidth0Act.setChecked(true);
+    connect(&setLineWidth0Act, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
+            [this](bool checked)
+            {
+                if (checked) emit lineWidthChanged(Plot::LineWidth0);
+            });
+
+    setLineWidthMenu.addAction(&setLineWidth1Act);
+    setLineWidth1Act.setCheckable(true);
+    connect(&setLineWidth1Act, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
+            [this](bool checked)
+            {
+                if (checked) emit lineWidthChanged(Plot::LineWidth1);
+            });
+
+    setLineWidthMenu.addAction(&setLineWidth2Act);
+    setLineWidth2Act.setCheckable(true);
+    connect(&setLineWidth2Act, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
+            [this](bool checked)
+            {
+                if (checked) emit lineWidthChanged(Plot::LineWidth2);
+            });
+
+    // add line width actions to same group so that they appear as radio buttons
+    auto groupLineWidth = new QActionGroup(this);
+    groupLineWidth->addAction(&setLineWidth0Act);
+    groupLineWidth->addAction(&setLineWidth1Act);
+    groupLineWidth->addAction(&setLineWidth2Act);
+
+    setLineWidthAction.setMenu(&setLineWidthMenu);
+
     // add all actions to create this menu
     addAction(&showGridAction);
     addAction(&showMinorGridAction);
@@ -104,6 +142,7 @@ PlotMenu::PlotMenu(QWidget* parent) :
     addAction(&showLegendAction);
     addAction(&showMultiAction);
     addAction(&setSymbolsAction);
+    addAction(&setLineWidthAction);
 }
 
 PlotMenu::PlotMenu(PlotViewSettings s, QWidget* parent) :

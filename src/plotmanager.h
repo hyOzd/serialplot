@@ -95,6 +95,7 @@ private:
     unsigned _numOfSamples;
     double _plotWidth;
     Plot::ShowSymbols showSymbols;
+    int lineWidth;
     bool inScaleSync; ///< scaleSync is in progress
 
     /// Common constructor
@@ -117,6 +118,7 @@ private slots:
     void unzoom();
     void darkBackground(bool enabled = true);
     void setSymbols(Plot::ShowSymbols shown);
+    void setLineWidth(Plot::LineWidths lw);
 
     void onNumChannelsChanged(unsigned value);
     void onChannelInfoChanged(const QModelIndex & topLeft,

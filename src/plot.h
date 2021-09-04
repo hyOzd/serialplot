@@ -47,6 +47,13 @@ public:
         ShowSymbolsHide
     };
 
+    enum LineWidths
+    {
+        LineWidth0 = 0,
+        LineWidth1 = 1,
+        LineWidth2 = 2
+    };
+
     Plot(QWidget* parent = 0);
     ~Plot();
 
