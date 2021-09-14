@@ -69,7 +69,7 @@ if(QWT_ROOT)
   find_library(QWT_LIBRARY NAMES "qwt-qt5" "qwt" PATHS "${QWT_ROOT}/lib")
 else (QWT_ROOT)
   ## Look into system locations
-  find_path(QWT_INCLUDE_DIR qwt_plot.h PATHS /usr/include/qwt)
+  find_path(QWT_INCLUDE_DIR qwt_plot.h PATHS /usr/include/qwt /usr/include/qwt6)
   # try extracting version information
   if (QWT_INCLUDE_DIR)
 	unset(qwt_version_string)
@@ -123,7 +123,8 @@ if (QWT_LIBRARY AND (NOT qwt_is_static))
     message(WARNING "Found qwt library (${QWT_LIBRARY}) isn't compiled with Qt5!")
     LIST_PREREQUISITES(${QWT_LIBRARY})
   endif()
-endif (QWT_LIBRARY)
+endif (QWT_LIBRARY AND (NOT qwt_is_static))
+#endif (QWT_LIBRARY)
 
 # set QWT_FOUND
 if(QWT_INCLUDE_DIR AND QWT_LIBRARY AND (qwt_is_static OR qwt_is_qt5))
