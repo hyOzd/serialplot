@@ -124,7 +124,6 @@ if (QWT_LIBRARY AND (NOT qwt_is_static))
     LIST_PREREQUISITES(${QWT_LIBRARY})
   endif()
 endif (QWT_LIBRARY AND (NOT qwt_is_static))
-#endif (QWT_LIBRARY)
 
 # set QWT_FOUND
 if(QWT_INCLUDE_DIR AND QWT_LIBRARY AND (qwt_is_static OR qwt_is_qt5))
