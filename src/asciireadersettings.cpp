@@ -67,7 +67,7 @@ AsciiReaderSettings::AsciiReaderSettings(QWidget *parent) :
             });
 
     connect(&filterButtons,
-            SELECT<int, bool>::OVERLOAD_OF(&QButtonGroup::buttonToggled),
+            SELECT<int, bool>::OVERLOAD_OF(&QButtonGroup::idToggled),
             [this](int id, bool checked)
             {
                 emit filterChanged(static_cast<FilterMode>(id), ui->leFilterPrefix->text());

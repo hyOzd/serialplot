@@ -79,10 +79,10 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
                      SELECT<int>::OVERLOAD_OF(&QComboBox::activated),
                      this, &PortControl::onTbPortListActivated);
     QObject::connect(ui->cbPortList,
-                     SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
+                     SELECT<const QString&>::OVERLOAD_OF(&QComboBox::textActivated),
                      this, &PortControl::selectListedPort);
     QObject::connect(&tbPortList,
-                     SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
+                     SELECT<const QString&>::OVERLOAD_OF(&QComboBox::textActivated),
                      this, &PortControl::selectListedPort);
 
     // setup buttons
@@ -91,7 +91,7 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
 
     // setup baud rate selection widget
     QObject::connect(ui->cbBaudRate,
-                     SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
+                     SELECT<const QString&>::OVERLOAD_OF(&QComboBox::textActivated),
                      this, &PortControl::_selectBaudRate);
 
     // setup parity selection buttons
@@ -100,7 +100,7 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     parityButtons.addButton(ui->rbOddParity, (int) QSerialPort::OddParity);
 
     QObject::connect(&parityButtons,
-                     SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
+                     SELECT<int>::OVERLOAD_OF(&QButtonGroup::idClicked),
                      this, &PortControl::selectParity);
 
     // setup data bits selection buttons
@@ -110,7 +110,7 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     dataBitsButtons.addButton(ui->rb5Bits, (int) QSerialPort::Data5);
 
     QObject::connect(&dataBitsButtons,
-                     SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
+                     SELECT<int>::OVERLOAD_OF(&QButtonGroup::idClicked),
                      this, &PortControl::selectDataBits);
 
     // setup stop bits selection buttons
@@ -118,7 +118,7 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     stopBitsButtons.addButton(ui->rb2StopBit, (int) QSerialPort::TwoStop);
 
     QObject::connect(&stopBitsButtons,
-                     SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
+                     SELECT<int>::OVERLOAD_OF(&QButtonGroup::idClicked),
                      this, &PortControl::selectStopBits);
 
     // setup flow control selection buttons
@@ -130,7 +130,7 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
                                  (int) QSerialPort::SoftwareControl);
 
     QObject::connect(&flowControlButtons,
-                     SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
+                     SELECT<int>::OVERLOAD_OF(&QButtonGroup::idClicked),
                      this, &PortControl::selectFlowControl);
 
     // initialize signal leds

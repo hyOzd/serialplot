@@ -85,8 +85,9 @@ RecordPanel::RecordPanel(Stream* stream, QWidget *parent) :
     connect(&recordAction, &QAction::toggled, ui->pbBrowse, &QWidget::setDisabled);
 
     QCompleter *completer = new QCompleter(this);
-    // TODO: QDirModel is deprecated, use QFileSystemModel (but it doesn't work)
-    completer->setModel(new QDirModel(completer));
+    // TODO: QDirModel is deprecated, use QFileSystemModel (but it doesn't work) 
+    // Works for me
+    completer->setModel(new QFileSystemModel(completer));
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     ui->leFileName->setCompleter(completer);
 

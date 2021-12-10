@@ -156,7 +156,7 @@ unsigned AsciiReader::readData()
 
 SamplePack* AsciiReader::parseLine(const QString& line) const
 {
-    auto separatedValues = line.split(delimiter, QString::SkipEmptyParts);
+    auto separatedValues = line.split(delimiter, Qt::SkipEmptyParts);
     unsigned numComingChannels = separatedValues.length();
 
     // check number of channels (skipped if auto num channels is enabled)
