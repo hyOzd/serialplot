@@ -12,6 +12,8 @@
 #include <qwt_plot_layout.h>
 #include <qwt_scale_engine.h>
 #include <qwt_scale_widget.h>
+#include <QStack>
+#include <QRectF>
 #include "scrollbar.h"
 #include "scrollzoomer.h"
 

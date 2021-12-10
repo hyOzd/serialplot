@@ -19,7 +19,9 @@
 
 #include "zoomer.h"
 #include <qwt_plot.h>
-#include <QPen>
+#include <qwt_text.h>
+#include <QPainter>
+#include <QPainterPath>
 #include <QMouseEvent>
 #include <QtMath>
 #include <algorithm>

@@ -17,6 +17,7 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QDebug>
 #include "plotmenu.h"
 #include "setting_defines.h"
 #include "utils.h"
