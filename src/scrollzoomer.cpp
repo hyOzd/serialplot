@@ -12,6 +12,8 @@
 #include <qwt_plot_layout.h>
 #include <qwt_scale_engine.h>
 #include <qwt_scale_widget.h>
+#include <QStack>
+#include <QRectF>
 #include "scrollbar.h"
 #include "scrollzoomer.h"
 
@@ -304,12 +306,11 @@ bool ScrollZoomer::eventFilter( QObject *object, QEvent *event )
         {
             case QEvent::Resize:
             {
-                int left, top, right, bottom;
-                canvas()->getContentsMargins( &left, &top, &right, &bottom );
-
+                QMargins c_margins = canvas()->contentsMargins();
                 QRect rect;
                 rect.setSize( static_cast<QResizeEvent *>( event )->size() );
-                rect.adjust( left, top, -right, -bottom );
+                rect.adjust( c_margins.left(), c_margins.top(),
+                            -c_margins.right(), -c_margins.bottom() );
 
                 layoutScrollBars( rect );
                 break;

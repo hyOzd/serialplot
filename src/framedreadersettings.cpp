@@ -50,7 +50,7 @@ FramedReaderSettings::FramedReaderSettings(QWidget *parent) :
         fbGroup.addButton(ui->rbSize1Byte, (int) SizeFieldType::Field1Byte);
         fbGroup.addButton(ui->rbSize2Byte, (int) SizeFieldType::Field2Byte);
 
-        connect(&fbGroup, static_cast<void(QButtonGroup::*)(int, bool)>(&QButtonGroup::buttonToggled),
+        connect(&fbGroup, static_cast<void(QButtonGroup::*)(int, bool)>(&QButtonGroup::idToggled),
                 [this](int id, bool enabled)
                 {
                     if (!enabled) return;

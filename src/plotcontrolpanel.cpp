@@ -143,14 +143,14 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
         int rmin = -rmax-1;
         Range r = {double(rmin),  double(rmax)};
         ui->cbRangePresets->addItem(
-            QString().sprintf("Signed %d bits %d to +%d", nbits, rmin, rmax),
+            QString("Signed %1 bits %2 to +%3").arg(nbits).arg(rmin).arg(rmax),
             QVariant::fromValue(r));
     }
     for (int nbits = 8; nbits <= 24; nbits++) // unsigned binary formats
     {
         int rmax = pow(2, nbits)-1;
         ui->cbRangePresets->addItem(
-            QString().sprintf("Unsigned %d bits %d to +%d", nbits, 0, rmax),
+            QString("Unsigned %1 bits %2 to +%3").arg(nbits).arg(0).arg(rmax),
             QVariant::fromValue(Range{0, double(rmax)}));
     }
     ui->cbRangePresets->addItem("-1 to +1", QVariant::fromValue(Range{-1, +1}));

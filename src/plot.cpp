@@ -22,6 +22,7 @@
 #include <QColor>
 #include <qwt_symbol.h>
 #include <qwt_plot_curve.h>
+#include <qwt_scale_map.h>
 #include <math.h>
 #include <algorithm>
 

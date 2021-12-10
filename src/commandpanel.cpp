@@ -27,7 +27,7 @@
 CommandPanel::CommandPanel(QSerialPort* port, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::CommandPanel),
-    _menu(trUtf8("&Commands")), _newCommandAction(trUtf8("&New Command"), this)
+    _menu("&Commands"), _newCommandAction("&New Command", this)
 {
     serialPort = port;
 
@@ -55,7 +55,7 @@ CommandWidget* CommandPanel::newCommand()
 {
     auto command = new CommandWidget();
     command_name_counter++;
-    command->setName(trUtf8("Command ") + QString::number(command_name_counter));
+    command->setName("Command " + QString::number(command_name_counter));
     ui->scrollAreaWidgetContents->layout()->addWidget(command);
     command->setFocusToEdit();
     connect(command, &CommandWidget::sendCommand, this, &CommandPanel::sendCommand);

@@ -25,7 +25,7 @@ SneakyLineEdit::SneakyLineEdit(QWidget *parent) :
 {
     setFrame(false);
     setStyleSheet("QLineEdit{background-color: rgba(0,0,0,0);}");
-    setToolTip(trUtf8("Click to edit"));    
+    setToolTip("Click to edit");
 
     setBold(true);
 }
