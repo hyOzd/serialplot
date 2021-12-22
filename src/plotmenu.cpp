@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2021 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -20,6 +20,8 @@
 #include "plotmenu.h"
 #include "setting_defines.h"
 #include "utils.h"
+
+#include <QtDebug>
 
 PlotMenu::PlotMenu(QWidget* parent) :
     QMenu(tr("&View"), parent),

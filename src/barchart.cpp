@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2021 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -17,10 +17,11 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QPalette>
-#include <qwt_scale_map.h>
-
 #include "barchart.h"
+#include <qwt_scale_map.h>
+#include <qwt_text.h>
+#include <QPalette>
+#include <math.h>
 
 BarChart::BarChart(const Stream* stream)
 {

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2021 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -22,6 +22,7 @@
 #include <QColor>
 #include <qwt_symbol.h>
 #include <qwt_plot_curve.h>
+#include <qwt_scale_map.h>
 #include <math.h>
 #include <algorithm>
 

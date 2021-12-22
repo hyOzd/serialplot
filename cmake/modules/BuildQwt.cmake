@@ -22,7 +22,7 @@ include(ExternalProject)
 ExternalProject_Add(QWT
   PREFIX qwt
   # SVN_REPOSITORY svn://svn.code.sf.net/p/qwt/code/branches/qwt-6.1
-  URL https://sourceforge.net/projects/qwt/files/qwt/6.1.6/qwt-6.1.6.tar.bz2
+  URL https://sourceforge.net/projects/qwt/files/qwt/6.2.0/qwt-6.2.0.tar.bz2
   # disable QwtDesigner plugin and enable static build
   PATCH_COMMAND sed -i -r -e "s/QWT_CONFIG\\s*\\+=\\s*QwtDesigner/#&/"
                           -e "s/QWT_CONFIG\\s*\\+=\\s*QwtDll/#&/"

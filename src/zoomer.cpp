@@ -1,5 +1,5 @@
 /*
-  Copyright © 2020 Hasan Yavuz Özderya
+  Copyright © 2021 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -19,9 +19,11 @@
 
 #include "zoomer.h"
 #include <qwt_plot.h>
+#include <qwt_text.h>
 #include <QPen>
 #include <QMouseEvent>
 #include <QtMath>
+#include <QPainter>
 #include <algorithm>
 
 static const int VALUE_POINT_DIAM = 4;
