@@ -24,6 +24,7 @@
 #include <QMouseEvent>
 #include <QtMath>
 #include <QPainter>
+#include <QPainterPath>
 #include <algorithm>
 
 static const int VALUE_POINT_DIAM = 4;
