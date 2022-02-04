@@ -1,5 +1,5 @@
 /*
-  Copyright © 2020 Hasan Yavuz Özderya
+  Copyright © 2022 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -67,8 +67,21 @@ CommandWidget* CommandPanel::newCommand()
     connect(command, &QObject::destroyed, [this](QObject* obj)
             {
                 commands.removeOne(static_cast<CommandWidget*>(obj));
+                reAssignShortcuts();
             });
+
+    reAssignShortcuts();
     return command;
+}
+
+void CommandPanel::reAssignShortcuts()
+{
+    // can assign shortcuts to first 12 commands
+    for (int i = 0; i < std::min(12, commands.size()); i++)
+    {
+        auto cmd = commands[i];
+        cmd->sendAction()->setShortcut(QKeySequence(Qt::Key_F1 + i));
+    }
 }
 
 void CommandPanel::sendCommand(QByteArray command)

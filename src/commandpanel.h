@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2022 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -62,6 +62,9 @@ private:
     QMenu _menu;
     QAction _newCommandAction;
     QList<CommandWidget*> commands;
+
+    /// Reassigns F1-12 keys to commands in order.
+    void reAssignShortcuts();
 
     unsigned command_name_counter;
 

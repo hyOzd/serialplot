@@ -54,7 +54,7 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
 
     // setup actions
     openAction.setCheckable(true);
-    openAction.setShortcut(QKeySequence("F12"));
+    openAction.setShortcut(QKeySequence("Ctrl+O"));
     openAction.setToolTip("Open Port");
     QObject::connect(&openAction, &QAction::triggered,
                      this, &PortControl::openActionTriggered);

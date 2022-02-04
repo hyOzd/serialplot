@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2022 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -42,7 +42,7 @@ SnapshotManager::SnapshotManager(MainWindow* mainWindow,
     _stream = stream;
 
     _takeSnapshotAction.setToolTip("Take a snapshot of current plot");
-    _takeSnapshotAction.setShortcut(QKeySequence("F5"));
+    _takeSnapshotAction.setShortcut(QKeySequence("Ctrl+P"));
     _takeSnapshotAction.setIcon(QIcon::fromTheme("camera"));
     loadSnapshotAction.setToolTip("Load snapshots from CSV files");
     clearAction.setToolTip("Delete all snapshots");
