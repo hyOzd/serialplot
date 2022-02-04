@@ -1,5 +1,5 @@
 /*
-  Copyright © 2021 Hasan Yavuz Özderya
+  Copyright © 2022 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -274,11 +274,18 @@ void PortControl::togglePort()
     }
     else
     {
+        QString portName;
+        QString portText = ui->cbPortList->currentText().trimmed();
+
+        if (portText.isEmpty())
+        {
+            qWarning() << "Select or enter a port name!";
+            return;
+        }
+
         // we get the port name from the edit text, which may not be
         // in the portList if user hasn't pressed Enter
-        // Also note that, portText may not be the `portName`
-        QString portText = ui->cbPortList->currentText();
-        QString portName;
+        // Also note that, portText may be different than `portName`
         int portIndex = portList.indexOf(portText);
         if (portIndex < 0) // not in list, add to model and update the selections
         {
