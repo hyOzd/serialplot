@@ -335,7 +335,7 @@ void PortControl::selectListedPort(QString portName)
     QSerialPortInfo portInfo(portName);
     if (portInfo.isNull())
     {
-        qWarning() << "Device doesn't exists:" << portName;
+        qWarning() << "Device doesn't exist:" << portName;
     }
 
     // has selection actually changed
@@ -411,7 +411,7 @@ void PortControl::onPortError(QSerialPort::SerialPortError error)
             loadPortList();
             break;
         case QSerialPort::DeviceNotFoundError:
-            qCritical() << "Device doesn't exists: " << serialPort->portName();
+            qCritical() << "Device doesn't exist: " << serialPort->portName();
             break;
         case QSerialPort::PermissionError:
             qCritical() << "Permission denied. Either you don't have \
