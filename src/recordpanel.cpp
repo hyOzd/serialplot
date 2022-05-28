@@ -1,5 +1,5 @@
 /*
-  Copyright © 2020 Hasan Yavuz Özderya
+  Copyright © 2022 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -414,7 +414,8 @@ void RecordPanel::loadSettings(QSettings* settings)
 
     // load timestamp format
     QString tsFormatStr = settings->value(SG_Record_TimestampFormat, "").toString();
-    DataRecorder::TimestampOption tsOpt = DataRecorder::TimestampOption::disabled; // invalid case
+    // get current timestamp option
+    DataRecorder::TimestampOption tsOpt = static_cast<DataRecorder::TimestampOption>(ui->cbTimestampFormat->currentData().toInt());
     if (tsFormatStr == "seconds")
     {
         tsOpt = DataRecorder::TimestampOption::seconds;
@@ -427,7 +428,7 @@ void RecordPanel::loadSettings(QSettings* settings)
     {
         tsOpt = DataRecorder::TimestampOption::milliseconds;
     }
-    else
+    else if (!tsFormatStr.isEmpty())
     {
         qCritical() << "Invalid timestamp format option:" << tsFormatStr;
     }
