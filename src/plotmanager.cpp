@@ -1,5 +1,5 @@
 /*
-  Copyright © 2021 Hasan Yavuz Özderya
+  Copyright © 2022 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -101,7 +101,7 @@ void PlotManager::construct(QWidget* plotArea, PlotMenu* menu)
     scrollArea = NULL;
 
     // connect to  menu
-    connect(menu, &PlotMenu::symbolShowChanged, this, &PlotManager:: setSymbols);
+    connect(menu, &PlotMenu::symbolShowChanged, this, &PlotManager::setSymbols);
 
     connect(&menu->showGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
             this, &PlotManager::showGrid);
@@ -109,18 +109,21 @@ void PlotManager::construct(QWidget* plotArea, PlotMenu* menu)
             this, &PlotManager::showMinorGrid);
     connect(&menu->darkBackgroundAction, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
             this, &PlotManager::darkBackground);
-    connect(&menu->showLegendAction, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
-            this, &PlotManager::showLegend);
     connect(&menu->showMultiAction, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
             this, &PlotManager::setMulti);
     connect(&menu->unzoomAction, &QAction::triggered,
             this, &PlotManager::unzoom);
+
+    connect(&menu->showLegendAction, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
+            this, &PlotManager::showLegend);
+    connect(menu, &PlotMenu::legendPosChanged, this, &PlotManager::setLegendPosition);
 
     // initial settings from menu actions
     showGrid(menu->showGridAction.isChecked());
     showMinorGrid(menu->showMinorGridAction.isChecked());
     darkBackground(menu->darkBackgroundAction.isChecked());
     showLegend(menu->showLegendAction.isChecked());
+    setLegendPosition(menu->legendPosition());
     setMulti(menu->showMultiAction.isChecked());
 }
 
@@ -330,6 +333,7 @@ Plot* PlotManager::addPlotWidget()
     plot->showGrid(_menu->showGridAction.isChecked());
     plot->showMinorGrid(_menu->showMinorGridAction.isChecked());
     plot->showLegend(_menu->showLegendAction.isChecked());
+    plot->setLegendPosition(_menu->legendPosition());
     plot->setSymbols(_menu->showSymbols());
 
     plot->showDemoIndicator(isDemoShown);
@@ -514,6 +518,14 @@ void PlotManager::showLegend(bool show)
     for (auto plot : plotWidgets)
     {
         plot->showLegend(show);
+    }
+}
+
+void PlotManager::setLegendPosition(Qt::AlignmentFlag alignment)
+{
+    for (auto plot : plotWidgets)
+    {
+        plot->setLegendPosition(alignment);
     }
 }
 

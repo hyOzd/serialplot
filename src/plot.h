@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2022 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -64,6 +64,7 @@ public slots:
     void setYAxis(bool autoScaled, double yMin = 0, double yMax = 1);
     void setXAxis(double xMin, double xMax);
     void setSymbols(ShowSymbols shown);
+    void setLegendPosition(Qt::AlignmentFlag alignment);
 
     /**
      * Displays an animation for snapshot.

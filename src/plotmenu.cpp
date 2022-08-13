@@ -1,5 +1,5 @@
 /*
-  Copyright © 2021 Hasan Yavuz Özderya
+  Copyright © 2022 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -21,6 +21,7 @@
 #include "setting_defines.h"
 #include "utils.h"
 
+#include <QtGlobal>
 #include <QtDebug>
 
 PlotMenu::PlotMenu(QWidget* parent) :
@@ -34,7 +35,13 @@ PlotMenu::PlotMenu(QWidget* parent) :
     setSymbolsAction("&Symbols", this),
     setSymbolsAutoAct("Show When &Zoomed", this),
     setSymbolsShowAct("Always &Show", this),
-    setSymbolsHideAct("Always &Hide", this)
+    setSymbolsHideAct("Always &Hide", this),
+    setLegendPosAction("Legend Position", this),
+    legendPosGrp(this),
+    setLegendTopLeftAct("Top Left", this),
+    setLegendTopRightAct("Top Right", this),
+    setLegendBottomRightAct("Bottom Right", this),
+    setLegendBottomLeftAct("Bottom Left", this)
 {
     showGridAction.setToolTip("Show Grid");
     showMinorGridAction.setToolTip("Show Minor Grid");
@@ -91,12 +98,43 @@ PlotMenu::PlotMenu(QWidget* parent) :
             });
 
     // add symbol actions to same group so that they appear as radio buttons
-    auto group = new QActionGroup(this);
-    group->addAction(&setSymbolsAutoAct);
-    group->addAction(&setSymbolsShowAct);
-    group->addAction(&setSymbolsHideAct);
+    auto sGroup = new QActionGroup(this);
+    sGroup->addAction(&setSymbolsAutoAct);
+    sGroup->addAction(&setSymbolsShowAct);
+    sGroup->addAction(&setSymbolsHideAct);
 
     setSymbolsAction.setMenu(&setSymbolsMenu);
+
+    // Setup legend position menu
+    setLegendTopLeftAct.setData(int(Qt::AlignLeft | Qt::AlignTop));
+    setLegendTopLeftAct.setCheckable(true);
+    setLegendPosMenu.addAction(&setLegendTopLeftAct);
+    setLegendTopLeftAct.setChecked(true); // default selection
+
+    setLegendTopRightAct.setData(int(Qt::AlignRight | Qt::AlignTop));
+    setLegendTopRightAct.setCheckable(true);
+    setLegendPosMenu.addAction(&setLegendTopRightAct);
+
+    setLegendBottomRightAct.setData(int(Qt::AlignRight | Qt::AlignBottom));
+    setLegendBottomRightAct.setCheckable(true);
+    setLegendPosMenu.addAction(&setLegendBottomRightAct);
+
+    setLegendBottomLeftAct.setData(int(Qt::AlignLeft | Qt::AlignBottom));
+    setLegendBottomLeftAct.setCheckable(true);
+    setLegendPosMenu.addAction(&setLegendBottomLeftAct);
+
+    legendPosGrp.addAction(&setLegendTopLeftAct);
+    legendPosGrp.addAction(&setLegendTopRightAct);
+    legendPosGrp.addAction(&setLegendBottomRightAct);
+    legendPosGrp.addAction(&setLegendBottomLeftAct);
+
+    connect(&setLegendPosMenu, &QMenu::triggered,
+            [this](QAction *act)
+            {
+                emit legendPosChanged((Qt::AlignmentFlag) act->data().toInt());
+            });
+
+    setLegendPosAction.setMenu(&setLegendPosMenu);
 
     // add all actions to create this menu
     addAction(&showGridAction);
@@ -104,6 +142,7 @@ PlotMenu::PlotMenu(QWidget* parent) :
     addAction(&unzoomAction);
     addAction(&darkBackgroundAction);
     addAction(&showLegendAction);
+    addAction(&setLegendPosAction);
     addAction(&showMultiAction);
     addAction(&setSymbolsAction);
 }
@@ -159,6 +198,11 @@ Plot::ShowSymbols PlotMenu::showSymbols() const
     }
 }
 
+Qt::AlignmentFlag PlotMenu::legendPosition() const
+{
+    return (Qt::AlignmentFlag) legendPosGrp.checkedAction()->data().toInt();
+}
+
 void PlotMenu::saveSettings(QSettings* settings)
 {
     settings->beginGroup(SettingGroup_Plot);
@@ -168,6 +212,7 @@ void PlotMenu::saveSettings(QSettings* settings)
     settings->setValue(SG_Plot_Legend, showLegendAction.isChecked());
     settings->setValue(SG_Plot_MultiPlot, showMultiAction.isChecked());
 
+    // save symbol option
     QString showSymbolsStr;
     if (showSymbols() == Plot::ShowSymbolsAuto)
     {
@@ -182,6 +227,26 @@ void PlotMenu::saveSettings(QSettings* settings)
         showSymbolsStr = "hide";
     }
     settings->setValue(SG_Plot_Symbols, showSymbolsStr);
+
+    // save legend position
+    QString legendPosStr;
+    if (setLegendTopLeftAct.isChecked())
+    {
+        legendPosStr = "topleft";
+    }
+    else if (setLegendTopRightAct.isChecked())
+    {
+        legendPosStr = "topright";
+    }
+    else if (setLegendBottomRightAct.isChecked())
+    {
+        legendPosStr = "bottomright";
+    }
+    else if (setLegendBottomLeftAct.isChecked())
+    {
+        legendPosStr = "bottomleft";
+    }
+    settings->setValue(SG_Plot_LegendPos, legendPosStr);
 
     settings->endGroup();
 }
@@ -201,6 +266,7 @@ void PlotMenu::loadSettings(QSettings* settings)
     showMultiAction.setChecked(
         settings->value(SG_Plot_MultiPlot, showMultiAction.isChecked()).toBool());
 
+    // load symbol option
     QString showSymbolsStr = settings->value(SG_Plot_Symbols, QString()).toString();
     if (showSymbolsStr == "auto")
     {
@@ -218,6 +284,33 @@ void PlotMenu::loadSettings(QSettings* settings)
     {
         qCritical() << "Invalid symbol setting:" << showSymbolsStr;
     }
+
+    // load legend position
+    QString legendPosStr = settings->value(SG_Plot_LegendPos, QString()).toString();
+    if (legendPosStr == "topleft")
+    {
+        setLegendTopLeftAct.setChecked(true);
+    }
+    else if (legendPosStr == "topright")
+    {
+        setLegendTopRightAct.setChecked(true);
+    }
+    else if (legendPosStr == "bottomright")
+    {
+        setLegendBottomRightAct.setChecked(true);
+    }
+    else if (legendPosStr == "bottomleft")
+    {
+        setLegendBottomLeftAct.setChecked(true);
+    }
+    else if (!showSymbolsStr.isEmpty())
+    {
+        qCritical() << "Invalid legend position setting:" << showSymbolsStr;
+    }
+
+    // Have to to manually emit signal because action groups 'triggered' signal isn't
+    // emitted when 'setChecked' is called on its items.
+    emit legendPosChanged(legendPosition());
 
     settings->endGroup();
 }

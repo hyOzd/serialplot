@@ -1,5 +1,5 @@
 /*
-  Copyright © 2021 Hasan Yavuz Özderya
+  Copyright © 2022 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -260,6 +260,12 @@ void Plot::setSymbols(ShowSymbols shown)
     }
 
     updateSymbols();
+    replot();
+}
+
+void Plot::setLegendPosition(Qt::AlignmentFlag alignment)
+{
+    legend.setAlignmentInCanvas(alignment);
     replot();
 }
 

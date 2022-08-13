@@ -56,20 +56,33 @@ public:
     PlotViewSettings viewSettings() const;
     /// Selected "show symbol" option
     Plot::ShowSymbols showSymbols() const;
+    /// Return selected legend position as Qt alignment enum
+    Qt::AlignmentFlag legendPosition() const;
     /// Stores plot settings into a `QSettings`.
     void saveSettings(QSettings* settings);
     /// Loads plot settings from a `QSettings`.
     void loadSettings(QSettings* settings);
 
 private:
+    // Symbol Menu
     QAction setSymbolsAction;
     QMenu setSymbolsMenu;
     QAction setSymbolsAutoAct;
     QAction setSymbolsShowAct;
     QAction setSymbolsHideAct;
 
+    // Legend position menu
+    QAction setLegendPosAction;
+    QMenu setLegendPosMenu;
+    QActionGroup legendPosGrp;
+    QAction setLegendTopLeftAct;
+    QAction setLegendTopRightAct;
+    QAction setLegendBottomRightAct;
+    QAction setLegendBottomLeftAct;
+
 signals:
     void symbolShowChanged(Plot::ShowSymbols shown);
+    void legendPosChanged(Qt::AlignmentFlag alignment);
 };
 
 #endif // PLOTMENU_H
