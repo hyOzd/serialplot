@@ -198,21 +198,31 @@ void Plot::darkBackground(bool enabled)
     if (enabled)
     {
         setCanvasBackground(QBrush(Qt::black));
-        gridColor.setHsvF(0, 0, 0.25);
-        grid.setPen(gridColor);
+
+        gridColor.setHsvF(0, 0, 0.30);
+        grid.setMajorPen(gridColor);
+        gridColor.setHsvF(0, 0, 0.15);
+        grid.setMinorPen(gridColor);
+
         zoomer.setRubberBandPen(QPen(Qt::white));
         zoomer.setTrackerPen(QPen(Qt::white));
         sZoomer.setPickerPen(QPen(Qt::white));
+
         legend.setTextPen(QPen(Qt::white));
     }
     else
     {
         setCanvasBackground(QBrush(Qt::white));
-        gridColor.setHsvF(0, 0, 0.80);
-        grid.setPen(gridColor);
+
+        gridColor.setHsvF(0, 0, 0.75);
+        grid.setMajorPen(gridColor);
+        gridColor.setHsvF(0, 0, 0.90);
+        grid.setMinorPen(gridColor);
+
         zoomer.setRubberBandPen(QPen(Qt::black));
         zoomer.setTrackerPen(QPen(Qt::black));
         sZoomer.setPickerPen(QPen(Qt::black));
+
         legend.setTextPen(QPen(Qt::black));
     }
     updateSymbols();
