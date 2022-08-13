@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2022 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -51,11 +51,6 @@ public:
     QAction darkBackgroundAction;
     QAction showLegendAction;
     QAction showMultiAction;
-    QAction setSymbolsAction;
-    QMenu setSymbolsMenu;
-    QAction setSymbolsAutoAct;
-    QAction setSymbolsShowAct;
-    QAction setSymbolsHideAct;
 
     /// Returns a bundle of current view settings (menu selections)
     PlotViewSettings viewSettings() const;
@@ -65,6 +60,13 @@ public:
     void saveSettings(QSettings* settings);
     /// Loads plot settings from a `QSettings`.
     void loadSettings(QSettings* settings);
+
+private:
+    QAction setSymbolsAction;
+    QMenu setSymbolsMenu;
+    QAction setSymbolsAutoAct;
+    QAction setSymbolsShowAct;
+    QAction setSymbolsHideAct;
 
 signals:
     void symbolShowChanged(Plot::ShowSymbols shown);
