@@ -185,6 +185,10 @@ SamplePack* AsciiReader::parseLine(const QString& line) const
         else
         {
             samples->data(ci)[0] = separatedValues[ci].toDouble(&ok);
+            if (!ok)
+            {
+                samples->data(ci)[0] = separatedValues[ci].toInt(&ok,0);
+            }
         }
         if (!ok)
         {
