@@ -58,6 +58,8 @@ AsciiReaderSettings::AsciiReaderSettings(QWidget *parent) :
             this, &AsciiReaderSettings::delimiterToggled);
     connect(ui->leDelimiter, &QLineEdit::textChanged,
             this, &AsciiReaderSettings::customDelimiterChanged);
+    connect(ui->cbHex, &QCheckBox::toggled,
+            this, &AsciiReaderSettings::hexChanged);
 
     // filter buttons signals
     connect(ui->rbFilterDisabled, &QAbstractButton::toggled,
@@ -123,6 +125,11 @@ QChar AsciiReaderSettings::delimiter() const
     }
 }
 
+bool AsciiReaderSettings::isHex() const
+{
+    return ui->cbHex->isChecked();
+}
+
 void AsciiReaderSettings::delimiterToggled(bool checked)
 {
     if (!checked) return;
@@ -166,6 +173,7 @@ void AsciiReaderSettings::saveSettings(QSettings* settings)
     {
         delimiterS = delimiter();
     }
+    settings->setValue(SG_ASCII_Hex, isHex());
 
     settings->setValue(SG_ASCII_Delimiter, delimiterS);
     settings->setValue(SG_ASCII_CustomDelimiter, ui->leDelimiter->text());
@@ -232,6 +240,8 @@ void AsciiReaderSettings::loadSettings(QSettings* settings)
     {
         ui->rbOtherDelimiter->setChecked(true);
     }
+
+    ui->cbHex->setChecked(settings->value(SG_ASCII_Hex, false).toBool());
 
     // load filter
     FilterMode filterModeE = filterMode();
