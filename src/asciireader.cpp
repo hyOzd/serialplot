@@ -32,6 +32,7 @@ AsciiReader::AsciiReader(QIODevice* device, QObject* parent) :
     _numChannels = _settingsWidget.numOfChannels();
     autoNumOfChannels = (_numChannels == NUMOFCHANNELS_AUTO);
     delimiter = _settingsWidget.delimiter();
+    isHexData = _settingsWidget.isHex();
 
     connect(&_settingsWidget, &AsciiReaderSettings::numOfChannelsChanged,
             [this](unsigned value)
@@ -56,6 +57,11 @@ AsciiReader::AsciiReader(QIODevice* device, QObject* parent) :
             {
                 filterMode = mode;
                 filterPrefix = prefix;
+            });
+    connect(&_settingsWidget, &AsciiReaderSettings::hexChanged,
+            [this](bool hexData)
+            {
+                isHexData = hexData;
             });
 }
 
@@ -172,7 +178,14 @@ SamplePack* AsciiReader::parseLine(const QString& line) const
     for (unsigned ci = 0; ci < numComingChannels; ci++)
     {
         bool ok;
-        samples->data(ci)[0] = separatedValues[ci].toDouble(&ok);
+        if (isHexData)
+        {
+            samples->data(ci)[0] = separatedValues[ci].toInt(&ok,16);
+        }
+        else
+        {
+            samples->data(ci)[0] = separatedValues[ci].toDouble(&ok);
+        }
         if (!ok)
         {
             qWarning() << "Data parsing error for channel: " << ci;

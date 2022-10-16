@@ -188,6 +188,23 @@
      </item>
     </layout>
    </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Value format:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QCheckBox" name="cbHex">
+     <property name="toolTip">
+      <string>Expect HEX data instead of decimal.</string>
+     </property>
+     <property name="text">
+      <string>Hex data</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>

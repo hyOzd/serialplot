@@ -45,6 +45,7 @@ public:
 
     unsigned numOfChannels() const;
     QChar delimiter() const;
+    bool isHex() const;
     /// Stores settings into a `QSettings`
     void saveSettings(QSettings* settings);
     /// Loads settings from a `QSettings`.
@@ -54,6 +55,7 @@ signals:
     void numOfChannelsChanged(unsigned);
     /// Signaled only with a valid delimiter
     void delimiterChanged(QChar);
+    void hexChanged(bool);
     void filterChanged(FilterMode, QString);
 
 private:

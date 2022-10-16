@@ -63,6 +63,7 @@ const char SG_ASCII_Delimiter[] = "delimiter";
 const char SG_ASCII_CustomDelimiter[] = "customDelimiter";
 const char SG_ASCII_FilterMode[] = "filterMode";
 const char SG_ASCII_FilterPrefix[] = "filterPrefix";
+const char SG_ASCII_Hex[] = "hex";
 
 // framed reader keys
 const char SG_CustomFrame_NumOfChannels[] = "numOfChannels";
