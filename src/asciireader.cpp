@@ -163,6 +163,7 @@ unsigned AsciiReader::readData()
 SamplePack* AsciiReader::parseLine(const QString& line) const
 {
     auto separatedValues = line.split(delimiter, QString::SkipEmptyParts);
+    QString strippedValue;
     unsigned numComingChannels = separatedValues.length();
 
     // check number of channels (skipped if auto num channels is enabled)
@@ -177,17 +178,18 @@ SamplePack* AsciiReader::parseLine(const QString& line) const
     auto samples = new SamplePack(1, numComingChannels);
     for (unsigned ci = 0; ci < numComingChannels; ci++)
     {
+	strippedValue = separatedValues[ci].split(':', QString::SkipEmptyParts).back();
         bool ok;
         if (isHexData)
         {
-            samples->data(ci)[0] = separatedValues[ci].toInt(&ok,16);
+            samples->data(ci)[0] = strippedValue.toInt(&ok,16);
         }
         else
         {
-            samples->data(ci)[0] = separatedValues[ci].toDouble(&ok);
+            samples->data(ci)[0] = strippedValue.toDouble(&ok);
             if (!ok)
             {
-                samples->data(ci)[0] = separatedValues[ci].toInt(&ok,0);
+                samples->data(ci)[0] = strippedValue.toInt(&ok,0);
             }
         }
         if (!ok)
