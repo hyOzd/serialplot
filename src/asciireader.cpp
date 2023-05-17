@@ -1,5 +1,5 @@
 /*
-  Copyright © 2020 Hasan Yavuz Özderya
+  Copyright © 2023 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -163,7 +163,6 @@ unsigned AsciiReader::readData()
 SamplePack* AsciiReader::parseLine(const QString& line) const
 {
     auto separatedValues = line.split(delimiter, QString::SkipEmptyParts);
-    QString strippedValue;
     unsigned numComingChannels = separatedValues.length();
 
     // check number of channels (skipped if auto num channels is enabled)
@@ -178,7 +177,8 @@ SamplePack* AsciiReader::parseLine(const QString& line) const
     auto samples = new SamplePack(1, numComingChannels);
     for (unsigned ci = 0; ci < numComingChannels; ci++)
     {
-	strippedValue = separatedValues[ci].split(':', QString::SkipEmptyParts).back();
+        // Strip arduino style labels from data
+        QString strippedValue = separatedValues[ci].section(':', -1);
         bool ok;
         if (isHexData)
         {
