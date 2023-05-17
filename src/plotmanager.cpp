@@ -1,5 +1,5 @@
 /*
-  Copyright © 2022 Hasan Yavuz Özderya
+  Copyright © 2023 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -95,6 +95,7 @@ void PlotManager::construct(QWidget* plotArea, PlotMenu* menu)
     showSymbols = Plot::ShowSymbolsAuto;
     emptyPlot = NULL;
     inScaleSync = false;
+    lineThickness = 1;
 
     // initalize layout and single widget
     isMulti = false;
@@ -179,7 +180,7 @@ void PlotManager::onChannelInfoChanged(const QModelIndex &topLeft,
         bool visible = topLeft.sibling(ci, ChannelInfoModel::COLUMN_VISIBILITY).data(Qt::CheckStateRole).toBool();
 
         curves[ci]->setTitle(name);
-        curves[ci]->setPen(color);
+        curves[ci]->setPen(color, lineThickness);
         curves[ci]->setVisible(visible);
         curves[ci]->setItemAttribute(QwtPlotItem::Legend, visible);
 
@@ -412,7 +413,7 @@ void PlotManager::_addCurve(QwtPlotCurve* curve)
 
     unsigned index = curves.size()-1;
     auto color = infoModel->color(index);
-    curve->setPen(color);
+    curve->setPen(color, lineThickness);
 
     // create the plot for the curve if we are on multi display
     Plot* plot;
@@ -626,6 +627,20 @@ void PlotManager::setPlotWidth(double width)
     {
         plot->setPlotWidth(width);
     }
+}
+
+void PlotManager::setLineThickness(int thickness)
+{
+    lineThickness = thickness;
+
+    for (auto curve : curves)
+    {
+        auto pen = curve->pen();
+        pen.setWidth(lineThickness);
+        curve->setPen(pen);
+    }
+
+    replot();
 }
 
 void PlotManager::exportSvg(QString fileName) const

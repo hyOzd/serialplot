@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2023 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -62,6 +62,7 @@ signals:
     void yScaleChanged(bool autoScaled, double yMin = 0, double yMax = 1);
     void xScaleChanged(bool asIndex, double xMin = 0, double xMax = 1);
     void plotWidthChanged(double width);
+    void lineThicknessChanged(int thickness);
 
 private:
     Ui::PlotControlPanel *ui;

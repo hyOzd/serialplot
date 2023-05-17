@@ -1,5 +1,5 @@
 /*
-  Copyright © 2021 Hasan Yavuz Özderya
+  Copyright © 2023 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -186,6 +186,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(&plotControlPanel, &PlotControlPanel::plotWidthChanged,
             plotMan, &PlotManager::setPlotWidth);
+
+    connect(&plotControlPanel, &PlotControlPanel::lineThicknessChanged,
+            plotMan, &PlotManager::setLineThickness);
 
     // plot toolbar signals
     QObject::connect(ui->actionClear, SIGNAL(triggered(bool)),

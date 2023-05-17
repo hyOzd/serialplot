@@ -1,5 +1,5 @@
 /*
-  Copyright © 2022 Hasan Yavuz Özderya
+  Copyright © 2023 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -101,6 +101,7 @@ const char SG_Plot_Legend[] = "legend";
 const char SG_Plot_LegendPos[] = "legendPos";
 const char SG_Plot_MultiPlot[] = "multiPlot";
 const char SG_Plot_Symbols[] = "symbols";
+const char SG_Plot_LineThickness[] = "lineThickness";
 
 // command setting keys
 const char SG_Commands_Command[] = "command";

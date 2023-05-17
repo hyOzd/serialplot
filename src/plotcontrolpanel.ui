@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>704</width>
+    <width>865</width>
     <height>220</height>
    </rect>
   </property>
@@ -96,6 +96,20 @@
           </property>
           <property name="flat">
            <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Line Thickness</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="spLineThickness">
+          <property name="minimum">
+           <number>1</number>
           </property>
          </widget>
         </item>

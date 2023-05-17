@@ -1,5 +1,5 @@
 /*
-  Copyright © 2022 Hasan Yavuz Özderya
+  Copyright © 2023 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -73,6 +73,8 @@ public slots:
     void setNumOfSamples(unsigned value);
     /// Maximum width of X axis (limit of hscroll)
     void setPlotWidth(double width);
+    /// Set curve line thickness
+    void setLineThickness(int thickness);
 
 private:
     bool isMulti;
@@ -96,6 +98,7 @@ private:
     double _plotWidth;
     Plot::ShowSymbols showSymbols;
     bool inScaleSync; ///< scaleSync is in progress
+    int lineThickness;
 
     /// Common constructor
     void construct(QWidget* plotArea, PlotMenu* menu);

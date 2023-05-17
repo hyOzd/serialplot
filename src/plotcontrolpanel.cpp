@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2023 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -135,6 +135,12 @@ PlotControlPanel::PlotControlPanel(QWidget *parent) :
 
     connect(ui->spPlotWidth, SIGNAL(valueChanged(int)),
             this, SLOT(onPlotWidthChanged()));
+
+    connect(ui->spLineThickness, QOverload<int>::of(&QSpinBox::valueChanged),
+            [this](int thickness)
+            {
+                emit lineThicknessChanged(thickness);
+            });
 
     // init scale range preset list
     for (int nbits = 8; nbits <= 24; nbits++) // signed binary formats
@@ -453,6 +459,7 @@ void PlotControlPanel::saveSettings(QSettings* settings)
     settings->setValue(SG_Plot_AutoScale, autoScale());
     settings->setValue(SG_Plot_YMax, yMax());
     settings->setValue(SG_Plot_YMin, yMin());
+    settings->setValue(SG_Plot_LineThickness, ui->spLineThickness->value());
     settings->endGroup();
 }
 
@@ -471,5 +478,7 @@ void PlotControlPanel::loadSettings(QSettings* settings)
         settings->value(SG_Plot_AutoScale, autoScale()).toBool());
     ui->spYmax->setValue(settings->value(SG_Plot_YMax, yMax()).toDouble());
     ui->spYmin->setValue(settings->value(SG_Plot_YMin, yMin()).toDouble());
+    ui->spLineThickness->setValue(
+        settings->value(SG_Plot_LineThickness, ui->spLineThickness->value()).toInt());
     settings->endGroup();
 }
