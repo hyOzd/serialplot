@@ -6,7 +6,7 @@
 #
 # Currently this script only outputs ASCII(comma separated) data.
 #
-# Copyright © 2021 Hasan Yavuz Özderya
+# Copyright © 2023 Hasan Yavuz Özderya
 #
 # This file is part of serialplot.
 #
@@ -42,16 +42,22 @@ nana
             os.write(port, bytes(line+"\r\n", 'utf8'))
             time.sleep(1)
 
-def ascii_test(port):
+def ascii_test(port, arduino_labels=False):
     """Put ASCII test data through pseudo terminal."""
     print("\n")
     nc = 4 # number of channels
     prefix = ""
     for i in range(0, 1000):
-        data = []
+        columns = []
         for ci in range(0, nc):
-            data.append(i*(ci+1))
-        data = ",".join([str(num) for num in data])
+            column = ""
+            if arduino_labels:
+                column += "label%d:" % ci
+            column += str(i*(ci+1))
+            columns.append(column)
+
+        data = ",".join(columns)
+
         print("<< " + data, end="\r")
         os.write(port, bytes(prefix + data + "\r\n", 'ASCII'))
         # os.write(port, bytes("##comment: test\r\n", 'ASCII'))
@@ -147,8 +153,8 @@ def run():
     try:
         # float_sine(master)
         # double_sine(master)
-        frame_test(master)
-        # ascii_test(master)
+        # frame_test(master)
+        ascii_test(master)
         # ascii_test_str(master)
     finally:
         # close the pseudo terminal files
