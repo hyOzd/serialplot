@@ -44,7 +44,7 @@ public:
     ~AsciiReaderSettings();
 
     unsigned numOfChannels() const;
-    QChar delimiter() const;
+    QString delimiter() const;
     bool isHex() const;
     /// Stores settings into a `QSettings`
     void saveSettings(QSettings* settings);
@@ -54,7 +54,7 @@ public:
 signals:
     void numOfChannelsChanged(unsigned);
     /// Signaled only with a valid delimiter
-    void delimiterChanged(QChar);
+    void delimiterChanged(QString);
     void hexChanged(bool);
     void filterChanged(FilterMode, QString);
 

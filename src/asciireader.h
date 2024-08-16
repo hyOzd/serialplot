@@ -46,7 +46,7 @@ private:
     unsigned _numChannels;
     /// number of channels will be determined from incoming data
     unsigned autoNumOfChannels;
-    QChar delimiter; ///< selected column delimiter
+    QString delimiter; ///< selected column delimiter
     bool isHexData; ///< use hex encoding instead of decimal
     AsciiReaderSettings::FilterMode filterMode;
     QString filterPrefix; ///< selected ASCII mode filter prefix

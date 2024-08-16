@@ -48,7 +48,7 @@ AsciiReader::AsciiReader(QIODevice* device, QObject* parent) :
             });
 
     connect(&_settingsWidget, &AsciiReaderSettings::delimiterChanged,
-            [this](QChar d)
+            [this](QString d)
             {
                 delimiter = d;
             });
