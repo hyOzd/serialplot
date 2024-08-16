@@ -33,7 +33,7 @@ AsciiReaderSettings::AsciiReaderSettings(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    auto validator = new QRegularExpressionValidator(QRegularExpression("[^\\d]?"), this);
+    auto validator = new QRegularExpressionValidator(QRegularExpression("[^\\d]*"), this);
     ui->leDelimiter->setValidator(validator);
 
     ui->spNumOfChannels->setMaximum(MAX_NUM_CHANNELS);
@@ -104,7 +104,7 @@ AsciiReaderSettings::FilterMode AsciiReaderSettings::filterMode() const
     return static_cast<FilterMode>(filterButtons.checkedId());
 }
 
-QChar AsciiReaderSettings::delimiter() const
+QString AsciiReaderSettings::delimiter() const
 {
     if (ui->rbComma->isChecked())
     {
@@ -120,8 +120,7 @@ QChar AsciiReaderSettings::delimiter() const
     }
     else                        // rbOther
     {
-        auto t = ui->leDelimiter->text();
-        return t.isEmpty() ? QChar() : t.at(0);
+        return ui->leDelimiter->text();
     }
 }
 
@@ -145,7 +144,7 @@ void AsciiReaderSettings::customDelimiterChanged(const QString text)
 {
     if (ui->rbOtherDelimiter->isChecked())
     {
-        if (!text.isEmpty()) emit delimiterChanged(text.at(0));
+        if (!text.isEmpty()) emit delimiterChanged(text);
     }
 }
 
