@@ -1,5 +1,5 @@
 /*
-  Copyright © 2023 Hasan Yavuz Özderya
+  Copyright © 2025 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -25,7 +25,6 @@
 
 #include "plot.h"
 #include "plotmanager.h"
-#include "utils.h"
 #include "setting_defines.h"
 
 PlotManager::PlotManager(QWidget* plotArea, PlotMenu* menu,
@@ -104,18 +103,18 @@ void PlotManager::construct(QWidget* plotArea, PlotMenu* menu)
     // connect to  menu
     connect(menu, &PlotMenu::symbolShowChanged, this, &PlotManager::setSymbols);
 
-    connect(&menu->showGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
+    connect(&menu->showGridAction, &QAction::toggled,
             this, &PlotManager::showGrid);
-    connect(&menu->showMinorGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
+    connect(&menu->showMinorGridAction, &QAction::toggled,
             this, &PlotManager::showMinorGrid);
-    connect(&menu->darkBackgroundAction, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
+    connect(&menu->darkBackgroundAction, &QAction::toggled,
             this, &PlotManager::darkBackground);
-    connect(&menu->showMultiAction, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
+    connect(&menu->showMultiAction, &QAction::toggled,
             this, &PlotManager::setMulti);
     connect(&menu->unzoomAction, &QAction::triggered,
             this, &PlotManager::unzoom);
 
-    connect(&menu->showLegendAction, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
+    connect(&menu->showLegendAction, &QAction::toggled,
             this, &PlotManager::showLegend);
     connect(menu, &PlotMenu::legendPosChanged, this, &PlotManager::setLegendPosition);
 

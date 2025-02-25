@@ -1,5 +1,5 @@
 /*
-  Copyright © 2016 Hasan Yavuz Özderya
+  Copyright © 2025 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -25,7 +25,7 @@ SneakyLineEdit::SneakyLineEdit(QWidget *parent) :
 {
     setFrame(false);
     setStyleSheet("QLineEdit{background-color: rgba(0,0,0,0);}");
-    setToolTip(trUtf8("Click to edit"));    
+    setToolTip(tr("Click to edit"));
 
     setBold(true);
 }

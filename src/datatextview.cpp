@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2025 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -21,7 +21,6 @@
 #include "ui_datatextview.h"
 
 #include "setting_defines.h"
-#include "utils.h"
 
 class DataTextViewSink : public Sink
 {
@@ -62,7 +61,7 @@ DataTextView::DataTextView(Stream* stream, QWidget *parent) :
             });
 
     ui->textView->setMaximumBlockCount(ui->spNumLines->value());
-    connect(ui->spNumLines, SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
+    connect(ui->spNumLines, &QSpinBox::valueChanged,
             [this](int value)
             {
                 ui->textView->setMaximumBlockCount(value);

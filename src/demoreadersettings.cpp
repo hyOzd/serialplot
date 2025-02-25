@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2025 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -20,7 +20,6 @@
 #include "demoreadersettings.h"
 #include "ui_demoreadersettings.h"
 
-#include "utils.h"
 #include "defines.h"
 
 DemoReaderSettings::DemoReaderSettings(QWidget *parent) :
@@ -31,7 +30,7 @@ DemoReaderSettings::DemoReaderSettings(QWidget *parent) :
 
     ui->spNumChannels->setMaximum(MAX_NUM_CHANNELS);
 
-    connect(ui->spNumChannels, SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
+    connect(ui->spNumChannels, &QSpinBox::valueChanged,
             [this](int value)
             {
                 emit numChannelsChanged(value);

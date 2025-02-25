@@ -1,5 +1,5 @@
 /*
-  Copyright © 2020 Hasan Yavuz Özderya
+  Copyright © 2025 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -20,7 +20,6 @@
 #include <QRegularExpressionValidator>
 #include <QRegularExpression>
 
-#include "utils.h"
 #include "defines.h"
 #include "setting_defines.h"
 
@@ -68,8 +67,7 @@ AsciiReaderSettings::AsciiReaderSettings(QWidget *parent) :
                 ui->leFilterPrefix->setDisabled(checked);
             });
 
-    connect(&filterButtons,
-            SELECT<int, bool>::OVERLOAD_OF(&QButtonGroup::buttonToggled),
+    connect(&filterButtons, &QButtonGroup::idToggled,
             [this](int id, bool checked)
             {
                 emit filterChanged(static_cast<FilterMode>(id), ui->leFilterPrefix->text());
@@ -82,7 +80,7 @@ AsciiReaderSettings::AsciiReaderSettings(QWidget *parent) :
             });
 
     // Note: if directly connected we get a runtime warning on incompatible signal arguments
-    connect(ui->spNumOfChannels, SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
+    connect(ui->spNumOfChannels, &QSpinBox::valueChanged,
             [this](int value)
             {
                 emit numOfChannelsChanged(value);

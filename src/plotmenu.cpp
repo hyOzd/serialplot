@@ -1,5 +1,5 @@
 /*
-  Copyright © 2022 Hasan Yavuz Özderya
+  Copyright © 2025 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -19,7 +19,6 @@
 
 #include "plotmenu.h"
 #include "setting_defines.h"
-#include "utils.h"
 
 #include <QtGlobal>
 #include <QtDebug>
@@ -68,14 +67,14 @@ PlotMenu::PlotMenu(QWidget* parent) :
 
     // minor grid is only enabled when _major_ grid is enabled
     showMinorGridAction.setEnabled(false);
-    connect(&showGridAction, SELECT<bool>::OVERLOAD_OF(&QAction::triggered),
+    connect(&showGridAction, &QAction::triggered,
             &showMinorGridAction, &QAction::setEnabled);
 
     // setup set symbols menu
     setSymbolsMenu.addAction(&setSymbolsAutoAct);
     setSymbolsAutoAct.setCheckable(true);
     setSymbolsAutoAct.setChecked(true);
-    connect(&setSymbolsAutoAct, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
+    connect(&setSymbolsAutoAct, &QAction::toggled,
             [this](bool checked)
             {
                 if (checked) emit symbolShowChanged(Plot::ShowSymbolsAuto);
@@ -83,7 +82,7 @@ PlotMenu::PlotMenu(QWidget* parent) :
 
     setSymbolsMenu.addAction(&setSymbolsShowAct);
     setSymbolsShowAct.setCheckable(true);
-    connect(&setSymbolsShowAct, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
+    connect(&setSymbolsShowAct, &QAction::toggled,
             [this](bool checked)
             {
                 if (checked) emit symbolShowChanged(Plot::ShowSymbolsShow);
@@ -91,7 +90,7 @@ PlotMenu::PlotMenu(QWidget* parent) :
 
     setSymbolsMenu.addAction(&setSymbolsHideAct);
     setSymbolsHideAct.setCheckable(true);
-    connect(&setSymbolsHideAct, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
+    connect(&setSymbolsHideAct, &QAction::toggled,
             [this](bool checked)
             {
                 if (checked) emit symbolShowChanged(Plot::ShowSymbolsHide);

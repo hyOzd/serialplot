@@ -162,7 +162,7 @@ void ScrollBar::catchSliderMoved( int value )
 int ScrollBar::extent() const
 {
     QStyleOptionSlider opt;
-    opt.init( this );
+    opt.initFrom( this );
     opt.subControls = QStyle::SC_None;
     opt.activeSubControls = QStyle::SC_None;
     opt.orientation = orientation();

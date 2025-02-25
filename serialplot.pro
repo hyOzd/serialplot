@@ -1,5 +1,5 @@
 #
-# Copyright © 2019 Hasan Yavuz Özderya
+# Copyright © 2025 Hasan Yavuz Özderya
 #
 # This file is part of serialplot.
 #
@@ -100,7 +100,6 @@ SOURCES += \
 
 HEADERS += \
     src/mainwindow.h \
-    src/utils.h \
     src/portcontrol.h \
     src/byteswap.h \
     src/plot.h \

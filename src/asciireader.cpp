@@ -1,5 +1,5 @@
 /*
-  Copyright © 2023 Hasan Yavuz Özderya
+  Copyright © 2025 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -162,7 +162,7 @@ unsigned AsciiReader::readData()
 
 SamplePack* AsciiReader::parseLine(const QString& line) const
 {
-    auto separatedValues = line.split(delimiter, QString::SkipEmptyParts);
+    auto separatedValues = line.split(delimiter, Qt::SkipEmptyParts);
     unsigned numComingChannels = separatedValues.length();
 
     // check number of channels (skipped if auto num channels is enabled)

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2017 Hasan Yavuz Özderya
+  Copyright © 2025 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -18,12 +18,13 @@
 */
 
 #include <QKeyEvent>
+#include <QRegularExpressionValidator>
 
 #include <QtDebug>
 
 #include "commandedit.h"
 
-class HexCommandValidator : public QRegExpValidator
+class HexCommandValidator : public QRegularExpressionValidator
 {
 public:
     explicit HexCommandValidator(QObject* parent = 0);
@@ -31,10 +32,10 @@ public:
 };
 
 HexCommandValidator::HexCommandValidator(QObject* parent) :
-    QRegExpValidator(parent)
+    QRegularExpressionValidator(parent)
 {
-    QRegExp regExp("^(?:(?:[0-9A-F]{2}[ ])+(?:[0-9A-F]{2}))|(?:[0-9A-F]{2})$");
-    setRegExp(regExp);
+    QRegularExpression regExp("^(?:(?:[0-9A-F]{2}[ ])+(?:[0-9A-F]{2}))|(?:[0-9A-F]{2})$");
+    setRegularExpression(regExp);
 }
 
 QValidator::State HexCommandValidator::validate(QString & input, int & pos) const
@@ -43,16 +44,16 @@ QValidator::State HexCommandValidator::validate(QString & input, int & pos) cons
 
     // don't let pos to be altered at this stage
     int orgPos = pos;
-    auto r = QRegExpValidator::validate(input, pos);
+    auto r = QRegularExpressionValidator::validate(input, pos);
     pos = orgPos;
 
     // try fixing up spaces
     if (r != QValidator::Acceptable)
     {
         input = input.replace(" ", "");
-        input.replace(QRegExp("([0-9A-F]{2}(?!$))"), "\\1 ");
+        input.replace(QRegularExpression("([0-9A-F]{2}(?!$))"), "\\1 ");
         if (pos == input.size()-1) pos = input.size();
-        r = QRegExpValidator::validate(input, pos);
+        r = QRegularExpressionValidator::validate(input, pos);
     }
 
     return r;
@@ -62,7 +63,8 @@ CommandEdit::CommandEdit(QWidget *parent) :
     QLineEdit(parent)
 {
     hexValidator = new HexCommandValidator(this);
-    asciiValidator = new QRegExpValidator(QRegExp("[\\x0000-\\x007F]+"), this);
+    asciiValidator = new QRegularExpressionValidator(
+        QRegularExpression("[\\x00-\\x7F]+"), this);
     ascii_mode = true;
     setValidator(asciiValidator);
 }
@@ -147,7 +149,7 @@ static QString unEscape(QString str)
             if (str.size() - i < 1) continue;
 
             // try matching the key at current position
-            if (k == str.midRef(i, k.size()))
+            if (k == QStringView(str).mid(i, k.size()))
             {
                 // append replacement
                 result += replacements[k];

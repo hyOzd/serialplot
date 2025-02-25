@@ -1,5 +1,5 @@
 /*
-  Copyright © 2022 Hasan Yavuz Özderya
+  Copyright © 2025 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -22,6 +22,7 @@
 
 #include <QMenu>
 #include <QAction>
+#include <QActionGroup>
 #include <QSettings>
 
 #include "plot.h"

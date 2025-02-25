@@ -1,5 +1,5 @@
 /*
-  Copyright © 2022 Hasan Yavuz Özderya
+  Copyright © 2025 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -25,14 +25,13 @@
 #include <QRegularExpression>
 #include <QCompleter>
 #include <QFileSystemModel>
-#include <QDirModel>
+#include <QFileSystemModel>
 #include <QtDebug>
 #include <ctime>
 
 #include "recordpanel.h"
 #include "ui_recordpanel.h"
 #include "setting_defines.h"
-#include "utils.h"
 
 RecordPanel::RecordPanel(Stream* stream, QWidget *parent) :
     QWidget(parent),
@@ -72,7 +71,7 @@ RecordPanel::RecordPanel(Stream* stream, QWidget *parent) :
                 recorder.windowsLE = enabled;
             });
 
-    connect(ui->spDecimals, SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
+    connect(ui->spDecimals, &QSpinBox::valueChanged,
             [this](int decimals)
             {
                 recorder.setDecimals(decimals);
@@ -85,8 +84,9 @@ RecordPanel::RecordPanel(Stream* stream, QWidget *parent) :
     connect(&recordAction, &QAction::toggled, ui->pbBrowse, &QWidget::setDisabled);
 
     QCompleter *completer = new QCompleter(this);
-    // TODO: QDirModel is deprecated, use QFileSystemModel (but it doesn't work)
-    completer->setModel(new QDirModel(completer));
+    auto fileSystemModel = new QFileSystemModel(completer);
+    fileSystemModel->setRootPath(QDir::currentPath());
+    completer->setModel(fileSystemModel);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     ui->leFileName->setCompleter(completer);
 

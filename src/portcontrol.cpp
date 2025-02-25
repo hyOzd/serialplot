@@ -1,5 +1,5 @@
 /*
-  Copyright © 2022 Hasan Yavuz Özderya
+  Copyright © 2025 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -28,7 +28,6 @@
 #include <QtDebug>
 
 #include "setting_defines.h"
-#include "utils.h"
 
 #define TBPORTLIST_MINWIDTH (200)
 
@@ -49,8 +48,8 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     ui->setupUi(this);
 
     serialPort = port;
-    connect(serialPort, SIGNAL(error(QSerialPort::SerialPortError)),
-            this, SLOT(onPortError(QSerialPort::SerialPortError)));
+    connect(serialPort, &QSerialPort::errorOccurred,
+            this, &PortControl::onPortError);
 
     // setup actions
     openAction.setCheckable(true);
@@ -72,17 +71,13 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     tbPortList.setMinimumWidth(TBPORTLIST_MINWIDTH);
     tbPortList.setModel(&portList);
     ui->cbPortList->setModel(&portList);
-    QObject::connect(ui->cbPortList,
-                     SELECT<int>::OVERLOAD_OF(&QComboBox::activated),
+    QObject::connect(ui->cbPortList, &QComboBox::activated,
                      this, &PortControl::onCbPortListActivated);
-    QObject::connect(&tbPortList,
-                     SELECT<int>::OVERLOAD_OF(&QComboBox::activated),
+    QObject::connect(&tbPortList, &QComboBox::activated,
                      this, &PortControl::onTbPortListActivated);
-    QObject::connect(ui->cbPortList,
-                     SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
+    QObject::connect(ui->cbPortList, &QComboBox::textActivated,
                      this, &PortControl::selectListedPort);
-    QObject::connect(&tbPortList,
-                     SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
+    QObject::connect(&tbPortList, &QComboBox::textActivated,
                      this, &PortControl::selectListedPort);
 
     // setup buttons
@@ -90,8 +85,7 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     ui->pbReloadPorts->setDefaultAction(&loadPortListAction);
 
     // setup baud rate selection widget
-    QObject::connect(ui->cbBaudRate,
-                     SELECT<const QString&>::OVERLOAD_OF(&QComboBox::activated),
+    QObject::connect(ui->cbBaudRate, &QComboBox::textActivated,
                      this, &PortControl::_selectBaudRate);
 
     // setup parity selection buttons
@@ -99,8 +93,7 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     parityButtons.addButton(ui->rbEvenParity, (int) QSerialPort::EvenParity);
     parityButtons.addButton(ui->rbOddParity, (int) QSerialPort::OddParity);
 
-    QObject::connect(&parityButtons,
-                     SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
+    QObject::connect(&parityButtons, &QButtonGroup::idClicked,
                      this, &PortControl::selectParity);
 
     // setup data bits selection buttons
@@ -109,16 +102,14 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     dataBitsButtons.addButton(ui->rb6Bits, (int) QSerialPort::Data6);
     dataBitsButtons.addButton(ui->rb5Bits, (int) QSerialPort::Data5);
 
-    QObject::connect(&dataBitsButtons,
-                     SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
+    QObject::connect(&dataBitsButtons, &QButtonGroup::idClicked,
                      this, &PortControl::selectDataBits);
 
     // setup stop bits selection buttons
     stopBitsButtons.addButton(ui->rb1StopBit, (int) QSerialPort::OneStop);
     stopBitsButtons.addButton(ui->rb2StopBit, (int) QSerialPort::TwoStop);
 
-    QObject::connect(&stopBitsButtons,
-                     SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
+    QObject::connect(&stopBitsButtons, &QButtonGroup::idClicked,
                      this, &PortControl::selectStopBits);
 
     // setup flow control selection buttons
@@ -129,8 +120,7 @@ PortControl::PortControl(QSerialPort* port, QWidget* parent) :
     flowControlButtons.addButton(ui->rbSoftwareControl,
                                  (int) QSerialPort::SoftwareControl);
 
-    QObject::connect(&flowControlButtons,
-                     SELECT<int>::OVERLOAD_OF(&QButtonGroup::buttonClicked),
+    QObject::connect(&flowControlButtons, &QButtonGroup::idClicked,
                      this, &PortControl::selectFlowControl);
 
     // initialize signal leds
@@ -422,15 +412,6 @@ required privileges or device is already opened by another process.";
             break;
         case QSerialPort::NotOpenError:
             qCritical() << "Device is not open!";
-            break;
-        case QSerialPort::ParityError:
-            qCritical() << "Parity error detected.";
-            break;
-        case QSerialPort::FramingError:
-            qCritical() << "Framing error detected.";
-            break;
-        case QSerialPort::BreakConditionError:
-            qCritical() << "Break condition is detected.";
             break;
         case QSerialPort::WriteError:
             qCritical() << "An error occurred while writing data.";

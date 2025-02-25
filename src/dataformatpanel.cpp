@@ -1,5 +1,5 @@
 /*
-  Copyright © 2021 Hasan Yavuz Özderya
+  Copyright © 2025 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -23,7 +23,6 @@
 #include <QRadioButton>
 #include <QtDebug>
 
-#include "utils.h"
 #include "setting_defines.h"
 
 DataFormatPanel::DataFormatPanel(QSerialPort* port, QWidget *parent) :

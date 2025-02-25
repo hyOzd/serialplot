@@ -1,5 +1,5 @@
 /*
-  Copyright © 2018 Hasan Yavuz Özderya
+  Copyright © 2025 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -19,7 +19,6 @@
 
 #include "barplot.h"
 #include "barscaledraw.h"
-#include "utils.h"
 
 BarPlot::BarPlot(Stream* stream, PlotMenu* menu, QWidget* parent) :
     QwtPlot(parent), _menu(menu), barChart(stream)
@@ -34,7 +33,7 @@ BarPlot::BarPlot(Stream* stream, PlotMenu* menu, QWidget* parent) :
     connect(_stream, &Stream::numChannelsChanged, this, &BarPlot::update);
 
     // connect to menu
-    connect(&menu->darkBackgroundAction, SELECT<bool>::OVERLOAD_OF(&QAction::toggled),
+    connect(&menu->darkBackgroundAction, &QAction::toggled,
             this, &BarPlot::darkBackground);
     darkBackground(menu->darkBackgroundAction.isChecked());
 }

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2023 Hasan Yavuz Özderya
+  Copyright © 2025 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -41,7 +41,6 @@
 #include <barplot.h>
 
 #include "framebufferseries.h"
-#include "utils.h"
 #include "defines.h"
 #include "version.h"
 #include "setting_defines.h"

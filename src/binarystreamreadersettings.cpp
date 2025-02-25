@@ -1,5 +1,5 @@
 /*
-  Copyright © 2019 Hasan Yavuz Özderya
+  Copyright © 2025 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -20,7 +20,6 @@
 #include "binarystreamreadersettings.h"
 #include "ui_binarystreamreadersettings.h"
 
-#include "utils.h"
 #include "defines.h"
 #include "setting_defines.h"
 
@@ -33,7 +32,7 @@ BinaryStreamReaderSettings::BinaryStreamReaderSettings(QWidget *parent) :
     ui->spNumOfChannels->setMaximum(MAX_NUM_CHANNELS);
 
     // Note: if directly connected we get a runtime warning on incompatible signal arguments
-    connect(ui->spNumOfChannels, SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
+    connect(ui->spNumOfChannels, &QSpinBox::valueChanged,
             [this](int value)
             {
                 emit numOfChannelsChanged(value);

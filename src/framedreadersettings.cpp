@@ -1,5 +1,5 @@
 /*
-  Copyright © 2021 Hasan Yavuz Özderya
+  Copyright © 2025 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -17,7 +17,6 @@
   along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "utils.h"
 #include "defines.h"
 #include "setting_defines.h"
 #include "framedreadersettings.h"
@@ -50,7 +49,7 @@ FramedReaderSettings::FramedReaderSettings(QWidget *parent) :
         fbGroup.addButton(ui->rbSize1Byte, (int) SizeFieldType::Field1Byte);
         fbGroup.addButton(ui->rbSize2Byte, (int) SizeFieldType::Field2Byte);
 
-        connect(&fbGroup, static_cast<void(QButtonGroup::*)(int, bool)>(&QButtonGroup::buttonToggled),
+        connect(&fbGroup, &QButtonGroup::idToggled,
                 [this](int id, bool enabled)
                 {
                     if (!enabled) return;
@@ -68,7 +67,7 @@ FramedReaderSettings::FramedReaderSettings(QWidget *parent) :
         connect(ui->rbFixedSize, &QRadioButton::toggled,
                 ui->spSize, &QWidget::setEnabled);
 
-        connect(ui->spSize, SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
+        connect(ui->spSize, &QSpinBox::valueChanged,
                 [this](int value)
                 {
                     if (ui->rbFixedSize->isChecked())
@@ -76,7 +75,7 @@ FramedReaderSettings::FramedReaderSettings(QWidget *parent) :
                 });
     }
 
-    connect(ui->spNumOfChannels, SELECT<int>::OVERLOAD_OF(&QSpinBox::valueChanged),
+    connect(ui->spNumOfChannels, &QSpinBox::valueChanged,
             [this](int value)
             {
                 emit numOfChannelsChanged(value);

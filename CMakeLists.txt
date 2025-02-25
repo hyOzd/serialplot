@@ -1,5 +1,5 @@
 #
-# Copyright © 2021 Hasan Yavuz Özderya
+# Copyright © 2025 Hasan Yavuz Özderya
 #
 # This file is part of serialplot.
 #
@@ -17,24 +17,22 @@
 # along with serialplot.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-cmake_minimum_required(VERSION 3.2.2)
+cmake_minimum_required(VERSION 3.16)
 
-project(serialplot)
+project(serialplot VERSION 0.12 LANGUAGES CXX)
 
 set(PROGRAM_NAME ${CMAKE_PROJECT_NAME} CACHE STRING "Output program name")
 set(PROGRAM_DISPLAY_NAME "SerialPlot" CACHE STRING "Display name (menus etc) of the program")
 
-# Find includes in corresponding build directories
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-# Instruct CMake to run moc automatically when needed.
-set(CMAKE_AUTOMOC ON)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # add local path for cmake modules
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 # Find the QtWidgets library
-find_package(Qt5Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Widgets SerialPort Network Svg)
+qt_standard_project_setup()
 
 # If set, cmake will download Qwt over SVN, build and use it as a static library.
 set(BUILD_QWT true CACHE BOOL "Download and build Qwt automatically.")
@@ -49,34 +47,13 @@ include_directories("./src"
   ${QWT_INCLUDE_DIR}
   )
 
-# wrap UI and resource files
-qt5_wrap_ui(UI_FILES
-  src/mainwindow.ui
-  src/portcontrol.ui
-  src/about_dialog.ui
-  src/snapshotview.ui
-  src/commandpanel.ui
-  src/commandwidget.ui
-  src/dataformatpanel.ui
-  src/plotcontrolpanel.ui
-  src/recordpanel.ui
-  src/numberformatbox.ui
-  src/endiannessbox.ui
-  src/binarystreamreadersettings.ui
-  src/asciireadersettings.ui
-  src/framedreadersettings.ui
-  src/demoreadersettings.ui
-  src/updatecheckdialog.ui
-  src/datatextview.ui
-  )
-
 if (WIN32)
-  qt5_add_resources(RES_FILES misc/icons.qrc misc/winicons.qrc)
+  qt_add_resources(RES_FILES misc/icons.qrc misc/winicons.qrc)
 else (WIN32)
-  qt5_add_resources(RES_FILES misc/icons.qrc)
+  qt_add_resources(RES_FILES misc/icons.qrc)
 endif (WIN32)
 
-add_executable(${PROGRAM_NAME} WIN32
+qt_add_executable(${PROGRAM_NAME}
   src/main.cpp
   src/mainwindow.cpp
   src/portcontrol.cpp
@@ -138,36 +115,21 @@ add_executable(${PROGRAM_NAME} WIN32
   src/datatextview.cpp
   src/bpslabel.cpp
   misc/windows_icon.rc
-  ${UI_FILES}
   ${RES_FILES}
   )
 
 # Use the Widgets module from Qt 5.
 target_link_libraries(${PROGRAM_NAME}
-  ${QWT_LIBRARY}
-  )
-qt5_use_modules(${PROGRAM_NAME} Widgets SerialPort Network Svg)
+  PRIVATE Qt6::Widgets Qt6::SerialPort Qt6::Network Qt6::Svg ${QWT_LIBRARY})
 
 if (BUILD_QWT)
   add_dependencies(${PROGRAM_NAME} QWT)
 endif ()
 
 # set compiler flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+add_compile_options(-Wall)
 
-# Enable C++11 support, fail if not supported
-include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-if(COMPILER_SUPPORTS_CXX11)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-elseif(COMPILER_SUPPORTS_CXX0X)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-else()
-  message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-endif()
-
-# default version
+# default version TODO
 set(VERSION_STRING "0.12.0")
 set(VERSION_REVISION "0")
 

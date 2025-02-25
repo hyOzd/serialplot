@@ -1,5 +1,5 @@
 /*
-  Copyright © 2020 Hasan Yavuz Özderya
+  Copyright © 2025 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -20,8 +20,6 @@
 #include "commandwidget.h"
 #include "ui_commandwidget.h"
 
-#include <QRegExp>
-#include <QRegExpValidator>
 #include <QtDebug>
 #include <QIcon>
 

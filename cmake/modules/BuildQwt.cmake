@@ -1,5 +1,5 @@
 #
-# Copyright © 2021 Hasan Yavuz Özderya
+# Copyright © 2025 Hasan Yavuz Özderya
 #
 # This file is part of serialplot.
 #
@@ -21,8 +21,7 @@ include(ExternalProject)
 
 ExternalProject_Add(QWT
   PREFIX qwt
-  # SVN_REPOSITORY svn://svn.code.sf.net/p/qwt/code/branches/qwt-6.1
-  URL https://sourceforge.net/projects/qwt/files/qwt/6.2.0/qwt-6.2.0.tar.bz2
+  URL https://sourceforge.net/projects/qwt/files/qwt/6.3.0/qwt-6.3.0.tar.bz2
   # disable QwtDesigner plugin and enable static build
   PATCH_COMMAND sed -i -r -e "s/QWT_CONFIG\\s*\\+=\\s*QwtDesigner/#&/"
                           -e "s/QWT_CONFIG\\s*\\+=\\s*QwtDll/#&/"
@@ -31,7 +30,7 @@ ExternalProject_Add(QWT
 						  -e "s|QWT_INSTALL_PREFIX\\s*=.*|QWT_INSTALL_PREFIX = <INSTALL_DIR>|"
                              <SOURCE_DIR>/qwtconfig.pri
   UPDATE_COMMAND ""
-  CONFIGURE_COMMAND qmake <SOURCE_DIR>/qwt.pro
+  CONFIGURE_COMMAND qmake6 <SOURCE_DIR>/qwt.pro
   )
 
 ExternalProject_Get_Property(QWT install_dir)

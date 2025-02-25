@@ -1,5 +1,5 @@
 /*
-  Copyright © 2022 Hasan Yavuz Özderya
+  Copyright © 2025 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -27,7 +27,7 @@
 CommandPanel::CommandPanel(QSerialPort* port, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::CommandPanel),
-    _menu(trUtf8("&Commands")), _newCommandAction(trUtf8("&New Command"), this)
+    _menu(tr("&Commands")), _newCommandAction(tr("&New Command"), this)
 {
     serialPort = port;
 
@@ -55,7 +55,7 @@ CommandWidget* CommandPanel::newCommand()
 {
     auto command = new CommandWidget();
     command_name_counter++;
-    command->setName(trUtf8("Command ") + QString::number(command_name_counter));
+    command->setName(tr("Command ") + QString::number(command_name_counter));
     ui->scrollAreaWidgetContents->layout()->addWidget(command);
     command->setFocusToEdit();
     connect(command, &CommandWidget::sendCommand, this, &CommandPanel::sendCommand);
@@ -77,7 +77,7 @@ CommandWidget* CommandPanel::newCommand()
 void CommandPanel::reAssignShortcuts()
 {
     // can assign shortcuts to first 12 commands
-    for (int i = 0; i < std::min(12, commands.size()); i++)
+    for (int i = 0; i < std::min(12, (int)commands.size()); i++)
     {
         auto cmd = commands[i];
         cmd->sendAction()->setShortcut(QKeySequence(Qt::Key_F1 + i));

@@ -1,5 +1,5 @@
 /*
-  Copyright © 2022 Hasan Yavuz Özderya
+  Copyright © 2025 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -27,7 +27,6 @@
 #include <algorithm>
 
 #include "plot.h"
-#include "utils.h"
 
 static const int SYMBOL_SHOW_AT_WIDTH = 5;
 static const int SYMBOL_SIZE_MAX = 7;

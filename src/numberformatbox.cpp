@@ -1,5 +1,5 @@
 /*
-  Copyright © 2021 Hasan Yavuz Özderya
+  Copyright © 2025 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -36,9 +36,8 @@ NumberFormatBox::NumberFormatBox(QWidget *parent) :
     buttonGroup.addButton(ui->rbFloat,  NumberFormat_float);
     buttonGroup.addButton(ui->rbDouble,  NumberFormat_double);
 
-    QObject::connect(
-        &buttonGroup, SIGNAL(buttonToggled(int, bool)),
-        this, SLOT(onButtonToggled(int, bool)));
+    connect(&buttonGroup, &QButtonGroup::idToggled,
+            this, &NumberFormatBox::onButtonToggled);
 }
 
 NumberFormatBox::~NumberFormatBox()
