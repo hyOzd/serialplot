@@ -1,0 +1,44 @@
+name: Serialplot build and release action
+run-name: Building ${{ github.event.repository.name }} ${{ github.ref_name }}
+on:
+  push:
+    tags:
+      - "v*"
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: 6.4.0
+          modules: qtserialport
+          arch: win64_mingw
+
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Configure CMake
+        run: cmake -G 'Unix Makefiles' -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+      - name: Package installer
+        run: cmake --build ${{github.workspace}}/build -t package
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.event.repository.name }}-build-artifacts-${{ matrix.os }}
+          path: |
+            build/*.exe
