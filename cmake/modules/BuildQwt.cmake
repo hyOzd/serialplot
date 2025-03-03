@@ -22,11 +22,17 @@ include(ExternalProject)
 ExternalProject_Add(QWT
   PREFIX qwt
   URL https://sourceforge.net/projects/qwt/files/qwt/6.3.0/qwt-6.3.0.tar.bz2
-  # disable QwtDesigner plugin and enable static build
-  PATCH_COMMAND sed -i -r -e "s/QWT_CONFIG\\s*\\+=\\s*QwtDesigner/#&/"
-                          -e "s/QWT_CONFIG\\s*\\+=\\s*QwtDll/#&/"
+  # enable static build and disable unwanted components
+  PATCH_COMMAND sed -i -r -e "s/QWT_CONFIG\\s*\\+=\\s*QwtDll/#&/"
+                          -e "s/QWT_CONFIG\\s*\\+=\\s*QwtPolar/#&/"
+                          -e "s/QWT_CONFIG\\s*\\+=\\s*QwtWidgets/#&/"
                           -e "s/QWT_CONFIG\\s*\\+=\\s*QwtSvg/#&/"
                           -e "s/QWT_CONFIG\\s*\\+=\\s*QwtOpenGL/#&/"
+                          -e "s/QWT_CONFIG\\s*\\+=\\s*QwtDesigner/#&/"
+                          -e "s/QWT_CONFIG\\s*\\+=\\s*QwtDesignerSelfContained/#&/"
+                          -e "s/QWT_CONFIG\\s*\\+=\\s*QwtExamples/#&/"
+                          -e "s/QWT_CONFIG\\s*\\+=\\s*QwtPlayground/#&/"
+                          -e "s/QWT_CONFIG\\s*\\+=\\s*QwtTests/#&/"
 						  -e "s|QWT_INSTALL_PREFIX\\s*=.*|QWT_INSTALL_PREFIX = <INSTALL_DIR>|"
                              <SOURCE_DIR>/qwtconfig.pri
   UPDATE_COMMAND ""
