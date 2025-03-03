@@ -66,7 +66,7 @@ endif(qwt_roots)
 
 if(QWT_ROOT)
   find_path(QWT_INCLUDE_DIR qwt_plot.h PATHS "${QWT_ROOT}/include" "${QWT_ROOT}/src")
-  find_library(QWT_LIBRARY NAMES "qwt" PATHS "${QWT_ROOT}/lib")
+  find_library(QWT_LIBRARY NAMES "qwt" PATHS "${QWT_ROOT}/lib" "${QWT_ROOT}/build/lib")
 else (QWT_ROOT)
   ## Look into system locations
   find_path(QWT_INCLUDE_DIR qwt_plot.h PATHS /usr/include/qwt /usr/include/qwt6)
