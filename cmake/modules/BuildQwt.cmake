@@ -35,6 +35,9 @@ ExternalProject_Add(QWT
                           -e "s/QWT_CONFIG\\s*\\+=\\s*QwtTests/#&/"
 						  -e "s|QWT_INSTALL_PREFIX\\s*=.*|QWT_INSTALL_PREFIX = <INSTALL_DIR>|"
                              <SOURCE_DIR>/qwtconfig.pri
+                          -e "s/(CONFIG\\s*\\+=\\s*)debug_and_release/\\1release/"
+                          -e "s/(CONFIG\\s*\\+=\\s*)build_all/#&/"
+                             <SOURCE_DIR>/qwtbuild.pri
   UPDATE_COMMAND ""
   CONFIGURE_COMMAND qmake6 <SOURCE_DIR>/qwt.pro
   )
