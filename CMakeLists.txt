@@ -39,7 +39,7 @@ set(BUILD_QWT true CACHE BOOL "Download and build Qwt automatically.")
 if (BUILD_QWT)
   include(BuildQwt)
 else (BUILD_QWT)
-    find_package(Qwt 6.1 REQUIRED)
+    find_package(Qwt 6.3 REQUIRED)
 endif (BUILD_QWT)
 
 # includes
