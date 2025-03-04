@@ -120,7 +120,7 @@ qt_add_executable(${PROGRAM_NAME}
 
 # Use the Widgets module from Qt 5.
 target_link_libraries(${PROGRAM_NAME}
-  PRIVATE Qt6::Widgets Qt6::SerialPort Qt6::Network Qt6::Svg ${QWT_LIBRARY})
+  PRIVATE ${QWT_LIBRARY} Qt6::Widgets Qt6::SerialPort Qt6::Network Qt6::Svg)
 
 if (BUILD_QWT)
   add_dependencies(${PROGRAM_NAME} QWT)
