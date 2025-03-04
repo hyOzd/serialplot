@@ -153,12 +153,22 @@ add_custom_target(run
 # installing
 install(TARGETS ${PROGRAM_NAME} DESTINATION bin)
 
-# for windows put libraries to install directory
+# on windows use windeployqt to collect qt dependencies
 if (WIN32)
-  file(GLOB WINDOWS_INSTALL_LIBRARIES
-    "${CMAKE_BINARY_DIR}/windows_install_libraries/*.*")
-  install(FILES ${WINDOWS_INSTALL_LIBRARIES} DESTINATION bin)
-endif (WIN32)
+  find_program(WINDEPLOYQT_EXECUTABLE windeployqt REQUIRED)
+
+  install(CODE "
+        execute_process(
+            COMMAND \"${WINDEPLOYQT_EXECUTABLE}\" --dir \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/bin\" \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/bin/${PROGRAM_NAME}.exe\"
+            OUTPUT_VARIABLE WINDEPLOYQT_OUTPUT
+            ERROR_VARIABLE WINDEPLOYQT_ERROR
+            RESULT_VARIABLE WINDEPLOYQT_RESULT
+        )
+        if (WINDEPLOYQT_RESULT)
+            message(FATAL_ERROR \"windeployqt failed: \${WINDEPLOYQT_ERROR}\")
+        endif()
+  ")
+endif()
 
 # prepare menu item and icon
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/misc/program_name.desktop.in"
