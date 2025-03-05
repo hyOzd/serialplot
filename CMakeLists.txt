@@ -129,9 +129,18 @@ endif ()
 # set compiler flags
 add_compile_options(-Wall)
 
-# TODO: get revision number from git
-set(VERSION_REVISION "0")
+# get the revision number as 'shorthash+' from git
+include(GetGitRevisionDescription)
+get_git_head_revision(GIT_REFSPEC GIT_HASH)
+string(SUBSTRING ${GIT_HASH} 0 10 GIT_SHORT_HASH)
+git_local_changes(GIT_STATUS)
+set(VERSION_REVISION "${GIT_SHORT_HASH}")
+if (GIT_STATUS STREQUAL "DIRTY")
+    set(VERSION_REVISION "${VERSION_REVISION}+")
+endif()
+message(STATUS "Git revision: ${VERSION_REVISION}")
 
+# set compiler defines for version number
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_STRING=\\\"${PROJECT_VERSION}\\\" ")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_MAJOR=${PROJECT_VERSION_MAJOR} ")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_MINOR=${PROJECT_VERSION_MINOR} ")
