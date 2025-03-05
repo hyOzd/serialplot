@@ -19,7 +19,7 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-project(serialplot VERSION 0.12 LANGUAGES CXX)
+project(serialplot VERSION 0.12.0 LANGUAGES CXX)
 
 set(PROGRAM_NAME ${CMAKE_PROJECT_NAME} CACHE STRING "Output program name")
 set(PROGRAM_DISPLAY_NAME "SerialPlot" CACHE STRING "Display name (menus etc) of the program")
@@ -129,17 +129,13 @@ endif ()
 # set compiler flags
 add_compile_options(-Wall)
 
-# default version TODO
-set(VERSION_STRING "0.12.0")
+# TODO: get revision number from git
 set(VERSION_REVISION "0")
 
-# get revision number from mercurial and parse version string
-include(GetVersion)
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_STRING=\\\"${VERSION_STRING}\\\" ")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_MAJOR=${VERSION_MAJOR} ")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_MINOR=${VERSION_MINOR} ")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_PATCH=${VERSION_PATCH} ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_STRING=\\\"${PROJECT_VERSION}\\\" ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_MAJOR=${PROJECT_VERSION_MAJOR} ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_MINOR=${PROJECT_VERSION_MINOR} ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_PATCH=${PROJECT_VERSION_PATCH} ")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVERSION_REVISION=\\\"${VERSION_REVISION}\\\" ")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPROGRAM_NAME=\\\"${PROGRAM_NAME}\\\" ")
 
