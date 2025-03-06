@@ -26,64 +26,47 @@ https://hackaday.io/project/5334-serialplot-realtime-plotting-software
 
 ## Dependencies
 
-- Qt 5, including SerialPort module
-- Qwt 6.1
+- Qt 6, including SerialPort module
+- Qwt 6.3
 
 ## Building
 
 ### Obtain Dependencies
 
-- Qt5 development packages
-- Qt5 SerialPort module
+- Qt6 development packages
+- Qt SerialPort module
 - CMake
-- Mercurial
+- git
 
 Under Ubuntu/Debian:
-```apt install qtbase5-dev libqt5serialport5-dev cmake mercurial```
+```apt install qt6-base-dev qt6-serialport-dev qt6-svg-dev git```
 
-Under OpenSUSE:
-```zypper in libqt5-qtbase-devel libqt5-qtserialbus-devel libqt5-qtserialport-devel cmake mercurial```
-
-### Download and Install Qwt [Optional]
+### Download and Install Qwt [You can skip this step]
 
 [Qwt](http://qwt.sourceforge.net) is the library that provides
 plotting widgets for SerialPlot. You have 3 different options for Qwt.
 
 * Leave it to serialplot build scripts. Qwt will be downloaded and built for you.
 
-* If your linux distribution has the `libqwt-qt5-dev` or `qwt-qt5-devel` or,
-  on OpenSUSE, `qwt6-qt5-devel` package, 
-  install it and set `BUILD_QWT` cmake option to `false`.
-
 * Download Qwt 6 [here](http://sourceforge.net/projects/qwt/files/)
   and build it yourself per these
   [instructions](http://qwt.sourceforge.net/qwtinstall.html#qwtinstall-unix)
-  and install. Make sure you use Qt5 (not Qt4) to build. And set
-  `BUILD_QWT` cmake option to `false`.
+  and install. Make sure you use Qt6 to build. When calling cmake for
+  serialplot, `BUILD_QWT` cmake option to `false`. If you didn't
+  install qwt after building point `QWT_ROOT` variable to `qwt/`
+  directory that you have just built.
 
 ### Download and Build SerialPlot
 
-You can use Mercurial to download SerialPlot source code. Or you can
-download it from here:
-https://hg.sr.ht/~hyozd/serialplot/
+You can use git to download SerialPlot source code. 
 
-    hg clone https://hg.sr.ht/~hyozd/serialplot/
+    git clone https://github.com/hyOzd/serialplot
     cd serialplot
     mkdir build && cd build
     cmake ..
-    make
-
-You can also build with QtCreator IDE (or qmake) using `serialplot.pro` file.
-
-## Known Issues
-
-- On Ubuntu 16.04 / Linux Mint 18, removing USB serial device while it
-  is open in SerialPlot, causes application to go into a nasty loop
-  and eventually it crashes. This is a bug of Qt 5.5. I have uploaded
-  a patched version of the problematic `libqt5serialport5` package to
-  launchpad ppa. If you install SerialPlot from there or use AppImage binary, you shouldn't
-  have any problems.
+    make -j
 
 ## License
 
-This software is licensed under GPLv3. See file COPYING for details.
+This software is licensed under GPLv3 excluding some third party
+files. See file COPYING for details.
