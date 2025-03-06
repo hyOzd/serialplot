@@ -2,7 +2,7 @@
 
 Small and simple software for plotting data from serial port in realtime.
 
-![SerialPlot v0.4 Screenshot](http://i.imgur.com/Wb53LRt.png)
+![SerialPlot Screenshot](./misc/screenshot.png)
 
 ## Features
 
