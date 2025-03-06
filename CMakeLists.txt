@@ -226,15 +226,17 @@ set(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH})
 set(CPACK_STRIP_FILES TRUE)
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5widgets5 (>= 5.2.1), libqt5svg5 (>= 5.2.1), libqt5serialport5 (>= 5.2.1), libc6 (>= 2.19)")
+# add debian package versions from ubuntu 24.04
+set(CPACK_DEBIAN_PACKAGE_DEPENDS
+  "libqt6widgets6t64 (>= 6.4.2), \
+libqt6svg6 (>= 6.4.2), \
+libqt6serialport6 (>= 6.4.2), \
+libqt6network6t64 (>= 6.4.2), \
+libc6 (>= 2.39)")
 set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Small and simple software for plotting data from serial port
  Supports binary data formats ([u]int8, [u]int16, [u]int32, float)
  and ASCII (as CSV). Captured waveforms can be exported in CSV format.
  Can also send simple user defined commands to serial port device.")
-
-if (NOT QWT_USE_STATIC)
-  set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libqwt6-qt5 (>= 6.1.1)")
-endif (NOT QWT_USE_STATIC)
 
 if (UNIX)
   set(CPACK_PACKAGE_EXECUTABLES "${PROGRAM_NAME}")
