@@ -36,7 +36,7 @@ add_custom_target(
         ${CMAKE_COMMAND} -E copy ${ICON_FILE} ${APPIMAGE_DIR}
     COMMAND
         ${CMAKE_COMMAND} -E env PATH=${QT_INSTALL_PREFIX}/bin:$ENV{PATH} ${LINUXDEPLOYQT_TOOL}
-            ${APPIMAGE_DIR}/${PROGRAM_NAME} -appimage
+            ${APPIMAGE_DIR}/${PROGRAM_NAME} -appimage -qmake=qmake6
             -always-overwrite -bundle-non-qt-libs -unsupported-allow-new-glibc -verbose=2
     WORKING_DIRECTORY
         ${CMAKE_CURRENT_BINARY_DIR})
