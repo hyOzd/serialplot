@@ -5,6 +5,9 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: write
+
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
@@ -45,11 +48,19 @@ jobs:
         if: runner.os == 'Linux'
         run: cmake --build ${{github.workspace}}/build -t appimage
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+      - name: Upload ubuntu files to Release
+        if: runner.os == 'Linux'
+        uses: softprops/action-gh-release@v2
         with:
-          name: ${{ github.event.repository.name }}-build-artifacts-${{ matrix.os }}
-          path: |
-            build/*.exe
+          fail_on_unmatched_files: true
+          files: |
             build/*.deb
-            build/*.AppImage
+            build/SerialPlot*.AppImage
+
+      - name: Upload windows files to Release
+        if: runner.os == 'Windows'
+        uses: softprops/action-gh-release@v2
+        with:
+          fail_on_unmatched_files: true
+          files: |
+            build/*win64.exe
