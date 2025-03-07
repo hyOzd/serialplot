@@ -13,16 +13,21 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [windows-latest]
+        os: [windows-latest, ubuntu-24.04]
     runs-on: ${{ matrix.os }}
     steps:
 
-      - name: Install Qt
+      - name: Install Qt on Windows
+        if: runner.os == 'Windows'
         uses: jurplel/install-qt-action@v4
         with:
           version: 6.4.0
           modules: qtserialport
           arch: win64_mingw
+
+      - name: Install dependencies on Ubuntu
+        if: runner.os == 'Linux'
+        run: sudo apt-get install -y --no-install-recommends libgl1-mesa-dev qt6-base-dev libqt6serialport6-dev libqt6svg6-dev
 
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -36,9 +41,15 @@ jobs:
       - name: Package installer
         run: cmake --build ${{github.workspace}}/build -t package
 
+      - name: Package appimage for ubuntu
+        if: runner.os == 'Linux'
+        run: cmake --build ${{github.workspace}}/build -t appimage
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ github.event.repository.name }}-build-artifacts-${{ matrix.os }}
           path: |
             build/*.exe
+            build/*.deb
+            build/*.AppImage
