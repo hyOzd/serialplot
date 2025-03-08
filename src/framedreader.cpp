@@ -1,5 +1,5 @@
 /*
-  Copyright © 2021 Hasan Yavuz Özderya
+  Copyright © 2025 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -19,7 +19,6 @@
 
 #include <QtDebug>
 #include <QtEndian>
-#include "byteswap.h"
 
 #include "framedreader.h"
 

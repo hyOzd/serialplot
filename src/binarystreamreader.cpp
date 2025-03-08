@@ -1,5 +1,5 @@
 /*
-  Copyright © 2021 Hasan Yavuz Özderya
+  Copyright © 2025 Hasan Yavuz Özderya
 
   This file is part of serialplot.
 
@@ -21,7 +21,6 @@
 #include <QtDebug>
 
 #include "binarystreamreader.h"
-#include "byteswap.h"
 
 BinaryStreamReader::BinaryStreamReader(QIODevice* device, QObject* parent) :
     AbstractReader(device, parent)

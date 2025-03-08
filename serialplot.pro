@@ -101,7 +101,6 @@ SOURCES += \
 HEADERS += \
     src/mainwindow.h \
     src/portcontrol.h \
-    src/byteswap.h \
     src/plot.h \
     src/hidabletabwidget.h \
     src/framebuffer.h \
