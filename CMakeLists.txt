@@ -53,7 +53,7 @@ else (WIN32)
   qt_add_resources(RES_FILES misc/icons.qrc)
 endif (WIN32)
 
-qt_add_executable(${PROGRAM_NAME}
+qt_add_executable(${PROGRAM_NAME} WIN32
   src/main.cpp
   src/mainwindow.cpp
   src/portcontrol.cpp
