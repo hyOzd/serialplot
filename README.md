@@ -39,7 +39,7 @@ https://hackaday.io/project/5334-serialplot-realtime-plotting-software
 - git
 
 Under Ubuntu/Debian:
-```apt install qt6-base-dev qt6-serialport-dev qt6-svg-dev git```
+```apt install qt6-base-dev qt6-serialport-dev qt6-svg-dev git cmake build-essential```
 
 ### Download and Install Qwt [You can skip this step]
 
