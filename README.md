@@ -20,9 +20,7 @@ page for [screenshots](https://hackaday.io/project/5334/gallery).
 
 ## Installation
 
-You can obtain windows and linux binary packages hackaday.io page:
-
-https://hackaday.io/project/5334-serialplot-realtime-plotting-software
+Check the releases page.
 
 ## Dependencies
 
