@@ -19,7 +19,7 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-project(serialplot VERSION 0.12.0 LANGUAGES CXX)
+project(serialplot VERSION 0.13.0 LANGUAGES CXX)
 
 set(PROGRAM_NAME ${CMAKE_PROJECT_NAME} CACHE STRING "Output program name")
 set(PROGRAM_DISPLAY_NAME "SerialPlot" CACHE STRING "Display name (menus etc) of the program")
