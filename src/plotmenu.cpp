@@ -302,7 +302,7 @@ void PlotMenu::loadSettings(QSettings* settings)
     {
         setLegendBottomLeftAct.setChecked(true);
     }
-    else if (!showSymbolsStr.isEmpty())
+    else if (!legendPosStr.isEmpty())
     {
         qCritical() << "Invalid legend position setting:" << showSymbolsStr;
     }
