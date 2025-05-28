@@ -142,19 +142,19 @@ void FramedReader::checkSettings()
     // show an error message
     if (settingsInvalid & SYNCWORD_INVALID)
     {
-        _settingsWidget.showMessage("Sync word is invalid!", true);
+        _settingsWidget.showMessage("Frame Start is invalid!", true);
     }
     else if (settingsInvalid & FRAMESIZE_INVALID)
     {
         QString errorMessage =
-            QString("Frame size must be multiple of %1 (#channels * sample size)!")\
+            QString("Payload size must be multiple of %1 (#channels * sample size)!")\
             .arg(_numChannels * sampleSize);
 
         _settingsWidget.showMessage(errorMessage, true);
     }
     else
     {
-        _settingsWidget.showMessage("All is well!");
+        _settingsWidget.showMessage("Settings are okay.");
     }
 }
 
@@ -255,13 +255,13 @@ unsigned FramedReader::readData()
             else if (frameSize % (_numChannels * sampleSize) != 0)
             {
                 qCritical() <<
-                    QString("Frame size is not multiple of %1 (#channels * sample size)!") \
+                    QString("Payload size is not multiple of %1 (#channels * sample size)!") \
                     .arg(_numChannels * sampleSize);
                 reset();
             }
             else
             {
-                if (debugModeEnabled) qDebug() << "Frame size:" << frameSize;
+                if (debugModeEnabled) qDebug() << "Payload size:" << frameSize;
                 gotSize = true;
             }
         }
